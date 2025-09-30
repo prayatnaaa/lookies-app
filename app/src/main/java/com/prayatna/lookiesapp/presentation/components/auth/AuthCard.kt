@@ -69,7 +69,7 @@ fun AuthCard(
             defaultElevation = 6.dp
         ),
         modifier = modifier.width(340.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
     ) {
         Column(
             modifier = modifier.padding(16.dp),
@@ -82,7 +82,7 @@ fun AuthCard(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
-                    color = light_onPrimary
+                    color = light_secondaryContainer
                 ),
                 modifier = modifier.width(148.dp)
             )
@@ -90,21 +90,21 @@ fun AuthCard(
             Spacer(modifier = modifier.height(25.dp))
 
             if (inRegister && nameValue != null && onNameChange != null) {
-              AuthTextField(
-                  value = nameValue,
-                  onValueChange = onNameChange,
-                  icon = {
-                      Icon(
-                          imageVector = Icons.Filled.Person,
-                          contentDescription = "Filled Person",
-                      ) },
-                  title = "Name",
-                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                AuthTextField(
+                    value = nameValue,
+                    onValueChange = onNameChange,
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "Filled Person",
+                        )
+                    },
+                    title = "Name",
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
 
-              )
+                )
+                Spacer(modifier = modifier.height(14.dp))
             }
-
-            Spacer(modifier = modifier.height(14.dp))
 
             AuthTextField(
                 value = emailValue,
