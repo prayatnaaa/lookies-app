@@ -1,12 +1,31 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+
 }
 
 android {
     namespace = "com.prayatna.lookiesapp"
     compileSdk = 36
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.prayatna.lookiesapp"
@@ -16,6 +35,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        val baseUrl = properties.getProperty("BASE_URL") ?: ""
+        val apiKey = properties.getProperty("API_KEY") ?: ""
+
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {
@@ -57,4 +84,25 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.material.icons.extended)
+
+    //Supabase Setup
+    implementation(libs.ktor.client.cio)
+    implementation(libs.gotrue.kt)
+    implementation(libs.storage.kt)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.utils.jvm)
+    implementation(libs.ktor.client.logging.jvm)
+    implementation(libs.coil.compose)
+    implementation(libs.postgrest.kt)
+
+    //Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.runtime)
+    implementation(libs.androidx.runtime.livedata)
+
 }
