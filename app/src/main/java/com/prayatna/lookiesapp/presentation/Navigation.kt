@@ -1,13 +1,23 @@
 package com.prayatna.lookiesapp.presentation
 
-import androidx.navigation.ActivityNavigator
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.prayatna.lookiesapp.presentation.login.LoginScreen
+import com.prayatna.lookiesapp.presentation.register.RegisterScreen
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
-interface Destination {
-    val route: String
-    val title: String
-}
+@Composable
+fun MainNavigation() {
+    val navController = rememberNavController()
 
-object RegisterDestination: Destination {
-    override val route = "signup"
-    override val title = "Sign up"
+    NavHost(navController = navController, startDestination = NavigationRoutes.REGISTER) {
+        composable(NavigationRoutes.LOGIN) {
+            LoginScreen(navController = navController)
+        }
+        composable(NavigationRoutes.REGISTER) {
+            RegisterScreen(navController = navController)
+        }
+    }
 }

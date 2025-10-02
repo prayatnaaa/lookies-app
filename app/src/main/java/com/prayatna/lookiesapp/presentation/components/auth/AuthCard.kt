@@ -13,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -55,10 +54,8 @@ fun AuthCard(
     onLogin: () -> Unit,
     onRegister: () -> Unit,
     inRegister: Boolean = false,
-    nameValue: String?,
     emailValue: String,
     passwordValue: String,
-    onNameChange: ((String) -> Unit)?,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
 ) {
@@ -88,23 +85,6 @@ fun AuthCard(
             )
 
             Spacer(modifier = modifier.height(25.dp))
-
-            if (inRegister && nameValue != null && onNameChange != null) {
-                AuthTextField(
-                    value = nameValue,
-                    onValueChange = onNameChange,
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Person,
-                            contentDescription = "Filled Person",
-                        )
-                    },
-                    title = "Name",
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-
-                )
-                Spacer(modifier = modifier.height(14.dp))
-            }
 
             AuthTextField(
                 value = emailValue,
@@ -239,10 +219,8 @@ fun AuthCardPreview() {
         onLogin = {},
         onRegister = {},
         inRegister = true,
-        nameValue = "John Doe",
         emailValue = "newuser@email.com",
         passwordValue = "password123",
-        onNameChange = {},
         onEmailChange = {},
         onPasswordChange = {}
     )
