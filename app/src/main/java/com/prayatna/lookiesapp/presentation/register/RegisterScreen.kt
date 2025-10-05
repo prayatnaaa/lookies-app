@@ -13,31 +13,55 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
+import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.ui.theme.light_onPrimary
 import com.prayatna.lookiesapp.utils.Constants
+import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
-import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(modifier: Modifier = Modifier,
                    navController: NavController,
                    viewModel: RegisterViewModel = hiltViewModel()) {
 
+    val registerStatus = viewModel.registerStatus.collectAsStateWithLifecycle()
     val snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(registerStatus.value) {
+        val status = registerStatus.value
+
+        if (status is DataResult.Success) {
+            val message = status.data
+            message.let {
+                snackBarHostState.showSnackbar(
+                    message = it,
+                    duration = SnackbarDuration.Long,
+                    withDismissAction = true
+                )
+            }
+        } else if (status is DataResult.Error) {
+            val errorMsg = status.error
+            errorMsg.let {
+                snackBarHostState.showSnackbar(
+                    message = it,
+                    duration = SnackbarDuration.Long,
+                    withDismissAction = true
+                )
+            }
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) },
@@ -59,23 +83,17 @@ fun RegisterScreen(modifier: Modifier = Modifier,
 
                 Spacer(modifier = modifier.height(32.dp))
 
-                val email = viewModel.email.collectAsState(initial = "")
-                val password = viewModel.password.collectAsState(initial = "")
+                val emailValue = viewModel.emailValue
+                val passwordValue = viewModel.passwordValue
                 AuthCard(
                     title = "Welcome",
                     onRegister = {
                         viewModel.onSignUp()
-                        coroutineScope.launch {
-                            snackBarHostState.showSnackbar(
-                                message = "Create account success!",
-                                duration = SnackbarDuration.Long
-                            )
-                        }
                     },
                     onLogin = {navController.navigate(NavigationRoutes.LOGIN)},
                     inRegister = true,
-                    emailValue = email.value,
-                    passwordValue = password.value,
+                    emailValue = emailValue,
+                    passwordValue = passwordValue,
                     onEmailChange = {
                         viewModel.onEmailChange(it)
                     },
@@ -84,12 +102,9 @@ fun RegisterScreen(modifier: Modifier = Modifier,
                     }
                 )
             }
+            if (registerStatus.value is DataResult.Loading) {
+                CircularLoading()
+            }
         }
     )
-}
-
-@Preview
-@Composable
-fun RegisterScreenPreview() {
-//    RegisterScreen()
 }
