@@ -6,18 +6,24 @@ import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 interface AuthRepository {
     suspend fun signIn(email: String, password: String): DataResult<String>
     suspend fun signUp(email: String, password: String): DataResult<String>
     suspend fun saveSession()
+    suspend fun isSessionActive(): Boolean
+    val authToken: Flow<String?>
 }
 
 class AuthRepositoryImpl @Inject constructor(
     private val auth: Auth,
     private val userPreference: UserPreference
 ): AuthRepository {
+
+    override val authToken: Flow<String?> = userPreference.authTokenPreference
 
     override suspend fun signIn(email: String, password: String): DataResult<String> {
         return try {
@@ -55,5 +61,8 @@ class AuthRepositoryImpl @Inject constructor(
         userPreference.setAuthToken(accessToken as String)
     }
 
-
+    override suspend fun isSessionActive(): Boolean {
+        val token = userPreference.authTokenPreference.first()
+        return !token.isNullOrEmpty()
+    }
 }
