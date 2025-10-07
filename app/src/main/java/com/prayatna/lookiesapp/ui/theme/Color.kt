@@ -4,6 +4,17 @@ import androidx.compose.ui.graphics.Color
 
 val PrimaryBase = Color(0xFF18186C) // #18186C
 
+//TODO: FIX COLOR
+
+//botnav color
+val DarkBlue = Color(0xFF1A1C40)
+val PureWhite =Color(0xFFFFFFFF)
+
+val DarkGrey = Color(0xFF505050)
+
+val Error = Color(0xFFBA1A1A)
+
+
 // Light Theme
 val light_primary = PrimaryBase
 val light_onPrimary = Color(0xFFFFFFFF)
@@ -32,7 +43,7 @@ val dark_onPrimaryContainer = Color(0xFFCCCCFF)
 
 val dark_secondary = Color(0xFF9CA3DB)
 val dark_onSecondary = Color(0xFF18186C)
-val dark_secondaryContainer = Color(0xFF303370)
+val dark_secondaryContainer = Color(0xFF23288D)
 val dark_onSecondaryContainer = Color(0xFFDBDEFF)
 
 val dark_background = Color(0xFF121212)

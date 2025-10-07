@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +35,9 @@ import com.prayatna.lookiesapp.presentation.main.home.HomeScreen
 import com.prayatna.lookiesapp.presentation.main.inbox.InboxScreen
 import com.prayatna.lookiesapp.presentation.main.profile.ProfileScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
+import com.prayatna.lookiesapp.ui.theme.light_onSecondaryContainer
+import com.prayatna.lookiesapp.ui.theme.light_primaryContainer
+import com.prayatna.lookiesapp.ui.theme.light_secondaryContainer
 import com.prayatna.lookiesapp.utils.BottomNavItem
 
 @Composable
@@ -108,7 +113,10 @@ fun BottomNavigationBar(
 
     NavigationBar(
         modifier = modifier
-        .fillMaxWidth()) {
+            .background(light_onSecondaryContainer)
+            .fillMaxWidth(),
+        containerColor = light_onSecondaryContainer
+    ) {
         items.forEach { item ->
             val isSelected = selectedRoute == item.route
 
@@ -117,31 +125,40 @@ fun BottomNavigationBar(
                     when (item.route) {
                         BottomNavItem.Home.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Home else Icons.Outlined.Home,
+                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Search.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Search else Icons.Outlined.Search,
+                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Inbox.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Inbox else Icons.Outlined.Inbox,
+                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Starred.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Star else Icons.Outlined.Star,
+                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Profile.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Person else Icons.Outlined.Person,
+                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
                             contentDescription = item.label
                         )
                     }
                 },
                 selected = false,
+                label = {
+                    Text(text = item.label,
+                        color = if (isSelected) light_secondaryContainer else light_primaryContainer)
+                },
                 onClick = { onSelectRoute(item.route) },
             )
         }
