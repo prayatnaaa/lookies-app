@@ -8,11 +8,16 @@ val PrimaryBase = Color(0xFF18186C) // #18186C
 
 //botnav color
 val DarkBlue = Color(0xFF1A1C40)
-val PureWhite =Color(0xFFFFFFFF)
+val BlackCharcoal = Color(0xFF1b1c1d)
+val PureWhite = Color(0xFFFFFFFF)
+val Grey = Color(0xFF60656b)
 
-val DarkGrey = Color(0xFF505050)
+val PurpleGrey = Color(0xFF9CA3DB)
+val DarkPurple = Color(0xFF2D2D80)
+val LightGrey = Color(0xFFD0D3F0)
 
 val Error = Color(0xFFBA1A1A)
+val Success = Color(0xFF36C65F)
 
 
 // Light Theme

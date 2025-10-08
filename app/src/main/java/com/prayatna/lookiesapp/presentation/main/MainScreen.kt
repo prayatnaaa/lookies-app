@@ -35,7 +35,9 @@ import com.prayatna.lookiesapp.presentation.main.home.HomeScreen
 import com.prayatna.lookiesapp.presentation.main.inbox.InboxScreen
 import com.prayatna.lookiesapp.presentation.main.profile.ProfileScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
-import com.prayatna.lookiesapp.ui.theme.light_onSecondaryContainer
+import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
+import com.prayatna.lookiesapp.ui.theme.Grey
+import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.ui.theme.light_primaryContainer
 import com.prayatna.lookiesapp.ui.theme.light_secondaryContainer
 import com.prayatna.lookiesapp.utils.BottomNavItem
@@ -113,9 +115,9 @@ fun BottomNavigationBar(
 
     NavigationBar(
         modifier = modifier
-            .background(light_onSecondaryContainer)
+            .background(BlackCharcoal)
             .fillMaxWidth(),
-        containerColor = light_onSecondaryContainer
+        containerColor = BlackCharcoal
     ) {
         items.forEach { item ->
             val isSelected = selectedRoute == item.route
@@ -125,31 +127,31 @@ fun BottomNavigationBar(
                     when (item.route) {
                         BottomNavItem.Home.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Home else Icons.Outlined.Home,
-                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
+                            tint = if (isSelected) PureWhite else Grey,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Search.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Search else Icons.Outlined.Search,
-                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
+                            tint = if (isSelected) PureWhite else Grey,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Inbox.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Inbox else Icons.Outlined.Inbox,
-                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
+                            tint = if (isSelected) PureWhite else Grey,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Starred.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Star else Icons.Outlined.Star,
-                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
+                            tint = if (isSelected) PureWhite else Grey,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Profile.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Person else Icons.Outlined.Person,
-                            tint = if (isSelected) light_secondaryContainer else light_primaryContainer,
+                            tint = if (isSelected) PureWhite else Grey,
                             contentDescription = item.label
                         )
                     }
@@ -157,7 +159,7 @@ fun BottomNavigationBar(
                 selected = false,
                 label = {
                     Text(text = item.label,
-                        color = if (isSelected) light_secondaryContainer else light_primaryContainer)
+                        color = if (isSelected) PureWhite else Grey)
                 },
                 onClick = { onSelectRoute(item.route) },
             )

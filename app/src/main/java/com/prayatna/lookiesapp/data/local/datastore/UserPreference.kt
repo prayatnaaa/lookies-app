@@ -20,6 +20,9 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
         private val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
         private val AUTH_TOKEN_KEY = stringPreferencesKey("auth_token")
         private val USER_EMAIL_KEY = stringPreferencesKey("user_email")
+        private val USERNAME_KEY = stringPreferencesKey("username")
+        private val USER_NAME_KEY = stringPreferencesKey("user_name")
+        private val PROFILE_URL_KEY = stringPreferencesKey("profile_url_key")
     }
 
     suspend fun setDarkMode(isDarkMode: Boolean) {
