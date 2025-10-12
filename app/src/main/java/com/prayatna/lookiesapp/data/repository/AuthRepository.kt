@@ -9,6 +9,7 @@ import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -17,8 +18,9 @@ interface AuthRepository {
     suspend fun signIn(email: String, password: String): DataResult<String>
     suspend fun signUp(email: String, password: String): DataResult<String>
     suspend fun saveSession()
-    suspend fun isSessionActive(): Boolean
+    suspend fun isSessionActive(): DataResult<String>
     suspend fun getProfile(): Flow<DataResult<ProfileDto>>
+    suspend fun logout()
 }
 
 class AuthRepositoryImpl @Inject constructor(
@@ -36,6 +38,7 @@ class AuthRepositoryImpl @Inject constructor(
                 this.password = password
             }
             saveSession()
+            userPreference.setUserEmail(email)
             DataResult.Success("You are logged in")
         } catch (e: SupabaseEncodingException) {
             DataResult.Error(e.localizedMessage as String)
@@ -63,12 +66,49 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun saveSession() {
         val accessToken = auth.currentAccessTokenOrNull()
-        userPreference.setAuthToken(accessToken as String)
+        val userId = auth.currentUserOrNull()?.id
+        val email = auth.currentUserOrNull()?.email
+
+        if (accessToken.isNullOrEmpty() || userId.isNullOrEmpty()) {
+            return
+        }
+
+        userPreference.setUserId(userId)
+        userPreference.setUserEmail(email ?: "")
+        userPreference.setAuthToken(accessToken)
     }
 
-    override suspend fun isSessionActive(): Boolean {
-        val token = auth.currentAccessTokenOrNull()
-        return !token.isNullOrEmpty()
+
+    override suspend fun isSessionActive(): DataResult<String> {
+        return try {
+            val token = authToken.first()
+            val currentSession  = auth.currentSessionOrNull()
+
+            if (currentSession != null) {
+                return DataResult.Success("You are logged in")
+            }
+
+            if (token.isNullOrEmpty()) {
+                return DataResult.Error("You are not logged in!")
+            }
+
+            auth.refreshCurrentSession()
+
+            val newToken = auth.currentSessionOrNull()?.accessToken
+            if (newToken.isNullOrEmpty()) {
+                userPreference.logout()
+                return DataResult.Error("Session expired. Please log in again.")
+            }
+
+            userPreference.setAuthToken(newToken)
+            DataResult.Success("User logged in")
+
+        } catch (e: SupabaseEncodingException) {
+            DataResult.Error("Error decoding session: ${e.localizedMessage}")
+        } catch (e: Exception) {
+            Log.e("SESSION", "Error checking session: ${e.message}")
+            DataResult.Error("Something went wrong while checking your session.")
+        }
     }
 
     override suspend fun getProfile(): Flow<DataResult<ProfileDto>> = flow {
@@ -89,12 +129,21 @@ class AuthRepositoryImpl @Inject constructor(
                 }
                 .decodeSingle<ProfileDto>()
 
+            userPreference.setUserAddress(userAddress = result.address ?: "")
             emit(DataResult.Success(result))
+            Log.d("PROFILE-TEST", "$result")
 
         } catch (e: SupabaseEncodingException) {
+            Log.e("PROFILE-TEST", "supabase: ${e.localizedMessage}")
             emit(DataResult.Error("Something went wrong: ${e.localizedMessage}"))
         } catch (e: Exception) {
+            Log.e("PROFILE-TEST", "exception: ${e.message}")
             emit(DataResult.Error("Something went wrong! Please check your connection!"))
         }
+    }
+
+    override suspend fun logout() {
+        auth.clearSession()
+        userPreference.logout()
     }
 }

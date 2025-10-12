@@ -38,6 +38,7 @@ fun ProfileCard(
     modifier: Modifier = Modifier,
     imagePainter: Painter = rememberImagePainter(data = R.drawable.default_avatar),
     username: String,
+    onCompleteProfileClick: () -> Unit
 ) {
     OutlinedCard(
         colors = CardDefaults.cardColors(containerColor = BlackCharcoal),
@@ -82,7 +83,7 @@ fun ProfileCard(
             Spacer(modifier = modifier.height(25.dp))
 
             OutlinedButton (
-                onClick = {},
+                onClick = onCompleteProfileClick,
                 shape = RoundedCornerShape(20.dp),
                 modifier = modifier
                     .width(140.dp),
@@ -104,5 +105,8 @@ fun ProfileCard(
 @Preview
 @Composable
 fun ProfileCardPreview() {
-    ProfileCard(username = "johndoe")
+    ProfileCard(
+        username = "johndoe",
+        onCompleteProfileClick = {}
+    )
 }

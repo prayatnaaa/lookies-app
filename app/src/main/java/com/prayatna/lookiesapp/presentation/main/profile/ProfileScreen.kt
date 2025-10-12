@@ -14,11 +14,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.profile.ProfileCard
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel = hiltViewModel()) {
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel = hiltViewModel(),
+    navController: NavController
+    ) {
 
     val snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
@@ -35,7 +41,8 @@ fun ProfileScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel = h
     }
 
     Scaffold(modifier = modifier.fillMaxSize(),
-        content = { padding -> padding.calculateTopPadding()
+        content = {
+            padding -> padding.calculateTopPadding()
             Column(modifier = modifier
                 .fillMaxSize()
                 .imePadding(),
@@ -44,7 +51,14 @@ fun ProfileScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel = h
                     if (viewModel.isSuccess) {
                         val user = viewModel.user
                         Log.d("PROFILE-TEST", "$user")
-                        ProfileCard(username = user?.username as String)
+                        ProfileCard(
+                            username = user?.username as String,
+                            onCompleteProfileClick = {
+                                navController.navigate(
+                                    NavigationRoutes.ARTIST_APPLICATION
+                                )
+                            }
+                        )
                     }
             }
 

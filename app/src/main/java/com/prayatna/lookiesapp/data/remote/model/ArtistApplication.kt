@@ -4,7 +4,7 @@ import com.prayatna.lookiesapp.data.remote.dto.Status
 
 data class ArtistApplication(
 
-    val userId: String,
+    val userId: String?,
 
     val portoUrl: String?,
 
@@ -12,9 +12,9 @@ data class ArtistApplication(
 
     val status: Status = Status.PENDING,
 
-    val reviewerId: String?,
+    val reviewerId: String? = null,
 
-    val reviewNote: String?,
+    val reviewNote: String? = null,
 
     val businessType: String
 )

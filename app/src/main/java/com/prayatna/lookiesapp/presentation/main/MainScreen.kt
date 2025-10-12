@@ -38,8 +38,6 @@ import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
 import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.ui.theme.Grey
 import com.prayatna.lookiesapp.ui.theme.PureWhite
-import com.prayatna.lookiesapp.ui.theme.light_primaryContainer
-import com.prayatna.lookiesapp.ui.theme.light_secondaryContainer
 import com.prayatna.lookiesapp.utils.BottomNavItem
 
 @Composable
@@ -65,13 +63,16 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
-        Content(modifier = modifier.padding(innerPadding), navController = navController)
+        Content(modifier =
+            modifier.padding(innerPadding),
+            navController = navController,
+            navHostController = navHostController)
 
     }
 }
 
 @Composable
-fun Content(modifier: Modifier = Modifier, navController: NavHostController) {
+fun Content(modifier: Modifier = Modifier, navController: NavHostController, navHostController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = BottomNavItem.Home.route,
@@ -94,7 +95,7 @@ fun Content(modifier: Modifier = Modifier, navController: NavHostController) {
         }
 
         composable(BottomNavItem.Profile.route) {
-            ProfileScreen()
+            ProfileScreen(navController = navHostController)
         }
     }
 }

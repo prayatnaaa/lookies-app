@@ -28,6 +28,10 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
     private val _loginStatus = MutableStateFlow<DataResult<String>>(DataResult.Idle)
     val loginStatus = _loginStatus.asStateFlow()
 
+    private val _sessionStatus = MutableStateFlow<DataResult<String>>(DataResult.Idle)
+    val sessionStatus = _sessionStatus.asStateFlow()
+
+
     fun onEmailChange(emailValue: String) {
        this.emailValue = emailValue
     }
@@ -47,10 +51,6 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
         }
     }
 
-    suspend fun isLoggedIn(): Boolean {
-        return authRepository.isSessionActive()
-    }
-
     val authToken = authRepository.authToken
         .map { !it.isNullOrEmpty() }
         .stateIn(
@@ -58,4 +58,10 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
             started = SharingStarted.Eagerly,
             initialValue = null
         )
+
+    fun isSessionActive() {
+        viewModelScope.launch {
+            _sessionStatus.value = authRepository.isSessionActive()
+        }
+    }
 }

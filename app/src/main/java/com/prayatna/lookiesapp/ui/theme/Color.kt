@@ -11,6 +11,7 @@ val DarkBlue = Color(0xFF1A1C40)
 val BlackCharcoal = Color(0xFF1b1c1d)
 val PureWhite = Color(0xFFFFFFFF)
 val Grey = Color(0xFF60656b)
+val DarkGrey = Color(0xFF303030)
 
 val PurpleGrey = Color(0xFF9CA3DB)
 val DarkPurple = Color(0xFF2D2D80)
