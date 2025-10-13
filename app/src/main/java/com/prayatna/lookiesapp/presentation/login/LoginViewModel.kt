@@ -9,10 +9,7 @@ import com.prayatna.lookiesapp.data.repository.AuthRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -50,14 +47,6 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
             _loginStatus.value = result
         }
     }
-
-    val authToken = authRepository.authToken
-        .map { !it.isNullOrEmpty() }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = null
-        )
 
     fun isSessionActive() {
         viewModelScope.launch {

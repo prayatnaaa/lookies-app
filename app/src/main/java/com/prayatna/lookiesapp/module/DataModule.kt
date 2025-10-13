@@ -4,6 +4,8 @@ import com.prayatna.lookiesapp.data.repository.ArtistRepository
 import com.prayatna.lookiesapp.data.repository.ArtistRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.AuthRepository
 import com.prayatna.lookiesapp.data.repository.AuthRepositoryImpl
+import com.prayatna.lookiesapp.data.repository.UserRepository
+import com.prayatna.lookiesapp.data.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -20,4 +22,8 @@ interface DataModule {
     @Singleton
     @Binds
     fun bindsArtistRepository(artistRepository: ArtistRepositoryImpl): ArtistRepository
+
+    @Singleton
+    @Binds
+    fun bindsUserRepository(userRepository: UserRepositoryImpl): UserRepository
 }

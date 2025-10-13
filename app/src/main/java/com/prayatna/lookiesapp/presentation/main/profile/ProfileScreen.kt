@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -42,10 +42,10 @@ fun ProfileScreen(
 
     Scaffold(modifier = modifier.fillMaxSize(),
         content = {
-            padding -> padding.calculateTopPadding()
+            padding ->
             Column(modifier = modifier
                 .fillMaxSize()
-                .imePadding(),
+                .padding(padding),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally) {
                     if (viewModel.isSuccess) {

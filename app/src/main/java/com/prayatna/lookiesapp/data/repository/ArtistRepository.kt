@@ -1,12 +1,12 @@
 package com.prayatna.lookiesapp.data.repository
 
-import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.ArtistApplicationDto
 import com.prayatna.lookiesapp.data.remote.dto.PaintingDto
 import com.prayatna.lookiesapp.data.remote.model.ArtistApplication
 import com.prayatna.lookiesapp.data.remote.model.Painting
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
@@ -62,7 +62,7 @@ class ArtistRepositoryImpl @Inject constructor(
                 val paintingDto = PaintingDto(
                     artistId = painting.artistId,
                     title = painting.title,
-                    thumbnailImageUrl = buildImageUrl(imageName = imageUrl)
+                    thumbnailImageUrl = Helper.buildImageUrl(imageName = imageUrl)
                 )
 
                 postgrest.from("paintings")
@@ -80,6 +80,4 @@ class ArtistRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun buildImageUrl(imageName: String) =
-        "${BuildConfig.BASE_URL}/storage/v1/object/public/${imageName}"
 }
