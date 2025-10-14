@@ -53,9 +53,9 @@ fun ProfileScreen(
                         Log.d("PROFILE-TEST", "$user")
                         ProfileCard(
                             username = user?.username as String,
-                            onCompleteProfileClick = {
+                            onEditProfileClick = {
                                 navController.navigate(
-                                    NavigationRoutes.ARTIST_APPLICATION
+                                    NavigationRoutes.EDIT_PROFILE
                                 )
                             }
                         )

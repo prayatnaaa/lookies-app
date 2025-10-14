@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.prayatna.lookiesapp.presentation.artist.application.ApplicationScreen
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
@@ -48,6 +49,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
         composable(NavigationRoutes.ARTIST_APPLICATION) {
             ApplicationScreen(navController = navController)
+        }
+        composable(NavigationRoutes.EDIT_PROFILE) {
+            EditProfileScreen(navController = navController)
         }
     }
 }

@@ -5,6 +5,7 @@ object NavigationRoutes {
     const val REGISTER = "register"
     const val LOGIN = "login"
     const val ARTIST_APPLICATION = "artist_application"
+    const val EDIT_PROFILE = "edit_profile"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {
