@@ -13,3 +13,12 @@ fun ProfileDto.asDomainModel(): Profile {
         bio = this.bio,
     )
 }
+
+fun Profile.toDto(): ProfileDto = ProfileDto(
+    id = id,
+    username = username,
+    fullName = fullName,
+    bio = bio,
+    address = address,
+    profileUrl = profileUrl
+)

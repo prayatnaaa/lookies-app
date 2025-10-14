@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.repository
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
+import com.prayatna.lookiesapp.data.remote.mapper.toDto
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
@@ -10,7 +11,8 @@ import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import java.util.UUID
 import javax.inject.Inject
 
@@ -18,6 +20,7 @@ interface UserRepository {
     fun getProfile(): Flow<DataResult<ProfileDto>>
     suspend fun editProfile(fullName: String, bio: String, address: String, username: String): DataResult<String>
     suspend fun editProfileImage(image: ByteArray): DataResult<String>
+    fun getRole(): Flow<DataResult<Number>>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -26,33 +29,33 @@ class UserRepositoryImpl @Inject constructor(
     private val storage: Storage,
     private val userPreference: UserPreference
 ): UserRepository {
-    override fun getProfile(): Flow<DataResult<ProfileDto>> = flow {
-        try {
-            emit(DataResult.Loading)
-            val userId = auth.currentUserOrNull()?.id
-            if (userId == null) {
-                emit(DataResult.Error("User not logged in"))
-                return@flow
+    override fun getProfile(): Flow<DataResult<ProfileDto>> =
+        userPreference.getProfile()
+            .map { localProfile ->
+                if (localProfile.id.isEmpty()) {
+                    DataResult.Loading
+                } else {
+                    DataResult.Success(localProfile.toDto())
+                }
+            }
+            .onStart {
+                try {
+                    val userId = auth.currentUserOrNull()?.id ?: return@onStart
+
+                    val remoteProfile = postgrest
+                        .from("user_profiles")
+                        .select {
+                            filter { eq("user_id", userId) }
+                        }
+                        .decodeSingle<ProfileDto>()
+
+                    userPreference.setProfile(remoteProfile.asDomainModel())
+
+                } catch (e: Exception) {
+                    emit(DataResult.Error("Something went wrong: ${e.localizedMessage}"))
+                }
             }
 
-            val result = postgrest
-                .from(table = "user_profiles")
-                .select {
-                    filter {
-                        eq("user_id", userId.toString())
-                    }
-                }
-                .decodeSingle<ProfileDto>()
-
-            userPreference.setProfile(result.asDomainModel())
-            emit(DataResult.Success(result))
-
-        } catch (e: SupabaseEncodingException) {
-            emit(DataResult.Error("Something went wrong: ${e.localizedMessage}"))
-        } catch (e: Exception) {
-            emit(DataResult.Error("Something went wrong! Please check your connection!"))
-        }
-    }
 
     override suspend fun editProfile(fullName: String, bio: String, address: String, username: String): DataResult<String> {
         return try {
@@ -104,6 +107,10 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             DataResult.Error(e.message.toString())
         }
+    }
+
+    override fun getRole(): Flow<DataResult<Number>> {
+        TODO("Not yet implemented")
     }
 
 }
