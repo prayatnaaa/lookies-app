@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.data.remote.model
+package com.prayatna.lookiesapp.data.model
 
 data class Painting(
 

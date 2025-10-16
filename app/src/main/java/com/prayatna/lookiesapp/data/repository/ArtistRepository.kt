@@ -3,8 +3,8 @@ package com.prayatna.lookiesapp.data.repository
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.ArtistApplicationDto
 import com.prayatna.lookiesapp.data.remote.dto.PaintingDto
-import com.prayatna.lookiesapp.data.remote.model.ArtistApplication
-import com.prayatna.lookiesapp.data.remote.model.Painting
+import com.prayatna.lookiesapp.data.model.ArtistApplication
+import com.prayatna.lookiesapp.data.model.Painting
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.SupabaseEncodingException

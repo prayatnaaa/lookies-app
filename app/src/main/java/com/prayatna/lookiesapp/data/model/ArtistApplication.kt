@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.data.remote.model
+package com.prayatna.lookiesapp.data.model
 
 import com.prayatna.lookiesapp.data.remote.dto.Status
 
