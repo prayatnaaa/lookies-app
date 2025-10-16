@@ -3,7 +3,13 @@ package com.prayatna.lookiesapp.data.repository
 import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.utils.DataResult
+import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.exceptions.NotFoundRestException
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
+import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import kotlinx.coroutines.flow.first
@@ -30,26 +36,41 @@ class AuthRepositoryImpl @Inject constructor(
             }
             saveSession()
             DataResult.Success("You are logged in")
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error(e.localizedMessage as String)
+        } catch (e: RestException) {
+            when (e) {
+                is BadRequestRestException -> DataResult.Error(e.error)
+                is NotFoundRestException -> DataResult.Error(e.error)
+                is UnauthorizedRestException -> DataResult.Error(e.error)
+                is UnknownRestException -> DataResult.Error(e.error)
+            }
+            DataResult.Error(e.message.toString())
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message.toString())
         } catch (e: Exception) {
-            Log.e("LOGIN", "${e.message}")
             DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
     override suspend fun signUp(email: String, password: String): DataResult<String> {
         return try {
-            auth.signUpWith(Email) {
+            val result = auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
             }
+
+            Log.d("AUTH", result.toString())
             DataResult.Success("You are registered! Please check your e-mail to confirm.")
-        } catch (e: SupabaseEncodingException) {
-            e.localizedMessage?.let { Log.e("REGISTER-TEST", it) }
-            DataResult.Error(e.localizedMessage as String)
+        } catch (e: RestException) {
+            when (e) {
+                is BadRequestRestException -> DataResult.Error(e.error)
+                is NotFoundRestException -> DataResult.Error(e.error)
+                is UnauthorizedRestException -> DataResult.Error(e.error)
+                is UnknownRestException -> DataResult.Error(e.error)
+            }
+            DataResult.Error(e.message.toString())
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message.toString())
         } catch (e: Exception) {
-            Log.e("REGISTER-TEST", "$e.message")
             DataResult.Error("Something went wrong! Please check your connection")
         }
     }
