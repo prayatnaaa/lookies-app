@@ -14,7 +14,7 @@ interface AuthRepository {
     suspend fun signUp(email: String, password: String): DataResult<String>
     suspend fun saveSession()
     suspend fun isSessionActive(): DataResult<String>
-    suspend fun logout()
+    suspend fun logout(): DataResult<Any>
 }
 
 class AuthRepositoryImpl @Inject constructor(
@@ -99,8 +99,16 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun logout() {
-        auth.clearSession()
-        userPreference.logout()
+    override suspend fun logout(): DataResult<Any> {
+        return try {
+            auth.clearSession()
+            userPreference.logout()
+            DataResult.Success(Any())
+        } catch (e: SupabaseEncodingException) {
+            DataResult.Error("Error decoding session: ${e.localizedMessage}")
+        } catch (e: Exception) {
+            Log.e("SESSION", "Error checking session: ${e.message}")
+            DataResult.Error("Something went wrong while checking your session.")
+        }
     }
 }

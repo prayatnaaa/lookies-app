@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +24,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.profile.ProfileCard
+import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -32,6 +35,7 @@ fun ProfileScreen(
     ) {
 
     val snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
+    val logoutStatus = viewModel.logoutStatus.collectAsState()
 
     LaunchedEffect(viewModel.isError) {
         if (viewModel.isError) {
@@ -45,7 +49,25 @@ fun ProfileScreen(
         }
     }
 
+    LaunchedEffect (logoutStatus.value) {
+        val status = logoutStatus.value
+
+        if (status is DataResult.Success) {
+            navController.navigate(NavigationRoutes.LOGIN)
+        } else if (status is DataResult.Error) {
+            val errorMsg = status.error
+            snackBarHostState.showSnackbar(
+                message = errorMsg,
+                duration = SnackbarDuration.Long,
+                withDismissAction = true
+            )
+        }
+    }
+
     Scaffold(modifier = modifier.fillMaxSize(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
+        },
         content = {
             padding ->
             Column(modifier = modifier
@@ -77,7 +99,7 @@ fun ProfileScreen(
                 }
             }
 
-            if (viewModel.isLoading) {
+            if (viewModel.isLoading || logoutStatus.value is DataResult.Loading) {
                 CircularLoading()
             }
         }
