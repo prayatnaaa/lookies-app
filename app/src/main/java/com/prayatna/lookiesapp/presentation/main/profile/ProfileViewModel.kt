@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.remote.model.Profile
+import com.prayatna.lookiesapp.data.repository.AuthRepository
 import com.prayatna.lookiesapp.data.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val repository: UserRepository
+    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository
 ): ViewModel() {
 
     var isSuccess by mutableStateOf(false)
@@ -31,7 +33,7 @@ class ProfileViewModel @Inject constructor(
         private set
 
     private fun getProfile() = viewModelScope.launch {
-        repository.getProfile().collect { result ->
+        userRepository.getProfile().collect { result ->
             when (result) {
                 is DataResult.Error -> {
                     isError = true
@@ -53,6 +55,10 @@ class ProfileViewModel @Inject constructor(
                 else -> {}
             }
         }
+    }
+
+    fun logout() = viewModelScope.launch {
+        authRepository.logout()
     }
 
     init {

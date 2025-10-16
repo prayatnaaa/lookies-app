@@ -1,7 +1,9 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
+import com.prayatna.lookiesapp.data.remote.dto.UserRoleDto
 import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.remote.mapper.toDto
 import com.prayatna.lookiesapp.utils.DataResult
@@ -9,6 +11,7 @@ import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -20,7 +23,7 @@ interface UserRepository {
     fun getProfile(): Flow<DataResult<ProfileDto>>
     suspend fun editProfile(fullName: String, bio: String, address: String, username: String): DataResult<String>
     suspend fun editProfileImage(image: ByteArray): DataResult<String>
-    fun getRole(): Flow<DataResult<Number>>
+    suspend fun getRole(): String
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -109,8 +112,29 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getRole(): Flow<DataResult<Number>> {
-        TODO("Not yet implemented")
+    override suspend fun getRole(): String {
+        return try {
+            val userId = auth.currentUserOrNull()?.id
+                ?: throw IllegalStateException("User not authenticated")
+
+            val result = postgrest
+                .from("user_roles")
+                .select {
+                    filter { eq("user_id", userId) }
+                }
+                .decodeSingle<UserRoleDto>()
+
+            val roleName = result.roleName
+            Log.d("ROLE", result.toString())
+            Log.d("ROLE", "RESULT FROM SUPABASE: $result")
+            roleName
+        } catch (e: SupabaseEncodingException) {
+            e.message.toString()
+        } catch (e: Exception) {
+            e.message.toString()
+        }
     }
+
+
 
 }
