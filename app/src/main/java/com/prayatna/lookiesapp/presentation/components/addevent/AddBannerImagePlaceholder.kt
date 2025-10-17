@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
+import com.prayatna.lookiesapp.ui.theme.DarkGrey
 import com.prayatna.lookiesapp.ui.theme.LightGrey
 
 @Composable
@@ -29,8 +31,12 @@ fun AddImageBannerPlaceholder(
     val shape = RoundedCornerShape(16.dp)
 
     ElevatedCard(
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = BlackCharcoal,
+            contentColor = DarkGrey
+        ),
         modifier = modifier
-            .padding(8.dp)
+            .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .height(160.dp)
             .border(1.dp, LightGrey, shape)
@@ -50,13 +56,13 @@ fun AddImageBannerPlaceholder(
             Icon(
                 imageVector = Icons.Default.CameraAlt,
                 contentDescription = "Add image",
-                tint = LightGrey,
+                tint = DarkGrey,
                 modifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Add image",
-                color = LightGrey,
+                color = DarkGrey,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )

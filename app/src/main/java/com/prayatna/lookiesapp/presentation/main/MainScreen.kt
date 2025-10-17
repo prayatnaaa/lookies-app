@@ -44,6 +44,7 @@ import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.ui.theme.Grey
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.BottomNavItem
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun MainScreen(
@@ -64,6 +65,7 @@ fun MainScreen(
                     contentColor = PureWhite,
                     containerColor = BlackCharcoal,
                     onClick = {
+                        navHostController.navigate(NavigationRoutes.ADD_EVENT)
                     }
                 ) {
                     Icon(

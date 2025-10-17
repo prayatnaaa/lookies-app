@@ -1,0 +1,18 @@
+package com.prayatna.lookiesapp.data.remote.mapper
+
+import com.prayatna.lookiesapp.data.model.Event
+import com.prayatna.lookiesapp.data.remote.dto.EventDto
+
+
+fun EventDto.asDomainModel(): Event {
+    return Event(
+        organizerId = this.organizerId,
+        title = this.title,
+        bannerImageUrl = this.bannerImageUrl,
+        location = this.location,
+        ticketPrice = this.ticketPrice,
+        registrationFee = this.registrationFee,
+        date = this.date,
+    )
+}
+

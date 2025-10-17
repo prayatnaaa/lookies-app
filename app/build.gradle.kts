@@ -40,9 +40,11 @@ android {
         properties.load(project.rootProject.file("local.properties").inputStream())
         val baseUrl = properties.getProperty("BASE_URL") ?: ""
         val apiKey = properties.getProperty("API_KEY") ?: ""
+        val supabaseEdgeBaseUrl = properties.getProperty("SUPABASE_EDGE_BASE_URL") ?: ""
 
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
+        buildConfigField("String", "SUPABASE_EDGE_BASE_URL", "\"$supabaseEdgeBaseUrl\"")
     }
 
     buildTypes {

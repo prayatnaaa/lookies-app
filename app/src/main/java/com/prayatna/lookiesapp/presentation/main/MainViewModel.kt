@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.repository.UserRepository
@@ -23,6 +22,5 @@ class MainViewModel @Inject constructor(
 
     private fun getRole() = viewModelScope.launch {
         _role.value = userRepository.getRole()
-        Log.d("ROLE", "vm: ${_role.value}")
     }
 }
