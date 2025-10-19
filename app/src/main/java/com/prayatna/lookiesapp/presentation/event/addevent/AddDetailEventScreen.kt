@@ -25,7 +25,7 @@ fun AddDetailEventScreen(
         containerColor = BlackCharcoal,
         bottomBar = {
             AddEventFooter(
-                route = NavigationRoutes.ADD_EVENT,
+                route = NavigationRoutes.ADD_DETAIL_EVENT,
                 onNextButton = {},
                 onBackButton = {
                     navController.navigate(NavigationRoutes.ADD_EVENT)
