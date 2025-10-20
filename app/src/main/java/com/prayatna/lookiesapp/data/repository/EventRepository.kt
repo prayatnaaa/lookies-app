@@ -6,6 +6,7 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseApi
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
+import com.prayatna.lookiesapp.data.remote.response.event.DetailEventResponse
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -14,7 +15,6 @@ import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
-import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import io.ktor.client.network.sockets.ConnectTimeoutException
@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 interface EventRepository {
     fun getEvents(): Flow<DataResult<List<EventDto>>>
-    suspend fun getEvent(eventId: String): DataResult<EventDto>
+    suspend fun getEvent(eventId: String): DataResult<DetailEventResponse>
     suspend fun addEvent(event: EventDto, detailEvent: DetailEventDto, imageByte: ByteArray): DataResult<AddEventResponse>
     suspend fun editEvent(event: EventDto): DataResult<String>
     suspend fun deleteEvent(eventId: String): DataResult<String>
@@ -37,7 +37,6 @@ class EventRepositoryImpl @Inject constructor(
     private val storage: Storage,
     private val userPreference: UserPreference,
     private val supabaseApi: SupabaseApi,
-    private val auth: Auth
 ): EventRepository {
     override fun getEvents(): Flow<DataResult<List<EventDto>>> = flow {
         try {
@@ -61,18 +60,14 @@ class EventRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getEvent(eventId: String): DataResult<EventDto> {
+    override suspend fun getEvent(eventId: String): DataResult<DetailEventResponse> {
         return try {
-            val event = postgrest
-                .from("events")
-                .select {
-                    filter {
-                        eq("id", eventId)
-                    }
-                }
-                .decodeSingle<EventDto>()
+            val token = userPreference.authTokenPreference.first()
+                ?: return DataResult.Error("Missing auth token")
 
-            DataResult.Success(event)
+            val response = supabaseApi.getEvent(token = token, eventId = eventId)
+
+            DataResult.Success(response)
         } catch (e: RestException) {
             when (e) {
                 is BadRequestRestException -> DataResult.Error(e.error)
@@ -108,7 +103,7 @@ class EventRepositoryImpl @Inject constructor(
             val imageUrl = Helper.buildImageUrl(imageName = path, bucketName = "event_image_banner")
             val userId = userPreference.userIdPreference.first()
                 ?: return DataResult.Error("User not logged in")
-            val token = auth.currentAccessTokenOrNull()
+            val token = userPreference.authTokenPreference.first()
                 ?: return DataResult.Error("Missing auth token")
 
             val eventDto = event.copy(
