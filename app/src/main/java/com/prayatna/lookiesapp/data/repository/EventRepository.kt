@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseApi
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
+import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -13,6 +14,7 @@ import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import io.ktor.client.network.sockets.ConnectTimeoutException
@@ -25,8 +27,7 @@ import javax.inject.Inject
 interface EventRepository {
     fun getEvents(): Flow<DataResult<List<EventDto>>>
     suspend fun getEvent(eventId: String): DataResult<EventDto>
-    suspend fun addEvent(event: EventDto, detailEvent: DetailEventDto, imageByte: ByteArray): DataResult<String>
-    suspend fun addDetailEvent(detailEventDto: DetailEventDto): DataResult<String>
+    suspend fun addEvent(event: EventDto, detailEvent: DetailEventDto, imageByte: ByteArray): DataResult<AddEventResponse>
     suspend fun editEvent(event: EventDto): DataResult<String>
     suspend fun deleteEvent(eventId: String): DataResult<String>
 }
@@ -35,7 +36,8 @@ class EventRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage,
     private val userPreference: UserPreference,
-    private val supabaseApi: SupabaseApi
+    private val supabaseApi: SupabaseApi,
+    private val auth: Auth
 ): EventRepository {
     override fun getEvents(): Flow<DataResult<List<EventDto>>> = flow {
         try {
@@ -89,23 +91,24 @@ class EventRepositoryImpl @Inject constructor(
         event: EventDto,
         detailEvent: DetailEventDto,
         imageByte: ByteArray
-    ): DataResult<String> {
+    ): DataResult<AddEventResponse> {
         if (imageByte.isEmpty()) {
             return DataResult.Error("Image banner cannot be empty!")
         }
 
         return try {
             val path = "${UUID.randomUUID()}.png"
+
             storage.from("event_image_banner").upload(
                 path = path,
                 data = imageByte,
-                upsert = true
+                upsert = true,
             )
 
-            val imageUrl = Helper.buildImageUrl(path)
+            val imageUrl = Helper.buildImageUrl(imageName = path, bucketName = "event_image_banner")
             val userId = userPreference.userIdPreference.first()
                 ?: return DataResult.Error("User not logged in")
-            val token = userPreference.authTokenPreference.first()
+            val token = auth.currentAccessTokenOrNull()
                 ?: return DataResult.Error("Missing auth token")
 
             val eventDto = event.copy(
@@ -120,9 +123,10 @@ class EventRepositoryImpl @Inject constructor(
             )
 
             Log.d("EVENT-ADD", "Success: ${response.message}")
-            DataResult.Success(response.message)
+            DataResult.Success(response)
 
         } catch (e: RestException) {
+            Log.e("EVENT-GET", "Error: ${e.error}")
             when (e) {
                 is BadRequestRestException -> DataResult.Error(e.error)
                 is NotFoundRestException -> DataResult.Error(e.error)
@@ -135,11 +139,6 @@ class EventRepositoryImpl @Inject constructor(
             Log.e("EVENT-ADD", "Error: ${e.message}")
             DataResult.Error("Unexpected error: ${e.message}")
         }
-    }
-
-
-    override suspend fun addDetailEvent(detailEventDto: DetailEventDto): DataResult<String> {
-        TODO("Not yet implemented")
     }
 
     override suspend fun editEvent(event: EventDto): DataResult<String> {

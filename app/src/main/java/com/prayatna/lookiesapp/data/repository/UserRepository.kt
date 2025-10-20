@@ -98,7 +98,7 @@ class UserRepositoryImpl @Inject constructor(
                 val result = postgrest.from("user_profiles")
                     .update(
                         {
-                            set("profile_picture_url", Helper.buildImageUrl(imageName = imageUrl))
+                            set("profile_picture_url", Helper.buildImageUrl(imageName = imageUrl, bucketName = "user_profile_image"))
                         }
                     )
                 DataResult.Success(result.data)

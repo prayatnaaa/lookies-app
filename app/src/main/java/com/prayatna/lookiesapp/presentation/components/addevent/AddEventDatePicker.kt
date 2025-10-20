@@ -1,17 +1,24 @@
 package com.prayatna.lookiesapp.presentation.components.addevent
 
+import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.ui.theme.Grey
+import com.prayatna.lookiesapp.ui.theme.PureWhite
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,6 +33,7 @@ fun AddEventDateRangePicker(
     onEndDateChange: (String) -> Unit
 ) {
     var showPicker by remember { mutableStateOf(false) }
+    val dateRangePickerState = rememberDateRangePickerState()
 
     val dateFormatter = remember {
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -34,7 +42,7 @@ fun AddEventDateRangePicker(
     val displayValue = if (startDate.isNotEmpty() && endDate.isNotEmpty())
         "$startDate → $endDate" else ""
 
-    Column (
+    Column(
         modifier = modifier.padding(vertical = 8.dp)
     ) {
         Text(
@@ -46,20 +54,30 @@ fun AddEventDateRangePicker(
                 color = Grey
             )
         )
-        OutlinedTextField(
-            value = displayValue,
-            onValueChange = {},
-            modifier = modifier
+        Box(
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .clickable { showPicker = true },
-            readOnly = true,
-        )
+                .background(Color.Transparent, RoundedCornerShape(8.dp))
+                .clickable {
+                    showPicker = true
+                }
+                .border(
+                    width = 1.dp,
+                    color = Grey,
+                    shape = RoundedCornerShape(4.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 16.dp)
+        ) {
+            Text(
+                text = displayValue.ifEmpty { "" },
+                color = if (displayValue.isNotEmpty()) PureWhite else Grey,
+                fontSize = 16.sp
+            )
+        }
     }
 
     if (showPicker) {
-        val dateRangePickerState = rememberDateRangePickerState()
-
+        Log.d("DATEPICKER", "Show picker")
         DatePickerDialog(
             onDismissRequest = { showPicker = false },
             confirmButton = {

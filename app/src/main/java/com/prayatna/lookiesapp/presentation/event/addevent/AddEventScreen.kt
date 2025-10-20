@@ -1,5 +1,7 @@
 package com.prayatna.lookiesapp.presentation.event.addevent
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +25,13 @@ fun AddEventScreen(
     viewModel: AddEventViewModel
 ) {
     val event = viewModel.eventState.value
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            viewModel.setImageUri(it)
+        }
+    }
     Scaffold(
         containerColor = BlackCharcoal,
         topBar = {
@@ -45,7 +54,12 @@ fun AddEventScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AddImageBannerPlaceholder {  }
+                AddImageBannerPlaceholder(
+                    onClick = {
+                        imagePickerLauncher.launch("image/*")
+                    },
+                    imageUri = viewModel.imageUri.value
+                )
                 AddEventForm(
                     titleValue = event.title,
                     onTitleChange = {

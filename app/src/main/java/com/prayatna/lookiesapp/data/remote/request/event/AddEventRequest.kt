@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AddEventRequest (
     val event: EventDto,
-    val detailEvent: DetailEventDto
+    val detail: DetailEventDto
 )

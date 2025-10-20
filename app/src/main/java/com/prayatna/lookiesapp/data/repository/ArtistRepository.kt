@@ -62,7 +62,7 @@ class ArtistRepositoryImpl @Inject constructor(
                 val paintingDto = PaintingDto(
                     artistId = painting.artistId,
                     title = painting.title,
-                    thumbnailImageUrl = Helper.buildImageUrl(imageName = imageUrl)
+                    thumbnailImageUrl = Helper.buildImageUrl(imageName = imageUrl, bucketName = "painting_urls")
                 )
 
                 postgrest.from("paintings")

@@ -112,4 +112,6 @@ dependencies {
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.livedata)
 
+    // Coil
+    implementation(libs.coil3.coil.compose)
 }

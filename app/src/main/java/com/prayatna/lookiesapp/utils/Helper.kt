@@ -8,8 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 
 object Helper {
-    fun buildImageUrl(imageName: String) =
-        "${BuildConfig.BASE_URL}/storage/v1/object/public/${imageName}"
+    fun buildImageUrl(imageName: String, bucketName: String) =
+        "${BuildConfig.BASE_URL}/storage/v1/object/public/${bucketName}/${imageName}"
 }
 
 @Composable

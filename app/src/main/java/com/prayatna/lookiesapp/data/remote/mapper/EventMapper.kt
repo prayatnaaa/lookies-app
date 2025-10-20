@@ -4,8 +4,8 @@ import com.prayatna.lookiesapp.data.model.Event
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 
 
-fun EventDto.asDomainModel(): Event {
-    return Event(
+fun Event.toDto(): EventDto {
+    return EventDto(
         organizerId = this.organizerId,
         title = this.title,
         bannerImageUrl = this.bannerImageUrl,

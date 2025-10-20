@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
@@ -15,6 +16,8 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class SupabaseApi @Inject constructor(
@@ -30,7 +33,7 @@ class SupabaseApi @Inject constructor(
             header("Authorization", "Bearer $token")
             setBody(AddEventRequest(event, detailEvent))
         }
-
+        Log.d("ADD-EVENT", Json.encodeToString(AddEventRequest(event, detailEvent)))
         if (response.status != HttpStatusCode.OK) {
             val body = response.bodyAsText()
             throw Exception("Failed! ${response.status}\n $body")
