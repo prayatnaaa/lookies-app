@@ -9,6 +9,7 @@ import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
 import com.prayatna.lookiesapp.data.remote.response.event.DetailEventResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -46,15 +47,15 @@ class SupabaseApi @Inject constructor(
         token: String,
         eventId: String
     ): DetailEventResponse {
-        val response: HttpResponse = httpClient.post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/get-event") {
-            contentType(ContentType.Application.Json)
+        val response = httpClient.get("${BuildConfig.SUPABASE_EDGE_BASE_URL}/get-event-detail?eventId=$eventId") {
             header("Authorization", "Bearer $token")
         }
+
         if (response.status != HttpStatusCode.OK) {
             val body = response.bodyAsText()
-            throw Exception("Failed! ${response.status}\n $body")
+            throw Exception("Failed! ${response.status}\n$body")
         }
 
-        return response.body()
+        return response.body<DetailEventResponse>()
     }
 }

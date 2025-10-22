@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class EventDto (
 
+    val id: Int?,
+
     @SerialName("organizer_id")
     val organizerId: String,
 
@@ -23,4 +25,6 @@ data class EventDto (
     val registrationFee: Double,
 
     val date: String,
+
+    val status: String?
 )

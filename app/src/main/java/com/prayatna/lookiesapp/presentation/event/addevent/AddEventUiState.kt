@@ -23,13 +23,15 @@ data class AddDetailEventUiState(
 
 fun AddEventUiState.toEvent(): Event {
     return Event(
+        id = null,
         organizerId = organizerId,
         title = title,
         bannerImageUrl = bannerImageUrl,
         location = location,
         ticketPrice = ticketPrice,
         registrationFee = registrationFee,
-        date = date
+        date = date,
+        status = null
     )
 }
 

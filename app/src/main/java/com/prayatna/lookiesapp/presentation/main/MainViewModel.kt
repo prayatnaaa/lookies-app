@@ -16,11 +16,7 @@ class MainViewModel @Inject constructor(
     private val _role = MutableStateFlow("")
     val role = _role
 
-    init {
-        getRole()
-    }
-
-    private fun getRole() = viewModelScope.launch {
+    fun getRole() = viewModelScope.launch {
         _role.value = userRepository.getRole()
     }
 }

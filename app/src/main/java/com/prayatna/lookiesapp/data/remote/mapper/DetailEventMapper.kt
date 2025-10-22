@@ -11,3 +11,12 @@ fun DetailEvent.toDto(): DetailEventDto {
         endTime = this.endTime
     )
 }
+
+fun DetailEventDto.asDomainModel(): DetailEvent {
+    return DetailEvent(
+        locationUrl = this.locationUrl,
+        ticketQuantity = this.ticketQuantity,
+        startTime = this.startTime,
+        endTime = this.endTime
+    )
+}

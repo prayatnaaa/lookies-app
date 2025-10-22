@@ -2,11 +2,13 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
+import com.prayatna.lookiesapp.data.model.DetailEventInfo
+import com.prayatna.lookiesapp.data.model.Event
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseApi
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
+import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
-import com.prayatna.lookiesapp.data.remote.response.event.DetailEventResponse
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -18,15 +20,13 @@ import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import io.ktor.client.network.sockets.ConnectTimeoutException
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import java.util.UUID
 import javax.inject.Inject
 
 interface EventRepository {
-    fun getEvents(): Flow<DataResult<List<EventDto>>>
-    suspend fun getEvent(eventId: String): DataResult<DetailEventResponse>
+    suspend fun getEvents(): DataResult<List<Event>>
+    suspend fun getEvent(eventId: String): DataResult<DetailEventInfo>
     suspend fun addEvent(event: EventDto, detailEvent: DetailEventDto, imageByte: ByteArray): DataResult<AddEventResponse>
     suspend fun editEvent(event: EventDto): DataResult<String>
     suspend fun deleteEvent(eventId: String): DataResult<String>
@@ -38,36 +38,38 @@ class EventRepositoryImpl @Inject constructor(
     private val userPreference: UserPreference,
     private val supabaseApi: SupabaseApi,
 ): EventRepository {
-    override fun getEvents(): Flow<DataResult<List<EventDto>>> = flow {
-        try {
-            val events = postgrest
+    override suspend fun getEvents(): DataResult<List<Event>> {
+        return try {
+            val eventDto = postgrest
                 .from("events")
                 .select()
                 .decodeList<EventDto>()
 
-            emit(DataResult.Success(events))
+            val events = eventDto.map { it.asDomainModel() }
+            DataResult.Success(events)
         } catch (e: RestException) {
             when (e) {
-                is BadRequestRestException -> emit(DataResult.Error(e.error))
-                is NotFoundRestException -> emit(DataResult.Error(e.error))
-                is UnauthorizedRestException -> emit(DataResult.Error(e.error))
-                is UnknownRestException -> emit(DataResult.Error(e.error))
+                is BadRequestRestException -> DataResult.Error(e.error)
+                is NotFoundRestException -> DataResult.Error(e.error)
+                is UnauthorizedRestException -> DataResult.Error(e.error)
+                is UnknownRestException -> DataResult.Error(e.error)
             }
         } catch (e: HttpRequestException) {
-            emit(DataResult.Error(e.message.toString()))
+            DataResult.Error(e.message.toString())
         } catch (e: Exception) {
-            emit(DataResult.Error(e.message.toString()))
+            DataResult.Error(e.message.toString())
         }
     }
 
-    override suspend fun getEvent(eventId: String): DataResult<DetailEventResponse> {
+
+    override suspend fun getEvent(eventId: String): DataResult<DetailEventInfo> {
         return try {
             val token = userPreference.authTokenPreference.first()
                 ?: return DataResult.Error("Missing auth token")
 
             val response = supabaseApi.getEvent(token = token, eventId = eventId)
-
-            DataResult.Success(response)
+            Log.d("EVENT", response.toString())
+            DataResult.Success(response.asDomainModel())
         } catch (e: RestException) {
             when (e) {
                 is BadRequestRestException -> DataResult.Error(e.error)
