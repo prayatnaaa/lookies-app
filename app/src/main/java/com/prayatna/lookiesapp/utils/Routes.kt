@@ -12,6 +12,7 @@ object NavigationRoutes {
     const val ADMIN_MAIN = "admin_main"
     const val ADMIN_EVENT = "admin_event"
     const val DETAIL_EVENT = "detail_event"
+    const val EVENT_LIST = "event_list"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

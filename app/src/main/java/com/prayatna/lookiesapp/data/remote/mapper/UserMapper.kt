@@ -7,10 +7,6 @@ fun UserDto.asDomainModel(): User {
     return User (
         id = this.id,
         username = this.username,
-        fullName = this.fullName,
-        profileUrl = this.profileUrl,
-        address = this.address,
-        bio = this.bio,
         role = this.role
     )
 }

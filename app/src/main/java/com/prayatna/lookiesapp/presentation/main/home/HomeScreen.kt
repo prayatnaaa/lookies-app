@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 
 @Composable
 fun HomeScreen(
@@ -20,7 +19,10 @@ fun HomeScreen(
         content = { innerPadding ->
             Column(verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally){
-                EventListScreen(navController = navController, modifier = modifier.padding(innerPadding))
+                Column(
+                    modifier = modifier
+                        .padding(innerPadding)
+                ) {  }
             }
         }
     )

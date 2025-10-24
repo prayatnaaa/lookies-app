@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventCardList
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun EventListScreen(
@@ -71,7 +72,7 @@ fun EventListScreen(
                         events = uiState.events,
                         modifier = Modifier.fillMaxSize(),
                         onClick = { event ->
-                            navController.navigate("detail_event/${event.id}")
+                            navController.navigate("${NavigationRoutes.DETAIL_EVENT}/${event.id}")
                         }
                     )
                 }

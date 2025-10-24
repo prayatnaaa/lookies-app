@@ -35,10 +35,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.prayatna.lookiesapp.data.model.User
 import com.prayatna.lookiesapp.presentation.main.home.HomeScreen
 import com.prayatna.lookiesapp.presentation.main.inbox.InboxScreen
 import com.prayatna.lookiesapp.presentation.main.profile.ProfileScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
+import com.prayatna.lookiesapp.presentation.main.starred.StarredScreen
 import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.ui.theme.Grey
 import com.prayatna.lookiesapp.ui.theme.PureWhite
@@ -49,7 +51,7 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 fun MainScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    role: String
+    user: User
 ) {
     var selectedRoute by remember { mutableStateOf("home") }
     val navController = rememberNavController()
@@ -58,7 +60,7 @@ fun MainScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {
-            if (role == "artist") {
+            if (user.role == "artist") {
                 Log.d("ROLE", "role artist")
                 FloatingActionButton(
                     contentColor = PureWhite,
@@ -107,7 +109,7 @@ fun Content(modifier: Modifier = Modifier, navController: NavHostController, nav
         }
 
         composable(BottomNavItem.Search.route) {
-            SearchScreen()
+            SearchScreen(navController = navHostController)
         }
 
         composable(BottomNavItem.Inbox.route) {
@@ -115,7 +117,7 @@ fun Content(modifier: Modifier = Modifier, navController: NavHostController, nav
         }
 
         composable(BottomNavItem.Starred.route) {
-            SearchScreen()
+            StarredScreen()
         }
 
         composable(BottomNavItem.Profile.route) {

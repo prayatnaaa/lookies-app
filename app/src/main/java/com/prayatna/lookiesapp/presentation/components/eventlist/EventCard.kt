@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation.components.eventlist
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,11 +25,11 @@ fun EventCard(
     event: Event,
     onClick: () -> Unit
 ) {
-    Log.d("EVENT", event.bannerImageUrl.toString())
     ElevatedCard(
         modifier = modifier
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(8.dp)
+            .fillMaxWidth()
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column {
             AsyncImage(
@@ -38,7 +37,6 @@ fun EventCard(
                 contentDescription = null,
                 modifier = modifier
                     .fillMaxWidth()
-                    .clickable { onClick() },
             )
 
             Spacer(modifier = modifier.height(4.dp))
