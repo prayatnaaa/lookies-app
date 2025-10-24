@@ -1,27 +1,26 @@
 package com.prayatna.lookiesapp.utils
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.ime
-import androidx.compose.runtime.Composable
 import com.prayatna.lookiesapp.BuildConfig
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalDensity
+import java.text.SimpleDateFormat
+import java.util.*
 
 object Helper {
     fun buildImageUrl(imageName: String, bucketName: String) =
         "${BuildConfig.BASE_URL}/storage/v1/object/public/${bucketName}/${imageName}"
-}
 
-@Composable
-fun rememberImeState(): State<Boolean> {
-    val density = LocalDensity.current
-    val imeBottom = WindowInsets.ime.getBottom(density)
-    val imeVisible = imeBottom > 0
-    val imeState = remember { mutableStateOf(false) }
+    fun parseDateRange(input: String): String {
+        val parts = input.split(" - ")
+        if (parts.size != 2) return input
 
-    LaunchedEffect(imeVisible) {
-        imeState.value = imeVisible
+        val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
+        isoFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        val outputFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        outputFormat.timeZone = TimeZone.getDefault()
+
+        val start = isoFormat.parse(parts[0])
+        val end = isoFormat.parse(parts[1])
+
+        return "${start?.let { outputFormat.format(it) }} - ${end?.let { outputFormat.format(it) }}"
     }
-
-    return imeState
 }

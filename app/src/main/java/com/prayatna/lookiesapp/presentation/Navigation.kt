@@ -1,10 +1,12 @@
 package com.prayatna.lookiesapp.presentation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -43,24 +45,49 @@ fun MainNavigation(
         mainViewModel.getUser()
     }
 
+    AppNavGraph(navController = navController, startDestination = NavigationRoutes.LOGIN, user = uiState.user)
+
     when {
         uiState.isLoading || sessionStatus == DataResult.Idle || sessionStatus is DataResult.Loading -> {
             CircularLoading()
         }
         uiState.errorMessage != null -> {
-            ErrorScreen(message = uiState.errorMessage ?: "Unknown error") {
-                mainViewModel.retry()
+
+            LaunchedEffect(uiState.errorMessage, navController) {
+                Log.d("MAIN_NAV", "errorMessage=${uiState.errorMessage}")
+                if (uiState.errorMessage == "Failed to get user! user not found.") {
+                    Log.d("MAIN_NAV", "Navigating to LOGIN due to missing user")
+                    val currentRoute = navController.currentDestination?.route
+                    Log.d("MAIN_NAV", "currentRoute before navigate = $currentRoute")
+                    if (currentRoute != NavigationRoutes.LOGIN) {
+                        navController.navigate(NavigationRoutes.LOGIN) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            }
+
+            if (uiState.errorMessage != "Failed to get user! user not found.") {
+                ErrorScreen(message = uiState.errorMessage ?: "Unknown error") {
+                    mainViewModel.retry()
+                }
             }
         }
         uiState.user != null -> {
-            val user = uiState.user
-            user?.let {
-                val startDestination = determineStartDestination(sessionStatus, user)
-                AppNavGraph(
-                    navController = navController,
-                    startDestination = startDestination,
-                    user = user
-                )
+            LaunchedEffect(uiState.user, sessionStatus, navController) {
+                val startDestination = determineStartDestination(sessionStatus, uiState.user!!)
+                val currentRoute = navController.currentDestination?.route
+                if (currentRoute != startDestination) {
+                    navController.navigate(startDestination) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
             }
         }
     }
@@ -76,41 +103,33 @@ fun determineStartDestination(sessionStatus: DataResult<*>, user: User): String 
 }
 
 @Composable
-fun AppNavGraph(navController: NavHostController, startDestination: String, user: User) {
+fun AppNavGraph(navController: NavHostController, startDestination: String, user: User?) {
     NavHost(navController = navController, startDestination = startDestination) {
 
         composable(NavigationRoutes.MAIN) {
-            MainScreen(navHostController = navController, user = user)
+            user?.let { MainScreen(navHostController = navController, user = it) }
         }
-
         composable(NavigationRoutes.LOGIN) {
-            LoginScreen(navController = navController, user = user)
+            LoginScreen(navController = navController)
         }
-
         composable(NavigationRoutes.REGISTER) {
             RegisterScreen(navController = navController)
         }
-
         composable(NavigationRoutes.ARTIST_APPLICATION) {
             ApplicationScreen(navController = navController)
         }
-
         composable(NavigationRoutes.EDIT_PROFILE) {
             EditProfileScreen(navController = navController)
         }
-
         composable(NavigationRoutes.ADMIN_MAIN) {
-            AdminMainScreen(navController = navController)
+            user?.let { if (it.role == "admin") AdminMainScreen(navController = navController) }
         }
-
         composable(NavigationRoutes.ADMIN_EVENT) {
             AdminEventScreen(navController = navController)
         }
-
         composable(NavigationRoutes.EVENT_LIST) {
             EventListScreen(navController = navController)
         }
-
         composable(
             "${NavigationRoutes.DETAIL_EVENT}/{eventId}",
             arguments = listOf(navArgument("eventId") { type = NavType.StringType })
@@ -119,7 +138,6 @@ fun AppNavGraph(navController: NavHostController, startDestination: String, user
                 DetailEventScreen(navController = navController, eventId = eventId)
             }
         }
-
         eventNavGraph(navController = navController)
     }
 }

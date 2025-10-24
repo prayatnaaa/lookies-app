@@ -2,16 +2,23 @@ package com.prayatna.lookiesapp.presentation.components.detailevent
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.data.model.DetailEvent
 import com.prayatna.lookiesapp.data.model.Event
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventStatusText
+import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
+import com.prayatna.lookiesapp.utils.Helper
 
 @Composable
 fun DetailEventInfo(
@@ -19,7 +26,7 @@ fun DetailEventInfo(
     detailEvent: DetailEvent,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
@@ -39,7 +46,7 @@ fun DetailEventInfo(
                 text = event.title,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp
+                    fontSize = 24.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -52,68 +59,48 @@ fun DetailEventInfo(
             }
 
             Spacer(
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = 4.dp),
             )
 
-            InfoSectionTitle()
-            EventInfoRow(label = "Location", value = event.location)
-            EventInfoRow(label = "Date", value = event.date)
-            EventInfoRow(label = "Time", value = "${detailEvent.startTime} - ${detailEvent.endTime}")
-            EventInfoRow(label = "Tickets", value = "${detailEvent.ticketQuantity} available")
+            EventInfoRow(icon = Icons.Default.LocationOn, value = event.location)
+//            EventInfoRow(label = "Date", value = event.date)
             EventInfoRow(
-                label = "Ticket Price",
-                value = if (event.ticketPrice == 0.0) "Free" else "Rp ${event.ticketPrice}"
+                icon = Icons.Default.DateRange,
+                value = Helper.parseDateRange("${detailEvent.startTime} - ${detailEvent.endTime}")
             )
             EventInfoRow(
-                label = "Registration Fee",
-                value = if (event.registrationFee == 0.0) "Free" else "Rp ${event.registrationFee}"
+                icon = Icons.Default.Bookmarks,
+                value = "${detailEvent.ticketQuantity} available"
             )
+//            EventInfoRow(
+//                label = "Registration Fee",
+//                value = if (event.registrationFee == 0.0) "Free" else "Rp ${event.registrationFee}"
+//            )
 
             Spacer(
                 modifier = Modifier.padding(vertical = 8.dp),
-            )
-
-            Text(
-                text = "View Location",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium
-                ),
-                modifier = Modifier
-                    .align(Alignment.End)
             )
         }
     }
 }
 
 @Composable
-private fun InfoSectionTitle() {
-    Text(
-        text = "Event Detail",
-        style = MaterialTheme.typography.titleSmall.copy(
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.SemiBold
-        ),
-        modifier = Modifier.padding(bottom = 4.dp)
-    )
-}
-
-@Composable
 private fun EventInfoRow(
-    label: String,
+    icon: ImageVector,
     value: String,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = BlackCharcoal,
         )
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),

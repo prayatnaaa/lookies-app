@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.event.detailevent
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -19,9 +20,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
+import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventFooter
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventImage
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventInfo
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun DetailEventScreen(
@@ -37,6 +40,9 @@ fun DetailEventScreen(
     }
 
     Scaffold (
+        bottomBar = {
+            DetailEventFooter()
+        },
         topBar = {
             BackTopBar(
                 navController = navController
@@ -47,6 +53,7 @@ fun DetailEventScreen(
             LazyColumn(
                 modifier = modifier
                     .padding(innerPadding)
+                    .background(PureWhite)
             ) {
                 when {
                     detailEventState.isLoading -> {

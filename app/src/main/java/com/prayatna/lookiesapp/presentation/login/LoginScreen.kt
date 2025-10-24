@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.prayatna.lookiesapp.data.model.User
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.ui.theme.light_onPrimary
@@ -36,7 +35,6 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 fun LoginScreen(modifier: Modifier = Modifier,
                 navController: NavController,
                 viewModel: LoginViewModel = hiltViewModel(),
-                user: User
 ) {
 
     val loginStatus = viewModel.loginStatus.collectAsStateWithLifecycle()
@@ -46,20 +44,11 @@ fun LoginScreen(modifier: Modifier = Modifier,
         val status = loginStatus.value
 
         if (status is DataResult.Success) {
-            if (user.role == "admin") {
-                navController.navigate(NavigationRoutes.ADMIN_MAIN) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
+            navController.navigate(NavigationRoutes.MAIN) {
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = true
                 }
-            } else {
-                navController.navigate(NavigationRoutes.MAIN) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
+                launchSingleTop = true
             }
         } else if (status is DataResult.Error) {
             val errorMsg = status.error
