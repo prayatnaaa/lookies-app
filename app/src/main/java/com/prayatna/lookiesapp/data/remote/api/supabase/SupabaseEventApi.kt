@@ -22,7 +22,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-class SupabaseApi @Inject constructor(
+class SupabaseEventApi @Inject constructor(
     private val httpClient: HttpClient
 ) {
     suspend fun addEvent(

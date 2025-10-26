@@ -4,7 +4,7 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.model.DetailEventInfo
 import com.prayatna.lookiesapp.data.model.Event
-import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseApi
+import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventApi
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
@@ -36,7 +36,7 @@ class EventRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage,
     private val userPreference: UserPreference,
-    private val supabaseApi: SupabaseApi,
+    private val supabaseEventApi: SupabaseEventApi,
 ): EventRepository {
     override suspend fun getEvents(): DataResult<List<Event>> {
         return try {
@@ -67,7 +67,7 @@ class EventRepositoryImpl @Inject constructor(
             val token = userPreference.authTokenPreference.first()
                 ?: return DataResult.Error("Missing auth token")
 
-            val response = supabaseApi.getEvent(token = token, eventId = eventId)
+            val response = supabaseEventApi.getEvent(token = token, eventId = eventId)
             Log.d("EVENT", response.toString())
             DataResult.Success(response.asDomainModel())
         } catch (e: RestException) {
@@ -113,7 +113,7 @@ class EventRepositoryImpl @Inject constructor(
                 bannerImageUrl = imageUrl
             )
 
-            val response = supabaseApi.addEvent(
+            val response = supabaseEventApi.addEvent(
                 token = token,
                 event = eventDto,
                 detailEvent = detailEvent
