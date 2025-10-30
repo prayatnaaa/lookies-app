@@ -2,6 +2,8 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
+import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthApi
+import com.prayatna.lookiesapp.data.remote.response.auth.LoginResponse
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -16,7 +18,7 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 interface AuthRepository {
-    suspend fun signIn(email: String, password: String): DataResult<String>
+    suspend fun signIn(email: String, password: String): DataResult<LoginResponse>
     suspend fun signUp(email: String, password: String): DataResult<String>
     suspend fun saveSession()
     suspend fun isSessionActive(): DataResult<String>
@@ -25,17 +27,19 @@ interface AuthRepository {
 
 class AuthRepositoryImpl @Inject constructor(
     private val auth: Auth,
+    private val supabaseAuthApi: SupabaseAuthApi,
     private val userPreference: UserPreference
 ): AuthRepository {
 
-    override suspend fun signIn(email: String, password: String): DataResult<String> {
+    override suspend fun signIn(email: String, password: String): DataResult<LoginResponse> {
         return try {
-            auth.signInWith(Email) {
-                this.email = email
-                this.password = password
+             val response = supabaseAuthApi.signIn(email = email, password = password)
+            if (response.success) {
+                DataResult.Success(response)
             }
-            saveSession()
-            DataResult.Success("You are logged in")
+            else {
+                DataResult.Error(response.message ?: "Unknown error")
+            }
         } catch (e: RestException) {
             when (e) {
                 is BadRequestRestException -> DataResult.Error(e.error)

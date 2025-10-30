@@ -44,12 +44,14 @@ fun LoginScreen(modifier: Modifier = Modifier,
         val status = loginStatus.value
 
         if (status is DataResult.Success) {
-            navController.navigate(NavigationRoutes.MAIN) {
-                popUpTo(navController.graph.startDestinationId) {
-                    inclusive = true
-                }
-                launchSingleTop = true
+            val role = status.data.role
+
+            if (role == "admin") {
+                navController.navigate(NavigationRoutes.ADMIN_MAIN)
+            } else {
+                navController.navigate(NavigationRoutes.MAIN)
             }
+
         } else if (status is DataResult.Error) {
             val errorMsg = status.error
 

@@ -35,7 +35,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.prayatna.lookiesapp.data.model.User
 import com.prayatna.lookiesapp.presentation.main.home.HomeScreen
 import com.prayatna.lookiesapp.presentation.main.inbox.InboxScreen
 import com.prayatna.lookiesapp.presentation.main.profile.ProfileScreen
@@ -51,7 +50,6 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 fun MainScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    user: User
 ) {
     var selectedRoute by remember { mutableStateOf("home") }
     val navController = rememberNavController()
@@ -60,20 +58,17 @@ fun MainScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {
-            if (user.role == "artist") {
-                Log.d("ROLE", "role artist")
-                FloatingActionButton(
-                    contentColor = PureWhite,
-                    containerColor = BlackCharcoal,
-                    onClick = {
-                        navHostController.navigate(NavigationRoutes.ADD_EVENT)
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
-                    )
+            FloatingActionButton(
+                contentColor = PureWhite,
+                containerColor = BlackCharcoal,
+                onClick = {
+                    navHostController.navigate(NavigationRoutes.ADD_EVENT)
                 }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null
+                )
             }
         },
         bottomBar = {
