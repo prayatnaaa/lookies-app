@@ -2,13 +2,14 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.data.model.DetailEventInfo
-import com.prayatna.lookiesapp.data.model.Event
+import com.prayatna.lookiesapp.domain.model.DetailEventInfo
+import com.prayatna.lookiesapp.domain.model.Event
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventApi
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
+import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -17,6 +18,7 @@ import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import io.ktor.client.network.sockets.ConnectTimeoutException
@@ -24,17 +26,10 @@ import kotlinx.coroutines.flow.first
 import java.util.UUID
 import javax.inject.Inject
 
-interface EventRepository {
-    suspend fun getEvents(): DataResult<List<Event>>
-    suspend fun getEvent(eventId: String): DataResult<DetailEventInfo>
-    suspend fun addEvent(event: EventDto, detailEvent: DetailEventDto, imageByte: ByteArray): DataResult<AddEventResponse>
-    suspend fun editEvent(event: EventDto): DataResult<String>
-    suspend fun deleteEvent(eventId: String): DataResult<String>
-}
-
 class EventRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage,
+    private val auth: Auth,
     private val userPreference: UserPreference,
     private val supabaseEventApi: SupabaseEventApi,
 ): EventRepository {
@@ -65,7 +60,7 @@ class EventRepositoryImpl @Inject constructor(
     override suspend fun getEvent(eventId: String): DataResult<DetailEventInfo> {
         return try {
             val token = userPreference.authTokenPreference.first()
-                ?: return DataResult.Error("Missing auth token")
+                ?: auth.currentSessionOrNull()?.accessToken ?: return DataResult.Error("Missing auth token")
 
             val response = supabaseEventApi.getEvent(token = token, eventId = eventId)
             Log.d("EVENT", response.toString())

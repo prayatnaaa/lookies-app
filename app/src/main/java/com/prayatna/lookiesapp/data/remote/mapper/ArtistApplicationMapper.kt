@@ -1,7 +1,7 @@
 package com.prayatna.lookiesapp.data.remote.mapper
 
 import com.prayatna.lookiesapp.data.remote.dto.ArtistApplicationDto
-import com.prayatna.lookiesapp.data.model.ArtistApplication
+import com.prayatna.lookiesapp.domain.model.ArtistApplication
 
 fun ArtistApplicationDto.asDomainModel(): ArtistApplication {
     return ArtistApplication(

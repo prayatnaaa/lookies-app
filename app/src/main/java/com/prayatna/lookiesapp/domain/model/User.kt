@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.data.model
+package com.prayatna.lookiesapp.domain.model
 
 data class User (
     val id: String,

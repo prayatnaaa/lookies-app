@@ -3,7 +3,7 @@ package com.prayatna.lookiesapp.presentation.admin.event
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.data.repository.EventRepository
+import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

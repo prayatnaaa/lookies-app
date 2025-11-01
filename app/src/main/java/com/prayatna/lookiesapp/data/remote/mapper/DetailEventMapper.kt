@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.mapper
 
-import com.prayatna.lookiesapp.data.model.DetailEvent
+import com.prayatna.lookiesapp.domain.model.DetailEvent
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 
 fun DetailEvent.toDto(): DetailEventDto {

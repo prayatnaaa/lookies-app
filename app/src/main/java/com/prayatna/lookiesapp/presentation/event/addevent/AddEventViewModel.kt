@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
-import com.prayatna.lookiesapp.data.repository.EventRepository
+import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
 import dagger.hilt.android.lifecycle.HiltViewModel

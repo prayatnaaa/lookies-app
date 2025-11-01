@@ -1,23 +1,15 @@
 package com.prayatna.lookiesapp.data.repository
 
-import com.prayatna.lookiesapp.data.model.Payment
+import com.prayatna.lookiesapp.domain.model.Payment
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePaymentApi
 import com.prayatna.lookiesapp.data.remote.request.payment.AddPaymentRequest
 import com.prayatna.lookiesapp.data.remote.response.payment.AddPaymentResponse
+import com.prayatna.lookiesapp.domain.repository.PaymentRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
 import javax.inject.Inject
 
-interface PaymentRepository {
-    suspend fun addTicket(request: AddPaymentRequest): DataResult<AddPaymentResponse>
-    fun getPaymentByUserId(): DataResult<Payment>
-//    fun getPayments()
-//    fun getPaymentsByUserId()
-//    fun getPayment()
-//    fun editPayment()
-//    fun deletePayment()
-}
 
 class PaymentRepositoryImpl @Inject constructor(
     private val supabasePaymentApi: SupabasePaymentApi,

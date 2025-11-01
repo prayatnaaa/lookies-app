@@ -2,12 +2,13 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.data.model.User
+import com.prayatna.lookiesapp.domain.model.User
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserApi
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.UserRoleDto
 import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.remote.mapper.toDto
+import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.RestException
@@ -20,14 +21,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import java.util.UUID
 import javax.inject.Inject
-
-interface UserRepository {
-    fun getProfile(): Flow<DataResult<ProfileDto>>
-    suspend fun editProfile(fullName: String, bio: String, address: String, username: String): DataResult<String>
-    suspend fun editProfileImage(image: ByteArray): DataResult<String>
-    suspend fun getRole(): String
-    suspend fun getUser(): DataResult<User>
-}
 
 class UserRepositoryImpl @Inject constructor(
     private val auth: Auth,

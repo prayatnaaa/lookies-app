@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.data.model.Event
+import com.prayatna.lookiesapp.domain.model.Event
 
 @Composable
 fun EventCard(

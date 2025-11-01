@@ -4,6 +4,7 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthApi
 import com.prayatna.lookiesapp.data.remote.response.auth.LoginResponse
+import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -16,14 +17,6 @@ import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
-
-interface AuthRepository {
-    suspend fun signIn(email: String, password: String): DataResult<LoginResponse>
-    suspend fun signUp(email: String, password: String): DataResult<String>
-    suspend fun saveSession()
-    suspend fun isSessionActive(): DataResult<String>
-    suspend fun logout(): DataResult<Any>
-}
 
 class AuthRepositoryImpl @Inject constructor(
     private val auth: Auth,
