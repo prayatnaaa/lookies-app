@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,9 +25,13 @@ import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun DetailEventFooter(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBuyButtonClick: () -> Unit,
+    onAddToCartButtonClick: () -> Unit
 ) {
     ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = PureWhite,
             contentColor = BlackCharcoal,
@@ -40,7 +43,6 @@ fun DetailEventFooter(
     ) {
         Row(
             modifier = modifier
-                .fillMaxWidth()
                 .padding(16.dp)
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.End,
@@ -49,14 +51,14 @@ fun DetailEventFooter(
 
             AddToCartButton(
                 modifier = modifier.weight(0.5f),
-                onClick = {}
+                onClick = onAddToCartButtonClick
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
             BuyButton(
                 modifier = modifier.weight(0.5f),
-                onClick = {}
+                onClick = onBuyButtonClick
             )
         }
     }
@@ -114,5 +116,8 @@ fun AddToCartButton(
 @Preview(showBackground = true)
 @Composable
 fun DetailEventFooterPreview() {
-    DetailEventFooter()
+    DetailEventFooter(
+        onBuyButtonClick = {},
+        onAddToCartButtonClick = {}
+    )
 }

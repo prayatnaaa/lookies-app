@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.mapper
 
-import com.prayatna.lookiesapp.domain.model.Exhibition
+import com.prayatna.lookiesapp.domain.model.event.Exhibition
 import com.prayatna.lookiesapp.data.remote.dto.ExhibitionDto
 
 fun ExhibitionDto.asDomainModel(): Exhibition {

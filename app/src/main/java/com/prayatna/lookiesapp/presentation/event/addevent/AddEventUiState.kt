@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.presentation.event.addevent
-import com.prayatna.lookiesapp.domain.model.DetailEvent
-import com.prayatna.lookiesapp.domain.model.Event
+import com.prayatna.lookiesapp.domain.model.event.DetailEvent
+import com.prayatna.lookiesapp.domain.model.event.Event
 
 data class AddEventUiState(
     val title: String = "",

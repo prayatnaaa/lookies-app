@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.presentation.event.eventlist
 
-import com.prayatna.lookiesapp.domain.model.Event
+import com.prayatna.lookiesapp.domain.model.event.Event
 
 data class EventListUiState(
     val isLoading: Boolean = false,

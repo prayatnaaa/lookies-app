@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.presentation.main
 
-import com.prayatna.lookiesapp.domain.model.User
+import com.prayatna.lookiesapp.domain.model.user.User
 
 data class MainUiState(
     val isLoading: Boolean = false,

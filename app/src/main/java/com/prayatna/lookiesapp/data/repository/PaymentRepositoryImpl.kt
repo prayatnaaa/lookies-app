@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.data.repository
 
-import com.prayatna.lookiesapp.domain.model.Payment
+import com.prayatna.lookiesapp.domain.model.payment.Payment
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePaymentApi
 import com.prayatna.lookiesapp.data.remote.request.payment.AddPaymentRequest
 import com.prayatna.lookiesapp.data.remote.response.payment.AddPaymentResponse
@@ -15,7 +15,7 @@ class PaymentRepositoryImpl @Inject constructor(
     private val supabasePaymentApi: SupabasePaymentApi,
     private val auth: Auth
 ): PaymentRepository {
-    override suspend fun addTicket(request: AddPaymentRequest): DataResult<AddPaymentResponse> {
+    override suspend fun addPayment(request: AddPaymentRequest): DataResult<AddPaymentResponse> {
         return try {
 
             val userId = auth.currentUserOrNull()?.id

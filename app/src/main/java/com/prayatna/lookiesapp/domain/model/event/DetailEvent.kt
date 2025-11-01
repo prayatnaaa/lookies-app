@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.domain.model
+package com.prayatna.lookiesapp.domain.model.event
 
 
 data class DetailEvent(

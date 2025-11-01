@@ -2,7 +2,7 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.domain.model.User
+import com.prayatna.lookiesapp.domain.model.user.User
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserApi
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.UserRoleDto

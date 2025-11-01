@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.domain.model
+package com.prayatna.lookiesapp.domain.model.payment
 
 data class Payment(
     val id: Int?,

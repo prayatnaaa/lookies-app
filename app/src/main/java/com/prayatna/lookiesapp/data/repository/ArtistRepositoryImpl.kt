@@ -3,8 +3,8 @@ package com.prayatna.lookiesapp.data.repository
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.ArtistApplicationDto
 import com.prayatna.lookiesapp.data.remote.dto.PaintingDto
-import com.prayatna.lookiesapp.domain.model.ArtistApplication
-import com.prayatna.lookiesapp.domain.model.Painting
+import com.prayatna.lookiesapp.domain.model.artist.ArtistApplication
+import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper

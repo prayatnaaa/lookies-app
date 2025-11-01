@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.domain.model.Event
+import com.prayatna.lookiesapp.domain.model.event.Event
 
 @Composable
 fun EventCardList(

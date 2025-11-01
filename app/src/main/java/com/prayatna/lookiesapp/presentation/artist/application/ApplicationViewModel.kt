@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.model.ArtistApplication
+import com.prayatna.lookiesapp.domain.model.artist.ArtistApplication
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel

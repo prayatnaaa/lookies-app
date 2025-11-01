@@ -1,7 +1,7 @@
 package com.prayatna.lookiesapp.domain.repository
 
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
-import com.prayatna.lookiesapp.domain.model.User
+import com.prayatna.lookiesapp.domain.model.user.User
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 

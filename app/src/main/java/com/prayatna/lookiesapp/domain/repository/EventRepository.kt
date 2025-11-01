@@ -3,8 +3,8 @@ package com.prayatna.lookiesapp.domain.repository
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
-import com.prayatna.lookiesapp.domain.model.DetailEventInfo
-import com.prayatna.lookiesapp.domain.model.Event
+import com.prayatna.lookiesapp.domain.model.event.DetailEventInfo
+import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.utils.DataResult
 
 interface EventRepository {

@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.domain.model.DetailEvent
-import com.prayatna.lookiesapp.domain.model.Event
+import com.prayatna.lookiesapp.domain.model.event.DetailEvent
+import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventStatusText
 import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.utils.Helper

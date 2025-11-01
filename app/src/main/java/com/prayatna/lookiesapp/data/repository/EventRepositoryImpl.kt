@@ -2,8 +2,8 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.domain.model.DetailEventInfo
-import com.prayatna.lookiesapp.domain.model.Event
+import com.prayatna.lookiesapp.domain.model.event.DetailEventInfo
+import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventApi
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto

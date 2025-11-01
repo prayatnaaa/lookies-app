@@ -13,6 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,6 +23,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
+import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventBottomModal
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventFooter
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventImage
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventInfo
@@ -34,6 +38,9 @@ fun DetailEventScreen(
     eventId: String,
 ) {
     val detailEventState by viewModel.state.collectAsStateWithLifecycle()
+    var isSheetOpen by rememberSaveable {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getEvent(eventId)
@@ -41,7 +48,12 @@ fun DetailEventScreen(
 
     Scaffold (
         bottomBar = {
-            DetailEventFooter()
+            DetailEventFooter(
+                onBuyButtonClick = {
+                    isSheetOpen = true
+                },
+                onAddToCartButtonClick = {}
+            )
         },
         topBar = {
             BackTopBar(
@@ -103,6 +115,14 @@ fun DetailEventScreen(
                     }
                 }
             }
+            if (isSheetOpen) {
+                DetailEventBottomModal(
+                    onDismiss = { isSheetOpen = false },
+                    value = 0,
+                    onValueChange = {},
+                )
+            }
+
         }
     )
 }
