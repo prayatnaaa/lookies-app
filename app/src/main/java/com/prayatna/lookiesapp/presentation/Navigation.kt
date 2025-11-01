@@ -5,11 +5,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
+import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
 import com.prayatna.lookiesapp.presentation.artist.application.ApplicationScreen
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.editprofile.EditProfileScreen
+import com.prayatna.lookiesapp.presentation.event.addevent.eventNavGraph
+import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
+import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
@@ -22,7 +30,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val sessionStatus by viewModel.sessionStatus.collectAsStateWithLifecycle()
 
-    LaunchedEffect (Unit) {
+    LaunchedEffect(Unit) {
         viewModel.isSessionActive()
     }
 
@@ -36,7 +44,10 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         else -> NavigationRoutes.LOGIN
     }
 
-    NavHost(navController = navController, startDestination = startDestination) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
         composable(NavigationRoutes.MAIN) {
             MainScreen(navHostController = navController)
         }
@@ -49,5 +60,26 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         composable(NavigationRoutes.ARTIST_APPLICATION) {
             ApplicationScreen(navController = navController)
         }
+        composable(NavigationRoutes.EDIT_PROFILE) {
+            EditProfileScreen(navController = navController)
+        }
+        composable(NavigationRoutes.ADMIN_MAIN) {
+            AdminMainScreen(navController = navController)
+        }
+        composable(NavigationRoutes.ADMIN_EVENT) {
+            AdminEventScreen(navController = navController)
+        }
+        composable(NavigationRoutes.EVENT_LIST) {
+            EventListScreen(navController = navController)
+        }
+        composable(
+            route = "${NavigationRoutes.DETAIL_EVENT}/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("eventId")?.let { eventId ->
+                DetailEventScreen(navController = navController, eventId = eventId)
+            }
+        }
+        eventNavGraph(navController = navController)
     }
 }

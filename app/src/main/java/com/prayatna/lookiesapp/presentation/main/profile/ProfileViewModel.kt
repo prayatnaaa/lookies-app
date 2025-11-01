@@ -6,16 +6,20 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
-import com.prayatna.lookiesapp.data.remote.model.Profile
-import com.prayatna.lookiesapp.data.repository.AuthRepository
+import com.prayatna.lookiesapp.domain.model.Profile
+import com.prayatna.lookiesapp.domain.repository.AuthRepository
+import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository
 ): ViewModel() {
 
     var isSuccess by mutableStateOf(false)
@@ -30,8 +34,11 @@ class ProfileViewModel @Inject constructor(
     var user by mutableStateOf<Profile?>(null)
         private set
 
+    private val _logoutStatus = MutableStateFlow<DataResult<Any>>(DataResult.Idle)
+    val logoutStatus = _logoutStatus.asStateFlow()
+
     private fun getProfile() = viewModelScope.launch {
-        repository.getProfile().collect { result ->
+        userRepository.getProfile().collect { result ->
             when (result) {
                 is DataResult.Error -> {
                     isError = true
@@ -52,6 +59,13 @@ class ProfileViewModel @Inject constructor(
                 }
                 else -> {}
             }
+        }
+    }
+
+    fun logout() {
+        _logoutStatus.value = DataResult.Loading
+        viewModelScope.launch {
+            _logoutStatus.value = authRepository.logout()
         }
     }
 

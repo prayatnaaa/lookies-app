@@ -1,9 +1,15 @@
 package com.prayatna.lookiesapp.module
 
-import com.prayatna.lookiesapp.data.repository.ArtistRepository
 import com.prayatna.lookiesapp.data.repository.ArtistRepositoryImpl
-import com.prayatna.lookiesapp.data.repository.AuthRepository
 import com.prayatna.lookiesapp.data.repository.AuthRepositoryImpl
+import com.prayatna.lookiesapp.data.repository.EventRepositoryImpl
+import com.prayatna.lookiesapp.data.repository.PaymentRepositoryImpl
+import com.prayatna.lookiesapp.data.repository.UserRepositoryImpl
+import com.prayatna.lookiesapp.domain.repository.ArtistRepository
+import com.prayatna.lookiesapp.domain.repository.AuthRepository
+import com.prayatna.lookiesapp.domain.repository.EventRepository
+import com.prayatna.lookiesapp.domain.repository.PaymentRepository
+import com.prayatna.lookiesapp.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -20,4 +26,16 @@ interface DataModule {
     @Singleton
     @Binds
     fun bindsArtistRepository(artistRepository: ArtistRepositoryImpl): ArtistRepository
+
+    @Singleton
+    @Binds
+    fun bindsUserRepository(userRepository: UserRepositoryImpl): UserRepository
+
+    @Singleton
+    @Binds
+    fun bindsEventRepository(eventRepository: EventRepositoryImpl): EventRepository
+
+    @Singleton
+    @Binds
+    fun bindsPaymentRepository(paymentRepository: PaymentRepositoryImpl): PaymentRepository
 }

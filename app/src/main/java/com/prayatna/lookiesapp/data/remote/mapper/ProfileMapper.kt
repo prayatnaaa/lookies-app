@@ -1,7 +1,7 @@
 package com.prayatna.lookiesapp.data.remote.mapper
 
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
-import com.prayatna.lookiesapp.data.remote.model.Profile
+import com.prayatna.lookiesapp.domain.model.Profile
 
 fun ProfileDto.asDomainModel(): Profile {
     return Profile(
@@ -13,3 +13,12 @@ fun ProfileDto.asDomainModel(): Profile {
         bio = this.bio,
     )
 }
+
+fun Profile.toDto(): ProfileDto = ProfileDto(
+    id = id,
+    username = username,
+    fullName = fullName,
+    bio = bio,
+    address = address,
+    profileUrl = profileUrl
+)

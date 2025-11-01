@@ -5,14 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.data.repository.AuthRepository
+import com.prayatna.lookiesapp.data.remote.response.auth.LoginResponse
+import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,7 +23,7 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
     var passwordValue by mutableStateOf("")
         private set
 
-    private val _loginStatus = MutableStateFlow<DataResult<String>>(DataResult.Idle)
+    private val _loginStatus = MutableStateFlow<DataResult<LoginResponse>>(DataResult.Idle)
     val loginStatus = _loginStatus.asStateFlow()
 
     private val _sessionStatus = MutableStateFlow<DataResult<String>>(DataResult.Idle)
@@ -50,14 +48,6 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
             _loginStatus.value = result
         }
     }
-
-    val authToken = authRepository.authToken
-        .map { !it.isNullOrEmpty() }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = null
-        )
 
     fun isSessionActive() {
         viewModelScope.launch {

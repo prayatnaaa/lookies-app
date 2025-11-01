@@ -40,9 +40,11 @@ android {
         properties.load(project.rootProject.file("local.properties").inputStream())
         val baseUrl = properties.getProperty("BASE_URL") ?: ""
         val apiKey = properties.getProperty("API_KEY") ?: ""
+        val supabaseEdgeBaseUrl = properties.getProperty("SUPABASE_EDGE_BASE_URL") ?: ""
 
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
+        buildConfigField("String", "SUPABASE_EDGE_BASE_URL", "\"$supabaseEdgeBaseUrl\"")
     }
 
     buildTypes {
@@ -110,4 +112,10 @@ dependencies {
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.livedata)
 
+    // Coil
+    implementation(libs.coil3.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+    //JWT Decode
+    implementation(libs.jwtdecode)
 }

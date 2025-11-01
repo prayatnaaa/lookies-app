@@ -34,7 +34,7 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier,
                 navController: NavController,
-                viewModel: LoginViewModel = hiltViewModel()
+                viewModel: LoginViewModel = hiltViewModel(),
 ) {
 
     val loginStatus = viewModel.loginStatus.collectAsStateWithLifecycle()
@@ -44,10 +44,14 @@ fun LoginScreen(modifier: Modifier = Modifier,
         val status = loginStatus.value
 
         if (status is DataResult.Success) {
-            navController.navigate(NavigationRoutes.MAIN) {
-                popUpTo(0) { inclusive = true }
-                launchSingleTop = true
+            val role = status.data.role
+
+            if (role == "admin") {
+                navController.navigate(NavigationRoutes.ADMIN_MAIN)
+            } else {
+                navController.navigate(NavigationRoutes.MAIN)
             }
+
         } else if (status is DataResult.Error) {
             val errorMsg = status.error
 
