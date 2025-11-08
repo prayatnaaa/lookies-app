@@ -33,6 +33,9 @@ class EventRepositoryImpl @Inject constructor(
     private val userPreference: UserPreference,
     private val supabaseEventApi: SupabaseEventApi,
 ): EventRepository {
+
+    private val eventCache = mutableMapOf<String, DetailEventInfo>()
+
     override suspend fun getEvents(): DataResult<List<Event>> {
         return try {
             val eventDto = postgrest
@@ -57,14 +60,26 @@ class EventRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun getEvent(eventId: String): DataResult<DetailEventInfo> {
+    override suspend fun getEvent(
+        eventId: String,
+        forceRefresh: Boolean
+    ): DataResult<DetailEventInfo> {
+
+        if (!forceRefresh && eventCache.containsKey(eventId)) {
+            return DataResult.Success(eventCache[eventId]!!)
+        }
+
         return try {
             val token = userPreference.authTokenPreference.first()
-                ?: auth.currentSessionOrNull()?.accessToken ?: return DataResult.Error("Missing auth token")
+                ?: auth.currentSessionOrNull()?.accessToken
+                ?: return DataResult.Error("Missing auth token")
 
             val response = supabaseEventApi.getEvent(token = token, eventId = eventId)
-            Log.d("EVENT", response.toString())
-            DataResult.Success(response.asDomainModel())
+            val eventInfo = response.asDomainModel()
+
+            eventCache[eventId] = eventInfo
+
+            DataResult.Success(eventInfo)
         } catch (e: RestException) {
             when (e) {
                 is BadRequestRestException -> DataResult.Error(e.error)

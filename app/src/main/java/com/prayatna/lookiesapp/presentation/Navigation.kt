@@ -21,6 +21,7 @@ import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
+import com.prayatna.lookiesapp.presentation.payment.addpayment.AddPaymentScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -80,6 +81,17 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 DetailEventScreen(navController = navController, eventId = eventId)
             }
         }
+        composable(
+            route = "${NavigationRoutes.ADD_PAYMENT}/{eventId}?quantity={quantity}",
+            arguments = listOf(
+                navArgument("eventId") { type = NavType.StringType },
+                navArgument("quantity") { type = NavType.IntType; defaultValue = 0 }
+            )
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId")!!
+            AddPaymentScreen(navController = navController, eventId = eventId)
+        }
+
         eventNavGraph(navController = navController)
     }
 }

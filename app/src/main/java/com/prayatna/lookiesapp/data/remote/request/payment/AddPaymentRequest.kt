@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class AddPaymentRequest (
     @SerialName("user_id") val userId: String?,
     val amount: Double,
-    @SerialName("payment_type") val paymentType: String,
+    @SerialName("payment_for_type") val paymentType: String,
     val quantity: Int
     )

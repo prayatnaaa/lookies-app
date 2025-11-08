@@ -21,7 +21,7 @@ import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.utils.Helper
 
 @Composable
-fun DetailEventInfo(
+fun DetailEventInfoSection(
     event: Event,
     detailEvent: DetailEvent,
     modifier: Modifier = Modifier

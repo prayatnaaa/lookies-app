@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.data.remote.request.payment.AddPaymentRequest
 import com.prayatna.lookiesapp.data.remote.response.payment.AddPaymentResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -20,10 +21,12 @@ class SupabasePaymentApi @Inject constructor(
 ) {
 
     suspend fun addPayment(
-        request: AddPaymentRequest
+        request: AddPaymentRequest,
+        token: String
     ): AddPaymentResponse {
         val response: HttpResponse = httpClient.post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/add-payment") {
             contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer $token")
             setBody(request)
         }
 

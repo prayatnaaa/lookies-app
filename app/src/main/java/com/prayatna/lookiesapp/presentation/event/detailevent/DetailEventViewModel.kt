@@ -12,11 +12,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailEventViewModel @Inject constructor(
-    private val repository: EventRepository
+    private val repository: EventRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailEventUiState())
     val state = _state.asStateFlow()
+
+    private val _quantityValue = MutableStateFlow(0)
+    val quantityValue = _quantityValue.asStateFlow()
+
+    fun setQuantityValue(value: Int) {
+        _quantityValue.value = value
+    }
 
     fun getEvent(eventId: String, forceRefresh: Boolean = false) {
         if (!forceRefresh && _state.value.info != null) return
@@ -27,7 +34,9 @@ class DetailEventViewModel @Inject constructor(
             when (val result = repository.getEvent(eventId)) {
                 is DataResult.Error -> _state.value = DetailEventUiState(errorMessage = result.error)
                 is DataResult.Loading -> _state.value = DetailEventUiState(isLoading = true)
-                is DataResult.Success -> _state.value = DetailEventUiState(info = result.data)
+                is DataResult.Success -> {
+                    _state.value = DetailEventUiState(info = result.data)
+                }
                 else -> {}
             }
         }

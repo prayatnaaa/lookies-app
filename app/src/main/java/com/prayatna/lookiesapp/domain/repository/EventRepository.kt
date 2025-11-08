@@ -9,7 +9,7 @@ import com.prayatna.lookiesapp.utils.DataResult
 
 interface EventRepository {
     suspend fun getEvents(): DataResult<List<Event>>
-    suspend fun getEvent(eventId: String): DataResult<DetailEventInfo>
+    suspend fun getEvent(eventId: String, forceRefresh: Boolean = false): DataResult<DetailEventInfo>
     suspend fun addEvent(event: EventDto, detailEvent: DetailEventDto, imageByte: ByteArray): DataResult<AddEventResponse>
     suspend fun editEvent(event: EventDto): DataResult<String>
     suspend fun deleteEvent(eventId: String): DataResult<String>

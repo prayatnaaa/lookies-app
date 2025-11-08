@@ -26,9 +26,10 @@ import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventBottomModal
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventFooter
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventImage
-import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventInfo
+import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventInfoSection
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.ui.theme.PureWhite
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun DetailEventScreen(
@@ -38,11 +39,12 @@ fun DetailEventScreen(
     eventId: String,
 ) {
     val detailEventState by viewModel.state.collectAsStateWithLifecycle()
+    val quantity by viewModel.quantityValue.collectAsStateWithLifecycle()
     var isSheetOpen by rememberSaveable {
         mutableStateOf(false)
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(eventId) {
         viewModel.getEvent(eventId)
     }
 
@@ -87,7 +89,7 @@ fun DetailEventScreen(
                                 )
                             }
                             item {
-                                DetailEventInfo(
+                                DetailEventInfoSection(
                                     event = data.event,
                                     detailEvent = data.detail,
                                 )
@@ -118,11 +120,14 @@ fun DetailEventScreen(
             if (isSheetOpen) {
                 DetailEventBottomModal(
                     onDismiss = { isSheetOpen = false },
-                    value = 0,
-                    onValueChange = {},
+                    value = quantity,
+                    onValueChange = { viewModel.setQuantityValue(it) },
+                    onBuyButtonClick = {
+                        isSheetOpen = false
+                        navController.navigate("${NavigationRoutes.ADD_PAYMENT}/${eventId}?quantity=$quantity")
+                    }
                 )
             }
-
         }
     )
 }
