@@ -46,10 +46,16 @@ fun RegisterScreen(modifier: Modifier = Modifier,
             val message = status.data
             message.let {
                 snackBarHostState.showSnackbar(
-                    message = it,
+                    message = it?.email.toString(),
                     duration = SnackbarDuration.Long,
                     withDismissAction = true
                 )
+                navController.navigate(NavigationRoutes.LOGIN) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
             }
         } else if (status is DataResult.Error) {
             val errorMsg = status.error
@@ -90,7 +96,13 @@ fun RegisterScreen(modifier: Modifier = Modifier,
                     onRegister = {
                         viewModel.onSignUp()
                     },
-                    onLogin = {navController.navigate(NavigationRoutes.LOGIN)},
+                    onLogin = {
+                        navController.navigate(NavigationRoutes.LOGIN) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        } },
                     inRegister = true,
                     emailValue = emailValue,
                     passwordValue = passwordValue,

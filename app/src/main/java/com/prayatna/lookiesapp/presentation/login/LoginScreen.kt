@@ -47,9 +47,19 @@ fun LoginScreen(modifier: Modifier = Modifier,
             val role = status.data.role
 
             if (role == "admin") {
-                navController.navigate(NavigationRoutes.ADMIN_MAIN)
+                navController.navigate(NavigationRoutes.ADMIN_MAIN) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
             } else {
-                navController.navigate(NavigationRoutes.MAIN)
+                navController.navigate(NavigationRoutes.MAIN){
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
             }
 
         } else if (status is DataResult.Error) {

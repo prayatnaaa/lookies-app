@@ -5,6 +5,7 @@ import com.auth0.android.jwt.JWT
 import com.prayatna.lookiesapp.data.remote.response.auth.LoginResponse
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.github.jan.supabase.gotrue.user.UserInfo
 import javax.inject.Inject
 
 class SupabaseAuthApi @Inject constructor(
@@ -33,5 +34,13 @@ class SupabaseAuthApi @Inject constructor(
         Log.d("ROLE", role.toString())
 
         return LoginResponse(success = true, role = role.toString())
+    }
+
+    suspend fun signUp(email: String, password: String): UserInfo? {
+        val result = auth.signUpWith(Email) {
+            this.email = email
+            this.password = password
+        }
+        return result
     }
 }

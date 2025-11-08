@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jan.supabase.gotrue.user.UserInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -24,7 +25,7 @@ class RegisterViewModel @Inject constructor(
         var passwordValue by mutableStateOf("")
             private set
 
-        private val _registerStatus = MutableStateFlow<DataResult<String>>(DataResult.Idle)
+        private val _registerStatus = MutableStateFlow<DataResult<UserInfo?>>(DataResult.Idle)
         val registerStatus = _registerStatus.asStateFlow()
 
         fun onEmailChange(emailValue: String) {

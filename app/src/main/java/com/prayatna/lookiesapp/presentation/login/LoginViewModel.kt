@@ -26,7 +26,7 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
     private val _loginStatus = MutableStateFlow<DataResult<LoginResponse>>(DataResult.Idle)
     val loginStatus = _loginStatus.asStateFlow()
 
-    private val _sessionStatus = MutableStateFlow<DataResult<String>>(DataResult.Idle)
+    private val _sessionStatus = MutableStateFlow<DataResult<Boolean>>(DataResult.Idle)
     val sessionStatus = _sessionStatus.asStateFlow()
 
 

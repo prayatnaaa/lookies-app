@@ -14,8 +14,7 @@ import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.providers.builtin.Email
-import kotlinx.coroutines.flow.first
+import io.github.jan.supabase.gotrue.user.UserInfo
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -48,15 +47,12 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun signUp(email: String, password: String): DataResult<String> {
+    override suspend fun signUp(email: String, password: String): DataResult<UserInfo?> {
         return try {
-            val result = auth.signUpWith(Email) {
-                this.email = email
-                this.password = password
-            }
+            val result = supabaseAuthApi.signUp(email = email, password = password)
 
             Log.d("AUTH", result.toString())
-            DataResult.Success("You are registered! Please check your e-mail to confirm.")
+            DataResult.Success(result)
         } catch (e: RestException) {
             when (e) {
                 is BadRequestRestException -> DataResult.Error(e.error)
@@ -72,50 +68,28 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveSession() {
-        val accessToken = auth.currentAccessTokenOrNull()
-        val userId = auth.currentUserOrNull()?.id
-
-        if (accessToken.isNullOrEmpty() || userId.isNullOrEmpty()) {
-            return
-        }
-
-        userPreference.setAuthToken(accessToken)
-        userPreference.setUserId(userId)
-    }
-
-
-    override suspend fun isSessionActive(): DataResult<String> {
+    override suspend fun isSessionActive(): DataResult<Boolean> {
         return try {
-            val token = userPreference.authTokenPreference.first()
-            val currentSession  = auth.currentSessionOrNull()
+            val currentSession = auth.currentSessionOrNull()
 
             if (currentSession != null) {
-                return DataResult.Success("You are logged in")
+                return DataResult.Success(true)
             }
 
-            if (token.isNullOrEmpty()) {
-                return DataResult.Error("You are not logged in!")
-            }
-
-            auth.refreshCurrentSession()
-
-            val newToken = auth.currentSessionOrNull()?.accessToken
-            if (newToken.isNullOrEmpty()) {
+            return try {
+                auth.refreshCurrentSession()
+                DataResult.Success(true)
+            } catch (e: Exception) {
                 userPreference.logout()
-                return DataResult.Error("Session expired. Please log in again.")
+                DataResult.Success(false)
             }
 
-            userPreference.setAuthToken(newToken)
-            DataResult.Success("User logged in")
-
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error("Error decoding session: ${e.localizedMessage}")
         } catch (e: Exception) {
-            Log.e("SESSION", "Error checking session: ${e.message}")
-            DataResult.Error("Something went wrong while checking your session.")
+            DataResult.Error("Failed to check session: ${e.localizedMessage}")
         }
     }
+
+
 
     override suspend fun logout(): DataResult<Any> {
         return try {
