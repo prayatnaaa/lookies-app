@@ -34,6 +34,8 @@ class SupabaseUserApi @Inject constructor(
         return user
     }
 
+    suspend fun updateRoleToPartner() {}
+
     suspend fun editProfile(
         fullName: String,
         bio: String,

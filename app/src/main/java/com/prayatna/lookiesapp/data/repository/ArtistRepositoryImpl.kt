@@ -3,7 +3,6 @@ package com.prayatna.lookiesapp.data.repository
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.ArtistApplicationDto
 import com.prayatna.lookiesapp.data.remote.dto.PaintingDto
-import com.prayatna.lookiesapp.domain.model.artist.ArtistApplication
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.utils.DataResult
@@ -17,33 +16,7 @@ import javax.inject.Inject
 class ArtistRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage,
-    private val userPreference: UserPreference
 ): ArtistRepository {
-    override suspend fun artistApplication(artistApplication: ArtistApplication): DataResult<String> {
-        val userId = userPreference.userIdPreference.first()
-        val artistApplicationDto = ArtistApplicationDto(
-            userId = userId as String,
-            portoUrl = artistApplication.portoUrl,
-            motiveLetter = artistApplication.motiveLetter,
-            status = artistApplication.status,
-            reviewerId = artistApplication.reviewerId,
-            reviewNote = artistApplication.reviewNote,
-            businessType = artistApplication.businessType
-        )
-
-        return try {
-            postgrest
-                .from("artist_applications")
-                .insert(artistApplicationDto)
-
-            DataResult.Success("Your application have been submitted!")
-
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error("Something went wrong! ${e.localizedMessage}")
-        } catch (e: Exception) {
-            DataResult.Error("Error! ${e.localizedMessage}")
-        }
-    }
 
     override suspend fun publishPainting(painting: Painting, imageFile: ByteArray): DataResult<String> {
         return try {
