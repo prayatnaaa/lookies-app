@@ -8,14 +8,16 @@
     import androidx.navigation.navigation
     import com.prayatna.lookiesapp.utils.NavigationRoutes
 
+    const val EVENT_FLOW = "event_flow"
+
     fun NavGraphBuilder.eventNavGraph(navController: NavController) {
         navigation(
             startDestination = NavigationRoutes.ADD_EVENT,
-            route = NavigationRoutes.EVENT_FLOW
+            route = EVENT_FLOW
         ) {
             composable(NavigationRoutes.ADD_EVENT) { navBackStackEntry ->
                 val mainEntry = remember(navBackStackEntry) {
-                    navController.getBackStackEntry(NavigationRoutes.EVENT_FLOW)
+                    navController.getBackStackEntry(EVENT_FLOW)
                 }
                 val viewModel: AddEventViewModel = hiltViewModel(mainEntry)
                 AddEventScreen(viewModel = viewModel, navController = navController)
@@ -23,7 +25,7 @@
 
             composable(NavigationRoutes.ADD_DETAIL_EVENT) { navBackStackEntry ->
                 val mainEntry = remember(navBackStackEntry) {
-                    navController.getBackStackEntry(NavigationRoutes.EVENT_FLOW)
+                    navController.getBackStackEntry(EVENT_FLOW)
                 }
                 val viewModel: AddEventViewModel = hiltViewModel(mainEntry)
                 AddDetailEventScreen(viewModel = viewModel, navController = navController)

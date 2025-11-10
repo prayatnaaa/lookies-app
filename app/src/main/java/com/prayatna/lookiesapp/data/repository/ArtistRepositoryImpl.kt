@@ -1,7 +1,5 @@
 package com.prayatna.lookiesapp.data.repository
 
-import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.data.remote.dto.ArtistApplicationDto
 import com.prayatna.lookiesapp.data.remote.dto.PaintingDto
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
@@ -10,7 +8,6 @@ import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class ArtistRepositoryImpl @Inject constructor(

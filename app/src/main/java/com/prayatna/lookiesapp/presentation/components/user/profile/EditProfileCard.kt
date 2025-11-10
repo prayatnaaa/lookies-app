@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.components.profile
+package com.prayatna.lookiesapp.presentation.components.user.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

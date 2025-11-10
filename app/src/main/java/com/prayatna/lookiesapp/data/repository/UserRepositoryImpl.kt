@@ -1,16 +1,18 @@
 package com.prayatna.lookiesapp.data.repository
 
-import android.util.Log
+import android.content.Context
+import android.net.Uri
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.domain.model.user.User
-import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserApi
+import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
-import com.prayatna.lookiesapp.data.remote.dto.UserRoleDto
 import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.remote.mapper.toDto
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
+import com.prayatna.lookiesapp.utils.compressImage
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.gotrue.Auth
@@ -27,12 +29,13 @@ class UserRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage,
     private val userPreference: UserPreference,
-    private val supabaseUserApi: SupabaseUserApi
+    private val supabaseUserService: SupabaseUserService,
+    @ApplicationContext private val context: Context
 ): UserRepository {
 
     override suspend fun getUser(): DataResult<User> {
        return try {
-           val response = supabaseUserApi.getUser()
+           val response = supabaseUserService.getUser()
            val user =  response.asDomainModel()
            DataResult.Success(user)
        } catch (e: RestException) {
@@ -40,6 +43,38 @@ class UserRepositoryImpl @Inject constructor(
        } catch (e: Exception) {
            DataResult.Error(e.message.toString())
        }
+    }
+
+    override suspend fun submitPartnerApplication(
+        partnerName: String,
+        partnerType: String,
+        locationId: Int,
+        portfolioLink: String,
+        imageLogo: Uri
+    ): DataResult<String> {
+        return try {
+
+            val compressImage = imageLogo.compressImage(
+                context = context,
+                compressionThreshold = 500_000L
+            )
+
+            if (compressImage == null) {
+                return DataResult.Error("Image is not selected")
+            }
+            val response = supabaseUserService.submitPartnerApplication(
+                partnerName = partnerName,
+                partnerType = partnerType,
+                locationId = locationId,
+                portfolioLink = portfolioLink,
+                imageLogo = compressImage
+            )
+            DataResult.Success(response)
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message.toString())
+        }
     }
 
     override fun getProfile(): Flow<DataResult<ProfileDto>> =
@@ -121,30 +156,5 @@ class UserRepositoryImpl @Inject constructor(
             DataResult.Error(e.message.toString())
         }
     }
-
-    override suspend fun getRole(): String {
-        return try {
-            val userId = auth.currentUserOrNull()?.id
-                ?: throw IllegalStateException("User not authenticated")
-
-            val result = postgrest
-                .from("user_roles")
-                .select {
-                    filter { eq("user_id", userId) }
-                }
-                .decodeSingle<UserRoleDto>()
-
-            val roleName = result.roleName
-            Log.d("ROLE", result.toString())
-            Log.d("ROLE", "RESULT FROM SUPABASE: $result")
-            roleName
-        } catch (e: SupabaseEncodingException) {
-            e.message.toString()
-        } catch (e: Exception) {
-            e.message.toString()
-        }
-    }
-
-
 
 }

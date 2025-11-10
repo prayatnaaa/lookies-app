@@ -5,11 +5,12 @@ import com.prayatna.lookiesapp.data.remote.dto.UserDto
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.storage.Storage
 import java.util.UUID
 import javax.inject.Inject
 
-class SupabaseUserApi @Inject constructor(
+class SupabaseUserService @Inject constructor(
     private val auth: Auth,
     private val postgrest: Postgrest,
     private val storage: Storage
@@ -34,7 +35,27 @@ class SupabaseUserApi @Inject constructor(
         return user
     }
 
-    suspend fun updateRoleToPartner() {}
+    suspend fun submitPartnerApplication(
+        partnerName: String,
+        partnerType: String,
+        locationId: Int,
+        portfolioLink: String,
+        imageLogo: ByteArray
+    ): String {
+        val imageUrl = uploadPartnerLogo(imageLogo)
+        val result = postgrest.rpc(
+            function = "submit_organizer_application",
+            parameters = mapOf(
+                "name_input" to partnerName,
+                "type_input" to partnerType,
+                "logo_url_input" to imageUrl,
+                "location_id_input" to locationId,
+                "portofolio_link_input" to portfolioLink
+            )
+        ).decodeSingle<String>()
+
+        return result
+    }
 
     suspend fun editProfile(
         fullName: String,
@@ -56,6 +77,24 @@ class SupabaseUserApi @Inject constructor(
             }
 
         return result.data
+    }
+
+    private suspend fun uploadPartnerLogo(image: ByteArray): String {
+        if (image.isEmpty()) throw Exception("Image is empty")
+
+        val path = "partner-logos/${UUID.randomUUID()}.png"
+        val bucketName = "partner_assets"
+
+        val imageUrl = storage.from(bucketName).upload(
+            path = path,
+            data = image,
+            upsert = true
+        )
+
+        val fullPublicUrl = Helper.buildImageUrl(imageName = imageUrl, bucketName = bucketName)
+
+        Log.d("PartnerLogo", "Logo updated: $fullPublicUrl")
+        return fullPublicUrl
     }
 
     suspend fun editProfileImage(image: ByteArray): String {

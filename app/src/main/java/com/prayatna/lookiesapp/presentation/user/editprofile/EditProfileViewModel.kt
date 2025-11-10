@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.editprofile
+package com.prayatna.lookiesapp.presentation.user.editprofile
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +42,29 @@ class EditProfileViewModel @Inject constructor(private val userRepository: UserR
     fun onUsernameChange(usernameValue: String) {
         this.usernameValue = usernameValue
     }
+
+    private var originalUsername = ""
+    private var originalFullName = ""
+    private var originalAddress = ""
+    private var originalBio = ""
+
+    fun prefillProfile(username: String, fullName: String, address: String, bio: String) {
+        this.usernameValue = username
+        this.fullNameValue = fullName
+        this.addressValue = address
+        this.bioValue = bio
+
+        originalUsername = username
+        originalFullName = fullName
+        originalAddress = address
+        originalBio = bio
+    }
+
+    val isChanged: Boolean
+        get() = usernameValue != originalUsername ||
+                fullNameValue != originalFullName ||
+                addressValue != originalAddress ||
+                bioValue != originalBio
 
     fun onEditProfile () {
         _editProfileStatus.value = DataResult.Loading

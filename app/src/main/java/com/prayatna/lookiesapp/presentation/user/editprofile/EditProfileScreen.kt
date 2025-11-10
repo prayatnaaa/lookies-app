@@ -1,6 +1,6 @@
-package com.prayatna.lookiesapp.presentation.editprofile
+package com.prayatna.lookiesapp.presentation.user.editprofile
 
-import androidx.compose.foundation.layout.Arrangement
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,9 +34,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.SharedViewModel
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.presentation.components.profile.EditProfileCard
-import com.prayatna.lookiesapp.presentation.components.profile.EditProfileImageCard
+import com.prayatna.lookiesapp.presentation.components.user.profile.EditProfileCard
+import com.prayatna.lookiesapp.presentation.components.user.profile.EditProfileImageCard
 import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.ui.theme.DarkGrey
 import com.prayatna.lookiesapp.ui.theme.LightGrey
@@ -46,30 +48,46 @@ import com.prayatna.lookiesapp.utils.DataResult
 fun EditProfileScreen (
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: EditProfileViewModel = hiltViewModel()
+    viewModel: EditProfileViewModel = hiltViewModel(),
+    sharedViewModel: SharedViewModel
 ) {
 
     val status = viewModel.editProfileStatus.collectAsStateWithLifecycle()
     val snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect (status.value) {
-        val result = status.value
+    val profileState by sharedViewModel.profileState.collectAsStateWithLifecycle()
 
-        if (result is DataResult.Success) {
-            val message = result.data
-            snackBarHostState.showSnackbar(
-                message = "Success edit profile! $message",
-                duration = SnackbarDuration.Long,
-                withDismissAction = true
-            )
+    Log.d("ProfileState", "$profileState")
 
-        } else if (result is DataResult.Error) {
-            val errorMsg = result.error
-            snackBarHostState.showSnackbar(
-                message = errorMsg,
-                duration = SnackbarDuration.Long,
-                withDismissAction = true
+    LaunchedEffect(profileState) {
+        if (profileState is DataResult.Success) {
+            val profile = (profileState as DataResult.Success).data
+            viewModel.prefillProfile(
+                username = profile.username.orEmpty(),
+                fullName = profile.fullName.orEmpty(),
+                address = profile.address.orEmpty(),
+                bio = profile.bio.orEmpty()
             )
+        }
+    }
+
+    LaunchedEffect(status.value) {
+        when (val result = status.value) {
+            is DataResult.Success -> {
+                snackBarHostState.showSnackbar(
+                    message = "Profile updated! ${result.data}",
+                    duration = SnackbarDuration.Short
+                )
+                sharedViewModel.refreshProfile()
+                navController.popBackStack()
+            }
+            is DataResult.Error -> {
+                snackBarHostState.showSnackbar(
+                    message = result.error,
+                    duration = SnackbarDuration.Long
+                )
+            }
+            else -> {}
         }
     }
 
@@ -102,43 +120,32 @@ fun EditProfileScreen (
             }
         },
         content = { innerPadding ->
-
-            Column (
+            Column(
                 modifier = modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
+                if (status.value is DataResult.Loading) CircularLoading()
 
-                if (status.value is DataResult.Loading) {
-                    CircularLoading()
-                }
-
-                EditProfileImageCard {  }
+                EditProfileImageCard { }
 
                 EditProfileCard(
                     usernameValue = viewModel.usernameValue,
                     fullNameValue = viewModel.fullNameValue,
                     addressValue = viewModel.addressValue,
                     bioValue = viewModel.bioValue,
-                    onUsernameChange = {
-                        viewModel.onUsernameChange(it)
-                    },
-                    onFullNameChange = {
-                        viewModel.onFullNameChange(it)
-                    },
-                    onAddressChange = {
-                        viewModel.onAddressChange(it)
-                    },
-                    onBioChange = {
-                        viewModel.onBioChange(it)
-                    }
+                    onUsernameChange = viewModel::onUsernameChange,
+                    onFullNameChange = viewModel::onFullNameChange,
+                    onAddressChange = viewModel::onAddressChange,
+                    onBioChange = viewModel::onBioChange
                 )
+
 
                 Spacer(modifier = modifier.height(4.dp))
 
                 ElevatedButton (
+                    enabled = viewModel.isChanged,
                     onClick = {
                         viewModel.onEditProfile()
                     },

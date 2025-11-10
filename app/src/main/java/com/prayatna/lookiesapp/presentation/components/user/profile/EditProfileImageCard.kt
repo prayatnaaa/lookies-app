@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.components.profile
+package com.prayatna.lookiesapp.presentation.components.user.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

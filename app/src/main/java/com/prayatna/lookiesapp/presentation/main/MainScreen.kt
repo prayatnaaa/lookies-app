@@ -1,12 +1,10 @@
 package com.prayatna.lookiesapp.presentation.main
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Person
@@ -17,7 +15,6 @@ import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -35,6 +32,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.prayatna.lookiesapp.presentation.SharedViewModel
 import com.prayatna.lookiesapp.presentation.main.home.HomeScreen
 import com.prayatna.lookiesapp.presentation.main.inbox.InboxScreen
 import com.prayatna.lookiesapp.presentation.main.profile.ProfileScreen
@@ -44,12 +42,12 @@ import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.ui.theme.Grey
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.BottomNavItem
-import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
+    sharedViewModel: SharedViewModel
 ) {
     var selectedRoute by remember { mutableStateOf("home") }
     val navController = rememberNavController()
@@ -57,20 +55,6 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route ?: BottomNavItem.Home.route
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        floatingActionButton = {
-            FloatingActionButton(
-                contentColor = PureWhite,
-                containerColor = BlackCharcoal,
-                onClick = {
-                    navHostController.navigate(NavigationRoutes.ADD_EVENT)
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null
-                )
-            }
-        },
         bottomBar = {
             BottomNavigationBar(selectedRoute = currentRoute) { itemRoute ->
                 selectedRoute = currentRoute
@@ -87,13 +71,16 @@ fun MainScreen(
         Content(modifier =
             modifier.padding(innerPadding),
             navController = navController,
-            navHostController = navHostController)
+            navHostController = navHostController, sharedViewModel = sharedViewModel)
 
     }
 }
 
 @Composable
-fun Content(modifier: Modifier = Modifier, navController: NavHostController, navHostController: NavHostController) {
+fun Content(modifier: Modifier = Modifier,
+            navController: NavHostController,
+            navHostController: NavHostController,
+            sharedViewModel: SharedViewModel) {
     NavHost(
         navController = navController,
         startDestination = BottomNavItem.Home.route,
@@ -116,7 +103,7 @@ fun Content(modifier: Modifier = Modifier, navController: NavHostController, nav
         }
 
         composable(BottomNavItem.Profile.route) {
-            ProfileScreen(navController = navHostController)
+            ProfileScreen(navController = navHostController, sharedViewModel = sharedViewModel)
         }
     }
 }
