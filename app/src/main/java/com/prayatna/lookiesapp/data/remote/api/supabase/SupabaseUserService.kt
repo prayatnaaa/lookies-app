@@ -8,6 +8,7 @@ import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.storage.Storage
+import kotlinx.serialization.json.Json
 import java.util.UUID
 import javax.inject.Inject
 
@@ -56,7 +57,7 @@ class SupabaseUserService @Inject constructor(
 
         val logoUrl = Helper.buildImageUrl(imageName = path, bucketName = bucketName)
 
-        val result = postgrest.rpc(
+        val response = postgrest.rpc(
             function = "submit_partner_application",
             parameters = mapOf(
                 "loc_name" to locName,
@@ -66,9 +67,10 @@ class SupabaseUserService @Inject constructor(
                 "partner_logo_url" to logoUrl,
                 "partner_portfolio_link" to partnerPortfolioLink
             )
-        ).decodeSingle<RpcBaseResponse>()
-
-        Log.d("PartnerSubmission", "result: $result")
+        )
+        Log.d("PartnerSubmission", "result: $response")
+        val jsonStr = response.data
+        val result = Json.decodeFromString<RpcBaseResponse>(jsonStr)
         return result.message
     }
 

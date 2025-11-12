@@ -97,12 +97,14 @@ fun ProfileScreen(
 
                     Spacer(Modifier.height(4.dp))
 
-                    SettingsSection(
-                        title = "Become our partner",
-                        onClick = {
-                            navController.navigate("${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup=true")
-                        }
-                    )
+                    if (profile.hasPartnerSub == false) {
+                        SettingsSection(
+                            title = "Become our partner",
+                            onClick = {
+                                navController.navigate("${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup=true")
+                            }
+                        )
+                    }
 
                     Button(onClick = { viewModel.logout() }) {
                         Text("Logout")

@@ -70,8 +70,7 @@ class EventRepositoryImpl @Inject constructor(
         }
 
         return try {
-            val token = userPreference.authTokenPreference.first()
-                ?: auth.currentSessionOrNull()?.accessToken
+            val token = auth.currentSessionOrNull()?.accessToken
                 ?: return DataResult.Error("Missing auth token")
 
             val response = supabaseEventService.getEvent(token = token, eventId = eventId)
@@ -113,9 +112,9 @@ class EventRepositoryImpl @Inject constructor(
             )
 
             val imageUrl = Helper.buildImageUrl(imageName = path, bucketName = "event_image_banner")
-            val userId = userPreference.userIdPreference.first()
+            val userId = auth.currentUserOrNull()?.id
                 ?: return DataResult.Error("User not logged in")
-            val token = userPreference.authTokenPreference.first()
+            val token = auth.currentSessionOrNull()?.accessToken
                 ?: return DataResult.Error("Missing auth token")
 
             val eventDto = event.copy(

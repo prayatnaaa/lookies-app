@@ -84,6 +84,14 @@ fun PartnerProfileFormScreen(
                 onBackButton = {
                     navController.popBackStack()
                 },
+                isButtonEnable =
+                    formState.partnerName.isNotEmpty() &&
+                    formState.partnerType.isNotEmpty() &&
+                    formState.imageLogo != null &&
+                    formState.locName.isNotEmpty() &&
+                    formState.locUrl.isNotEmpty() &&
+                    formState.portfolioLink.isNotEmpty() &&
+                    formState.partnerName.isNotBlank(),
                 onProfileButton = {},
                 onLocationButton = {},
                 onSubmissionButton = {

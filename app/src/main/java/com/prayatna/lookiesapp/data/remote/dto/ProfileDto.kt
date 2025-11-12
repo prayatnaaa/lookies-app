@@ -24,4 +24,6 @@ data class ProfileDto (
     @SerialName("bio")
     val bio: String?,
 
+    @SerialName("has_partner_sub")
+    val hasPartnerSub: Boolean?
 )

@@ -27,6 +27,8 @@ fun AddLocationScreen(
     Scaffold(
         bottomBar = {
             PartnerApplicationFooter(
+                isButtonEnable = formState.locUrl.isNotEmpty() &&
+                        formState.locName.isNotEmpty(),
                 route = NavigationRoutes.ADD_LOCATION,
                 onBackButton = { navController.popBackStack() },
                 onProfileButton = {},

@@ -40,4 +40,15 @@ class SupabasePartnerService @Inject constructor(
         Log.d("PartnerLogo", "Logo updated: ${updateResult.data}")
         return fullPublicUrl
     }
+
+    suspend fun getPartnerProfile() {
+        val userId = auth.currentUserOrNull()?.id
+            ?: throw Exception("User not authenticated")
+        val partnerProfile = postgrest.from("partner_profiles")
+            .select {
+                filter {
+                    eq("profile_id", userId)
+                }
+            }
+    }
 }

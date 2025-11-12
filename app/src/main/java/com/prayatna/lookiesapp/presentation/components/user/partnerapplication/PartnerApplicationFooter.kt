@@ -28,7 +28,7 @@ fun PartnerApplicationFooter(
     isButtonEnable: Boolean = true,
     onProfileButton: () -> Unit,
     onLocationButton: () -> Unit,
-    onSubmissionButton: () -> Unit
+    onSubmissionButton: () -> Unit,
 ) {
     Row (modifier = Modifier
         .fillMaxWidth()
