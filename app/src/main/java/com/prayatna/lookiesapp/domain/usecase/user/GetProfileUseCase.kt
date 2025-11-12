@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.domain.usecase.user
 
-import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
+import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.domain.model.user.Profile
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult

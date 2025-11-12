@@ -4,10 +4,10 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.domain.model.event.DetailEventInfo
 import com.prayatna.lookiesapp.domain.model.event.Event
-import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventApi
+import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventService
 import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
-import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
+import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.utils.DataResult
@@ -31,7 +31,7 @@ class EventRepositoryImpl @Inject constructor(
     private val storage: Storage,
     private val auth: Auth,
     private val userPreference: UserPreference,
-    private val supabaseEventApi: SupabaseEventApi,
+    private val supabaseEventService: SupabaseEventService,
 ): EventRepository {
 
     private val eventCache = mutableMapOf<String, DetailEventInfo>()
@@ -74,7 +74,7 @@ class EventRepositoryImpl @Inject constructor(
                 ?: auth.currentSessionOrNull()?.accessToken
                 ?: return DataResult.Error("Missing auth token")
 
-            val response = supabaseEventApi.getEvent(token = token, eventId = eventId)
+            val response = supabaseEventService.getEvent(token = token, eventId = eventId)
             val eventInfo = response.asDomainModel()
 
             eventCache[eventId] = eventInfo
@@ -123,7 +123,7 @@ class EventRepositoryImpl @Inject constructor(
                 bannerImageUrl = imageUrl
             )
 
-            val response = supabaseEventApi.addEvent(
+            val response = supabaseEventService.addEvent(
                 token = token,
                 event = eventDto,
                 detailEvent = detailEvent

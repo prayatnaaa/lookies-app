@@ -24,7 +24,7 @@ import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.payment.addpayment.AddPaymentScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
-import com.prayatna.lookiesapp.presentation.user.partnerapplication.PartnerApplicationScreen
+import com.prayatna.lookiesapp.presentation.user.partnerapplication.partnerApplicationNavGraph
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -71,12 +71,20 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         composable(NavigationRoutes.REGISTER) {
             RegisterScreen(navController = navController)
         }
-        composable(NavigationRoutes.EDIT_PROFILE) { navBackStackEntry ->
+        composable(
+            route = "${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup={isPartnerSignup}",
+            arguments = listOf(navArgument("isPartnerSignup") { type = NavType.BoolType })
+        ) { navBackStackEntry ->
             val rootEntry = remember(navBackStackEntry) {
                 navController.getBackStackEntry(NavigationRoutes.MAIN)
             }
+            val isPartnerSignup = navBackStackEntry.arguments?.getBoolean("isPartnerSignup") ?: false
             val sharedViewModel: SharedViewModel = hiltViewModel(rootEntry)
-            EditProfileScreen(navController = navController, sharedViewModel = sharedViewModel)
+            EditProfileScreen(
+                navController = navController,
+                sharedViewModel = sharedViewModel,
+                isPartnerSignup = isPartnerSignup
+            )
         }
         composable(NavigationRoutes.ADMIN_MAIN) {
             AdminMainScreen(navController = navController)
@@ -105,10 +113,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             val eventId = backStackEntry.arguments?.getString("eventId")!!
             AddPaymentScreen(navController = navController, eventId = eventId)
         }
-        composable(NavigationRoutes.PARTNER_APPLICATION) {
-            PartnerApplicationScreen(navController = navController)
-        }
 
         eventNavGraph(navController = navController)
+
+        partnerApplicationNavGraph(navController = navController)
     }
 }

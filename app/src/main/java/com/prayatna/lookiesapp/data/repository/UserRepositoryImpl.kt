@@ -6,8 +6,8 @@ import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.domain.model.user.User
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
-import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
-import com.prayatna.lookiesapp.data.remote.mapper.toDto
+import com.prayatna.lookiesapp.data.mapper.asDomainModel
+import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
@@ -48,7 +48,8 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun submitPartnerApplication(
         partnerName: String,
         partnerType: String,
-        locationId: Int,
+        locName: String,
+        locUrl: String,
         portfolioLink: String,
         imageLogo: Uri
     ): DataResult<String> {
@@ -65,9 +66,10 @@ class UserRepositoryImpl @Inject constructor(
             val response = supabaseUserService.submitPartnerApplication(
                 partnerName = partnerName,
                 partnerType = partnerType,
-                locationId = locationId,
-                portfolioLink = portfolioLink,
-                imageLogo = compressImage
+                locUrl = locUrl,
+                locName = locName,
+                partnerPortfolioLink = portfolioLink,
+                partnerLogo = compressImage
             )
             DataResult.Success(response)
         } catch (e: RestException) {

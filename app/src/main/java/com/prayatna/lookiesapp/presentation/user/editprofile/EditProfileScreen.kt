@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation.user.editprofile
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -36,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.SharedViewModel
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.components.user.partnerapplication.PartnerApplicationFooter
 import com.prayatna.lookiesapp.presentation.components.user.profile.EditProfileCard
 import com.prayatna.lookiesapp.presentation.components.user.profile.EditProfileImageCard
 import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
@@ -43,21 +43,22 @@ import com.prayatna.lookiesapp.ui.theme.DarkGrey
 import com.prayatna.lookiesapp.ui.theme.LightGrey
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.NavigationRoutes
+import kotlinx.coroutines.launch
 
 @Composable
 fun EditProfileScreen (
     modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: EditProfileViewModel = hiltViewModel(),
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    isPartnerSignup: Boolean = false
 ) {
 
     val status = viewModel.editProfileStatus.collectAsStateWithLifecycle()
     val snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
     val profileState by sharedViewModel.profileState.collectAsStateWithLifecycle()
-
-    Log.d("ProfileState", "$profileState")
 
     LaunchedEffect(profileState) {
         if (profileState is DataResult.Success) {
@@ -74,12 +75,20 @@ fun EditProfileScreen (
     LaunchedEffect(status.value) {
         when (val result = status.value) {
             is DataResult.Success -> {
-                snackBarHostState.showSnackbar(
-                    message = "Profile updated! ${result.data}",
-                    duration = SnackbarDuration.Short
-                )
+                launch {
+                    snackBarHostState.showSnackbar(
+                        message = "Profile updated! ${result.data}",
+                        duration = SnackbarDuration.Short
+                    )
+                }
                 sharedViewModel.refreshProfile()
-                navController.popBackStack()
+                if (isPartnerSignup) {
+                    navController.navigate(NavigationRoutes.ADD_LOCATION) {
+                        popUpTo(NavigationRoutes.EDIT_PROFILE) { inclusive = true }
+                    }
+                } else {
+                    navController.popBackStack()
+                }
             }
             is DataResult.Error -> {
                 snackBarHostState.showSnackbar(
@@ -93,6 +102,25 @@ fun EditProfileScreen (
 
     Scaffold (
         snackbarHost = { SnackbarHost(snackBarHostState) },
+        bottomBar = {
+            if (isPartnerSignup) {
+                PartnerApplicationFooter(
+                    route = "${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup=true",
+                    onBackButton = { navController.popBackStack() },
+                    onProfileButton = {
+                        if (!viewModel.isChanged) {
+                            navController.navigate(NavigationRoutes.ADD_LOCATION) {
+                                popUpTo(NavigationRoutes.EDIT_PROFILE) { inclusive = true }
+                            }
+                        } else {
+                            viewModel.onEditProfile()
+                        }
+                    },
+                    onLocationButton = {},
+                    onSubmissionButton = {},
+                )
+            }
+        },
         topBar = {
             Box(
                 modifier = modifier
@@ -109,14 +137,25 @@ fun EditProfileScreen (
                     )
                 }
 
-                Text(
-                    text = "Profile",
-                    modifier = Modifier.align(Alignment.Center),
-                    style = TextStyle(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Medium
+                if (!isPartnerSignup) {
+                    Text(
+                        text = "Profile",
+                        modifier = Modifier.align(Alignment.Center),
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Medium
+                        )
                     )
-                )
+                } else {
+                    Text(
+                        text = "Confirm your profile first!",
+                        modifier = Modifier.align(Alignment.Center),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    )
+                }
             }
         },
         content = { innerPadding ->
@@ -126,7 +165,8 @@ fun EditProfileScreen (
                     .padding(innerPadding),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (status.value is DataResult.Loading) CircularLoading()
+                val editStatus = status.value
+                if (editStatus is DataResult.Loading) CircularLoading()
 
                 EditProfileImageCard { }
 
@@ -144,23 +184,26 @@ fun EditProfileScreen (
 
                 Spacer(modifier = modifier.height(4.dp))
 
-                ElevatedButton (
-                    enabled = viewModel.isChanged,
-                    onClick = {
-                        viewModel.onEditProfile()
-                    },
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonColors(
-                        containerColor = BlackCharcoal,
-                        contentColor = PureWhite,
-                        disabledContentColor = LightGrey,
-                        disabledContainerColor = DarkGrey
-                    )
-                ) {
-                    Text(text = "Save")
+                if (!isPartnerSignup) {
+                    ElevatedButton(
+                        enabled = viewModel.isChanged,
+                        onClick = {
+                            viewModel.onEditProfile()
+                        },
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = BlackCharcoal,
+                            contentColor = PureWhite,
+                            disabledContainerColor = DarkGrey,
+                            disabledContentColor = LightGrey
+                        )
+
+                    ) {
+                        Text(text = "Save")
+                    }
                 }
             }
         }

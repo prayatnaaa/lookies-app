@@ -16,7 +16,7 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import javax.inject.Inject
 
-class SupabasePaymentApi @Inject constructor(
+class SupabasePaymentService @Inject constructor(
     private val httpClient: HttpClient
 ) {
 

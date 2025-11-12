@@ -13,6 +13,7 @@ object NavigationRoutes {
     const val EVENT_LIST = "event_list"
     const val ADD_PAYMENT = "add_payment"
     const val PARTNER_APPLICATION = "partner_application"
+    const val ADD_LOCATION = "add_location"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

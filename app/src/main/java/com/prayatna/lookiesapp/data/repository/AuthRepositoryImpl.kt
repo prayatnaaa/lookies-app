@@ -2,7 +2,7 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthApi
+import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthService
 import com.prayatna.lookiesapp.data.remote.response.auth.LoginResponse
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.utils.DataResult
@@ -19,13 +19,13 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val auth: Auth,
-    private val supabaseAuthApi: SupabaseAuthApi,
+    private val supabaseAuthService: SupabaseAuthService,
     private val userPreference: UserPreference
 ): AuthRepository {
 
     override suspend fun signIn(email: String, password: String): DataResult<LoginResponse> {
         return try {
-             val response = supabaseAuthApi.signIn(email = email, password = password)
+             val response = supabaseAuthService.signIn(email = email, password = password)
             if (response.success) {
                 DataResult.Success(response)
             }
@@ -49,7 +49,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun signUp(email: String, password: String): DataResult<UserInfo?> {
         return try {
-            val result = supabaseAuthApi.signUp(email = email, password = password)
+            val result = supabaseAuthService.signUp(email = email, password = password)
 
             Log.d("AUTH", result.toString())
             DataResult.Success(result)

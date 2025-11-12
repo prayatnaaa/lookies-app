@@ -5,7 +5,8 @@ import android.net.Uri
 data class PartnerSubmissionFormState (
     val partnerName: String = "",
     val partnerType: String = "",
-    val locationId: Int = 0,
+    val locName: String = "",
+    val locUrl: String = "",
     val portfolioLink: String = "",
     val imageLogo: Uri? = null
 )

@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.components.user.partnerapplication
 
 import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +22,8 @@ import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.ui.theme.DarkGrey
 
 @Composable
-fun PartnerLogoSection(imageLogo: Uri?) {
+fun PartnerLogoSection(imageLogo: Uri?,
+                       onClick: () -> Unit) {
     if (imageLogo != null) {
         AsyncImage(
             model = imageLogo,
@@ -30,9 +32,16 @@ fun PartnerLogoSection(imageLogo: Uri?) {
                 .fillMaxWidth()
                 .height(140.dp)
                 .padding(bottom = 12.dp)
+                .clickable {
+                    onClick()
+                }
         )
     } else {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clickable {
+                    onClick()
+                }) {
             Icon(
                 imageVector = Icons.Default.CameraAlt,
                 contentDescription = "Add image",

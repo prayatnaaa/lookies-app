@@ -2,10 +2,11 @@ package com.prayatna.lookiesapp.domain.model.user
 
 import android.net.Uri
 
-data class PartnerSubmissionRequest(
+data class PartnerSubmissionParams(
     val partnerName: String,
     val partnerType: String,
-    val locationId: Int,
+    val locName: String,
+    val locUrl: String,
     val portfolioLink: String,
     val imageLogo: Uri
 )

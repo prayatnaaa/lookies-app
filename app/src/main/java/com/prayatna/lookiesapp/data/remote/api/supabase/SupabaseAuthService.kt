@@ -8,7 +8,7 @@ import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.user.UserInfo
 import javax.inject.Inject
 
-class SupabaseAuthApi @Inject constructor(
+class SupabaseAuthService @Inject constructor(
     private val auth: Auth,
 ) {
 

@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.UserDto
+import com.prayatna.lookiesapp.data.remote.response.base.RpcBaseResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -36,25 +37,39 @@ class SupabaseUserService @Inject constructor(
     }
 
     suspend fun submitPartnerApplication(
+        locName: String,
+        locUrl: String,
         partnerName: String,
         partnerType: String,
-        locationId: Int,
-        portfolioLink: String,
-        imageLogo: ByteArray
+        partnerLogo: ByteArray,
+        partnerPortfolioLink: String
     ): String {
-        val imageUrl = uploadPartnerLogo(imageLogo)
-        val result = postgrest.rpc(
-            function = "submit_organizer_application",
-            parameters = mapOf(
-                "name_input" to partnerName,
-                "type_input" to partnerType,
-                "logo_url_input" to imageUrl,
-                "location_id_input" to locationId,
-                "portofolio_link_input" to portfolioLink
-            )
-        ).decodeSingle<String>()
 
-        return result
+        val path = "partner-logos/${UUID.randomUUID()}.png"
+        val bucketName = "partner_assets"
+
+        storage.from(bucketName).upload(
+            path = path,
+            data = partnerLogo,
+            upsert = true
+        )
+
+        val logoUrl = Helper.buildImageUrl(imageName = path, bucketName = bucketName)
+
+        val result = postgrest.rpc(
+            function = "submit_partner_application",
+            parameters = mapOf(
+                "loc_name" to locName,
+                "loc_url" to locUrl,
+                "partner_name" to partnerName,
+                "partner_type" to partnerType,
+                "partner_logo_url" to logoUrl,
+                "partner_portfolio_link" to partnerPortfolioLink
+            )
+        ).decodeSingle<RpcBaseResponse>()
+
+        Log.d("PartnerSubmission", "result: $result")
+        return result.message
     }
 
     suspend fun editProfile(

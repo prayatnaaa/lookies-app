@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.data.remote.mapper
+package com.prayatna.lookiesapp.data.mapper
 
 import com.prayatna.lookiesapp.domain.model.user.User
 import com.prayatna.lookiesapp.data.remote.dto.UserDto

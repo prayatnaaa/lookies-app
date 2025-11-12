@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.SharedViewModel
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.user.profile.ProfileCard
+import com.prayatna.lookiesapp.presentation.components.user.profile.SettingsSection
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -90,11 +91,18 @@ fun ProfileScreen(
                     ProfileCard(
                         username = profile.username ?: "Unknown",
                         onEditProfileClick = {
-                            navController.navigate(NavigationRoutes.EDIT_PROFILE)
+                            navController.navigate("${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup=false")
                         }
                     )
 
                     Spacer(Modifier.height(4.dp))
+
+                    SettingsSection(
+                        title = "Become our partner",
+                        onClick = {
+                            navController.navigate("${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup=true")
+                        }
+                    )
 
                     Button(onClick = { viewModel.logout() }) {
                         Text("Logout")

@@ -19,7 +19,8 @@ interface UserRepository {
     suspend fun submitPartnerApplication(
         partnerName: String,
         partnerType: String,
-        locationId: Int,
+        locName: String,
+        locUrl: String,
         portfolioLink: String,
         imageLogo: Uri
     ): DataResult<String>
