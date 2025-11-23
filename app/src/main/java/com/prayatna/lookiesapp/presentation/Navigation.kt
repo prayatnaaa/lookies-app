@@ -22,6 +22,7 @@ import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
+import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.payment.addpayment.AddPaymentScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.partnerApplicationNavGraph
@@ -32,6 +33,7 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val sessionStatus by viewModel.sessionStatus.collectAsStateWithLifecycle()
+    val roleState by viewModel.roleState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.isSessionActive()
@@ -41,12 +43,13 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         CircularLoading()
     }
 
-    Log.d("SessionStatus", "$sessionStatus")
     val startDestination = when (sessionStatus) {
         is DataResult.Error -> NavigationRoutes.LOGIN
         is DataResult.Success -> {
             if ((sessionStatus as DataResult.Success).data) {
-                NavigationRoutes.MAIN
+                if (roleState == "admin") {
+                    NavigationRoutes.ADMIN_MAIN
+                } else NavigationRoutes.MAIN
             } else {
                 NavigationRoutes.LOGIN
             }
@@ -112,6 +115,11 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         ) { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId")!!
             AddPaymentScreen(navController = navController, eventId = eventId)
+        }
+        composable(
+            route = NavigationRoutes.PARTNER_LIST
+        ) {
+            PartnerListScreen(navController = navController)
         }
 
         eventNavGraph(navController = navController)

@@ -40,13 +40,15 @@ fun AdminMainScreen(
         modifier = modifier.padding(16.dp)
     ) {
         AdminPanelCard(
-            contentFor = "Artist Application",
-            onClick = { }
+            contentFor = "Partner Applications",
+            onClick = {
+                navController.navigate(NavigationRoutes.PARTNER_LIST)
+            }
         )
         Spacer(modifier = modifier.height(8.dp))
 
         AdminPanelCard(
-            contentFor = "Event Application",
+            contentFor = "Event Applications",
             onClick = {
                 navController.navigate(NavigationRoutes.ADMIN_EVENT)
             }

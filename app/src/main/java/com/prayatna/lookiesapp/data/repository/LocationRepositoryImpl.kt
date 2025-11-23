@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.data.repository
 
-import com.prayatna.lookiesapp.data.mapper.asDomainModel
+import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseLocationService
 import com.prayatna.lookiesapp.domain.model.location.Location
 import com.prayatna.lookiesapp.domain.repository.LocationRepository
@@ -15,7 +15,7 @@ class LocationRepositoryImpl @Inject constructor(
     override suspend fun getLocationsById(): DataResult<List<Location>> {
         return try {
             val response = supabaseLocationService.getLocationsById()
-            DataResult.Success(response.map { it.asDomainModel() })
+            DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.message.toString())
         } catch (e: HttpRequestException) {
@@ -35,7 +35,7 @@ class LocationRepositoryImpl @Inject constructor(
                 name = name,
                 url = url
             )
-            DataResult.Success(response.asDomainModel())
+            DataResult.Success(response.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.message.toString())
         } catch (e: HttpRequestException) {

@@ -4,13 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PartnerProfileDto(
-    @SerialName("profile_id") val profileId: String,
+data class PartnerDto(
     val name: String,
     val type: String,
     @SerialName("logo_url") val logoUrl: String,
-    @SerialName("portfolio_link") val portfolioLink: String,
     val status: String,
-    val locations: LocationDto,
-    val profile: ProfileDto
+    val locations: List<LocationDto>,
 )

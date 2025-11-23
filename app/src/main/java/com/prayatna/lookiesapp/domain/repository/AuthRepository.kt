@@ -9,4 +9,5 @@ interface AuthRepository {
     suspend fun signUp(email: String, password: String): DataResult<UserInfo?>
     suspend fun isSessionActive(): DataResult<Boolean>
     suspend fun logout(): DataResult<Any>
+    fun getRole(): String
 }

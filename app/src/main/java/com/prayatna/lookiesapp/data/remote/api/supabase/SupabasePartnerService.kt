@@ -1,9 +1,12 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.remote.dto.DetailPartnerDto
+import com.prayatna.lookiesapp.data.remote.dto.PartnerDto
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.storage.Storage
 import java.util.UUID
 import javax.inject.Inject
@@ -41,14 +44,18 @@ class SupabasePartnerService @Inject constructor(
         return fullPublicUrl
     }
 
-    suspend fun getPartnerProfile() {
-        val userId = auth.currentUserOrNull()?.id
-            ?: throw Exception("User not authenticated")
-        val partnerProfile = postgrest.from("partner_profiles")
-            .select {
-                filter {
-                    eq("profile_id", userId)
-                }
-            }
+    suspend fun getPartners(): List<PartnerDto> {
+        val result = postgrest
+            .rpc("get_partner_profiles")
+            .decodeList<PartnerDto>()
+        Log.d("GET-PARTNERS", result.toString())
+        return result
+    }
+
+    suspend fun getDetailPartner(id: Int): DetailPartnerDto {
+        val result  = postgrest
+            .rpc("get_partner_profile_by_id", id)
+            .decodeSingle<DetailPartnerDto>()
+        return result
     }
 }

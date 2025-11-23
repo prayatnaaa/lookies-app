@@ -4,12 +4,14 @@ import com.prayatna.lookiesapp.data.repository.ArtistRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.AuthRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.EventRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.LocationRepositoryImpl
+import com.prayatna.lookiesapp.data.repository.PartnerRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.PaymentRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.UserRepositoryImpl
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.repository.LocationRepository
+import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.domain.repository.PaymentRepository
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import dagger.Binds
@@ -44,4 +46,8 @@ interface DataModule {
     @Singleton
     @Binds
     fun bindsLocationRepository(locationRepository: LocationRepositoryImpl): LocationRepository
+
+    @Singleton
+    @Binds
+    fun bindsPartnerRepository(partnerRepository: PartnerRepositoryImpl): PartnerRepository
 }

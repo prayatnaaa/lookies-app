@@ -25,7 +25,8 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun signIn(email: String, password: String): DataResult<LoginResponse> {
         return try {
-             val response = supabaseAuthService.signIn(email = email, password = password)
+            val response = supabaseAuthService.signIn(email = email, password = password)
+            userPreference.setRole(response.role)
             if (response.success) {
                 DataResult.Success(response)
             }
@@ -101,6 +102,17 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e("SESSION", "Error checking session: ${e.message}")
             DataResult.Error("Something went wrong while checking your session.")
+        }
+    }
+
+    override fun getRole(): String {
+        return try {
+            val response = supabaseAuthService.getRole()
+            response
+        } catch (e: Exception) {
+            e.message.toString()
+        } catch (e: RestException) {
+            e.message.toString()
         }
     }
 }

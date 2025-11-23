@@ -43,4 +43,19 @@ class SupabaseAuthService @Inject constructor(
         }
         return result
     }
+
+    fun getRole(): String {
+        val accessToken = auth.currentAccessTokenOrNull()
+        if (accessToken.isNullOrEmpty()) {
+            throw Exception("unknown")
+        }
+        val jwt = JWT(accessToken)
+        val role = jwt.getClaim("app_metadata").asObject(Map::class.java)?.get("role")
+            ?: "unknown"
+
+        if (role == "unknown") {
+            throw Exception("Role not found")
+        }
+        return role.toString()
+    }
 }
