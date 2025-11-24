@@ -5,7 +5,6 @@ import com.prayatna.lookiesapp.domain.model.location.Location
 
 fun LocationDto.toDomain(): Location {
     return Location(
-        userId = this.userId,
         name = this.name,
         url = this.url
     )

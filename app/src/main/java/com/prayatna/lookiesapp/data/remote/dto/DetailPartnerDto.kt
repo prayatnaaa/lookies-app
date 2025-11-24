@@ -5,12 +5,20 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DetailPartnerDto(
-    @SerialName("profile_id") val profileId: Int?,
-    val name: String,
-    val type: String,
-    @SerialName("logo_url") val logoUrl: String,
-    @SerialName("portfolio_link") val portfolioLink: String,
-    val status: String,
-    val locations: List<LocationDto>,
-    val profile: ProfileDto
+    val id: Int? = null,
+    val name: String? = null,
+    val type: String? = null,
+    val status: String? = null,
+
+    @SerialName("logo_url")
+    val logoUrl: String? = null,
+
+    @SerialName("portofolio_link")
+    val portfolioLink: String? = null,
+
+    @SerialName("locations")
+    val locations: List<LocationDto> = emptyList(),
+
+    @SerialName("profile")
+    val profile: ProfileDto? = null
 )

@@ -86,7 +86,7 @@ fun PartnerCard(
 
                 val displayLocation = data.locations.firstOrNull()
 
-                if (displayLocation != null) {
+                if (displayLocation?.name != null) {
                     InfoRow(
                         icon = Icons.Default.LocationOn,
                         text = displayLocation.name
@@ -131,6 +131,7 @@ private fun InfoRow(
 fun PartnerListCardPreview() {
     val dummyList = listOf(
         PartnerUiModel(
+            id = 1,
             name = "Stark Industries",
             type = "Personal",
             logoUrl = "https://example.com/logo.png",
@@ -138,6 +139,7 @@ fun PartnerListCardPreview() {
             locations = listOf(LocationUiModel(name = "Jakarta, Indonesia", locUrl = ""))
         ),
         PartnerUiModel(
+            id = 2,
             name = "Wayne Enterprises",
             type = "Gallery",
             logoUrl = "https://example.com/logo.png",
@@ -145,6 +147,7 @@ fun PartnerListCardPreview() {
             locations = listOf(LocationUiModel(name = "Gotham City", locUrl = ""))
         ),
         PartnerUiModel(
+            id = 3,
             name = "Hello World",
             type = "Corporate",
             logoUrl = "https://example.com/logo.png",

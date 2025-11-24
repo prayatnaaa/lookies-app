@@ -4,12 +4,12 @@ import com.prayatna.lookiesapp.domain.model.location.Location
 import com.prayatna.lookiesapp.domain.model.user.Profile
 
 data class DetailPartner(
-    val profileId: Int?,
-    val name: String,
-    val type: String,
-    val logoUrl: String,
-    val portfolioLink: String,
-    val status: String,
+    val id: Int? = null,
+    val name: String? = null,
+    val type: String? = null,
+    val logoUrl: String? = null,
+    val portfolioLink: String? = null,
+    val status: String? = null,
     val locations: List<Location>,
-    val profile: Profile
+    val profile: Profile? = null
 )

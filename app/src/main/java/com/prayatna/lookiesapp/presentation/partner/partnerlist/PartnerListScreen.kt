@@ -13,6 +13,7 @@ import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.partner.PartnerListCard
 import com.prayatna.lookiesapp.presentation.error.ErrorScreen
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun PartnerListScreen(
@@ -46,7 +47,9 @@ fun PartnerListScreen(
                         PartnerListCard(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             contentPadding = innerPadding,
-                            onPartnerClick = {},
+                            onPartnerClick = {
+                                navController.navigate("${NavigationRoutes.DETAIL_PARTNER}/${it.id}")
+                            },
                             partnerList = result.data,
                             showStatus = roleState == "admin"
                         )

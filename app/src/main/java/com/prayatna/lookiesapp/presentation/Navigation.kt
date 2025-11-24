@@ -22,6 +22,7 @@ import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
+import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.payment.addpayment.AddPaymentScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
@@ -120,6 +121,14 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             route = NavigationRoutes.PARTNER_LIST
         ) {
             PartnerListScreen(navController = navController)
+        }
+        composable(
+            route = "${NavigationRoutes.DETAIL_PARTNER}/{partnerId}",
+            arguments = listOf(navArgument("partnerId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getInt("partnerId")?.let { partnerId ->
+                DetailPartnerScreen(navController = navController, partnerId = partnerId)
+            }
         }
 
         eventNavGraph(navController = navController)

@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.presentation.partner.partnerlist.state.PartnerUiM
 
 fun Partner.toUi(): PartnerUiModel {
     return PartnerUiModel(
+        id = this.id,
         name = this.name,
         type = this.type,
         logoUrl = this.logoUrl,

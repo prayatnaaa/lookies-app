@@ -1,7 +1,7 @@
 package com.prayatna.lookiesapp.domain.model.user
 
 data class Profile (
-    val id: String,
+    val id: String?,
     val profileUrl: String?,
     val username: String?,
     val fullName: String?,

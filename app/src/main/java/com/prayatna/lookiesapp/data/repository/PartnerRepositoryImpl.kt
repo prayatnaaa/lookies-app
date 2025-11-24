@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePartnerService
 import com.prayatna.lookiesapp.domain.model.partner.DetailPartner
@@ -30,10 +31,13 @@ class PartnerRepositoryImpl @Inject constructor(
     override suspend fun getDetailPartner(id: Int): DataResult<DetailPartner> {
         return try {
             val response = supabasePartnerService.getDetailPartner(id)
+            Log.d("PartnerRepository", response.toString())
             DataResult.Success(response.toDomain())
         } catch (e: RestException) {
+            Log.e("PartnerRepository", e.message.toString())
             DataResult.Error(e.message.toString())
         } catch (e: Exception) {
+            Log.e("PartnerRepository", e.message.toString())
             DataResult.Error(e.message.toString())
         }
     }

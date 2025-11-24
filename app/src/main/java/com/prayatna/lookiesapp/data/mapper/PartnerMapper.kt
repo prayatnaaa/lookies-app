@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.domain.model.partner.Partner
 
 fun PartnerDto.toDomain(): Partner {
     return Partner(
+        id = this.id,
         name = this.name,
         type = this.type,
         logoUrl = this.logoUrl,

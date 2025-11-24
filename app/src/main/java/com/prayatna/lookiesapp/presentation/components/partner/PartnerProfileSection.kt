@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,50 +38,43 @@ fun PartnerProfileSection(
     onPortofolioClick: () -> Unit,
     showStatus: Boolean = false
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+
         AsyncImage(
             model = data.logoUrl,
             contentDescription = data.name,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
         )
 
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = data.name,
+                    text = data.name ?: "Unknown Partner",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = BlackCharcoal
                 )
-                if (showStatus) {
+                if (showStatus && !data.status.isNullOrBlank()) {
                     StatusPill(text = data.status)
                 }
             }
             Text(
-                text = data.type,
+                text = data.type ?: "-",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
         }
 
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+            // About
             Column {
                 Text(
                     text = "About",
@@ -88,29 +82,47 @@ fun PartnerProfileSection(
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(Modifier.height(8.dp))
-                Text(
-                    text = data.profile.bio,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                val bio = data.profile?.bio
+                if (!bio.isNullOrBlank()) {
+                    Text(
+                        text = bio,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    Text(
+                        text = "No bio available",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontStyle = FontStyle.Italic),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                }
             }
 
+            // Info Rows
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 InfoRow(
                     icon = Icons.Outlined.LocationOn,
-                    text = data.locations.name
+                    text = data.locations.firstOrNull()?.name ?: "Location not set"
                 )
+
                 InfoRow(
                     icon = Icons.Outlined.AccountCircle,
-                    text = "${data.profile.fullName} (@${data.profile.username})"
-                )
-                InfoRowClickable(
-                    icon = Icons.Outlined.Link,
-                    text = data.portfolioLink,
-                    onClick = {
-                       onPortofolioClick()
+                    text = buildString {
+                        append(data.profile?.fullName ?: "Unknown")
+                        append(" (@")
+                        append(data.profile?.username ?: "no_username")
+                        append(")")
                     }
                 )
+
+                val portfolio = data.portfolioLink
+                if (!portfolio.isNullOrBlank()) {
+                    InfoRowClickable(
+                        icon = Icons.Outlined.Link,
+                        text = portfolio,
+                        onClick = onPortofolioClick
+                    )
+                }
             }
         }
     }
@@ -179,12 +191,14 @@ fun DetailPartnerSectionPreview() {
             logoUrl = "https://qevtkceidfnpyhiacbgh.supabase.co/storage/v1/object/public/partner_assets/partner-logos/e4146d94-1baf-40f2-b1b2-8ac41fbb3454.png",
             portfolioLink = "www.stark-industries.com",
             status = "pending",
-            locations = LocationUiModel(
-                name = "Jakarta Pusat, Indonesia",
-                locUrl = "www.google.com"
+            locations = listOf(
+                LocationUiModel(
+                    name = "Jakarta Pusat, Indonesia",
+                    locUrl = "www.google.com"
+                )
             ),
             profile = ProfileUiModel(
-                id = 1,
+                id = "1",
                 profileUrl = "www.google.com",
                 username = "tonystark",
                 fullName = "Tony Stark",

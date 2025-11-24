@@ -6,7 +6,7 @@ import com.prayatna.lookiesapp.domain.model.user.Profile
 fun ProfileDto.asDomainModel(): Profile {
     return Profile(
         id = this.id,
-        profileUrl = this.profileUrl,
+        profileUrl = this.profilePictureUrl,
         username = this.username,
         fullName = this.fullName,
         address = this.address,
@@ -21,6 +21,6 @@ fun Profile.toDto(): ProfileDto = ProfileDto(
     fullName = fullName,
     bio = bio,
     address = address,
-    profileUrl = profileUrl,
+    profilePictureUrl = profileUrl,
     hasPartnerSub = hasPartnerSub
 )

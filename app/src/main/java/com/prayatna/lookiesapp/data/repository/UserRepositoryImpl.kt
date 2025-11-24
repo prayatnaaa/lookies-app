@@ -82,7 +82,7 @@ class UserRepositoryImpl @Inject constructor(
     override fun getProfile(): Flow<DataResult<ProfileDto>> =
         userPreference.getProfile()
             .map { localProfile ->
-                if (localProfile.id.isEmpty()) {
+                if (localProfile.id == null) {
                     DataResult.Loading
                 } else {
                     DataResult.Success(localProfile.toDto())

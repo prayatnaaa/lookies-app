@@ -27,8 +27,7 @@ class SupabaseLocationService @Inject constructor(
     }
 
     suspend fun addLocation(name: String, url: String): LocationDto {
-        val userId = auth.currentUserOrNull()?.id ?: throw Exception("User not authenticated")
-        val location = LocationDto(userId = userId, name = name, url = url)
+        val location = LocationDto(name = name, url = url)
         val response = postgrest.from("locations")
             .insert(location) {
                 select()

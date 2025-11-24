@@ -4,6 +4,7 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.DetailPartnerDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDto
 import com.prayatna.lookiesapp.utils.Helper
+import com.prayatna.lookiesapp.utils.JsonProvider
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.rpc
@@ -48,14 +49,12 @@ class SupabasePartnerService @Inject constructor(
         val result = postgrest
             .rpc("get_partner_profiles")
             .decodeList<PartnerDto>()
-        Log.d("GET-PARTNERS", result.toString())
         return result
     }
 
     suspend fun getDetailPartner(id: Int): DetailPartnerDto {
-        val result  = postgrest
-            .rpc("get_partner_profile_by_id", id)
-            .decodeSingle<DetailPartnerDto>()
-        return result
+        return postgrest
+            .rpc("get_partner_profile_by_id", mapOf("p_partner_id" to id))
+            .decodeAs<DetailPartnerDto>()
     }
 }

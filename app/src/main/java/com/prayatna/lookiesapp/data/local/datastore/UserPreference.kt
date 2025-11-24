@@ -55,7 +55,7 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
 
     suspend fun setProfile(profile: Profile) {
         context.dataStore.edit { preferences ->
-            preferences[USER_ID_KEY] = profile.id
+            preferences[USER_ID_KEY] = profile.id ?: ""
             preferences[USER_URL_KEY] = profile.profileUrl ?: ""
             preferences[USERNAME_KEY] = profile.username ?: ""
             preferences[USER_ADDRESS_KEY] = profile.address ?: ""
