@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.partner.detailpartner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.mapper.toUi
+import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.GetDetailPartnerUseCase
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.state.DetailPartnerState
 import com.prayatna.lookiesapp.utils.DataResult
@@ -15,11 +16,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailPartnerViewModel @Inject constructor(
-    private val getDetailPartnerUseCase: GetDetailPartnerUseCase
+    private val getDetailPartnerUseCase: GetDetailPartnerUseCase,
+    private val getRolesUseCase: GetRoleUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailPartnerState())
     val state = _state.asStateFlow()
+
+    private val _roleState = MutableStateFlow("")
+    val roleState = _roleState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            getRolesUseCase().collect { role ->
+                _roleState.value = role
+            }
+        }
+    }
 
     fun loadPartnerDetail(id: Int) {
         viewModelScope.launch {

@@ -1,10 +1,13 @@
 package com.prayatna.lookiesapp.ui.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.ui.graphics.Color
 
 val PrimaryBase = Color(0xFF18186C) // #18186C
 
 //TODO: FIX COLOR
+val Maroon = Color(0xFFaa0a0a)
+val DarkGreen = Color(0xFF006102)
 
 //botnav color
 val DarkBlue = Color(0xFF1A1C40)

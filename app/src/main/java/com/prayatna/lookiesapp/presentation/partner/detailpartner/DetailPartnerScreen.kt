@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation.partner.detailpartner
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -24,6 +23,7 @@ fun DetailPartnerScreen(
     navController: NavController
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val role by viewModel.roleState.collectAsStateWithLifecycle()
 
     LaunchedEffect(partnerId) {
         viewModel.loadPartnerDetail(partnerId)
@@ -57,7 +57,7 @@ fun DetailPartnerScreen(
                             PartnerProfileSection(
                                 data = data,
                                 onPortofolioClick = { onPortfolioClick(state.data!!.portfolioLink!!) },
-                                showStatus = true
+                                isAdmin = role == "admin"
                             )
                         }
                     }

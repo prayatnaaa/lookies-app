@@ -36,7 +36,7 @@ import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 fun PartnerProfileSection(
     data: DetailPartnerUiModel,
     onPortofolioClick: () -> Unit,
-    showStatus: Boolean = false
+    isAdmin: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -60,7 +60,7 @@ fun PartnerProfileSection(
                     fontWeight = FontWeight.Bold,
                     color = BlackCharcoal
                 )
-                if (showStatus && !data.status.isNullOrBlank()) {
+                if (isAdmin && !data.status.isNullOrBlank()) {
                     StatusPill(text = data.status)
                 }
             }
@@ -183,7 +183,7 @@ private fun InfoRowClickable(
 fun DetailPartnerSectionPreview() {
     PartnerProfileSection(
         onPortofolioClick = {},
-        showStatus = true,
+        isAdmin = true,
         data = DetailPartnerUiModel(
             id = 1,
             name = "Stark Industries",
