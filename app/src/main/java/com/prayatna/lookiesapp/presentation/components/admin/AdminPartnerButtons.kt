@@ -25,7 +25,7 @@ fun AdminPartnerButtons(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 8.dp),
+            .padding(vertical = 32.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
 

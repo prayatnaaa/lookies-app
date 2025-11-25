@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.partner.partnerlist
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,6 +24,18 @@ fun PartnerListScreen(
 
     val uiState by viewModel.partnerState.collectAsStateWithLifecycle()
     val roleState by viewModel.roleState.collectAsStateWithLifecycle()
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+
+    val shouldRefresh = savedStateHandle
+        ?.getStateFlow("shouldRefresh", false)
+        ?.collectAsStateWithLifecycle()
+
+    LaunchedEffect(shouldRefresh?.value) {
+        if (shouldRefresh?.value == true) {
+            viewModel.loadPartners()
+            savedStateHandle["shouldRefresh"] = false
+        }
+    }
 
     when (val result = uiState) {
         is DataResult.Error -> {

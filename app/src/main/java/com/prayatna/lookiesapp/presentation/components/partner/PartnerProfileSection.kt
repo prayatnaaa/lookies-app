@@ -41,7 +41,7 @@ fun PartnerProfileSection(
     Column(modifier = Modifier.fillMaxWidth()) {
 
         AsyncImage(
-            model = data.logoUrl,
+            model = data.logoUrl?.replace("http://172.21.179.110", "http://10.0.2.2"),
             contentDescription = data.name,
             modifier = Modifier
                 .fillMaxWidth()
