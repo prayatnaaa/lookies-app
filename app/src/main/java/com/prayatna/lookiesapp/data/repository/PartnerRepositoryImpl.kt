@@ -7,6 +7,8 @@ import com.prayatna.lookiesapp.domain.model.partner.DetailPartner
 import com.prayatna.lookiesapp.domain.model.partner.Partner
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.extractSupabaseError
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -21,9 +23,12 @@ class PartnerRepositoryImpl @Inject constructor(
             val response = supabasePartnerService.getPartners()
             emit(DataResult.Success(response.map { it.toDomain() }))
         } catch (e: RestException) {
-            emit(DataResult.Error(e.message.toString()))
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            emit(DataResult.Error(e.message.toString()))
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
@@ -34,11 +39,12 @@ class PartnerRepositoryImpl @Inject constructor(
             Log.d("PartnerRepository", response.toString())
             DataResult.Success(response.toDomain())
         } catch (e: RestException) {
-            Log.e("PartnerRepository", e.message.toString())
-            DataResult.Error(e.message.toString())
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            Log.e("PartnerRepository", e.message.toString())
-            DataResult.Error(e.message.toString())
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 }

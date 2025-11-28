@@ -12,17 +12,12 @@ import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
-import io.github.jan.supabase.exceptions.BadRequestRestException
+import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
-import io.ktor.client.network.sockets.ConnectTimeoutException
-import kotlinx.coroutines.flow.first
 import java.util.UUID
 import javax.inject.Inject
 
@@ -46,16 +41,12 @@ class EventRepositoryImpl @Inject constructor(
             val events = eventDto.map { it.asDomainModel() }
             DataResult.Success(events)
         } catch (e: RestException) {
-            when (e) {
-                is BadRequestRestException -> DataResult.Error(e.error)
-                is NotFoundRestException -> DataResult.Error(e.error)
-                is UnauthorizedRestException -> DataResult.Error(e.error)
-                is UnknownRestException -> DataResult.Error(e.error)
-            }
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
         } catch (e: HttpRequestException) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
@@ -80,16 +71,12 @@ class EventRepositoryImpl @Inject constructor(
 
             DataResult.Success(eventInfo)
         } catch (e: RestException) {
-            when (e) {
-                is BadRequestRestException -> DataResult.Error(e.error)
-                is NotFoundRestException -> DataResult.Error(e.error)
-                is UnauthorizedRestException -> DataResult.Error(e.error)
-                is UnknownRestException -> DataResult.Error(e.error)
-            }
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
         } catch (e: HttpRequestException) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
@@ -132,18 +119,12 @@ class EventRepositoryImpl @Inject constructor(
             DataResult.Success(response)
 
         } catch (e: RestException) {
-            Log.e("EVENT-GET", "Error: ${e.error}")
-            when (e) {
-                is BadRequestRestException -> DataResult.Error(e.error)
-                is NotFoundRestException -> DataResult.Error(e.error)
-                is UnauthorizedRestException -> DataResult.Error(e.error)
-                else -> DataResult.Error("REST error: ${e.message}")
-            }
-        } catch (e: ConnectTimeoutException) {
-            DataResult.Error("Connection timed out, please check your network.")
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            Log.e("EVENT-ADD", "Error: ${e.message}")
-            DataResult.Error("Unexpected error: ${e.message}")
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 

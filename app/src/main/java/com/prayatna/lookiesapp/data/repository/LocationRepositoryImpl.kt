@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseLocationService
 import com.prayatna.lookiesapp.domain.model.location.Location
 import com.prayatna.lookiesapp.domain.repository.LocationRepository
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import javax.inject.Inject
@@ -17,11 +18,12 @@ class LocationRepositoryImpl @Inject constructor(
             val response = supabaseLocationService.getLocationsById()
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
-            DataResult.Error(e.message.toString())
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
         } catch (e: HttpRequestException) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
@@ -37,11 +39,12 @@ class LocationRepositoryImpl @Inject constructor(
             )
             DataResult.Success(response.toDomain())
         } catch (e: RestException) {
-            DataResult.Error(e.message.toString())
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
         } catch (e: HttpRequestException) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 }

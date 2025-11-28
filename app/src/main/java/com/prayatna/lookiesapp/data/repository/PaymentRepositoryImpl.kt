@@ -8,6 +8,8 @@ import com.prayatna.lookiesapp.domain.model.payment.AddPayment
 import com.prayatna.lookiesapp.domain.model.payment.AddPaymentResult
 import com.prayatna.lookiesapp.domain.repository.PaymentRepository
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.extractSupabaseError
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
 import javax.inject.Inject
@@ -40,9 +42,12 @@ class PaymentRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: RestException) {
-            DataResult.Error(e.error)
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 

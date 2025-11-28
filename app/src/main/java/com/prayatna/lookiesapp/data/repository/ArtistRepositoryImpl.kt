@@ -5,6 +5,9 @@ import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
+import com.prayatna.lookiesapp.utils.extractSupabaseError
+import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
@@ -39,10 +42,13 @@ class ArtistRepositoryImpl @Inject constructor(
             } else {
                 DataResult.Error("Something went wrong! Please check every field")
             }
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error("Something went wrong! ${e.localizedMessage}")
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error("Something went wrong! ${e.localizedMessage}")
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 

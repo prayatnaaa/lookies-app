@@ -4,6 +4,8 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAdminService
 import com.prayatna.lookiesapp.domain.model.partner.Partner
 import com.prayatna.lookiesapp.domain.repository.AdminRepository
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.extractSupabaseError
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import javax.inject.Inject
 
@@ -26,10 +28,13 @@ class AdminRepositoryImpl @Inject constructor(
         return try {
             val response = supabaseAdminService.decidePartnerApplication(status, id)
             DataResult.Success(response)
-        } catch (e: Exception) {
-            DataResult.Error(e.message ?: DEFAULT_ERROR_MESSAGE)
         } catch (e: RestException) {
-            DataResult.Error(e.message ?: DEFAULT_ERROR_MESSAGE)
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
+        } catch (e: Exception) {
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 

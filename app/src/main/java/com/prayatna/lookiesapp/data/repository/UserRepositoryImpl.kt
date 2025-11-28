@@ -12,9 +12,10 @@ import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import com.prayatna.lookiesapp.utils.compressImage
+import com.prayatna.lookiesapp.utils.extractSupabaseError
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
@@ -39,9 +40,12 @@ class UserRepositoryImpl @Inject constructor(
            val user =  response.asDomainModel()
            DataResult.Success(user)
        } catch (e: RestException) {
-           DataResult.Error(e.error)
+           val msg = extractSupabaseError(e.error)
+           DataResult.Error(msg)
+       } catch (e: HttpRequestException) {
+           DataResult.Error(e.message ?: "Network error")
        } catch (e: Exception) {
-           DataResult.Error(e.message.toString())
+           DataResult.Error("Something went wrong! Please check your connection")
        }
     }
 
@@ -73,9 +77,12 @@ class UserRepositoryImpl @Inject constructor(
             )
             DataResult.Success(response)
         } catch (e: RestException) {
-            DataResult.Error(e.error)
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
@@ -101,8 +108,13 @@ class UserRepositoryImpl @Inject constructor(
 
                     userPreference.setProfile(remoteProfile.asDomainModel())
 
+                } catch (e: RestException) {
+                    val msg = extractSupabaseError(e.error)
+                    emit(DataResult.Error(msg))
+                } catch (e: HttpRequestException) {
+                    emit(DataResult.Error(e.message ?: "Network error"))
                 } catch (e: Exception) {
-                    emit(DataResult.Error("Something went wrong: ${e.localizedMessage}"))
+                    emit(DataResult.Error("Something went wrong! Please check your connection"))
                 }
             }
 
@@ -123,10 +135,13 @@ class UserRepositoryImpl @Inject constructor(
                     }
                 }
             DataResult.Success(result.data)
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error("Error! ${e.message}")
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error("Error! ${e.message}")
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
@@ -152,10 +167,13 @@ class UserRepositoryImpl @Inject constructor(
             } else {
                 DataResult.Error(error = "Image is not selected")
             }
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error(e.message.toString())
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
