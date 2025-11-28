@@ -6,10 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
+import com.prayatna.lookiesapp.presentation.register.events.RegisterEvent
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.gotrue.user.UserInfo
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,6 +31,9 @@ class RegisterViewModel @Inject constructor(
         private val _registerStatus = MutableStateFlow<DataResult<UserInfo?>>(DataResult.Idle)
         val registerStatus = _registerStatus.asStateFlow()
 
+        private val _events = MutableSharedFlow<RegisterEvent>()
+        val events = _events.asSharedFlow()
+
         fun onEmailChange(emailValue: String) {
             this.emailValue = emailValue
         }
@@ -36,15 +42,23 @@ class RegisterViewModel @Inject constructor(
             this.passwordValue = passwordValue
         }
 
-        fun onSignUp() {
+    fun onSignUp() {
+        viewModelScope.launch {
             _registerStatus.value = DataResult.Loading
-            viewModelScope.launch {
-                val result =
-                    authRepository.signUp(
-                    email = emailValue,
-                    password = passwordValue
-                )
-                _registerStatus.value = result
+
+            when (val result = authRepository.signUp(emailValue, passwordValue)) {
+                is DataResult.Success -> {
+                    _events.emit(RegisterEvent.ShowSnackbar("Register success!"))
+                    _events.emit(RegisterEvent.NavigateToLogin)
+                    _registerStatus.value = DataResult.Success(result.data)
+                }
+
+                is DataResult.Error -> {
+                    _events.emit(RegisterEvent.ShowSnackbar(result.error))
+                    _registerStatus.value = DataResult.Error(result.error)
+                }
+                else -> Unit
             }
         }
+    }
 }

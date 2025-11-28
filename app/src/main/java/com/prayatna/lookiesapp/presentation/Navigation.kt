@@ -19,6 +19,7 @@ import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.event.addevent.eventNavGraph
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
 import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
+import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
@@ -55,13 +56,16 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 NavigationRoutes.LOGIN
             }
         }
-        else -> NavigationRoutes.LOGIN
+        else -> NavigationRoutes.MAIN_LOADING
     }
 
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
+        composable(NavigationRoutes.MAIN_LOADING) {
+            MainLoadingScreen()
+        }
         composable(NavigationRoutes.MAIN) { backStackEntry ->
             val rootEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(NavigationRoutes.MAIN)

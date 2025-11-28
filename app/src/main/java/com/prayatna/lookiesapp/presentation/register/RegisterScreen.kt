@@ -26,97 +26,84 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.register.events.RegisterEvent
 import com.prayatna.lookiesapp.ui.theme.light_onPrimary
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
-fun RegisterScreen(modifier: Modifier = Modifier,
-                   navController: NavController,
-                   viewModel: RegisterViewModel = hiltViewModel()) {
-
+fun RegisterScreen(
+    navController: NavController,
+    viewModel: RegisterViewModel = hiltViewModel()
+) {
+    val snackBarHostState = remember { SnackbarHostState() }
     val registerStatus = viewModel.registerStatus.collectAsStateWithLifecycle()
-    val snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(registerStatus.value) {
-        val status = registerStatus.value
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
 
-        if (status is DataResult.Success) {
-            val message = status.data
-            message.let {
-                snackBarHostState.showSnackbar(
-                    message = it?.email.toString(),
-                    duration = SnackbarDuration.Long,
-                    withDismissAction = true
-                )
-                navController.navigate(NavigationRoutes.LOGIN) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
+                is RegisterEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(
+                        message = event.message,
+                        duration = SnackbarDuration.Long,
+                        withDismissAction = true
+                    )
                 }
-            }
-        } else if (status is DataResult.Error) {
-            val errorMsg = status.error
-            errorMsg.let {
-                snackBarHostState.showSnackbar(
-                    message = it,
-                    duration = SnackbarDuration.Long,
-                    withDismissAction = true
-                )
+
+                RegisterEvent.NavigateToLogin -> {
+                    navController.navigate(NavigationRoutes.LOGIN) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             }
         }
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) },
-        modifier = modifier.fillMaxSize(),
-        content = { padding -> padding.calculateTopPadding()
-            Column(modifier = modifier
+        snackbarHost = { SnackbarHost(snackBarHostState) }
+    ) { padding -> padding.calculateTopPadding()
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
                 .imePadding()
                 .background(Constants.gradientBackground),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-                Text(text = "Lookies", style = TextStyle(
+            Text(
+                text = "Lookies",
+                style = TextStyle(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
                     color = light_onPrimary
-                ))
-
-                Spacer(modifier = modifier.height(32.dp))
-
-                val emailValue = viewModel.emailValue
-                val passwordValue = viewModel.passwordValue
-                AuthCard(
-                    title = "Welcome",
-                    onRegister = {
-                        viewModel.onSignUp()
-                    },
-                    onLogin = {
-                        navController.navigate(NavigationRoutes.LOGIN) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        } },
-                    inRegister = true,
-                    emailValue = emailValue,
-                    passwordValue = passwordValue,
-                    onEmailChange = {
-                        viewModel.onEmailChange(it)
-                    },
-                    onPasswordChange = {
-                        viewModel.onPasswordChange(it)
-                    }
                 )
-            }
-            if (registerStatus.value is DataResult.Loading) {
-                CircularLoading()
-            }
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            AuthCard(
+                title = "Welcome",
+                onRegister = { viewModel.onSignUp() },
+                onLogin = {
+                    navController.navigate(NavigationRoutes.LOGIN) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                inRegister = true,
+                emailValue = viewModel.emailValue,
+                passwordValue = viewModel.passwordValue,
+                onEmailChange = viewModel::onEmailChange,
+                onPasswordChange = viewModel::onPasswordChange
+            )
         }
-    )
+
+        if (registerStatus.value is DataResult.Loading) {
+            CircularLoading()
+        }
+    }
 }

@@ -1,18 +1,13 @@
 package com.prayatna.lookiesapp.data.repository
 
-import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthService
 import com.prayatna.lookiesapp.data.remote.response.auth.LoginResponse
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.utils.DataResult
-import io.github.jan.supabase.exceptions.BadRequestRestException
+import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.SupabaseEncodingException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.user.UserInfo
 import javax.inject.Inject
@@ -34,15 +29,10 @@ class AuthRepositoryImpl @Inject constructor(
                 DataResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: RestException) {
-            when (e) {
-                is BadRequestRestException -> DataResult.Error(e.error)
-                is NotFoundRestException -> DataResult.Error(e.error)
-                is UnauthorizedRestException -> DataResult.Error(e.error)
-                is UnknownRestException -> DataResult.Error(e.error)
-            }
-            DataResult.Error(e.message.toString())
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
         } catch (e: HttpRequestException) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
             DataResult.Error("Something went wrong! Please check your connection")
         }
@@ -51,23 +41,17 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signUp(email: String, password: String): DataResult<UserInfo?> {
         return try {
             val result = supabaseAuthService.signUp(email = email, password = password)
-
-            Log.d("AUTH", result.toString())
             DataResult.Success(result)
         } catch (e: RestException) {
-            when (e) {
-                is BadRequestRestException -> DataResult.Error(e.error)
-                is NotFoundRestException -> DataResult.Error(e.error)
-                is UnauthorizedRestException -> DataResult.Error(e.error)
-                is UnknownRestException -> DataResult.Error(e.error)
-            }
-            DataResult.Error(e.message.toString())
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
         } catch (e: HttpRequestException) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
             DataResult.Error("Something went wrong! Please check your connection")
         }
     }
+
 
     override suspend fun isSessionActive(): DataResult<Boolean> {
         return try {
@@ -97,11 +81,13 @@ class AuthRepositoryImpl @Inject constructor(
             auth.clearSession()
             userPreference.logout()
             DataResult.Success(Any())
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error("Error decoding session: ${e.localizedMessage}")
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            Log.e("SESSION", "Error checking session: ${e.message}")
-            DataResult.Error("Something went wrong while checking your session.")
+            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
