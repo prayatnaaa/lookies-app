@@ -1,13 +1,15 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.content.Context
-import android.net.Uri
+import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.domain.model.user.User
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.mapper.toDto
+import com.prayatna.lookiesapp.data.remote.request.user.PartnerApplicationRequest
+import com.prayatna.lookiesapp.domain.model.user.PartnerSubmissionParams
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
@@ -49,40 +51,41 @@ class UserRepositoryImpl @Inject constructor(
        }
     }
 
-    override suspend fun submitPartnerApplication(
-        partnerName: String,
-        partnerType: String,
-        locName: String,
-        locUrl: String,
-        portfolioLink: String,
-        imageLogo: Uri
-    ): DataResult<String> {
+    override suspend fun submitPartnerApplication(params: PartnerSubmissionParams): DataResult<String> {
         return try {
+            val compressedLogo = params.partnerLogo.compressImage(context, 500_000L)
+            val compressedKtp = params.ktpFile.compressImage(context, 500_000L)
+            val compressedLicense = params.businessLicenseFile.compressImage(context, 500_000L)
 
-            val compressImage = imageLogo.compressImage(
-                context = context,
-                compressionThreshold = 500_000L
-            )
-
-            if (compressImage == null) {
-                return DataResult.Error("Image is not selected")
+            if (compressedLogo == null || compressedKtp == null || compressedLicense == null) {
+                return DataResult.Error("Failed to generate images! make sure all images are valid")
             }
-            val response = supabaseUserService.submitPartnerApplication(
-                partnerName = partnerName,
-                partnerType = partnerType,
-                locUrl = locUrl,
-                locName = locName,
-                partnerPortfolioLink = portfolioLink,
-                partnerLogo = compressImage
+
+            val serviceParams = PartnerApplicationRequest(
+                partnerName = params.partnerName,
+                partnerType = params.partnerType,
+                locName = params.locName,
+                locUrl = params.locUrl,
+                partnerPortfolioLink = params.partnerPortfolioLink,
+                bankName = params.bankName,
+                bankAccountNumber = params.bankAccountNumber,
+                bankAccountHolder = params.bankAccountHolder,
+                partnerLogo = compressedLogo,
+                ktpFile = compressedKtp,
+                businessLicenseFile = compressedLicense
             )
+            val response = supabaseUserService.submitPartnerApplication(serviceParams)
             DataResult.Success(response)
         } catch (e: RestException) {
+            Log.e("PartnerApplication", e.toString())
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
         } catch (e: HttpRequestException) {
-            DataResult.Error(e.message ?: "Network error")
+            Log.e("PartnerApplication", e.message.toString())
+           DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error("Something went wrong! Please check your connection")
+            Log.e("PartnerApplication", e.message.toString())
+           DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 

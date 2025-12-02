@@ -1,10 +1,10 @@
 package com.prayatna.lookiesapp.presentation.user.partnerapplication
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.user.PartnerSubmissionParams
-import com.prayatna.lookiesapp.domain.usecase.user.AddPartnerSubmissionUseCase
+import com.prayatna.lookiesapp.domain.usecase.user.SubmitPartnerSubmissionUseCase
+import com.prayatna.lookiesapp.presentation.user.partnerapplication.event.PartnerApplicationEvent
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.state.PartnerSubmissionFormState
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.state.PartnerSubmissionState
 import com.prayatna.lookiesapp.utils.DataResult
@@ -17,73 +17,108 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PartnerApplicationViewModel @Inject constructor(
-    private val partnerApplicationUseCase: AddPartnerSubmissionUseCase
-): ViewModel() {
-    private val _addPartnerSubmissionState = MutableStateFlow(PartnerSubmissionState())
-    val addPartnerSubmissionState: StateFlow<PartnerSubmissionState> = _addPartnerSubmissionState
+    private val submitUseCase: SubmitPartnerSubmissionUseCase
+) : ViewModel() {
 
-    private val _addPartnerSubmissionFormState = MutableStateFlow(PartnerSubmissionFormState())
-    val addPartnerSubmissionFormState: StateFlow<PartnerSubmissionFormState> = _addPartnerSubmissionFormState
+    private val _state = MutableStateFlow(PartnerSubmissionState())
+    val state: StateFlow<PartnerSubmissionState> = _state
 
-    fun onPartnerNameChanged(value: String) {
-        _addPartnerSubmissionFormState.update { it.copy(partnerName = value) }
+    private val _form = MutableStateFlow(PartnerSubmissionFormState())
+    val form: StateFlow<PartnerSubmissionFormState> = _form
+
+    fun onEvent(event: PartnerApplicationEvent) {
+        when (event) {
+
+            is PartnerApplicationEvent.LocNameChanged ->
+                updateForm { copy(locName = event.value) }
+
+            is PartnerApplicationEvent.LocUrlChanged ->
+                updateForm { copy(locUrl = event.value) }
+
+            is PartnerApplicationEvent.PartnerNameChanged ->
+                updateForm { copy(partnerName = event.value) }
+
+            is PartnerApplicationEvent.PartnerTypeChanged ->
+                updateForm { copy(partnerType = event.value) }
+
+            is PartnerApplicationEvent.PartnerLogoChanged ->
+                updateForm { copy(partnerLogo = event.value) }
+
+            is PartnerApplicationEvent.PortfolioLinkChanged ->
+                updateForm { copy(partnerPortfolioLink = event.value) }
+
+            is PartnerApplicationEvent.KtpFileChanged ->
+                updateForm { copy(ktpFile = event.value) }
+
+            is PartnerApplicationEvent.BusinessLicenseFileChanged ->
+                updateForm { copy(businessLicenseFile = event.value) }
+
+            is PartnerApplicationEvent.BankNameChanged ->
+                updateForm { copy(bankName = event.value) }
+
+            is PartnerApplicationEvent.BankAccountNumberChanged ->
+                updateForm { copy(bankAccountNumber = event.value) }
+
+            is PartnerApplicationEvent.BankAccountHolderChanged ->
+                updateForm { copy(bankAccountHolder = event.value) }
+
+            PartnerApplicationEvent.Submit -> submit()
+        }
     }
 
-    fun onPartnerTypeChange(value: String) {
-        _addPartnerSubmissionFormState.update { it.copy(partnerType = value) }
+    private fun updateForm(updater: PartnerSubmissionFormState.() -> PartnerSubmissionFormState) {
+        _form.update { it.updater() }
     }
 
-    fun onLocNameChange(value: String) {
-        _addPartnerSubmissionFormState.update { it.copy(locName = value) }
-    }
+    private fun submit() {
+        val formValue = _form.value
 
-    fun onLocUrlChange(value: String) {
-        _addPartnerSubmissionFormState.update { it.copy(locUrl = value) }
-    }
-
-    fun onPortofolioChange(value: String) {
-        _addPartnerSubmissionFormState.update { it.copy(portfolioLink = value) }
-    }
-
-    fun onImageLogoChange(value: Uri) {
-        _addPartnerSubmissionFormState.update { it.copy(imageLogo = value) }
-    }
-
-    fun submitPartnerSubmission() {
-        val form = _addPartnerSubmissionFormState.value
-
-        if (form.partnerName.isBlank() ||
-            form.partnerType.isBlank() || form.imageLogo == null
-        ) {
-            _addPartnerSubmissionState.update {
-                it.copy(error = "Please complete all required fields")
-            }
+        if (!formValue.isValid()) {
+            _state.update { it.copy(error = "Please complete all required fields") }
             return
         }
 
-        val request = PartnerSubmissionParams(
-            partnerName = form.partnerName,
-            partnerType = form.partnerType,
-            locName = form.locName,
-            locUrl = form.locUrl,
-            portfolioLink = form.portfolioLink,
-            imageLogo = form.imageLogo
-        )
+        val params = formValue.toParams()
 
         viewModelScope.launch {
-            _addPartnerSubmissionState.update { it.copy(isLoading = true, error = null) }
+            _state.update { it.copy(isLoading = true, error = null) }
 
-            when (val result = partnerApplicationUseCase(request)) {
-                is DataResult.Success -> _addPartnerSubmissionState.update {
-                    it.copy(isLoading = false, success = result.data)
-                }
+            when (val result = submitUseCase(params)) {
+                is DataResult.Success ->
+                    _state.update { it.copy(isLoading = false, success = result.data) }
 
-                is DataResult.Error -> _addPartnerSubmissionState.update {
-                    it.copy(isLoading = false, error = result.error)
-                }
+                is DataResult.Error ->
+                    _state.update { it.copy(isLoading = false, error = result.error) }
 
-                else -> Unit
+               else -> Unit
             }
         }
     }
+}
+
+private fun PartnerSubmissionFormState.toParams() = PartnerSubmissionParams(
+    locName = locName,
+    locUrl = locUrl,
+    partnerName = partnerName,
+    partnerType = partnerType,
+    partnerLogo = partnerLogo!!,
+    partnerPortfolioLink = partnerPortfolioLink,
+    ktpFile = ktpFile!!,
+    businessLicenseFile = businessLicenseFile!!,
+    bankName = bankName,
+    bankAccountNumber = bankAccountNumber,
+    bankAccountHolder = bankAccountHolder
+)
+
+
+
+private fun PartnerSubmissionFormState.isValid(): Boolean {
+    return partnerName.isNotBlank() &&
+            partnerType.isNotBlank() &&
+            partnerLogo != null &&
+            ktpFile != null &&
+            businessLicenseFile != null &&
+            bankName.isNotBlank() &&
+            bankAccountNumber.isNotBlank() &&
+            bankAccountHolder.isNotBlank()
 }

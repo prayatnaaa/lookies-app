@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.domain.repository
 
 import android.net.Uri
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
+import com.prayatna.lookiesapp.domain.model.user.PartnerSubmissionParams
 import com.prayatna.lookiesapp.domain.model.user.User
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
@@ -16,12 +17,5 @@ interface UserRepository {
     ): DataResult<String>
     suspend fun editProfileImage(image: ByteArray): DataResult<String>
     suspend fun getUser(): DataResult<User>
-    suspend fun submitPartnerApplication(
-        partnerName: String,
-        partnerType: String,
-        locName: String,
-        locUrl: String,
-        portfolioLink: String,
-        imageLogo: Uri
-    ): DataResult<String>
+    suspend fun submitPartnerApplication(params: PartnerSubmissionParams): DataResult<String>
 }

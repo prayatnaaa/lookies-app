@@ -13,10 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.ui.theme.DarkGrey
+import com.prayatna.lookiesapp.ui.theme.LightGrey
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
@@ -24,9 +26,9 @@ fun AddLocationTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
+    placeholder: String
 ) {
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.Start
     ) {
         Text(
@@ -39,6 +41,15 @@ fun AddLocationTextField(
         )
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
+            placeholder = {
+                Text(
+                    text = placeholder,
+                    style = TextStyle(
+                        color = LightGrey,
+                        fontSize = 16.sp
+                    )
+                )
+            },
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier
@@ -55,4 +66,15 @@ fun AddLocationTextField(
             )
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AddLocationTextFieldPreview() {
+    AddLocationTextField(
+        value = "",
+        onValueChange = {},
+        label = "Location name",
+        placeholder = "https://www.google.com"
+    )
 }

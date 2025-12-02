@@ -101,7 +101,7 @@ fun ProfileScreen(
                         SettingsSection(
                             title = "Become our partner",
                             onClick = {
-                                navController.navigate("${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup=true")
+                                navController.navigate(NavigationRoutes.ADD_LOCATION)
                             }
                         )
                     }
