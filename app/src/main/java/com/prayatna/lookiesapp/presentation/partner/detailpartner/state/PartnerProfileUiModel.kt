@@ -1,27 +1,35 @@
 package com.prayatna.lookiesapp.presentation.partner.detailpartner.state
 
+import kotlinx.datetime.Instant
+
 data class DetailPartnerUiModel(
-    val id: Int?,
-    val name: String? = null,
-    val type: String? = null,
-    val logoUrl: String? = null,
-    val portfolioLink: String? = null,
-    val status: String? = null,
-    val locations: List<LocationUiModel>,
-    val profile: ProfileUiModel? = null
+    val name: String,
+    val type: String,
+    val logoUrl: String?,
+    val locationId: String?,
+    val portofolioLink: String?,
+    val status: String,
+    val createdAt: Instant,
+    val ktpOwnerUrl: String?,
+    val businessLicenseUrl: String?,
+    val userId: String,
+    val id: String,
+    val locations: List<GetLocationUi> = emptyList(),
+    val userBanks: List<UserBankUi> = emptyList()
 )
 
-data class LocationUiModel (
-    val name: String? = null,
-    val locUrl: String? = null
+data class GetLocationUi(
+    val id: Int,
+    val url: String?,
+    val name: String,
+    val createdAt: Instant,
+    val partnerId: String
 )
 
-data class ProfileUiModel (
-    val id: String? = "",
-    val profileUrl: String? = "",
-    val username: String? = "",
-    val fullName: String? = "",
-    val address: String? = "",
-    val bio: String? = "",
-    val hasPartnerSub: Boolean? = false
+data class UserBankUi(
+    val id: String,
+    val bankName: String,
+    val partnerId: String,
+    val bankAccountHolder: String,
+    val bankAccountNumber: String
 )

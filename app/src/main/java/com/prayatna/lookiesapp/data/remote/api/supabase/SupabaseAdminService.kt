@@ -17,11 +17,11 @@ class SupabaseAdminService @Inject constructor(
         return role == "admin"
     }
 
-    suspend fun decidePartnerApplication(status: String, id: Long): String {
+    suspend fun decidePartnerApplication(status: String, id: String): String {
         if (!isAdmin()) {
             throw Exception("Only admin can approve partner application")
         }
-        val result = postgrest.from("partner_profiles").update(
+        postgrest.from("partner_profiles").update(
             {
                 set("status", status)
             }

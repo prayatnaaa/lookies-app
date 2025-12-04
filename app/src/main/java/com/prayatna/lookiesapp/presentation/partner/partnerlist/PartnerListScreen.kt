@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.partner.partnerlist
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.partner.PartnerListCard
 import com.prayatna.lookiesapp.presentation.error.ErrorScreen
+import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -46,6 +48,7 @@ fun PartnerListScreen(
         }
         DataResult.Idle -> {}
         DataResult.Loading -> {
+            Log.d("PartnerList", "Loading")
             CircularLoading()
         }
         is DataResult.Success -> {
@@ -56,6 +59,7 @@ fun PartnerListScreen(
                 )
             } else {
                 Scaffold(
+                    containerColor = PureWhite,
                     content = { innerPadding ->
                         PartnerListCard(
                             modifier = Modifier.padding(horizontal = 16.dp),

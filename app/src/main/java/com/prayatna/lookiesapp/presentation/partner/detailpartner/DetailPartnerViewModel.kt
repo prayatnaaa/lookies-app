@@ -43,8 +43,8 @@ class DetailPartnerViewModel @Inject constructor(
     }
 
     private fun decidePartner(
-        partnerId: Long,
-        action: suspend (Long) -> DataResult<String>
+        partnerId: String,
+        action: suspend (String) -> DataResult<String>
     ) {
         viewModelScope.launch {
             _adminState.update { it.copy(isLoading = true, error = null) }
@@ -74,15 +74,15 @@ class DetailPartnerViewModel @Inject constructor(
         }
     }
 
-    fun approvePartner(partnerId: Long) {
+    fun approvePartner(partnerId: String) {
         decidePartner(partnerId, approvePartnerUseCase::invoke)
     }
 
-    fun rejectPartner(partnerId: Long) {
+    fun rejectPartner(partnerId: String) {
         decidePartner(partnerId, rejectPartnerUseCase::invoke)
     }
 
-    fun loadPartnerDetail(id: Int) {
+    fun loadPartnerDetail(id: String) {
         viewModelScope.launch {
             getDetailPartnerUseCase(id).collect { result ->
                 when (result) {

@@ -21,7 +21,7 @@ import com.prayatna.lookiesapp.presentation.error.ErrorScreen
 
 @Composable
 fun DetailPartnerScreen(
-    partnerId: Int,
+    partnerId: String,
     viewModel: DetailPartnerViewModel = hiltViewModel(),
     onPortfolioClick: (String) -> Unit = {},
     navController: NavController
@@ -63,7 +63,7 @@ fun DetailPartnerScreen(
             state.data?.let { data ->
 
                 val showAdminButtons =
-                    role == "admin" && data.status == "pending" && data.id != null
+                    role == "admin" && data.status == "pending"
 
                 Scaffold(
                     snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -71,8 +71,8 @@ fun DetailPartnerScreen(
                     bottomBar = {
                         if (showAdminButtons) {
                             AdminPartnerButtons(
-                                onApprovedButtonClick = { viewModel.approvePartner(data.id!!.toLong()) },
-                                onRejectButtonClick = { viewModel.rejectPartner(data.id!!.toLong()) }
+                                onApprovedButtonClick = { viewModel.approvePartner(data.id) },
+                                onRejectButtonClick = { viewModel.rejectPartner(data.id) }
                             )
                         }
                     }
@@ -81,9 +81,12 @@ fun DetailPartnerScreen(
                         PartnerProfileSection(
                             data = data,
                             onPortofolioClick = {
-                                data.portfolioLink?.let(onPortfolioClick)
+                                data.portofolioLink?.let(onPortfolioClick)
                             },
-                            isAdmin = role == "admin"
+                            onDocumentClick = {
+                                data.ktpOwnerUrl?.let(onPortfolioClick)
+                            },
+                            isAdmin = showAdminButtons
                         )
                     }
                 }

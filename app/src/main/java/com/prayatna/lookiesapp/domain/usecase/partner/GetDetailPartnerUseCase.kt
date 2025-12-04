@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetDetailPartnerUseCase @Inject constructor(
     private val partnerRepository: PartnerRepository
 ){
-    operator fun invoke(id: Int) = flow {
+    operator fun invoke(id: String) = flow {
         emit(DataResult.Loading)
         emit(partnerRepository.getDetailPartner(id))
     }

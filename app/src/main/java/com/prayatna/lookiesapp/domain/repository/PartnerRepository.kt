@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface PartnerRepository {
     fun getPartners(): Flow<DataResult<List<Partner>>>
-    suspend fun getDetailPartner(id: Int): DataResult<DetailPartner>
+    suspend fun getDetailPartner(id: String): DataResult<DetailPartner>
 }

@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -30,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.presentation.partner.detailpartner.state.LocationUiModel
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.state.PartnerUiModel
 import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 
@@ -43,7 +40,7 @@ fun PartnerCard(
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
@@ -78,20 +75,6 @@ fun PartnerCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = data.type,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp
-                )
-
-                val displayLocation = data.locations.firstOrNull()
-
-                if (displayLocation?.name != null) {
-                    InfoRow(
-                        icon = Icons.Default.LocationOn,
-                        text = displayLocation.name
-                    )
-                }
             }
 
             Spacer(Modifier.width(8.dp))
@@ -131,30 +114,24 @@ private fun InfoRow(
 fun PartnerListCardPreview() {
     val dummyList = listOf(
         PartnerUiModel(
-            id = 1,
+            id = "sasa",
             name = "Stark Industries",
-            type = "Personal",
             logoUrl = "https://example.com/logo.png",
             status = "pending",
-            locations = listOf(LocationUiModel(name = "Jakarta, Indonesia", locUrl = ""))
         ),
         PartnerUiModel(
-            id = 2,
+            id = "saa",
             name = "Wayne Enterprises",
-            type = "Gallery",
             logoUrl = "https://example.com/logo.png",
             status = "approved",
-            locations = listOf(LocationUiModel(name = "Gotham City", locUrl = ""))
         ),
         PartnerUiModel(
-            id = 3,
+            id = "lklds",
             name = "Hello World",
-            type = "Corporate",
             logoUrl = "https://example.com/logo.png",
             status = "rejected",
-            locations = emptyList()
         )
     )
 
-    PartnerListCard(partnerList = dummyList, onPartnerClick = {})
+    PartnerListCard(partnerList = dummyList, onPartnerClick = {}, showStatus = true)
 }

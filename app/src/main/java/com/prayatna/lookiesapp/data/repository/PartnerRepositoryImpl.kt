@@ -24,26 +24,27 @@ class PartnerRepositoryImpl @Inject constructor(
             emit(DataResult.Success(response.map { it.toDomain() }))
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
-            DataResult.Error(msg)
+            emit(DataResult.Error(msg))
         } catch (e: HttpRequestException) {
-            DataResult.Error(e.message ?: "Network error")
+            emit(DataResult.Error(e.message ?: "Network error"))
         } catch (e: Exception) {
-            DataResult.Error("Something went wrong! Please check your connection")
+            Log.e("PartnerList", e.toString())
+            emit(DataResult.Error("Something went wrong! Please check your connection"))
         }
     }
 
-
-    override suspend fun getDetailPartner(id: Int): DataResult<DetailPartner> {
+    override suspend fun getDetailPartner(id: String): DataResult<DetailPartner> {
         return try {
             val response = supabasePartnerService.getDetailPartner(id)
             Log.d("PartnerRepository", response.toString())
-            DataResult.Success(response.toDomain())
+            DataResult.Success(response.toDomain()!!)
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
         } catch (e: HttpRequestException) {
             DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
+            Log.e("PartnerRepository", e.toString())
             DataResult.Error("Something went wrong! Please check your connection")
         }
     }

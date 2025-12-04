@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -128,9 +127,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
         composable(
             route = "${NavigationRoutes.DETAIL_PARTNER}/{partnerId}",
-            arguments = listOf(navArgument("partnerId") { type = NavType.IntType })
+            arguments = listOf(navArgument("partnerId") { type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry.arguments?.getInt("partnerId")?.let { partnerId ->
+            backStackEntry.arguments?.getString("partnerId")?.let { partnerId ->
                 DetailPartnerScreen(navController = navController, partnerId = partnerId)
             }
         }

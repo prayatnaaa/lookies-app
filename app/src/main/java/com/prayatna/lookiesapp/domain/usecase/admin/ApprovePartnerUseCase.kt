@@ -7,7 +7,7 @@ import javax.inject.Inject
 class ApprovePartnerUseCase @Inject constructor(
     private val adminRepository: AdminRepository
 ) {
-    suspend operator fun invoke(partnerId: Long): DataResult<String> {
+    suspend operator fun invoke(partnerId: String): DataResult<String> {
         return adminRepository.approvePartner(partnerId = partnerId)
     }
 }

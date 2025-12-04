@@ -43,7 +43,6 @@ class SupabaseUserService @Inject constructor(
     suspend fun submitPartnerApplication(data: PartnerApplicationRequest): String = coroutineScope { // Gunakan coroutineScope untuk upload paralel
 
         val userId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
-        // 1. Definisikan Path dan Bucket
         val logoPath = "partner-logos/${UUID.randomUUID()}.png"
         val ktpPath = "legal-docs/$userId/ktp-${UUID.randomUUID()}.jpg"
         val licensePath = "legal-docs/$userId/license-${UUID.randomUUID()}.jpg"
@@ -51,14 +50,12 @@ class SupabaseUserService @Inject constructor(
         val publicBucket = "partner_assets"
         val privateBucket = "private_documents"
 
-        // 2. Upload File secara PARALEL (Supaya lebih cepat)
         val uploadLogoDeferred = async {
             storage.from(publicBucket).upload(
                 path = logoPath,
                 data = data.partnerLogo,
                 upsert = true
             )
-            // Return URL Publik untuk Logo
             Helper.buildImageUrl(imageName = logoPath, bucketName = publicBucket)
         }
 
@@ -68,8 +65,6 @@ class SupabaseUserService @Inject constructor(
                 data = data.ktpFile,
                 upsert = true,
             )
-            // Return Path saja (karena private, nanti download pakai createSignedUrl)
-            // Atau simpan full URL jika Helper Anda mendukung private url generation
             ktpPath
         }
 
@@ -96,7 +91,6 @@ class SupabaseUserService @Inject constructor(
                 "p_partner_logo_url" to logoUrl,
                 "p_partner_portfolio_link" to data.partnerPortfolioLink,
 
-                // Parameter for Payouts
                 "p_ktp_owner_url" to ktpUrlOrPath,
                 "p_business_license_url" to licenseUrlOrPath,
                 "p_bank_name" to data.bankName,

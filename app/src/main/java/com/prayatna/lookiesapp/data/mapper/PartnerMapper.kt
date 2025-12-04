@@ -7,9 +7,7 @@ fun PartnerDto.toDomain(): Partner {
     return Partner(
         id = this.id,
         name = this.name,
-        type = this.type,
         logoUrl = this.logoUrl,
         status = this.status,
-        locations = this.locations.map { it.toDomain() },
     )
 }

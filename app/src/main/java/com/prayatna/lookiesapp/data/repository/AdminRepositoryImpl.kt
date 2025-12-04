@@ -23,7 +23,7 @@ class AdminRepositoryImpl @Inject constructor(
 
     private suspend fun decidePartner(
         status: String,
-        id: Long
+        id: String
     ): DataResult<String> {
         return try {
             val response = supabaseAdminService.decidePartnerApplication(status, id)
@@ -38,9 +38,9 @@ class AdminRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun approvePartner(partnerId: Long): DataResult<String> =
+    override suspend fun approvePartner(partnerId: String): DataResult<String> =
         decidePartner("approved", partnerId)
 
-    override suspend fun rejectPartner(partnerId: Long): DataResult<String> =
+    override suspend fun rejectPartner(partnerId: String): DataResult<String> =
         decidePartner("disapproved", partnerId)
 }

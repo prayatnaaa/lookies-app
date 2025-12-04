@@ -5,10 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PartnerDto(
-    val id: Int,
+    val id: String,
     val name: String,
-    val type: String,
     @SerialName("logo_url") val logoUrl: String,
     val status: String,
-    val locations: List<LocationDto>,
 )
