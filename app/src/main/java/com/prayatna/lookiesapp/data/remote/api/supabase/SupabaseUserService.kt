@@ -1,7 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
-import com.prayatna.lookiesapp.data.remote.dto.UserDto
 import com.prayatna.lookiesapp.data.remote.request.user.PartnerApplicationRequest
 import com.prayatna.lookiesapp.data.remote.response.base.RpcBaseResponse
 import com.prayatna.lookiesapp.utils.Helper
@@ -20,27 +19,7 @@ class SupabaseUserService @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage
 ) {
-    suspend fun getUser(): UserDto {
-        val userId = auth.currentUserOrNull()?.id
-
-        if (userId.isNullOrEmpty()) {
-            throw Exception("Failed to get user! user not found.")
-        }
-
-        val user = postgrest.from("user_view")
-            .select {
-                filter {
-                    eq("id", userId)
-                }
-            }
-            .decodeSingle<UserDto>()
-
-        Log.d("USER", "user:$user")
-
-        return user
-    }
-
-    suspend fun submitPartnerApplication(data: PartnerApplicationRequest): String = coroutineScope { // Gunakan coroutineScope untuk upload paralel
+    suspend fun submitPartnerApplication(data: PartnerApplicationRequest): String = coroutineScope {
 
         val userId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
         val logoPath = "partner-logos/${UUID.randomUUID()}.png"

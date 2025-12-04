@@ -27,6 +27,7 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
         private val USER_FULL_NAME_KEY = stringPreferencesKey("user_full_name")
         private val USER_PARTNER_SUBMISSION = booleanPreferencesKey("user_partner_submission")
         private val USER_ROLE = stringPreferencesKey("user_role")
+        private val IS_ARTIST = booleanPreferencesKey("is_artist")
     }
 
     suspend fun setDarkMode(isDarkMode: Boolean) {
@@ -75,7 +76,8 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
                     fullName = preference[USER_FULL_NAME_KEY] ?: "",
                     address = preference[USER_ADDRESS_KEY] ?: "",
                     bio = preference[USER_BIO_KEY] ?: "",
-                    hasPartnerSub = preference[USER_PARTNER_SUBMISSION] ?: false
+                    hasPartnerSub = preference[USER_PARTNER_SUBMISSION] ?: false,
+                    isArtist = preference[IS_ARTIST] ?: false
                 )
             }
     }

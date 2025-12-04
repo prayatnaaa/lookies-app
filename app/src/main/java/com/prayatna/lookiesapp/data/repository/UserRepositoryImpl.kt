@@ -3,7 +3,6 @@ package com.prayatna.lookiesapp.data.repository
 import android.content.Context
 import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.domain.model.user.User
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.mapper.asDomainModel
@@ -35,21 +34,6 @@ class UserRepositoryImpl @Inject constructor(
     private val supabaseUserService: SupabaseUserService,
     @ApplicationContext private val context: Context
 ): UserRepository {
-
-    override suspend fun getUser(): DataResult<User> {
-       return try {
-           val response = supabaseUserService.getUser()
-           val user =  response.asDomainModel()
-           DataResult.Success(user)
-       } catch (e: RestException) {
-           val msg = extractSupabaseError(e.error)
-           DataResult.Error(msg)
-       } catch (e: HttpRequestException) {
-           DataResult.Error(e.message ?: "Network error")
-       } catch (e: Exception) {
-           DataResult.Error("Something went wrong! Please check your connection")
-       }
-    }
 
     override suspend fun submitPartnerApplication(params: PartnerSubmissionParams): DataResult<String> {
         return try {

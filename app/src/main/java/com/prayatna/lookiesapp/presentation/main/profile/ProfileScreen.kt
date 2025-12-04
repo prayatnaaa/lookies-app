@@ -79,7 +79,8 @@ fun ProfileScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(padding),
+                .padding(padding)
+                .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -100,11 +101,18 @@ fun ProfileScreen(
                     if (profile.hasPartnerSub == false) {
                         SettingsSection(
                             title = "Become our partner",
+                            subtitle = "Apply to become our partner",
                             onClick = {
                                 navController.navigate(NavigationRoutes.ADD_LOCATION)
                             }
                         )
                     }
+
+                    SettingsSection(
+                        title = "Arts",
+                        subtitle = if (profile.isArtist == true) "Upload or see your arts" else "Upload your first art",
+                        onClick = {}
+                    )
 
                     Button(onClick = { viewModel.logout() }) {
                         Text("Logout")

@@ -42,14 +42,14 @@ fun ProfileCard(
 ) {
     OutlinedCard(
         colors = CardDefaults.cardColors(containerColor = BlackCharcoal),
-        modifier = modifier.width(350.dp),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, color = PureWhite)
     ) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(20.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
         ) {

@@ -2,12 +2,14 @@ package com.prayatna.lookiesapp.presentation.components.user.profile
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,41 +20,75 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
+import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun SettingsSection(
     title: String,
+    subtitle: String? = null,
     onClick: () -> Unit
 ) {
-    Row(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp, vertical = 16.dp)
+            .padding(vertical = 6.dp)
             .clickable { onClick() },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        contentColor = PureWhite.copy(alpha = 0.9f),
+        color = BlackCharcoal,
+        tonalElevation = 2.dp,
+        shadowElevation = 4.dp,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
     ) {
-        Text(
-            text = title,
-            style = TextStyle(
-                color = BlackCharcoal,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = title,
+                    style = TextStyle(
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                )
 
-        Icon(
-            imageVector = Icons.Default.ChevronRight,
-            contentDescription = null
-        )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = TextStyle(
+                            color = PureWhite.copy(alpha = 0.6f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Normal
+                        ),
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+            }
+
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null
+            )
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SettingsSectionPreview() {
-    SettingsSection(
-        title = "Settings",
-        onClick = {}
-    )
+    Column {
+        SettingsSection(
+            title = "Account",
+            subtitle = "Manage your profile",
+            onClick = {}
+        )
+        SettingsSection(
+            title = "Notifications",
+            subtitle = "Control push messages",
+            onClick = {}
+        )
+    }
 }

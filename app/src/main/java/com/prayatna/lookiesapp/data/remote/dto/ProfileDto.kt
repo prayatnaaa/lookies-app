@@ -7,22 +7,19 @@ import kotlinx.serialization.Serializable
 data class ProfileDto(
     @SerialName("id")
     val id: String? = null,
-
     @SerialName("bio")
     val bio: String? = null,
-
     @SerialName("address")
     val address: String? = null,
-
     @SerialName("username")
     val username: String? = null,
-
     @SerialName("full_name")
     val fullName: String? = null,
-
     @SerialName("has_partner_sub")
     val hasPartnerSub: Boolean? = null,
-
     @SerialName("profile_picture_url")
-    val profilePictureUrl: String? = null
+    val profilePictureUrl: String? = null,
+    @SerialName("is_artist")
+    val isArtist: Boolean? = false
+
 )
