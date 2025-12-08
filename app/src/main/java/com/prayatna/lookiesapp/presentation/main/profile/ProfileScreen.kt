@@ -111,7 +111,9 @@ fun ProfileScreen(
                     SettingsSection(
                         title = "Arts",
                         subtitle = if (profile.isArtist == true) "Upload or see your arts" else "Upload your first art",
-                        onClick = {}
+                        onClick = {
+                            navController.navigate(NavigationRoutes.UPLOAD_PAINTING)
+                        }
                     )
 
                     Button(onClick = { viewModel.logout() }) {

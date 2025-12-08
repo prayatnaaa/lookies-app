@@ -102,6 +102,7 @@ dependencies {
     implementation(libs.ktor.client.logging.jvm)
     implementation(libs.coil.compose)
     implementation(libs.postgrest.kt)
+    implementation(libs.realtime.kt)
 
     //Hilt
     implementation(libs.hilt.android)

@@ -1,12 +1,10 @@
-package com.prayatna.lookiesapp.data.remote.response.painting
+package com.prayatna.lookiesapp.data.remote.request.painting
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GetPaintingDto(
-    val id: Int,
+data class UploadPaintingRequest (
     @SerialName("artist_id")
     val artistId: String,
     val title: String,
@@ -23,8 +21,4 @@ data class GetPaintingDto(
     val subject: String? = null,
     @SerialName("year_created")
     val yearCreated: Int,
-    @SerialName("created_at")
-    val createdAt: Instant? = null,
-    @SerialName("updated_at")
-    val updatedAt: Instant? = null
 )

@@ -56,7 +56,7 @@ class SupabasePartnerService @Inject constructor(
     suspend fun getPartners(): List<PartnerDto> {
         val result = postgrest
             .from("partner_profiles").select(
-                columns = Columns.list("id", "name", "logo_url", "status")
+                columns = Columns.list("user_id", "name", "logo_url", "status")
             )
             .decodeList<PartnerDto>()
         Log.d("PartnerList", result.toString())
@@ -64,6 +64,7 @@ class SupabasePartnerService @Inject constructor(
     }
 
     suspend fun getDetailPartner(id: String): DetailPartnerDto {
+        Log.d("PartnerRepository", "Getting detail partner with id: $id")
         val response: HttpResponse = httpClient
             .get("${BuildConfig.SUPABASE_EDGE_BASE_URL}/get-detail-partner?id=${id}") {
                 auth.currentSessionOrNull()?.let {

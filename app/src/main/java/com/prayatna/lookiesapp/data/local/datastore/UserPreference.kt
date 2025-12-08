@@ -63,6 +63,7 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
             preferences[USER_BIO_KEY] = profile.bio ?: ""
             preferences[USER_FULL_NAME_KEY] = profile.fullName ?: ""
             preferences[USER_PARTNER_SUBMISSION] = profile.hasPartnerSub ?: false
+            preferences[IS_ARTIST] = profile.isArtist ?: false
         }
     }
 

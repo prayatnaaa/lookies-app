@@ -12,6 +12,7 @@ object NavigationRoutes {
     const val DETAIL_EVENT = "detail_event"
     const val EVENT_LIST = "event_list"
     const val ADD_PAYMENT = "add_payment"
+    const val UPLOAD_PAINTING = "upload_painting"
     const val PARTNER_APPLICATION = "partner_application"
     const val ADD_LOCATION = "add_location"
     const val PARTNER_LIST = "partner_list"

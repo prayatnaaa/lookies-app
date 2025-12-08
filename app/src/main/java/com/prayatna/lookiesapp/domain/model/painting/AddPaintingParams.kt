@@ -1,9 +1,6 @@
 package com.prayatna.lookiesapp.domain.model.painting
 
-import kotlinx.datetime.Instant
-
-data class Painting(
-    val id: Int,
+data class AddPaintingParams (
     val artistId: String,
     val title: String,
     val paintingUrl: String,
@@ -14,6 +11,4 @@ data class Painting(
     val artStyle: String? = null,
     val subject: String? = null,
     val yearCreated: Int,
-    val createdAt: Instant? = null,
-    val updatedAt: Instant? = null
 )
