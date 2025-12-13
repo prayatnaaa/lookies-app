@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,10 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.DarkGrey
-import com.prayatna.lookiesapp.ui.theme.Grey
-import com.prayatna.lookiesapp.ui.theme.LightGrey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -41,10 +38,10 @@ fun AddEventFooter(
                 shape = RoundedCornerShape(8.dp),
                 onClick = onBackButton,
                 colors = ButtonColors(
-                    containerColor = DarkGrey,
-                    contentColor = PureWhite,
-                    disabledContainerColor = Grey,
-                    disabledContentColor = LightGrey
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledContentColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             ) {
                 Text(
@@ -69,10 +66,10 @@ fun AddEventFooter(
                 }
             },
             colors = ButtonColors(
-                containerColor = DarkGrey,
-                contentColor = PureWhite,
-                disabledContainerColor = Grey,
-                disabledContentColor = LightGrey
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.surfaceVariant
             ),
             enabled = isButtonEnable
         ) {

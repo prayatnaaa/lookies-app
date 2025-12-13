@@ -26,7 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.ui.theme.light_onPrimary
+import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -90,8 +90,8 @@ fun LoginScreen(modifier: Modifier = Modifier,
                 Text(text = "Lookies", style = TextStyle(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
-                    color = light_onPrimary
-                ))
+                ),
+                    color = PureWhite)
 
                 Spacer(modifier = modifier.height(32.dp))
 

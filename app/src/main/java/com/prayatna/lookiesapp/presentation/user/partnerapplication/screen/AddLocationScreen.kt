@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +27,6 @@ import com.prayatna.lookiesapp.presentation.components.user.partnerapplication.P
 import com.prayatna.lookiesapp.presentation.components.user.partnerapplication.PartnerBankSection
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.PartnerApplicationViewModel
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.event.PartnerApplicationEvent
-import com.prayatna.lookiesapp.ui.theme.LightGrey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -46,7 +45,7 @@ fun AddLocationScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
-        containerColor = PureWhite,
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             PartnerApplicationFooter(
                 isButtonEnable = isValid,
@@ -72,7 +71,7 @@ fun AddLocationScreen(
                     fontSize = 24.sp,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                HorizontalDivider(color = LightGrey, thickness = 1.dp)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
             }
         },
         content = { innerPadding ->

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -29,8 +30,6 @@ import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.prayatna.lookiesapp.R
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
@@ -41,10 +40,10 @@ fun ProfileCard(
     onEditProfileClick: () -> Unit
 ) {
     OutlinedCard(
-        colors = CardDefaults.cardColors(containerColor = BlackCharcoal),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, color = PureWhite)
+        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
     ) {
         Column(
             modifier = modifier
@@ -74,7 +73,6 @@ fun ProfileCard(
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
-                    color = PureWhite,
                     letterSpacing = 2.sp,
                 ),
                 text = username
@@ -87,14 +85,13 @@ fun ProfileCard(
                 shape = RoundedCornerShape(20.dp),
                 modifier = modifier
                     .width(140.dp),
-                border = BorderStroke(1.dp, color = PureWhite)
+                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
 
             ) {
                 Text(text = "Edit profile",
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
-                        color = PureWhite
                     ),
                     )
             }
@@ -106,7 +103,7 @@ fun ProfileCard(
 @Composable
 fun ProfileCardPreview() {
     ProfileCard(
-        username = "johndoe",
+        username = "Today",
         onEditProfileClick = {}
     )
 }

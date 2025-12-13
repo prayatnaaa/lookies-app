@@ -21,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -41,11 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.light_onPrimary
-import com.prayatna.lookiesapp.ui.theme.light_onSecondary
-import com.prayatna.lookiesapp.ui.theme.light_primary
-import com.prayatna.lookiesapp.ui.theme.light_secondary
-import com.prayatna.lookiesapp.ui.theme.light_secondaryContainer
+import com.prayatna.lookiesapp.ui.theme.DarkSurface
 
 @Composable
 fun AuthCard(
@@ -61,7 +58,7 @@ fun AuthCard(
 ) {
 
     ElevatedCard(
-        colors = CardDefaults.cardColors(containerColor = light_primary),
+        colors = CardDefaults.cardColors(containerColor = DarkSurface),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
@@ -79,7 +76,6 @@ fun AuthCard(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
-                    color = light_secondaryContainer
                 ),
                 modifier = modifier.width(148.dp)
             )
@@ -115,7 +111,6 @@ fun AuthCard(
                 trailingIcon = {
                     IconButton(onClick = {isPasswordVisible = !isPasswordVisible}) {
                         Icon(
-                            tint = light_secondary,
                             imageVector = if (isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                             contentDescription = "Filled Visibility"
                         )
@@ -133,6 +128,10 @@ fun AuthCard(
             ) {
                 TextButton(
                     onClick = { if (inRegister) onLogin() else onRegister() },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.size(109.dp, 34.dp)
                 ) {
@@ -141,7 +140,6 @@ fun AuthCard(
                         style = TextStyle(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = light_secondaryContainer
                         ),
                     )
                 }
@@ -151,15 +149,15 @@ fun AuthCard(
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.size(109.dp, 34.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = light_secondaryContainer
+                        containerColor = MaterialTheme.colorScheme.surface
                     )
                 ) {
                     Text(
                         text = if (inRegister) "Sign up" else "Sign in",
                         style = TextStyle(
                             fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
-                            color = light_primary
                         ),
                     )
                 }
@@ -189,7 +187,7 @@ fun AuthTextField(
         placeholder = {
             Text(
                 text = title,
-                style = TextStyle(fontSize = 12.sp, color = light_onPrimary)
+                style = TextStyle(fontSize = 12.sp)
             )
         },
         leadingIcon = icon,
@@ -197,15 +195,24 @@ fun AuthTextField(
         modifier = modifier.size(303.dp, 48.dp),
         visualTransformation = visualTransformation,
         shape = RoundedCornerShape(12.dp),
-        textStyle = TextStyle(fontSize = 12.sp, color = light_onSecondary),
+        textStyle = TextStyle(fontSize = 12.sp),
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedBorderColor = light_secondaryContainer.copy(alpha = 0.5f),
-            focusedContainerColor = light_secondary.copy(alpha = 0.3f),
-            unfocusedContainerColor = light_primary,
-            unfocusedLeadingIconColor = light_secondaryContainer,
-            focusedLeadingIconColor = light_secondary,
-            focusedBorderColor = light_secondary,
-            cursorColor = light_secondary
+            focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+
+            focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+
+            cursorColor = MaterialTheme.colorScheme.primary,
+
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+
+            focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
         keyboardOptions = keyboardOptions
     )

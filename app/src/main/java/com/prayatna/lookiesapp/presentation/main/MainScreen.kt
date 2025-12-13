@@ -16,8 +16,10 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,9 +40,6 @@ import com.prayatna.lookiesapp.presentation.main.inbox.InboxScreen
 import com.prayatna.lookiesapp.presentation.main.profile.ProfileScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
 import com.prayatna.lookiesapp.presentation.main.starred.StarredScreen
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.Grey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.BottomNavItem
 
 @Composable
@@ -124,9 +123,9 @@ fun BottomNavigationBar(
 
     NavigationBar(
         modifier = modifier
-            .background(BlackCharcoal)
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxWidth(),
-        containerColor = BlackCharcoal
+        containerColor = MaterialTheme.colorScheme.surface,
     ) {
         items.forEach { item ->
             val isSelected = selectedRoute == item.route
@@ -136,40 +135,53 @@ fun BottomNavigationBar(
                     when (item.route) {
                         BottomNavItem.Home.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Home else Icons.Outlined.Home,
-                            tint = if (isSelected) PureWhite else Grey,
+                            tint = if (isSelected) MaterialTheme.colorScheme.onSurface
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Search.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Search else Icons.Outlined.Search,
-                            tint = if (isSelected) PureWhite else Grey,
+                            tint = if (isSelected) MaterialTheme.colorScheme.onSurface
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Inbox.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Inbox else Icons.Outlined.Inbox,
-                            tint = if (isSelected) PureWhite else Grey,
+                            tint = if (isSelected) MaterialTheme.colorScheme.onSurface
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Starred.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Star else Icons.Outlined.Star,
-                            tint = if (isSelected) PureWhite else Grey,
+                            tint = if (isSelected) MaterialTheme.colorScheme.onSurface
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
                             contentDescription = item.label
                         )
 
                         BottomNavItem.Profile.route -> Icon(
                             imageVector = if (isSelected) Icons.Filled.Person else Icons.Outlined.Person,
-                            tint = if (isSelected) PureWhite else Grey,
+                            tint = if (isSelected) MaterialTheme.colorScheme.onSurface
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
                             contentDescription = item.label
                         )
                     }
                 },
-                selected = false,
+                selected = isSelected,
                 label = {
                     Text(text = item.label,
-                        color = if (isSelected) PureWhite else Grey)
+                        color = if (isSelected) MaterialTheme.colorScheme.onSurface
+                        else MaterialTheme.colorScheme.onSurfaceVariant)
                 },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
                 onClick = { onSelectRoute(item.route) },
             )
         }

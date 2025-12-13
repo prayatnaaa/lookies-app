@@ -19,7 +19,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.painting.PaintingCardList
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -39,8 +38,7 @@ fun PersonalPaintingListScreen(
         floatingActionButton = {
             ElevatedButton(
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = BlackCharcoal,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ),
                 onClick = {
                     navController.navigate(NavigationRoutes.UPLOAD_PAINTING)

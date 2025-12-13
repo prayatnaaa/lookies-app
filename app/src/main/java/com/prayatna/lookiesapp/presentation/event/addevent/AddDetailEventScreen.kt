@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -19,7 +20,6 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.addevent.AddDetailEventForm
 import com.prayatna.lookiesapp.presentation.components.addevent.AddEventFooter
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -54,7 +54,7 @@ fun AddDetailEventScreen(
     }
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) },
-        containerColor = BlackCharcoal,
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             AddEventFooter(
                 route = NavigationRoutes.ADD_DETAIL_EVENT,

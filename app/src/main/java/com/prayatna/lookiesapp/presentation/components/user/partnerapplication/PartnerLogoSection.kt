@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,9 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.DarkGrey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun PartnerLogoSection(imageLogo: Uri?,
@@ -38,13 +36,12 @@ fun PartnerLogoSection(imageLogo: Uri?,
         modifier = Modifier
             .fillMaxWidth()
             .height(160.dp)
-            .border(1.dp, BlackCharcoal, RoundedCornerShape(8.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
             .clickable {
                 onClick()
             },
         colors = CardDefaults.elevatedCardColors(
-            containerColor = PureWhite,
-            contentColor = BlackCharcoal
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
         shape = RoundedCornerShape(16.dp),
     ) {
@@ -69,13 +66,11 @@ fun PartnerLogoSection(imageLogo: Uri?,
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
                     contentDescription = "Add image",
-                    tint = DarkGrey,
                     modifier = Modifier.size(40.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Add image",
-                    color = DarkGrey,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )

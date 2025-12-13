@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,7 +16,6 @@ import com.prayatna.lookiesapp.presentation.components.addevent.AddEventFooter
 import com.prayatna.lookiesapp.presentation.components.addevent.AddEventForm
 import com.prayatna.lookiesapp.presentation.components.addevent.AddImageBannerPlaceholder
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -33,7 +33,7 @@ fun AddEventScreen(
         }
     }
     Scaffold(
-        containerColor = BlackCharcoal,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BackTopBar(navController = navController)
         },

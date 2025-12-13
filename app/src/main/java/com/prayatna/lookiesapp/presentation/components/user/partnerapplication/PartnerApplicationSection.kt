@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,8 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.event.PartnerApplicationEvent
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.state.PartnerSubmissionFormState
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun PartnerApplicationSection(
@@ -99,8 +98,7 @@ private fun FilePickerRow(
             .padding(vertical = 6.dp)
         ,
         colors = CardDefaults.elevatedCardColors(
-            containerColor = PureWhite,
-            contentColor = BlackCharcoal
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         onClick = onClick
     ) {

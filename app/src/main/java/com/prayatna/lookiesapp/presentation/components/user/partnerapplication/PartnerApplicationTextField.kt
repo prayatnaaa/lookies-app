@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -14,10 +15,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.DarkGrey
-import com.prayatna.lookiesapp.ui.theme.LightGrey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun PartnerApplicationTextField(
@@ -35,7 +32,6 @@ fun PartnerApplicationTextField(
         Text(
             text = label,
             style = TextStyle(
-                color = BlackCharcoal,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -46,7 +42,6 @@ fun PartnerApplicationTextField(
                 Text(
                     text = placeholder,
                     style = TextStyle(
-                        color = LightGrey,
                         fontSize = 16.sp
                     )
                 )
@@ -57,14 +52,23 @@ fun PartnerApplicationTextField(
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = BlackCharcoal,
-                focusedContainerColor = PureWhite,
-                focusedLabelColor = BlackCharcoal,
-                cursorColor = BlackCharcoal,
-                focusedTrailingIconColor = BlackCharcoal,
-                focusedTextColor = BlackCharcoal,
-                unfocusedTextColor = DarkGrey
-            )
+                focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+
+                focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+
+                cursorColor = MaterialTheme.colorScheme.primary,
+
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+
+                focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
         )
     }
 }

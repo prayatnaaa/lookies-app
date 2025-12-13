@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
@@ -39,7 +38,7 @@ fun SearchOptionTemplate(
             .clickable { onClick() }
             .padding(8.dp)
             .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = BlackCharcoal)
+            .background(color = MaterialTheme.colorScheme.surface)
             .width(80.dp)
             .height(80.dp)
     ) {

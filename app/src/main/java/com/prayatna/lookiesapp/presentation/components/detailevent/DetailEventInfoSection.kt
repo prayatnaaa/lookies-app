@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.domain.model.event.DetailEvent
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventStatusText
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.utils.Helper
 
 @Composable
@@ -98,7 +97,7 @@ private fun EventInfoRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = BlackCharcoal,
+            tint = MaterialTheme.colorScheme.surface,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(

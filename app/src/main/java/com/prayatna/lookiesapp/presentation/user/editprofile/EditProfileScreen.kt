@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -38,10 +39,6 @@ import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.user.partnerapplication.PartnerApplicationFooter
 import com.prayatna.lookiesapp.presentation.components.user.profile.EditProfileCard
 import com.prayatna.lookiesapp.presentation.components.user.profile.EditProfileImageCard
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.DarkGrey
-import com.prayatna.lookiesapp.ui.theme.LightGrey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 import kotlinx.coroutines.launch
@@ -195,10 +192,8 @@ fun EditProfileScreen (
                             .padding(horizontal = 16.dp),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.elevatedButtonColors(
-                            containerColor = BlackCharcoal,
-                            contentColor = PureWhite,
-                            disabledContainerColor = DarkGrey,
-                            disabledContentColor = LightGrey
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         )
 
                     ) {

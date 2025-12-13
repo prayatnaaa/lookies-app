@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,8 +29,6 @@ import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun UploadPaintingForm(
@@ -42,8 +41,7 @@ fun UploadPaintingForm(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { onEvent(UploadPaintingEvent.ValidateAndSubmit) },
-                containerColor = BlackCharcoal,
-                contentColor = PureWhite
+                containerColor = MaterialTheme.colorScheme.surface,
             ) { Text("Upload") }
         }
     ) { padding ->

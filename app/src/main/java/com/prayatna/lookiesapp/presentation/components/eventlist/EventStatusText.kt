@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 
 enum class EventStatus(val value: String) {
     PendingValidation("pending_validation"),
@@ -37,7 +36,7 @@ fun EventStatusText(
     val (text, color) = when (eventStatus) {
         EventStatus.PendingValidation -> "Pending" to Color(0xFFFFC107) // Amber
         EventStatus.Approved -> "Approved" to Color(0xFF4CAF50) // Green
-        EventStatus.Ongoing -> "Ongoing" to BlackCharcoal
+        EventStatus.Ongoing -> "Ongoing" to MaterialTheme.colorScheme.surface
         EventStatus.Completed -> "Completed" to Color(0xFF2196F3) // Blue
         EventStatus.Cancelled -> "Cancelled" to Color.Gray
         EventStatus.Unknown -> "Unknown" to Color.LightGray

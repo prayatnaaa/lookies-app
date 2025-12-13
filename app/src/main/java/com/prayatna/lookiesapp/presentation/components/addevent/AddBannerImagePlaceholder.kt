@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,9 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.DarkGrey
-import com.prayatna.lookiesapp.ui.theme.LightGrey
 
 @Composable
 fun AddImageBannerPlaceholder(
@@ -37,14 +35,14 @@ fun AddImageBannerPlaceholder(
 
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
-            containerColor = BlackCharcoal,
-            contentColor = DarkGrey
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
         ),
         modifier = modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .height(160.dp)
-            .border(1.dp, LightGrey, shape)
+            .border(1.dp, MaterialTheme.colorScheme.onSurface, shape)
             .background(color = Color.Transparent)
             .clickable {
                 onClick()
@@ -73,13 +71,12 @@ fun AddImageBannerPlaceholder(
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
                     contentDescription = "Add image",
-                    tint = DarkGrey,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(40.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Add image",
-                    color = DarkGrey,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )

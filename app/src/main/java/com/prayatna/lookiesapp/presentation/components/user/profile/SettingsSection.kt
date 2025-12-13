@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,8 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun SettingsSection(
@@ -33,8 +32,7 @@ fun SettingsSection(
             .fillMaxWidth()
             .padding(vertical = 6.dp)
             .clickable { onClick() },
-        contentColor = PureWhite.copy(alpha = 0.9f),
-        color = BlackCharcoal,
+        color = MaterialTheme.colorScheme.surface,
         tonalElevation = 2.dp,
         shadowElevation = 4.dp,
         shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
@@ -59,7 +57,6 @@ fun SettingsSection(
                     Text(
                         text = subtitle,
                         style = TextStyle(
-                            color = PureWhite.copy(alpha = 0.6f),
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Normal
                         ),

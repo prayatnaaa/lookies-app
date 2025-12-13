@@ -19,9 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.Grey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun DetailEventFooter(
@@ -33,10 +30,8 @@ fun DetailEventFooter(
         modifier = modifier
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = PureWhite,
-            contentColor = BlackCharcoal,
-            disabledContainerColor = Grey,
-            disabledContentColor = PureWhite
+            containerColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         elevation = CardDefaults.cardElevation(16.dp),
         shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
@@ -74,10 +69,8 @@ fun BuyButton(
         modifier = modifier
             .width(150.dp),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = BlackCharcoal,
-            contentColor = PureWhite,
-            disabledContainerColor = Grey,
-            disabledContentColor = PureWhite
+            containerColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         shape = RoundedCornerShape(8.dp),
     ) {
@@ -98,13 +91,11 @@ fun AddToCartButton(
         modifier = modifier
             .width(150.dp),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = PureWhite,
-            contentColor = BlackCharcoal,
-            disabledContainerColor = Grey,
-            disabledContentColor = PureWhite
+            containerColor = MaterialTheme.colorScheme.primary,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(width = 1.dp, color = BlackCharcoal)
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline)
     ) {
         Text(
             text = "Add to cart",

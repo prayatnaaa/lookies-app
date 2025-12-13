@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -17,9 +18,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.DarkGrey
-import com.prayatna.lookiesapp.ui.theme.Grey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun AddEventTextField(
@@ -41,7 +39,12 @@ fun AddEventTextField(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 letterSpacing = 0.5.sp,
-                color = if (!isFocused) Grey else PureWhite
+                color = if (isFocused) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+
             )
         )
         OutlinedTextField(
@@ -54,14 +57,24 @@ fun AddEventTextField(
                 },
             keyboardOptions = keyboardOptions,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = PureWhite,
-                focusedContainerColor = DarkGrey,
-                focusedLabelColor = PureWhite,
-                cursorColor = PureWhite,
-                focusedTrailingIconColor = PureWhite,
-                focusedTextColor = PureWhite,
-                unfocusedTextColor = PureWhite
+                focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+
+                focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+
+                cursorColor = MaterialTheme.colorScheme.primary,
+
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+
+                focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
         )
     }
 }

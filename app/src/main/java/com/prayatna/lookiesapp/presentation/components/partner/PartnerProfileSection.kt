@@ -16,7 +16,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.state.DetailPartnerUiModel
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -55,7 +54,6 @@ fun PartnerProfileSection(
                         text = data.name,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = BlackCharcoal
                     )
                     if (isAdmin && data.status.isNotBlank()) {
                         StatusPill(text = data.status)

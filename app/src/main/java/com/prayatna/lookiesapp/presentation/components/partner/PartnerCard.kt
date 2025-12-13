@@ -13,8 +13,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.state.PartnerUiModel
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 
 @Composable
 fun PartnerCard(
@@ -69,7 +66,6 @@ fun PartnerCard(
             ) {
                 Text(
                     text = data.name,
-                    color = BlackCharcoal,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -86,35 +82,12 @@ fun PartnerCard(
     }
 }
 
-@Composable
-private fun InfoRow(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    text: String
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(16.dp)
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun PartnerListCardPreview() {
     val dummyList = listOf(
         PartnerUiModel(
-            id = "sasa",
+            id = "info",
             name = "Stark Industries",
             logoUrl = "https://example.com/logo.png",
             status = "pending",
@@ -126,7 +99,7 @@ fun PartnerListCardPreview() {
             status = "approved",
         ),
         PartnerUiModel(
-            id = "lklds",
+            id = "kids",
             name = "Hello World",
             logoUrl = "https://example.com/logo.png",
             status = "rejected",

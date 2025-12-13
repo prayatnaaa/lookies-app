@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,8 +28,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.Grey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 import java.util.Calendar
 
 @Composable
@@ -125,7 +124,12 @@ fun AddEventDateTimeField(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 letterSpacing = 0.5.sp,
-                color = if (isFocused) PureWhite else Grey
+                color = if (isFocused) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+
             ),
             modifier = Modifier.padding(bottom = 4.dp)
         )
@@ -145,7 +149,11 @@ fun AddEventDateTimeField(
                 }
                 .border(
                     width = if (isFocused) 2.dp else 1.dp,
-                    color = if (isFocused) PureWhite else Grey,
+                    color = if (isFocused) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                     shape = RoundedCornerShape(4.dp)
                 )
                 .padding(horizontal = 12.dp, vertical = 16.dp)
@@ -155,7 +163,12 @@ fun AddEventDateTimeField(
         ) {
             Text(
                 text = value.ifEmpty { "" },
-                color = if (value.isNotEmpty()) PureWhite else Grey,
+                color = if (isFocused) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+                ,
                 fontSize = 16.sp
             )
         }

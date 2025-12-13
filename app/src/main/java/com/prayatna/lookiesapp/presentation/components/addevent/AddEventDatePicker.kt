@@ -17,8 +17,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.Grey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -51,7 +49,6 @@ fun AddEventDateRangePicker(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 letterSpacing = 0.5.sp,
-                color = Grey
             )
         )
         Box(
@@ -63,14 +60,18 @@ fun AddEventDateRangePicker(
                 }
                 .border(
                     width = 1.dp,
-                    color = Grey,
+                    color = MaterialTheme.colorScheme.onSurface,
                     shape = RoundedCornerShape(4.dp)
                 )
                 .padding(horizontal = 12.dp, vertical = 16.dp)
         ) {
             Text(
                 text = displayValue.ifEmpty { "" },
-                color = if (displayValue.isNotEmpty()) PureWhite else Grey,
+                color = if (displayValue.isNotEmpty()) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
                 fontSize = 16.sp
             )
         }
