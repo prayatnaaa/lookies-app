@@ -25,8 +25,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
-import com.prayatna.lookiesapp.presentation.artist.uploadpainting.event.UploadPaintingEvent
-import com.prayatna.lookiesapp.presentation.artist.uploadpainting.state.UploadPaintingUiState
+import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
+import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
 import com.prayatna.lookiesapp.ui.theme.PureWhite

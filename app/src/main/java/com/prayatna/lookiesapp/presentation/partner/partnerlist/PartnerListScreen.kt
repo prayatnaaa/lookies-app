@@ -48,7 +48,6 @@ fun PartnerListScreen(
         }
         DataResult.Idle -> {}
         DataResult.Loading -> {
-            Log.d("PartnerList", "Loading")
             CircularLoading()
         }
         is DataResult.Success -> {

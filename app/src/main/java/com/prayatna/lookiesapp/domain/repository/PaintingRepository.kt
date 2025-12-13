@@ -7,7 +7,7 @@ import com.prayatna.lookiesapp.utils.DataResult
 
 interface PaintingRepository {
     suspend fun getPaintings(): DataResult<List<Painting>>
-    suspend fun getPaintingsByArtist(): DataResult<List<Painting>>
+    suspend fun getPaintingsByArtist(id: String): DataResult<List<Painting>>
     suspend fun getPaintingDetail(id: Int): DataResult<Painting>
     suspend fun uploadPainting(painting: AddPaintingParams, image: Uri): DataResult<Painting>
     suspend fun deletePainting(paintingId: String): DataResult<String>

@@ -59,7 +59,6 @@ class SupabasePartnerService @Inject constructor(
                 columns = Columns.list("user_id", "name", "logo_url", "status")
             )
             .decodeList<PartnerDto>()
-        Log.d("PartnerList", result.toString())
         return result
     }
 
@@ -76,5 +75,7 @@ class SupabasePartnerService @Inject constructor(
         }
         return JsonProvider.json.decodeFromString(response.body())
     }
+
+    suspend fun updatePartner() {}
 
 }

@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.utils
 
 object NavigationRoutes {
+    const val DETAIL_PAINTING = "detail_painting"
     const val MAIN = "main"
     const val REGISTER = "register"
     const val LOGIN = "login"
@@ -10,14 +11,13 @@ object NavigationRoutes {
     const val ADMIN_MAIN = "admin_main"
     const val ADMIN_EVENT = "admin_event"
     const val DETAIL_EVENT = "detail_event"
-    const val EVENT_LIST = "event_list"
-    const val ADD_PAYMENT = "add_payment"
     const val UPLOAD_PAINTING = "upload_painting"
     const val PARTNER_APPLICATION = "partner_application"
     const val ADD_LOCATION = "add_location"
     const val PARTNER_LIST = "partner_list"
     const val DETAIL_PARTNER = "partner_detail"
     const val MAIN_LOADING = "main_loading"
+    const val PERSONAL_PAINTING = "personal_painting"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

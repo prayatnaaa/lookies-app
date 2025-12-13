@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.artist.uploadpainting.event
+package com.prayatna.lookiesapp.presentation.painting.uploadpainting.event
 
 import android.net.Uri
 

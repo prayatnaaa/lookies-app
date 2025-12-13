@@ -28,7 +28,7 @@ fun SearchScreen(navController: NavController) {
 
     SearchOptionsGrid (items = options) { clickedItem ->
         when(clickedItem) {
-            SearchScreenOptions.EVENTS -> { navController.navigate(NavigationRoutes.EVENT_LIST) }
+            SearchScreenOptions.EVENTS -> {  }
             SearchScreenOptions.PAINTINGS -> {}
             SearchScreenOptions.ARTISTS -> {}
             SearchScreenOptions.PARTNERS -> { navController.navigate(NavigationRoutes.PARTNER_LIST) }

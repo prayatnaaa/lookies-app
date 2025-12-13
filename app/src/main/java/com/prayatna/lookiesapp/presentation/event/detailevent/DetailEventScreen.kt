@@ -29,7 +29,6 @@ import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventIm
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventInfoSection
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.ui.theme.PureWhite
-import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun DetailEventScreen(
@@ -124,7 +123,6 @@ fun DetailEventScreen(
                     onValueChange = { viewModel.setQuantityValue(it) },
                     onBuyButtonClick = {
                         isSheetOpen = false
-                        navController.navigate("${NavigationRoutes.ADD_PAYMENT}/${eventId}?quantity=$quantity")
                     }
                 )
             }

@@ -13,19 +13,18 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
-import com.prayatna.lookiesapp.presentation.artist.uploadpainting.UploadPaintingScreen
+import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
+import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.event.addevent.eventNavGraph
-import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
-import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
+import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
-import com.prayatna.lookiesapp.presentation.payment.addpayment.AddPaymentScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.partnerApplicationNavGraph
 import com.prayatna.lookiesapp.utils.DataResult
@@ -56,6 +55,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 NavigationRoutes.LOGIN
             }
         }
+
         else -> NavigationRoutes.MAIN_LOADING
     }
 
@@ -86,7 +86,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             val rootEntry = remember(navBackStackEntry) {
                 navController.getBackStackEntry(NavigationRoutes.MAIN)
             }
-            val isPartnerSignup = navBackStackEntry.arguments?.getBoolean("isPartnerSignup") ?: false
+            val isPartnerSignup =
+                navBackStackEntry.arguments?.getBoolean("isPartnerSignup") ?: false
             val sharedViewModel: SharedViewModel = hiltViewModel(rootEntry)
             EditProfileScreen(
                 navController = navController,
@@ -99,27 +100,6 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
         composable(NavigationRoutes.ADMIN_EVENT) {
             AdminEventScreen(navController = navController)
-        }
-        composable(NavigationRoutes.EVENT_LIST) {
-            EventListScreen(navController = navController)
-        }
-        composable(
-            route = "${NavigationRoutes.DETAIL_EVENT}/{eventId}",
-            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            backStackEntry.arguments?.getString("eventId")?.let { eventId ->
-                DetailEventScreen(navController = navController, eventId = eventId)
-            }
-        }
-        composable(
-            route = "${NavigationRoutes.ADD_PAYMENT}/{eventId}?quantity={quantity}",
-            arguments = listOf(
-                navArgument("eventId") { type = NavType.StringType },
-                navArgument("quantity") { type = NavType.IntType; defaultValue = 0 }
-            )
-        ) { backStackEntry ->
-            val eventId = backStackEntry.arguments?.getString("eventId")!!
-            AddPaymentScreen(navController = navController, eventId = eventId)
         }
         composable(
             route = NavigationRoutes.PARTNER_LIST
@@ -135,13 +115,31 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             }
         }
         composable(
+            route = "${NavigationRoutes.DETAIL_PAINTING}/{paintingId}",
+            arguments = listOf(navArgument("paintingId") {
+                type = NavType.IntType
+            })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getInt("paintingId")?.let { id ->
+                DetailPaintingScreen(paintingId = id, navController = navController)
+            }
+        }
+        composable(
             route = NavigationRoutes.UPLOAD_PAINTING
         ) {
             UploadPaintingScreen(navController = navController)
         }
+        composable(
+            route = "${NavigationRoutes.PERSONAL_PAINTING}/{artistId}",
+            arguments = listOf(navArgument("artistId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("artistId")?.let { artistId ->
+                PersonalPaintingListScreen(artistId = artistId, navController = navController)
+            }
 
-        eventNavGraph(navController = navController)
+            eventNavGraph(navController = navController)
 
-        partnerApplicationNavGraph(navController = navController)
+            partnerApplicationNavGraph(navController = navController)
+        }
     }
 }

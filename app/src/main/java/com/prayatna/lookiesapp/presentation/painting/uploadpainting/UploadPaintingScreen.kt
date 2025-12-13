@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.artist.uploadpainting
+package com.prayatna.lookiesapp.presentation.painting.uploadpainting
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.prayatna.lookiesapp.presentation.artist.uploadpainting.event.UploadPaintingEvent
-import com.prayatna.lookiesapp.presentation.artist.uploadpainting.state.UploadPaintingUiState
+import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
+import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
 import com.prayatna.lookiesapp.presentation.components.artist.UploadPaintingForm
 
 @Composable

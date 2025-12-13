@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.main.profile
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -112,7 +113,11 @@ fun ProfileScreen(
                         title = "Arts",
                         subtitle = if (profile.isArtist == true) "Upload or see your arts" else "Upload your first art",
                         onClick = {
-                            navController.navigate(NavigationRoutes.UPLOAD_PAINTING)
+                            if (profile.isArtist == false) {
+                                navController.navigate(NavigationRoutes.UPLOAD_PAINTING)
+                            } else {
+                                navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${profile.id}")
+                            }
                         }
                     )
 

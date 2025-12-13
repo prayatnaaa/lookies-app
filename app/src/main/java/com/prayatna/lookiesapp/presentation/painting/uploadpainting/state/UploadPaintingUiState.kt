@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.artist.uploadpainting.state
+package com.prayatna.lookiesapp.presentation.painting.uploadpainting.state
 
 sealed class UploadPaintingUiState {
     data object Idle : UploadPaintingUiState()

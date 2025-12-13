@@ -12,6 +12,8 @@ import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PaintingRepositoryImpl @Inject constructor(
@@ -22,12 +24,24 @@ class PaintingRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getPaintingsByArtist(): DataResult<List<Painting>> {
-        TODO("Not yet implemented")
+    override suspend fun getPaintingsByArtist(id: String): DataResult<List<Painting>> {
+        return try {
+            val response = paintingService.getPaintingByArtistId(id)
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
     }
 
     override suspend fun getPaintingDetail(id: Int): DataResult<Painting> {
-        TODO("Not yet implemented")
+        return  try {
+            withContext(Dispatchers.IO) {
+                val result = paintingService.getPaintingDetail(id = id)
+                DataResult.Success(result.toDomain())
+            }
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
+        }
     }
 
     override suspend fun uploadPainting(painting: AddPaintingParams, image: Uri): DataResult<Painting> {
