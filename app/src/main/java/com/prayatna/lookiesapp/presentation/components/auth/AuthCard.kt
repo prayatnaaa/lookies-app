@@ -77,7 +77,8 @@ fun AuthCard(
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
                 ),
-                modifier = modifier.width(148.dp)
+                modifier = modifier.width(148.dp),
+                color = MaterialTheme.colorScheme.onPrimary
             )
 
             Spacer(modifier = modifier.height(25.dp))
@@ -145,12 +146,14 @@ fun AuthCard(
                 }
 
                 Button (
+                    enabled = if (inRegister) emailValue.isNotBlank() && passwordValue.isNotBlank() else emailValue.isNotBlank() && passwordValue.isNotBlank(),
                     onClick = { if (inRegister) onRegister() else onLogin() },
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.size(109.dp, 34.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        disabledContainerColor = MaterialTheme.colorScheme.secondary,
+                    ),
                 ) {
                     Text(
                         text = if (inRegister) "Sign up" else "Sign in",
@@ -187,7 +190,8 @@ fun AuthTextField(
         placeholder = {
             Text(
                 text = title,
-                style = TextStyle(fontSize = 12.sp)
+                style = TextStyle(fontSize = 12.sp),
+                color = MaterialTheme.colorScheme.secondary
             )
         },
         leadingIcon = icon,
@@ -197,22 +201,25 @@ fun AuthTextField(
         shape = RoundedCornerShape(12.dp),
         textStyle = TextStyle(fontSize = 12.sp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+            focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
 
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedContainerColor = MaterialTheme.colorScheme.primary,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
 
-            focusedLabelColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSecondary,
 
-            cursorColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.onPrimary,
 
-            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
 
-            focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+            focusedTrailingIconColor = MaterialTheme.colorScheme.onPrimary,
+            unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline,
+
+            focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+            unfocusedLeadingIconColor = MaterialTheme.colorScheme.outline
         ),
         keyboardOptions = keyboardOptions
     )

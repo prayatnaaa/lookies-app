@@ -1,6 +1,17 @@
 package com.prayatna.lookiesapp.utils
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Dataset
+import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Dataset
+import androidx.compose.material.icons.outlined.Inbox
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.prayatna.lookiesapp.R
+
 object NavigationRoutes {
+    const val PARTNER_MAIN_SCREEN = "partner_main_screen"
     const val DETAIL_PAINTING = "detail_painting"
     const val MAIN = "main"
     const val REGISTER = "register"
@@ -24,6 +35,45 @@ sealed class BottomNavItem(val route: String, val label: String) {
     data object Home: BottomNavItem(route = "home", label = "Home")
     data object Search: BottomNavItem(route = "search", label = "Search")
     data object Inbox: BottomNavItem(route = "inbox", label = "Inbox")
-    data object Starred: BottomNavItem(route = "starred", label = "Starred")
+    data object Transaction: BottomNavItem(route = "transaction", label = "Purchase")
     data object Profile: BottomNavItem(route = "profile", label = "Profile")
+}
+
+sealed class PartnerBottomNavItem(
+    val route: String,
+    val label: String,
+    val selectedIcon: ImageVector?,
+    val unselectedIcon: ImageVector?,
+    val selectedDrawableIcon: Int? = null,
+    val unselectedDrawableIcon: Int? = null
+) {
+    data object Home : PartnerBottomNavItem(
+        route = "home",
+        label = "Home",
+        selectedIcon = Icons.Filled.Dataset,
+        unselectedIcon = Icons.Outlined.Dataset
+    )
+
+    data object Chat : PartnerBottomNavItem(
+        route = "chat",
+        label = "Chat",
+        selectedIcon = Icons.Filled.Inbox,
+        unselectedIcon = Icons.Outlined.Inbox
+    )
+
+    data object Transaction : PartnerBottomNavItem(
+        route = "transaction",
+        label = "Transaction",
+        selectedIcon = null,
+        unselectedIcon = null,
+        selectedDrawableIcon = R.drawable.filled_transaction,
+        unselectedDrawableIcon = R.drawable.outlined_list
+    )
+
+    data object Settings : PartnerBottomNavItem(
+        route = "settings",
+        label = "Settings",
+        selectedIcon = Icons.Filled.Settings,
+        unselectedIcon = Icons.Outlined.Settings
+    )
 }

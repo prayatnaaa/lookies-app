@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
+import com.prayatna.lookiesapp.presentation.partner.main.PartnerMainScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.partnerApplicationNavGraph
@@ -48,9 +50,21 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         is DataResult.Error -> NavigationRoutes.LOGIN
         is DataResult.Success -> {
             if ((sessionStatus as DataResult.Success).data) {
-                if (roleState == "admin") {
-                    NavigationRoutes.ADMIN_MAIN
-                } else NavigationRoutes.MAIN
+                when (roleState) {
+                    "admin" -> {
+                        NavigationRoutes.ADMIN_MAIN
+                    }
+                    "partner" -> {
+                        NavigationRoutes.PARTNER_MAIN_SCREEN
+                    }
+
+                    "user" -> {
+                        NavigationRoutes.MAIN
+                    }
+                    else -> {
+                        NavigationRoutes.MAIN_LOADING
+                    }
+                }
             } else {
                 NavigationRoutes.LOGIN
             }
@@ -105,6 +119,11 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             route = NavigationRoutes.PARTNER_LIST
         ) {
             PartnerListScreen(navController = navController)
+        }
+        composable(
+            route = NavigationRoutes.PARTNER_MAIN_SCREEN
+        ) {
+            PartnerMainScreen(navHostController = navController)
         }
         composable(
             route = "${NavigationRoutes.DETAIL_PARTNER}/{partnerId}",

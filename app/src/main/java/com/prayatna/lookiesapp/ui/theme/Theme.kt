@@ -24,7 +24,9 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = SoftWhite,
 
     secondary = GreyText,
-    onSecondary = PureWhite
+    onSecondary = PureWhite,
+
+    outline = GreyTextLight
 )
 
 
@@ -42,7 +44,9 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = BlackText,
 
     secondary = GreyTextLight,
-    onSecondary = PureWhite
+    onSecondary = PureWhite,
+
+    outline = GreyTextLight
 )
 
 

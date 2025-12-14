@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -19,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -27,6 +30,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.register.events.RegisterEvent
+import com.prayatna.lookiesapp.ui.theme.GreyTextLight
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.DataResult
@@ -75,18 +79,34 @@ fun RegisterScreen(
         ) {
 
             Text(
-                text = "Lookies",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                text = "Welcome!",
                 color = PureWhite,
                 style = TextStyle(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
-                )
+                ),
+                textAlign = TextAlign.Start
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                text = "Register to continue",
+                color = GreyTextLight,
+                style = TextStyle(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 30.sp,
+                ),
+                textAlign = TextAlign.Start
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             AuthCard(
-                title = "Welcome",
+                title = "Lookies",
                 onRegister = { viewModel.onSignUp() },
                 onLogin = {
                     navController.navigate(NavigationRoutes.LOGIN) {
