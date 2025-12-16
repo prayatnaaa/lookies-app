@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.domain.repository
 
-import com.prayatna.lookiesapp.data.remote.response.auth.LoginResponse
+import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.gotrue.user.UserInfo
 

@@ -56,7 +56,7 @@ fun EventCard(
                     Spacer(modifier = modifier.height(4.dp))
 
                     Text(
-                        text = event.date,
+                        text = event.startDate,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = modifier.height(4.dp))
@@ -72,7 +72,7 @@ fun EventCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-                EventStatusText(status = event.status.toString())
+                EventStatusText(status = event.status)
             }
         }
     }

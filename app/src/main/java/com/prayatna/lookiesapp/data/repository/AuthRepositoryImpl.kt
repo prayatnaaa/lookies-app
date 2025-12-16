@@ -2,7 +2,7 @@ package com.prayatna.lookiesapp.data.repository
 
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthService
-import com.prayatna.lookiesapp.data.remote.response.auth.LoginResponse
+import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError

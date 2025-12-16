@@ -1,8 +1,8 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
-import com.prayatna.lookiesapp.data.remote.request.user.PartnerApplicationRequest
-import com.prayatna.lookiesapp.data.remote.response.base.RpcBaseResponse
+import com.prayatna.lookiesapp.data.remote.dto.request.user.PartnerApplicationRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.base.RpcBaseResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest

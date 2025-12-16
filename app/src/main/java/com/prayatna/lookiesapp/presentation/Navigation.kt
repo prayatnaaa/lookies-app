@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,12 +17,12 @@ import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPainti
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
-import com.prayatna.lookiesapp.presentation.event.addevent.eventNavGraph
 import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
+import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScreen
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.main.PartnerMainScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
@@ -93,6 +92,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         composable(NavigationRoutes.REGISTER) {
             RegisterScreen(navController = navController)
         }
+        composable(NavigationRoutes.CREATE_EVENT) {
+            CreateEventScreen(navController = navController)
+        }
         composable(
             route = "${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup={isPartnerSignup}",
             arguments = listOf(navArgument("isPartnerSignup") { type = NavType.BoolType })
@@ -155,9 +157,6 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             backStackEntry.arguments?.getString("artistId")?.let { artistId ->
                 PersonalPaintingListScreen(artistId = artistId, navController = navController)
             }
-
-            eventNavGraph(navController = navController)
-
             partnerApplicationNavGraph(navController = navController)
         }
     }

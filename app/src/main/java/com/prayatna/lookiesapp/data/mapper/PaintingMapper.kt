@@ -1,7 +1,7 @@
 package com.prayatna.lookiesapp.data.mapper
 
-import com.prayatna.lookiesapp.data.remote.request.painting.UploadPaintingRequest
-import com.prayatna.lookiesapp.data.remote.response.painting.GetPaintingDto
+import com.prayatna.lookiesapp.data.remote.dto.request.painting.UploadPaintingRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetPaintingDto
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 

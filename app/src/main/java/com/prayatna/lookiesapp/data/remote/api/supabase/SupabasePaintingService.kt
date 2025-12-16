@@ -1,7 +1,7 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
-import com.prayatna.lookiesapp.data.remote.request.painting.UploadPaintingRequest
-import com.prayatna.lookiesapp.data.remote.response.painting.GetPaintingDto
+import com.prayatna.lookiesapp.data.remote.dto.request.painting.UploadPaintingRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetPaintingDto
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest

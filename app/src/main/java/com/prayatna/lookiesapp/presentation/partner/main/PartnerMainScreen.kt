@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.prayatna.lookiesapp.presentation.partner.main.home.PartnerHomeScreen
 import com.prayatna.lookiesapp.utils.PartnerBottomNavItem
 
 @Composable
@@ -70,7 +71,7 @@ fun PartnerContent(
         modifier = modifier
     ) {
         composable(PartnerBottomNavItem.Home.route) {
-//            HomeScreen(navController = navHostController)
+            PartnerHomeScreen(navController = navHostController)
         }
 
         composable(PartnerBottomNavItem.Chat.route) {

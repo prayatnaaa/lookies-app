@@ -3,7 +3,7 @@ package com.prayatna.lookiesapp.data.repository
 import com.prayatna.lookiesapp.domain.model.payment.Payment
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePaymentService
 import com.prayatna.lookiesapp.data.mapper.asDomainModel
-import com.prayatna.lookiesapp.data.remote.request.payment.AddPaymentRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.payment.AddPaymentRequest
 import com.prayatna.lookiesapp.domain.model.payment.AddPayment
 import com.prayatna.lookiesapp.domain.model.payment.AddPaymentResult
 import com.prayatna.lookiesapp.domain.repository.PaymentRepository

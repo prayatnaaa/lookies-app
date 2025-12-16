@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.domain.mapper
 
-import com.prayatna.lookiesapp.data.remote.request.painting.UploadPaintingRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.painting.UploadPaintingRequest
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
 
 fun AddPaintingParams.toDto(): UploadPaintingRequest {

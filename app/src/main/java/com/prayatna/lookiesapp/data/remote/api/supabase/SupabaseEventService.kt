@@ -2,60 +2,81 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
-import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
-import com.prayatna.lookiesapp.data.remote.dto.EventDto
-import com.prayatna.lookiesapp.data.remote.request.event.AddEventRequest
-import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
-import com.prayatna.lookiesapp.data.remote.response.event.DetailEventResponse
+import com.prayatna.lookiesapp.data.remote.dto.request.event.CreateEventRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.event.CreateEventResponse
+import com.prayatna.lookiesapp.utils.Helper
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import java.util.UUID
 import javax.inject.Inject
 
 class SupabaseEventService @Inject constructor(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val auth: Auth,
+    private val storage: Storage,
+    private val postgrest: Postgrest
 ) {
-    suspend fun addEvent(
-        token: String,
-        event: EventDto,
-        detailEvent: DetailEventDto
-    ): AddEventResponse {
-        val response: HttpResponse = httpClient.post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/create-event") {
-            contentType(ContentType.Application.Json)
-            header("Authorization", "Bearer $token")
-            setBody(AddEventRequest(event, detailEvent))
-        }
-        Log.d("ADD-EVENT", Json.encodeToString(AddEventRequest(event, detailEvent)))
-        if (response.status != HttpStatusCode.OK) {
-            val body = response.bodyAsText()
-            throw Exception("Failed! ${response.status}\n $body")
-        }
-        return response.body()
-    }
 
-    suspend fun getEvent(
-        token: String,
-        eventId: String
-    ): DetailEventResponse {
-        val response = httpClient.get("${BuildConfig.SUPABASE_EDGE_BASE_URL}/get-event-detail?eventId=$eventId") {
-            header("Authorization", "Bearer $token")
+    suspend fun createEvent(
+        request: CreateEventRequest,
+        bannerImage: ByteArray?
+    ): CreateEventResponse {
+
+        val userId = auth.currentUserOrNull()?.id
+            ?: throw IllegalStateException("User not logged in")
+
+        if (bannerImage == null) {
+            throw IllegalArgumentException("Banner image cannot be null")
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            val body = response.bodyAsText()
-            throw Exception("Failed! ${response.status}\n$body")
-        }
+        var uploadedPath: String? = null
 
-        return response.body<DetailEventResponse>()
+        try {
+            val path = "events/$userId/${UUID.randomUUID()}.png"
+
+            storage.from("partner_assets").upload(
+                path = path,
+                data = bannerImage,
+                upsert = true
+            )
+
+            uploadedPath = path
+
+            val bannerUrl = Helper.buildImageUrl(
+                bucketName = "partner_assets",
+                imageName = path
+            )
+
+            val finalRequest = request.copy(
+                bannerImageUrl = bannerUrl
+            )
+
+            val session = auth.currentSessionOrNull()
+                ?: throw IllegalStateException("No active session")
+
+            val response =  httpClient.post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/create-event") {
+                contentType(ContentType.Application.Json)
+                header("Authorization", "Bearer ${session.accessToken}")
+                setBody(finalRequest)
+            }
+
+            Log.d("Create-Event", response.body())
+
+            return response.body()
+
+        } catch (e: Exception) {
+            uploadedPath?.let {
+                storage.from("event-banners").delete(it)
+            }
+            throw e
+        }
     }
 }

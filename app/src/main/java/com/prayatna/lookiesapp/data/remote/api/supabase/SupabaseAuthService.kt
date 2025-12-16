@@ -2,7 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.auth0.android.jwt.JWT
-import com.prayatna.lookiesapp.data.remote.response.auth.LoginResponse
+import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.user.UserInfo

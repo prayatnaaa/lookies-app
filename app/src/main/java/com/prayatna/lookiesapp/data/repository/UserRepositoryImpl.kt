@@ -7,7 +7,7 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.mapper.toDto
-import com.prayatna.lookiesapp.data.remote.request.user.PartnerApplicationRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.user.PartnerApplicationRequest
 import com.prayatna.lookiesapp.domain.model.user.PartnerSubmissionParams
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult

@@ -1,8 +1,8 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import com.prayatna.lookiesapp.BuildConfig
-import com.prayatna.lookiesapp.data.remote.request.payment.AddPaymentRequest
-import com.prayatna.lookiesapp.data.remote.response.payment.AddPaymentResponse
+import com.prayatna.lookiesapp.data.remote.dto.request.payment.AddPaymentRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.payment.AddPaymentResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.header

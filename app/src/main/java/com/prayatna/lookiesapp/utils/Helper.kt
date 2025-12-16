@@ -23,4 +23,14 @@ object Helper {
 
         return "${start?.let { outputFormat.format(it) }} - ${end?.let { outputFormat.format(it) }}"
     }
+
+    fun formatIdr(value: String): String {
+        val number = value.toLongOrNull() ?: return ""
+        return "Rp " + number
+            .toString()
+            .reversed()
+            .chunked(3)
+            .joinToString(".")
+            .reversed()
+    }
 }
