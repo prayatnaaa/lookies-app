@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.DetailPartnerDto
+import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDto
 import com.prayatna.lookiesapp.utils.Helper
 import com.prayatna.lookiesapp.utils.JsonProvider
@@ -76,6 +77,17 @@ class SupabasePartnerService @Inject constructor(
         return JsonProvider.json.decodeFromString(response.body())
     }
 
-    suspend fun updatePartner() {}
+    suspend fun getSelfEvents(): List<EventDto> {
+        val user = auth.currentUserOrNull()
+            ?: throw Exception("user not logged in")
+        val events = postgrest.from("events")
+            .select {
+                filter {
+                    eq("organizer_id", user.id)
+                }
+            }.decodeList<EventDto>()
+
+        return events
+    }
 
 }

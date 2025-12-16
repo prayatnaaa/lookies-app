@@ -14,6 +14,7 @@ import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.jan.supabase.exceptions.RestException
 import javax.inject.Inject
 
 class EventRepositoryImpl @Inject constructor(
@@ -21,7 +22,12 @@ class EventRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ): EventRepository {
     override suspend fun getEvents(): DataResult<List<Event>> {
-        TODO("Not yet implemented")
+        return try {
+            val response = supabaseEventService.getEvents()
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
     }
 
     override suspend fun getEvent(

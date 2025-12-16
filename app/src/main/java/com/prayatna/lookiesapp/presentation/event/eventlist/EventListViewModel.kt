@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.repository.EventRepository
+import com.prayatna.lookiesapp.domain.usecase.event.GetEventsUseCase
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EventListViewModel @Inject constructor(
-    private val eventRepository: EventRepository
+    private val getEventsUseCase: GetEventsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EventListUiState())
@@ -26,7 +27,7 @@ class EventListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            when (val result = eventRepository.getEvents()) {
+            when (val result = getEventsUseCase()) {
                 is DataResult.Success -> _uiState.update {
                     it.copy(isLoading = false, events = result.data, errorMessage = null)
                 }

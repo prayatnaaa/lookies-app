@@ -42,7 +42,7 @@ fun ProfileCard(
     OutlinedCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(4.dp),
         border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
     ) {
         Column(
@@ -82,7 +82,7 @@ fun ProfileCard(
 
             OutlinedButton (
                 onClick = onEditProfileClick,
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(4.dp),
                 modifier = modifier
                     .width(140.dp),
                 border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)

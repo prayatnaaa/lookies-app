@@ -83,7 +83,9 @@ fun PartnerHomeScreen(
             }
             item {
                 ActionButton(
-                    onClick = {},
+                    onClick = {
+                        navController.navigate(NavigationRoutes.SELF_EVENT_LIST)
+                    },
                     labelFor = "My events"
                 )
                 Spacer(modifier = Modifier.height(16.dp))

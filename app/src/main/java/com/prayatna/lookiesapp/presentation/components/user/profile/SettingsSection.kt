@@ -32,10 +32,10 @@ fun SettingsSection(
             .fillMaxWidth()
             .padding(vertical = 6.dp)
             .clickable { onClick() },
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.primary,
         tonalElevation = 2.dp,
         shadowElevation = 4.dp,
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
     ) {
         Row(
             modifier = Modifier

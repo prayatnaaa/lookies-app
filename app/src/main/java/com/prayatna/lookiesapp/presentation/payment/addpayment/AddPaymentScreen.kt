@@ -84,7 +84,6 @@ private fun AddPaymentContent(
 
         DetailEventInfoSection(
             event = eventInfo.event,
-            detailEvent = eventInfo.detail
         )
 
         OutlinedTextField(

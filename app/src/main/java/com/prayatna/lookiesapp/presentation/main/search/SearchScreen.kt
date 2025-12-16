@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.main.search
 
+import androidx.compose.foundation.layout.Box
 import androidx.navigation.NavController
 import androidx.compose.runtime.Composable
 import androidx.compose.material.icons.Icons
@@ -7,6 +8,8 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Padding
 import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import com.prayatna.lookiesapp.presentation.components.search.SearchOptionsGrid
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -26,12 +29,23 @@ fun SearchScreen(navController: NavController) {
         SearchScreenOptions.PARTNERS to Icons.Default.MeetingRoom,
     )
 
-    SearchOptionsGrid (items = options) { clickedItem ->
-        when(clickedItem) {
-            SearchScreenOptions.EVENTS -> {  }
-            SearchScreenOptions.PAINTINGS -> {}
-            SearchScreenOptions.ARTISTS -> {}
-            SearchScreenOptions.PARTNERS -> { navController.navigate(NavigationRoutes.PARTNER_LIST) }
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
+        content = { innerPadding ->
+            innerPadding.calculateTopPadding()
+            SearchOptionsGrid(items = options) { clickedItem ->
+                when (clickedItem) {
+                    SearchScreenOptions.EVENTS -> {
+                        navController.navigate(NavigationRoutes.EVENT_LIST)
+                    }
+
+                    SearchScreenOptions.PAINTINGS -> {}
+                    SearchScreenOptions.ARTISTS -> {}
+                    SearchScreenOptions.PARTNERS -> {
+                        navController.navigate(NavigationRoutes.PARTNER_LIST)
+                    }
+                }
+            }
         }
-    }
+    )
 }

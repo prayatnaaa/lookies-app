@@ -3,6 +3,8 @@ package com.prayatna.lookiesapp.data.repository
 import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePartnerService
+import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.partner.DetailPartner
 import com.prayatna.lookiesapp.domain.model.partner.Partner
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
@@ -46,6 +48,15 @@ class PartnerRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e("PartnerRepository", e.toString())
             DataResult.Error("Something went wrong! Please check your connection")
+        }
+    }
+
+    override suspend fun getSelfEvents(): DataResult<List<Event>> {
+        return try {
+            val response = supabasePartnerService.getSelfEvents()
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
         }
     }
 }

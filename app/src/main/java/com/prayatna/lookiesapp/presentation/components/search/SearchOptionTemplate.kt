@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun SearchOptionTemplate(
@@ -37,8 +36,8 @@ fun SearchOptionTemplate(
         modifier = modifier
             .clickable { onClick() }
             .padding(8.dp)
-            .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = MaterialTheme.colorScheme.surface)
+            .clip(shape = RoundedCornerShape(4.dp))
+            .background(color = MaterialTheme.colorScheme.primary)
             .width(80.dp)
             .height(80.dp)
     ) {
@@ -50,15 +49,15 @@ fun SearchOptionTemplate(
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
+                tint = MaterialTheme.colorScheme.onPrimary,
                 imageVector =icon,
                 contentDescription = null,
-                tint = PureWhite
             )
             Spacer(modifier = modifier.height(4.dp))
             Text(
                 text = title,
                 style = TextStyle(
-                    color = PureWhite,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontWeight = MaterialTheme.typography.titleMedium.fontWeight
                 )

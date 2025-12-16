@@ -84,13 +84,12 @@ fun DetailEventScreen(
                         detailEventState.info?.let { data ->
                             item {
                                 DetailEventImage(
-                                    imageUrl = data.event.bannerImageUrl.toString()
+                                    imageUrl = data.event.bannerImageUrl
                                 )
                             }
                             item {
                                 DetailEventInfoSection(
                                     event = data.event,
-                                    detailEvent = data.detail,
                                 )
                             }
                         }

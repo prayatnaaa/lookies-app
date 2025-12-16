@@ -16,18 +16,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.prayatna.lookiesapp.presentation.SharedViewModel
 import com.prayatna.lookiesapp.presentation.partner.main.home.PartnerHomeScreen
+import com.prayatna.lookiesapp.presentation.partner.main.settings.PartnerSettingsScreen
 import com.prayatna.lookiesapp.utils.PartnerBottomNavItem
 
 @Composable
 fun PartnerMainScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
+    sharedViewModel: SharedViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -55,6 +59,7 @@ fun PartnerMainScreen(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
             navHostController = navHostController,
+            sharedViewModel = sharedViewModel
         )
     }
 }
@@ -64,6 +69,7 @@ fun PartnerContent(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     navHostController: NavHostController,
+    sharedViewModel: SharedViewModel
 ) {
     NavHost(
         navController = navController,
@@ -83,9 +89,8 @@ fun PartnerContent(
         }
 
         composable(PartnerBottomNavItem.Settings.route) {
-//            ProfileScreen(
-//                navController = navHostController,
-//            )
+            PartnerSettingsScreen(navController = navHostController,
+                sharedViewModel = sharedViewModel)
         }
     }
 }

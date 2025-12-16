@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.event.eventlist
+package com.prayatna.lookiesapp.presentation.partner.selfEventList
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,20 +20,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventCardList
-import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.components.loading.EventListLoading
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
-fun EventListScreen(
+fun SelfEventListScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    viewModel: EventListViewModel = hiltViewModel()
+    viewModel: SelfEventListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.getEvents()
-    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -47,7 +42,9 @@ fun EventListScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    CircularLoading()
+                    EventListLoading(
+                        modifier = Modifier.padding(16.dp)
+                    )
                 }
 
                 uiState.errorMessage != null -> {

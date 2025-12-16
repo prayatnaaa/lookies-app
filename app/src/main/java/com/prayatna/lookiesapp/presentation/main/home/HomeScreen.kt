@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.main.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +17,7 @@ fun HomeScreen(
 ){
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         content = { innerPadding ->
             Column(verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally){

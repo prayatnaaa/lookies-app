@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.domain.model.event.DetailEvent
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventStatusText
 import com.prayatna.lookiesapp.utils.Helper
@@ -22,7 +21,6 @@ import com.prayatna.lookiesapp.utils.Helper
 @Composable
 fun DetailEventInfoSection(
     event: Event,
-    detailEvent: DetailEvent,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -50,31 +48,24 @@ fun DetailEventInfoSection(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            event.status?.let {
-                EventStatusText(
-                    status = it,
-                    modifier = Modifier.align(Alignment.Start)
-                )
-            }
+            EventStatusText(
+                status = event.status,
+                modifier = Modifier.align(Alignment.Start)
+            )
 
             Spacer(
                 modifier = Modifier.padding(vertical = 4.dp),
             )
 
             EventInfoRow(icon = Icons.Default.LocationOn, value = event.location)
-//            EventInfoRow(label = "Date", value = event.date)
             EventInfoRow(
                 icon = Icons.Default.DateRange,
-                value = Helper.parseDateRange("${detailEvent.startTime} - ${detailEvent.endTime}")
+                value = Helper.parseDateRange("${event.startDate} - ${event.endDate}")
             )
             EventInfoRow(
                 icon = Icons.Default.Bookmarks,
-                value = "${detailEvent.ticketQuantity} available"
+                value = "${event.ticketPrice} available"
             )
-//            EventInfoRow(
-//                label = "Registration Fee",
-//                value = if (event.registrationFee == 0.0) "Free" else "Rp ${event.registrationFee}"
-//            )
 
             Spacer(
                 modifier = Modifier.padding(vertical = 8.dp),

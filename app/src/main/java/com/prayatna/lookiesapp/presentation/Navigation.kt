@@ -16,6 +16,7 @@ import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
 import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
@@ -26,6 +27,7 @@ import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScree
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.main.PartnerMainScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
+import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.partnerApplicationNavGraph
 import com.prayatna.lookiesapp.utils.DataResult
@@ -85,6 +87,12 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             }
             val sharedViewModel: SharedViewModel = hiltViewModel(rootEntry)
             MainScreen(navHostController = navController, sharedViewModel = sharedViewModel)
+        }
+        composable(NavigationRoutes.EVENT_LIST) {
+            EventListScreen(navController = navController)
+        }
+        composable(NavigationRoutes.SELF_EVENT_LIST) {
+            SelfEventListScreen(navController = navController)
         }
         composable(NavigationRoutes.LOGIN) {
             LoginScreen(navController = navController)
