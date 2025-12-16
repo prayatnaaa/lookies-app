@@ -3,7 +3,6 @@ package com.prayatna.lookiesapp.data.repository
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.prayatna.lookiesapp.domain.model.event.DetailEventInfo
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventService
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
@@ -33,8 +32,13 @@ class EventRepositoryImpl @Inject constructor(
     override suspend fun getEvent(
         eventId: String,
         forceRefresh: Boolean
-    ): DataResult<DetailEventInfo> {
-        TODO("Not yet implemented")
+    ): DataResult<Event> {
+        return try {
+            val response = supabaseEventService.getDetailEvent(eventId)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
     }
 
     override suspend fun createEvent(
@@ -53,13 +57,4 @@ class EventRepositoryImpl @Inject constructor(
             DataResult.Error(e.message ?: "Something went wrong")
         }
     }
-
-    override suspend fun editEvent(event: EventDto): DataResult<String> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteEvent(eventId: String): DataResult<String> {
-        TODO("Not yet implemented")
-    }
-
 }

@@ -89,8 +89,8 @@ class SupabaseEventService @Inject constructor(
         return events
     }
 
-    suspend fun getDetailEvent(id: Int): EventDto {
-        val event = postgrest.from("events").select {
+    suspend fun getDetailEvent(id: String): EventDto {
+        val event = postgrest.from("approved_events").select {
             filter {
                 eq("id", id)
             }

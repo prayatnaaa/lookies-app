@@ -1,11 +1,10 @@
 package com.prayatna.lookiesapp.presentation.event.detailevent
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -24,11 +23,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventBottomModal
+import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventContent
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventFooter
-import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventImage
-import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventInfoSection
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun DetailEventScreen(
@@ -48,6 +45,7 @@ fun DetailEventScreen(
     }
 
     Scaffold (
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             DetailEventFooter(
                 onBuyButtonClick = {
@@ -63,39 +61,26 @@ fun DetailEventScreen(
         },
         content = {
             innerPadding ->
-            LazyColumn(
-                modifier = modifier
-                    .padding(innerPadding)
-                    .background(PureWhite)
-            ) {
                 when {
                     detailEventState.isLoading -> {
-                        item {
                             Box(
                                 modifier = modifier
-                                    .fillParentMaxSize(),
+                                    .fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularLoading()
                             }
-                        }
                     }
                     detailEventState.info != null -> {
                         detailEventState.info?.let { data ->
-                            item {
-                                DetailEventImage(
-                                    imageUrl = data.event.bannerImageUrl
+                                DetailEventContent(
+                                    event = data,
+                                    modifier = Modifier
+                                        .padding(innerPadding)
                                 )
-                            }
-                            item {
-                                DetailEventInfoSection(
-                                    event = data.event,
-                                )
-                            }
                         }
                     }
                     detailEventState.errorMessage != null -> {
-                        item {
                             Box(
                                 modifier = modifier
                                     .padding(16.dp),
@@ -111,10 +96,9 @@ fun DetailEventScreen(
                                     Text("Retry")
                                 }
                             }
-                        }
+
                     }
                 }
-            }
             if (isSheetOpen) {
                 DetailEventBottomModal(
                     onDismiss = { isSheetOpen = false },

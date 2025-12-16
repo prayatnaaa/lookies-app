@@ -38,6 +38,7 @@ fun DetailEventBottomModal(
     range: IntRange = 0..100
 ) {
     ModalBottomSheet(
+        containerColor = MaterialTheme.colorScheme.background,
         onDismissRequest = onDismiss
     ) {
         Row (modifier = modifier
@@ -54,7 +55,7 @@ fun DetailEventBottomModal(
                 colors = ButtonDefaults.elevatedButtonColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                 ),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(4.dp)
             ) {
                 Text(
                     modifier = modifier

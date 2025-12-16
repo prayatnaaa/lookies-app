@@ -34,7 +34,7 @@ fun DetailEventFooter(
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         elevation = CardDefaults.cardElevation(16.dp),
-        shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+        shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
     ) {
         Row(
             modifier = modifier
@@ -76,7 +76,8 @@ fun BuyButton(
     ) {
         Text(
             text = "Buy",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -99,7 +100,8 @@ fun AddToCartButton(
     ) {
         Text(
             text = "Add to cart",
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
