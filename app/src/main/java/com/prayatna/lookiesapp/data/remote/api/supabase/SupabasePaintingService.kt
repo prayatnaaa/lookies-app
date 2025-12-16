@@ -1,7 +1,9 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.UploadPaintingRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetDetailPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetPaintingDto
+import com.prayatna.lookiesapp.data.remote.dto.response.painting.PaintingAttributeResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -22,12 +24,12 @@ class SupabasePaintingService @Inject constructor(
         return result
     }
 
-    suspend fun getPaintingDetail(id: Int): GetPaintingDto {
-        val result = postgrest.from("paintings").select {
+    suspend fun getPaintingDetail(id: Int): GetDetailPaintingDto {
+        val result = postgrest.from("detail_paintings").select {
             filter {
                 eq("id", id)
             }
-        }.decodeSingle<GetPaintingDto>()
+        }.decodeSingle<GetDetailPaintingDto>()
         return result
     }
 
@@ -39,6 +41,22 @@ class SupabasePaintingService @Inject constructor(
         }.decodeList<GetPaintingDto>()
 
         return response
+    }
+
+    suspend fun getPaintingArtStyles(): List<PaintingAttributeResponse> {
+            val artStyles = postgrest
+                .from("painting_art_styles")
+                .select()
+                .decodeList<PaintingAttributeResponse>()
+        return artStyles
+    }
+
+    suspend fun getPaintingMediums(): List<PaintingAttributeResponse> {
+        val artStyles = postgrest
+            .from("painting_mediums")
+            .select()
+            .decodeList<PaintingAttributeResponse>()
+        return artStyles
     }
 
     suspend fun uploadPainting(painting: UploadPaintingRequest, image: ByteArray?): GetPaintingDto {
@@ -90,10 +108,11 @@ class SupabasePaintingService @Inject constructor(
             storage.from("paintings").delete(path)
     }
 
-    suspend fun deletePaintingById(paintingId: String) {
+    suspend fun deletePaintingById(paintingId: String): String {
         val painting = postgrest.from("paintings")
             .select { filter { eq("id", paintingId) } }
             .decodeSingle<GetPaintingDto>()
         deletePainting(paintingId = paintingId.toInt(), paintingUrl = painting.paintingUrl)
+        return "Painting delete successfully"
     }
 }

@@ -7,8 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
+import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.domain.usecase.painting.UploadPaintingUseCase
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
+import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.PaintingDropdownState
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +19,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UploadPaintingViewModel @Inject constructor(
-    private val uploadPaintingUseCase: UploadPaintingUseCase
+    private val uploadPaintingUseCase: UploadPaintingUseCase,
+    private val paintingRepository: PaintingRepository
 ): ViewModel() {
+
+    var dropdownState by mutableStateOf(PaintingDropdownState())
+        private set
 
     var params by mutableStateOf(
         AddPaintingParams(
@@ -40,6 +46,26 @@ class UploadPaintingViewModel @Inject constructor(
     var uiState by mutableStateOf<UploadPaintingUiState>(UploadPaintingUiState.Idle)
         private set
 
+    init {
+        fetchDropdowns()
+    }
+
+    private fun fetchDropdowns() {
+        viewModelScope.launch {
+            dropdownState = dropdownState.copy(isLoading = true)
+
+            val artStylesResult = paintingRepository.getPaintingArtStyles()
+            val mediumsResult = paintingRepository.getPaintingMediums()
+
+            dropdownState = dropdownState.copy(
+                artStyles = (artStylesResult as? DataResult.Success)?.data ?: emptyList(),
+                mediums = (mediumsResult as? DataResult.Success)?.data ?: emptyList(),
+                isLoading = false,
+                error = (artStylesResult as? DataResult.Error)?.error
+                    ?: (mediumsResult as? DataResult.Error)?.error
+            )
+        }
+    }
 
     fun onEvent(event: UploadPaintingEvent) {
         when(event) {
@@ -56,10 +82,10 @@ class UploadPaintingViewModel @Inject constructor(
                 params = params.copy(dimensionWidth = event.value.toDoubleOrNull() ?: 0.0)
 
             is UploadPaintingEvent.OnMediumChange ->
-                params = params.copy(medium = event.value)
+                params = params.copy(medium = event.value.id)
 
             is UploadPaintingEvent.OnArtStyleChange ->
-                params = params.copy(artStyle = event.value.takeIf { it.isNotBlank() })
+                params = params.copy(artStyle = event.value.id)
 
             is UploadPaintingEvent.OnSubjectChange ->
                 params = params.copy(subject = event.value.takeIf { it.isNotBlank() })

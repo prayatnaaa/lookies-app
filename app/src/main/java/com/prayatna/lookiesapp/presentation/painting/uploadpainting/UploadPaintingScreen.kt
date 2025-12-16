@@ -4,11 +4,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
-import com.prayatna.lookiesapp.presentation.components.artist.UploadPaintingForm
+import com.prayatna.lookiesapp.presentation.components.painting.UploadPaintingForm
+import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.NONE_ITEM
 
 @Composable
 fun UploadPaintingScreen(
@@ -19,6 +21,10 @@ fun UploadPaintingScreen(
     val params = viewModel.params
     val image = viewModel.selectedImage
     val uiState = viewModel.uiState
+    val dropDownState = viewModel.dropdownState
+    val artStyles = remember(viewModel.dropdownState.artStyles) {
+        listOf(NONE_ITEM) + viewModel.dropdownState.artStyles
+    }
 
     LaunchedEffect(uiState) {
         if (uiState is UploadPaintingUiState.Success) {
@@ -39,6 +45,8 @@ fun UploadPaintingScreen(
         onEvent = {
             if (it is UploadPaintingEvent.OnImageSelected) launcher.launch("image/*")
             else viewModel.onEvent(it)
-        }
+        },
+        artStyles = artStyles,
+        mediums = dropDownState.mediums
     )
 }

@@ -38,7 +38,7 @@ fun PersonalPaintingListScreen(
         floatingActionButton = {
             ElevatedButton(
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.primary,
                 ),
                 onClick = {
                     navController.navigate(NavigationRoutes.UPLOAD_PAINTING)

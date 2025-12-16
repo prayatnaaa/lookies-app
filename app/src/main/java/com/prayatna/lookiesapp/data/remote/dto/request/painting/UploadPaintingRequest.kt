@@ -15,8 +15,9 @@ data class UploadPaintingRequest (
     val dimensionHeight: Double,
     @SerialName("dimension_width")
     val dimensionWidth: Double,
+    @SerialName("medium_id")
     val medium: String,
-    @SerialName("art_style")
+    @SerialName("art_style_id")
     val artStyle: String? = null,
     val subject: String? = null,
     @SerialName("year_created")

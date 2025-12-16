@@ -7,11 +7,14 @@ import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePaintingService
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
+import com.prayatna.lookiesapp.domain.model.painting.DetailPainting
 import com.prayatna.lookiesapp.domain.model.painting.Painting
+import com.prayatna.lookiesapp.domain.model.painting.PaintingAttribute
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -33,13 +36,13 @@ class PaintingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPaintingDetail(id: Int): DataResult<Painting> {
+    override suspend fun getPaintingDetail(id: Int): DataResult<DetailPainting> {
         return  try {
             withContext(Dispatchers.IO) {
                 val result = paintingService.getPaintingDetail(id = id)
                 DataResult.Success(result.toDomain())
             }
-        } catch (e: Exception) {
+        } catch (e: RestException) {
             DataResult.Error(e.message ?: "Something went wrong")
         }
     }
@@ -57,10 +60,35 @@ class PaintingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deletePainting(paintingId: String): DataResult<String> {
-        TODO("Not yet implemented")
+        return try {
+            val response = paintingService.deletePaintingById(paintingId)
+            DataResult.Success(response)
+        } catch (e: RestException) {
+            DataResult.Error(e.message ?: "Something went wrong!")
+        }
     }
+
+
 
     override suspend fun editPainting(painting: Painting): DataResult<String> {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun getPaintingArtStyles(): DataResult<List<PaintingAttribute>> {
+        return try {
+            val response = paintingService.getPaintingArtStyles()
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.message ?: "Something went wrong!")
+        }
+    }
+
+    override suspend fun getPaintingMediums(): DataResult<List<PaintingAttribute>> {
+        return try {
+            val response = paintingService.getPaintingMediums()
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.message ?: "Something went wrong!")
+        }
     }
 }

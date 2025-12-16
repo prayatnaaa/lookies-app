@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.components.artist
+package com.prayatna.lookiesapp.presentation.components.painting
 
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
+import com.prayatna.lookiesapp.domain.model.painting.PaintingAttribute
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
@@ -35,9 +36,12 @@ fun UploadPaintingForm(
     params: AddPaintingParams,
     selectedImage: Uri?,
     uiState: UploadPaintingUiState,
-    onEvent: (UploadPaintingEvent) -> Unit
+    onEvent: (UploadPaintingEvent) -> Unit,
+    artStyles: List<PaintingAttribute>,
+    mediums: List<PaintingAttribute>,
 ) {
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { onEvent(UploadPaintingEvent.ValidateAndSubmit) },
@@ -110,11 +114,13 @@ fun UploadPaintingForm(
                 )
             }
 
-            OutlinedTextField(
-                value = params.medium,
-                onValueChange = { onEvent(UploadPaintingEvent.OnMediumChange(it)) },
-                label = { Text("Medium") },
-                modifier = Modifier.fillMaxWidth()
+            PaintingDropdown(
+                label = "Medium",
+                items = mediums,
+                selectedItem = mediums.find { it.id == params.medium },
+                onItemSelected = {
+                    onEvent(UploadPaintingEvent.OnMediumChange(it))
+                }
             )
 
             OutlinedTextField(
@@ -124,11 +130,13 @@ fun UploadPaintingForm(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(
-                value = params.artStyle ?: "",
-                onValueChange = { onEvent(UploadPaintingEvent.OnArtStyleChange(it)) },
-                label = { Text("Art Style (Optional)") },
-                modifier = Modifier.fillMaxWidth()
+            PaintingDropdown(
+                label = "Art Style (Optional)",
+                items = artStyles,
+                selectedItem = artStyles.find { it.id == params.artStyle },
+                onItemSelected = {
+                    onEvent(UploadPaintingEvent.OnArtStyleChange(it))
+                }
             )
 
             OutlinedTextField(
