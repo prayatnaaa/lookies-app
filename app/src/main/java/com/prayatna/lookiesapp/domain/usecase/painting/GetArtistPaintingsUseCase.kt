@@ -11,36 +11,36 @@ class GetArtistPaintingsUseCase @Inject constructor(
     private val paintingRepository: PaintingRepository
 ) {
 
-    suspend operator fun invoke(filter: PaintingFilter, id: String): DataResult<List<Painting>> {
+    suspend operator fun invoke(filter: PaintingFilter? = null, id: String? = null): DataResult<List<Painting>> {
         return when (val result = paintingRepository.getPaintingsByArtist(id)) {
             is DataResult.Success -> {
                 var list = result.data
 
-                filter.artistId?.let {
+                filter?.artistId?.let {
                     list = list.filter { painting -> painting.artistId == it }
                 }
 
-                filter.medium?.let {
+                filter?.medium?.let {
                     list = list.filter { painting -> painting.medium.equals(it, ignoreCase = true) }
                 }
 
-                filter.artStyle?.let {
+                filter?.artStyle?.let {
                     list = list.filter { painting -> painting.artStyle?.equals(it, ignoreCase = true) == true }
                 }
 
-                filter.subject?.let {
+                filter?.subject?.let {
                     list = list.filter { painting -> painting.subject?.equals(it, ignoreCase = true) == true }
                 }
 
-                filter.minYear?.let {
+                filter?.minYear?.let {
                     list = list.filter { painting -> painting.yearCreated >= it }
                 }
 
-                filter.maxYear?.let {
+                filter?.maxYear?.let {
                     list = list.filter { painting -> painting.yearCreated <= it }
                 }
 
-                filter.sortBy?.let { sort ->
+                filter?.sortBy?.let { sort ->
                     list = when (sort) {
                         SortType.YEAR_ASC -> list.sortedBy { it.yearCreated }
                         SortType.YEAR_DESC -> list.sortedByDescending { it.yearCreated }

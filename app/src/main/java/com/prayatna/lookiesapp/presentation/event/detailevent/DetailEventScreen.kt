@@ -26,6 +26,7 @@ import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventBo
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventContent
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventFooter
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun DetailEventScreen(
@@ -39,6 +40,7 @@ fun DetailEventScreen(
     var isSheetOpen by rememberSaveable {
         mutableStateOf(false)
     }
+    val role by viewModel.roleState.collectAsStateWithLifecycle()
 
     LaunchedEffect(eventId) {
         viewModel.getEvent(eventId)
@@ -48,6 +50,11 @@ fun DetailEventScreen(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             DetailEventFooter(
+                showRegisterButton = role == "artist",
+                onRegisterButtonClick = {
+                    if (detailEventState.info != null)
+                    navController.navigate("${NavigationRoutes.REGISTER_EVENT}/${eventId}")
+                },
                 onBuyButtonClick = {
                     isSheetOpen = true
                 },

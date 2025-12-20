@@ -81,13 +81,28 @@ class SupabaseEventService @Inject constructor(
         }
     }
 
-    suspend fun getEvents(): List<EventDto> {
-        val events = postgrest.from("approved_events")
-            .select()
-            .decodeList<EventDto>()
+    suspend fun getEvents(
+        title: String? = null,
+        organizerId: String? = null
+    ): List<EventDto> {
 
-        return events
+        val query = postgrest
+            .from("approved_events")
+            .select {
+                filter {
+                    if (title != null) {
+                        eq("title", title)
+                    }
+                    if (organizerId != null) {
+                        eq("organizer_id", organizerId)
+                    }
+                }
+            }
+
+        return query.decodeList()
+
     }
+
 
     suspend fun getDetailEvent(id: String): EventDto {
         val event = postgrest.from("approved_events").select {

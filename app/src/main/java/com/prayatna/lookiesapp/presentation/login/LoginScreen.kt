@@ -67,6 +67,14 @@ fun LoginScreen(modifier: Modifier = Modifier,
                         launchSingleTop = true
                     }
                 }
+                "artist" -> {
+                    navController.navigate(NavigationRoutes.MAIN){
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
                 else -> {
                     navController.navigate(NavigationRoutes.PARTNER_MAIN_SCREEN){
                         popUpTo(navController.graph.startDestinationId) {

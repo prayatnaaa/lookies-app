@@ -33,15 +33,20 @@ class SupabasePaintingService @Inject constructor(
         return result
     }
 
-    suspend fun getPaintingByArtistId(id: String): List<GetPaintingDto>{
-        val response = postgrest.from("paintings").select {
-            filter {
-                eq("artist_id", id)
-            }
-        }.decodeList<GetPaintingDto>()
+    suspend fun getPaintingByArtistId(id: String?): List<GetPaintingDto> {
+        val artistId = id ?: auth.currentUserOrNull()?.id
+        ?: throw IllegalStateException("Artist ID is required")
 
-        return response
+        return postgrest
+            .from("paintings")
+            .select {
+                filter {
+                    eq("artist_id", artistId)
+                }
+            }
+            .decodeList<GetPaintingDto>()
     }
+
 
     suspend fun getPaintingArtStyles(): List<PaintingAttributeResponse> {
             val artStyles = postgrest

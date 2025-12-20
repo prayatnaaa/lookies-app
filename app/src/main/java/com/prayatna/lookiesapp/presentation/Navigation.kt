@@ -30,6 +30,7 @@ import com.prayatna.lookiesapp.presentation.partner.main.PartnerMainScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
+import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.partnerApplicationNavGraph
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -59,8 +60,10 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                     "partner" -> {
                         NavigationRoutes.PARTNER_MAIN_SCREEN
                     }
-
                     "user" -> {
+                        NavigationRoutes.MAIN
+                    }
+                    "artist" -> {
                         NavigationRoutes.MAIN
                     }
                     else -> {
@@ -103,6 +106,13 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
         composable(NavigationRoutes.CREATE_EVENT) {
             CreateEventScreen(navController = navController)
+        }
+        composable(route = "${NavigationRoutes.REGISTER_EVENT}/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getInt("eventId")?.let { eventId ->
+                RegisterEventScreen(navController = navController, eventId = eventId)
+            }
         }
         composable(
             route = "${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup={isPartnerSignup}",

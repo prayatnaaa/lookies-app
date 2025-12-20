@@ -2,12 +2,14 @@ package com.prayatna.lookiesapp.presentation.components.detailevent
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
@@ -24,7 +26,9 @@ import androidx.compose.ui.unit.dp
 fun DetailEventFooter(
     modifier: Modifier = Modifier,
     onBuyButtonClick: () -> Unit,
-    onAddToCartButtonClick: () -> Unit
+    onAddToCartButtonClick: () -> Unit,
+    showRegisterButton: Boolean = false,
+    onRegisterButtonClick: () -> Unit = {}
 ) {
     ElevatedCard(
         modifier = modifier
@@ -36,25 +40,40 @@ fun DetailEventFooter(
         elevation = CardDefaults.cardElevation(16.dp),
         shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
     ) {
-        Row(
-            modifier = modifier
-                .padding(16.dp)
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column {
+            if (showRegisterButton) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    shape = RoundedCornerShape(4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    onClick = onRegisterButtonClick
+                ) {
+                    Text(text = "Register")
+                }
+            }
+            Row(
+                modifier = modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-            AddToCartButton(
-                modifier = modifier.weight(0.5f),
-                onClick = onAddToCartButtonClick
-            )
+                AddToCartButton(
+                    modifier = modifier.weight(0.5f),
+                    onClick = onAddToCartButtonClick
+                )
 
-            Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-            BuyButton(
-                modifier = modifier.weight(0.5f),
-                onClick = onBuyButtonClick
-            )
+                BuyButton(
+                    modifier = modifier.weight(0.5f),
+                    onClick = onBuyButtonClick
+                )
+            }
         }
     }
 }
@@ -75,7 +94,7 @@ fun BuyButton(
         shape = RoundedCornerShape(8.dp),
     ) {
         Text(
-            text = "Buy",
+            text = "Buy ticket",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.primary
         )
