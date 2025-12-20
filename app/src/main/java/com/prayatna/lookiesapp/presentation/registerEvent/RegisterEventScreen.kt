@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.components.CustomDialog
+import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.registerEvent.BottomActionBar
 import com.prayatna.lookiesapp.presentation.components.registerEvent.ConfirmPaintingsContent
 import com.prayatna.lookiesapp.presentation.components.registerEvent.SelectPaintingContent
@@ -37,6 +39,19 @@ fun RegisterEventScreen(
 
     LaunchedEffect(eventId) {
         viewModel.onEvent(RegisterEventEvent.SetEventId(eventId))
+    }
+
+    if (state.isSuccess) {
+        CustomDialog(
+            title = "Success!",
+            message = "Tunggu keputusan apakah anda lolos atau tidak!",
+            onConfirm = {
+                navController.popBackStack()
+            },
+            onDismiss = {
+                navController.popBackStack()
+            }
+        )
     }
 
     Scaffold(
@@ -63,6 +78,10 @@ fun RegisterEventScreen(
             })
         }
     ) { padding ->
+
+        if (state.isLoading) {
+            CircularLoading()
+        }
         Box(modifier = Modifier
             .padding(padding)
             .fillMaxSize()) {

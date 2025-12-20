@@ -30,12 +30,13 @@ fun BottomActionBar(state: RegisterEventUiState, onEvent: (RegisterEventEvent) -
             }
         }
 
-        if (state.currentStep == 1)
-        OutlinedButton(
-            onClick = onCancel,
-            modifier = Modifier.weight(1f)
-        ) {
-            Text("Batal")
+        if (state.currentStep == 1) {
+            OutlinedButton(
+                onClick = onCancel,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Batal")
+            }
         }
 
         Button (
@@ -44,7 +45,7 @@ fun BottomActionBar(state: RegisterEventUiState, onEvent: (RegisterEventEvent) -
                 else if (state.currentStep == 2) onEvent(RegisterEventEvent.Submit)
             },
             modifier = Modifier.weight(1f),
-            enabled = state.selectedIds.isNotEmpty()
+            enabled = state.selectedIds.isNotEmpty() || !state.isLoading
         ) {
             Text(if (state.currentStep == 1) "Lanjut Review" else "Kirim Pendaftaran")
         }

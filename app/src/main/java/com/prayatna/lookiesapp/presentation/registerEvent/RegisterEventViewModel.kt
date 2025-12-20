@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation.registerEvent
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
@@ -62,7 +61,7 @@ class RegisterEventViewModel @Inject constructor(
             }
 
             is RegisterEventEvent.DismissError -> {
-                _state.update { it.copy(errorMessage = null) }
+                _state.update { it.copy(errorMessage = null, isLoading = false) }
             }
         }
     }
