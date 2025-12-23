@@ -32,8 +32,7 @@ fun DetailEventForm(
     onEventTypeChange: (String) -> Unit,
     eventFormats: List<EventFormat>,
     selectedEventFormatId: String,
-    onEventFormatChange: (String) -> Unit
-
+    onEventFormatChange: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -44,6 +43,11 @@ fun DetailEventForm(
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             modifier = Modifier.padding(4.dp),
+        )
+        Text(
+            text = "Please fill in the following information to create an event",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         EventBannerCard(
             onClick = onImageClick,

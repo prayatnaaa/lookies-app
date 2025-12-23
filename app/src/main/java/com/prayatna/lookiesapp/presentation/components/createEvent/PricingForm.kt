@@ -19,10 +19,10 @@ import com.prayatna.lookiesapp.utils.Helper
 
 @Composable
 fun PricingForm(
-    ticketPrice: String,
-    onTicketPriceChange: (String) -> Unit,
-    artistRegistrationFee: String,
-    onArtistRegistrationFeeChange: (String) -> Unit
+    ticketPrice: String?,
+    onTicketPriceChange: (String?) -> Unit,
+    artistRegistrationFee: String?,
+    onArtistRegistrationFeeChange: (String?) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -31,9 +31,14 @@ fun PricingForm(
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp
         )
+        Text(
+            text = "This is the section about the pricing and fees",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
 
         CustomTextField(
-            value = Helper.formatIdr(ticketPrice),
+            value = Helper.formatIdr(ticketPrice ?: ""),
             onValueChange = { input ->
                 val digitsOnly = input.filter { it.isDigit() }
                 onTicketPriceChange(digitsOnly)
@@ -45,7 +50,7 @@ fun PricingForm(
         Spacer(modifier = Modifier.height(4.dp))
 
         CustomTextField(
-            value = Helper.formatIdr(artistRegistrationFee),
+            value = Helper.formatIdr(artistRegistrationFee ?: ""),
             onValueChange = { input ->
                 val digitsOnly = input.filter { it.isDigit() }
                 onArtistRegistrationFeeChange(digitsOnly)

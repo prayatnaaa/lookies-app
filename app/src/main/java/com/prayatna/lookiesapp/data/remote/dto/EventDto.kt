@@ -18,16 +18,16 @@ data class EventDto(
     @SerialName("location_url")
     val locationUrl: String,
     @SerialName("max_participant")
-    val maxParticipant: Int,
+    val maxParticipant: Int? = null,
     @SerialName("max_painting")
-    val maxPainting: Int,
+    val maxPainting: Int? = null,
     @SerialName("max_painting_per_artist")
-    val maxPaintingPerArtist: Int,
+    val maxPaintingPerArtist: Int? = null,
     val status: String,
     @SerialName("ticket_price")
-    val ticketPrice: Int,
+    val ticketPrice: Int? = null,
     @SerialName("registration_fee")
-    val artistRegistrationFee: Int,
+    val artistRegistrationFee: Int? = null,
     @SerialName("created_at")
     val createdAt: String,
     @SerialName("updated_at")

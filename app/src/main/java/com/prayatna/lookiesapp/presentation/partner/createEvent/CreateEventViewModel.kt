@@ -128,11 +128,11 @@ class CreateEventViewModel @Inject constructor(
                 about = state.about.ifBlank { null },
                 location = state.location,
                 locationUrl = state.locationUrl,
-                maxParticipant = state.maxParticipant.toInt(),
-                maxPainting = state.maxPainting.toInt(),
-                maxPaintingPerArtist = state.maxPaintingPerArtist.toInt(),
-                ticketPrice = state.ticketPrice.toDouble(),
-                registrationFee = state.artistRegistrationFee.toDouble(),
+                maxParticipant = state.maxParticipant?.toInt(),
+                maxPainting = state.maxPainting?.toInt(),
+                maxPaintingPerArtist = state.maxPaintingPerArtist?.toInt(),
+                ticketPrice = state.ticketPrice?.toDouble(),
+                registrationFee = state.artistRegistrationFee?.toDouble(),
                 eventType = state.eventType.toInt(),
                 eventFormat = state.eventFormat.toInt()
             )

@@ -30,12 +30,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun EventBannerCard(modifier: Modifier = Modifier,
                     onClick: () -> Unit,
                     imageUri: Uri? = null) {
-    val shape = RoundedCornerShape(4.dp)
+    val shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
 
     Card(
         colors = CardDefaults.elevatedCardColors(
@@ -62,7 +63,7 @@ fun EventBannerCard(modifier: Modifier = Modifier,
             if (imageUri != null) {
                 AsyncImage(
                     model = imageUri,
-                    contentDescription = "Selected image",
+                    contentDescription = "Selected banner image",
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(shape),

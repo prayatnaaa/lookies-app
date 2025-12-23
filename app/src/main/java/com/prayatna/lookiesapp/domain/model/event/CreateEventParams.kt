@@ -8,11 +8,11 @@ data class CreateEventParams(
     val about: String? = null,
     val location: String,
     val locationUrl: String,
-    val maxParticipant: Int,
-    val maxPainting: Int,
-    val maxPaintingPerArtist: Int,
-    val ticketPrice: Double,
-    val registrationFee: Double,
+    val maxParticipant: Int? = null,
+    val maxPainting: Int? = null,
+    val maxPaintingPerArtist: Int? = null,
+    val ticketPrice: Double? = null,
+    val registrationFee: Double? = null,
     val eventType: Int,
     val eventFormat: Int
 )

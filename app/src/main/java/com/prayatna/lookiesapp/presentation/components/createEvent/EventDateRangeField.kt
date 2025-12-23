@@ -3,9 +3,11 @@ package com.prayatna.lookiesapp.presentation.components.createEvent
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.utils.Constants
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -54,6 +57,7 @@ fun EventDateRangeField(
     ) {
 
         OutlinedTextField(
+            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
             value = startDate,
             onValueChange = {},
             readOnly = true,
@@ -73,6 +77,7 @@ fun EventDateRangeField(
         )
 
         OutlinedTextField(
+            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
             value = endDate,
             onValueChange = {},
             readOnly = true,
@@ -88,6 +93,9 @@ fun EventDateRangeField(
 
     if (showStartPicker) {
         DatePickerDialog(
+            colors = DatePickerDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
             onDismissRequest = { showStartPicker = false },
             confirmButton = {
                 TextButton(onClick = {
@@ -102,12 +110,29 @@ fun EventDateRangeField(
                 }
             }
         ) {
-            DatePicker(state = startPickerState)
+            DatePicker(
+                colors = DatePickerDefaults.colors(
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    headlineContentColor = MaterialTheme.colorScheme.onSurface,
+                    weekdayContentColor = MaterialTheme.colorScheme.onSurface,
+                    subheadContentColor = MaterialTheme.colorScheme.onSurface,
+                    yearContentColor = MaterialTheme.colorScheme.onSurface,
+                    currentYearContentColor = MaterialTheme.colorScheme.onSurface,
+                    selectedYearContentColor = MaterialTheme.colorScheme.onSurface,
+                    dayContentColor = MaterialTheme.colorScheme.onSurface,
+                    todayContentColor = MaterialTheme.colorScheme.onSurface,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
+                state = startPickerState
+            )
         }
     }
 
     if (showEndPicker) {
         DatePickerDialog(
+            colors = DatePickerDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
             onDismissRequest = { showEndPicker = false },
             confirmButton = {
                 TextButton(onClick = {
@@ -122,7 +147,19 @@ fun EventDateRangeField(
                 }
             }
         ) {
-            DatePicker(state = endPickerState)
+            DatePicker(state = endPickerState,
+                colors = DatePickerDefaults.colors(
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    headlineContentColor = MaterialTheme.colorScheme.onSurface,
+                    weekdayContentColor = MaterialTheme.colorScheme.onSurface,
+                    subheadContentColor = MaterialTheme.colorScheme.onSurface,
+                    yearContentColor = MaterialTheme.colorScheme.onSurface,
+                    currentYearContentColor = MaterialTheme.colorScheme.onSurface,
+                    selectedYearContentColor = MaterialTheme.colorScheme.onSurface,
+                    dayContentColor = MaterialTheme.colorScheme.onSurface,
+                    todayContentColor = MaterialTheme.colorScheme.onSurface,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),)
         }
     }
 }

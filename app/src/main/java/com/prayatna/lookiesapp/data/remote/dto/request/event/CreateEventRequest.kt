@@ -17,15 +17,15 @@ data class CreateEventRequest(
     @SerialName("location_url")
     val locationUrl: String,
     @SerialName("max_participant")
-    val maxParticipant: Int,
+    val maxParticipant: Int? = null,
     @SerialName("max_painting")
-    val maxPainting: Int,
+    val maxPainting: Int? = null,
     @SerialName("max_painting_per_artist")
-    val maxPaintingPerArtist: Int,
+    val maxPaintingPerArtist: Int? = null,
     @SerialName("ticket_price")
-    val ticketPrice: Double,
+    val ticketPrice: Double? = null,
     @SerialName("registration_fee")
-    val registrationFee: Double,
+    val registrationFee: Double? = null,
     @SerialName("event_type_id")
     val eventType: Int,
     @SerialName("event_format_id")

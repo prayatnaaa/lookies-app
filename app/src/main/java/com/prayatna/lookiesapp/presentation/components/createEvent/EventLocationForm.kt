@@ -32,6 +32,11 @@ fun EventLocationForm(
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 4.dp)
         )
+        Text(
+            text = "Please fill in the location information to create an event",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         CustomTextField(
             value = locationName,
             onValueChange = onLocationNameChange,
@@ -41,7 +46,7 @@ fun EventLocationForm(
         CustomTextField(
             value = locationUrl,
             onValueChange = onLocationUrlChange,
-            label = "Location URL"
+            label = "Location URL (Optional)"
         )
         HorizontalDivider(thickness = 1.dp,
             color = MaterialTheme.colorScheme.outline,

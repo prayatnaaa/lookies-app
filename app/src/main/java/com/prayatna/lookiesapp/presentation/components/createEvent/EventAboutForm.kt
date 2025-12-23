@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.components.createEvent
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,6 +21,11 @@ fun EventAboutForm(
             text = "About",
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp
+        )
+        Text(
+            text = "This is the section about the event description",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         CustomTextField(
             textFieldModifier = Modifier.height(200.dp),

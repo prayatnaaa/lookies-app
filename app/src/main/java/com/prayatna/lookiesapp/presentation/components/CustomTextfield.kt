@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun CustomTextField(
@@ -43,7 +44,7 @@ fun CustomTextField(
             modifier = textFieldModifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp),
-            shape = RoundedCornerShape(4.dp),
+            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
 
             value = value,
             onValueChange = onValueChange,

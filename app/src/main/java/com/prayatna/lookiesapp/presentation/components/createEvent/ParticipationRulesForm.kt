@@ -18,12 +18,12 @@ import com.prayatna.lookiesapp.presentation.components.CustomTextField
 
 @Composable
 fun ParticipationRulesForm(
-    maxParticipants: String,
+    maxParticipants: String?,
     onMaxParticipantsChange: (String) -> Unit,
-    maxPainting: String,
-    onMaxPaintingChange: (String) -> Unit,
-    maxPaintingPerArtist: String,
-    onMaxPaintingPerArtistChange: (String) -> Unit
+    maxPainting: String?,
+    onMaxPaintingChange: (String?) -> Unit,
+    maxPaintingPerArtist: String?,
+    onMaxPaintingPerArtistChange: (String?) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -34,8 +34,13 @@ fun ParticipationRulesForm(
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 4.dp)
         )
+        Text(
+            text = "This is the section about the participants information",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         CustomTextField(
-            value = maxParticipants,
+            value = maxParticipants ?: "",
             onValueChange = {
                 if (it.all {
                     isDigit ->
@@ -47,7 +52,7 @@ fun ParticipationRulesForm(
         )
         Spacer(modifier = Modifier.height(4.dp))
         CustomTextField(
-            value = maxPainting,
+            value = maxPainting ?: "",
             onValueChange = {
                 if (it.all {
                     isDigit ->
@@ -58,7 +63,7 @@ fun ParticipationRulesForm(
         )
         Spacer(modifier = Modifier.height(4.dp))
         CustomTextField(
-            value = maxPaintingPerArtist,
+            value = maxPaintingPerArtist ?: "",
             onValueChange = {
                 if (it.all {
                     isDigit ->

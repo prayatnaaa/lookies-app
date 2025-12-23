@@ -2,12 +2,14 @@ package com.prayatna.lookiesapp.presentation.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun <T> CustomDropdownField(
@@ -29,8 +32,11 @@ fun <T> CustomDropdownField(
     var expanded by remember { mutableStateOf(false) }
 
     Column {
-        Text(text = label, fontWeight = FontWeight.Medium)
         OutlinedTextField(
+            label = {
+                Text(text = label)
+            },
+            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
             value = selectedItem?.let(itemLabel) ?: "",
             onValueChange = {},
             modifier = Modifier.fillMaxWidth(),
@@ -42,7 +48,9 @@ fun <T> CustomDropdownField(
             }
         )
 
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        DropdownMenu(expanded = expanded,
+            onDismissRequest = { expanded = false },
+            containerColor = MaterialTheme.colorScheme.surface) {
             items.forEach {
                 DropdownMenuItem(
                     text = { Text(itemLabel(it)) },

@@ -2,8 +2,10 @@ package com.prayatna.lookiesapp.presentation.partner.createEvent
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +30,7 @@ import com.prayatna.lookiesapp.presentation.components.createEvent.EventLocation
 import com.prayatna.lookiesapp.presentation.components.createEvent.ParticipationRulesForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.PricingForm
 import com.prayatna.lookiesapp.presentation.partner.createEvent.state.CreateEventFormEvent
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun CreateEventScreen(
@@ -140,34 +143,55 @@ fun CreateEventScreen(
                        }
                    )
                 }
-                item {
-                    ParticipationRulesForm(
-                        maxParticipants = formState.maxParticipant,
-                        onMaxParticipantsChange = {
-                            viewModel.onEvent(CreateEventFormEvent.MaxParticipantChanged(it))
-                        },
-                        maxPainting = formState.maxPainting,
-                        onMaxPaintingChange = {
-                            viewModel.onEvent(CreateEventFormEvent.MaxPaintingChanged(it))
-                        },
-                        maxPaintingPerArtist = formState.maxPaintingPerArtist,
-                        onMaxPaintingPerArtistChange = {
-                            viewModel.onEvent(CreateEventFormEvent.MaxPaintingPerArtistChanged(it))
-                        }
-                    )
-                }
+                val selectedEventType =
+                    formState.eventTypes.find { it.id.toString() == formState.eventType }
 
-                item {
-                   PricingForm(
-                       ticketPrice = formState.ticketPrice,
-                       onTicketPriceChange = {
-                           viewModel.onEvent(CreateEventFormEvent.TicketPriceChanged(it))
-                       },
-                       artistRegistrationFee = formState.artistRegistrationFee,
-                       onArtistRegistrationFeeChange = {
-                           viewModel.onEvent(CreateEventFormEvent.ArtistRegistrationFeeChanged(it))
-                       }
-                   )
+                val isSelfExhibition = selectedEventType?.slug == "self_exhibition"
+
+                if (!isSelfExhibition && formState.eventType.isNotEmpty()) {
+                    item {
+                        ParticipationRulesForm(
+                            maxParticipants = formState.maxParticipant,
+                            onMaxParticipantsChange = {
+                                viewModel.onEvent(CreateEventFormEvent.MaxParticipantChanged(it))
+                            },
+                            maxPainting = formState.maxPainting,
+                            onMaxPaintingChange = {
+                                viewModel.onEvent(CreateEventFormEvent.MaxPaintingChanged(it))
+                            },
+                            maxPaintingPerArtist = formState.maxPaintingPerArtist,
+                            onMaxPaintingPerArtistChange = {
+                                viewModel.onEvent(
+                                    CreateEventFormEvent.MaxPaintingPerArtistChanged(
+                                        it
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+                val selectedEventFormat =
+                    formState.eventFormats.find { it.id.toString() == formState.eventFormat }
+
+                val isOnlineEvent = selectedEventFormat?.slug == "online"
+
+                if (!isOnlineEvent && formState.eventFormat.isNotEmpty()) {
+                    item {
+                        PricingForm(
+                            ticketPrice = formState.ticketPrice,
+                            onTicketPriceChange = {
+                                viewModel.onEvent(CreateEventFormEvent.TicketPriceChanged(it))
+                            },
+                            artistRegistrationFee = formState.artistRegistrationFee,
+                            onArtistRegistrationFeeChange = {
+                                viewModel.onEvent(
+                                    CreateEventFormEvent.ArtistRegistrationFeeChanged(
+                                        it
+                                    )
+                                )
+                            }
+                        )
+                    }
                 }
 
                 item {
@@ -181,6 +205,8 @@ fun CreateEventScreen(
 
                 item {
                     Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         ),

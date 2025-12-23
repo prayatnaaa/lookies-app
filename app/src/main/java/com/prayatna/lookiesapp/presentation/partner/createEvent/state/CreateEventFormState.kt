@@ -11,12 +11,12 @@ data class CreateEventFormState(
     val endDate: String = "",
     val location: String = "",
     val locationUrl: String = "",
-    val maxParticipant: String = "",
-    val maxPainting: String = "",
-    val maxPaintingPerArtist: String = "",
+    val maxParticipant: String? = null,
+    val maxPainting: String? = null,
+    val maxPaintingPerArtist: String? = null,
     val about: String = "",
-    val ticketPrice: String = "",
-    val artistRegistrationFee: String = "",
+    val ticketPrice: String? = null,
+    val artistRegistrationFee: String? = null,
     val eventType: String = "",
     val eventFormat: String = "",
     val eventTypes: List<TEventType> = emptyList(),
@@ -32,9 +32,6 @@ data class CreateEventFormState(
                     endDate.isNotBlank() &&
                     location.isNotBlank() &&
                     locationUrl.isNotBlank() &&
-                    maxParticipant.toIntOrNull() != null &&
-                    maxPainting.toIntOrNull() != null &&
-                    maxPaintingPerArtist.toIntOrNull() != null &&
-                    eventType .toIntOrNull() != null &&
+                    eventType.toIntOrNull() != null &&
                     eventFormat.toIntOrNull() != null
 }
