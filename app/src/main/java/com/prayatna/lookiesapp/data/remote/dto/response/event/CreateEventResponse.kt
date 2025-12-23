@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateEventResponse(
     val message: String,
-    val event: EventDto
+    val event: EventDto? = null,
+    val status: String
 )

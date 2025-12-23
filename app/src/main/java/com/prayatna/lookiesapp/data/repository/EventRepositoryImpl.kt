@@ -52,7 +52,12 @@ class EventRepositoryImpl @Inject constructor(
                 request = params.toDto(),
                 bannerImage = compressedBannerImage
             )
-            DataResult.Success(result.event.toDomain())
+
+            if (result.event != null && result.status == "success") {
+                DataResult.Success(result.event.toDomain())
+            } else {
+                DataResult.Error(result.message)
+            }
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
         }
