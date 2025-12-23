@@ -35,6 +35,7 @@ fun UploadPaintingRequest.toDomain(): AddPaintingParams {
         medium = this.medium,
         artStyle = this.artStyle,
         subject = this.subject,
-        yearCreated = this.yearCreated
+        yearCreated = this.yearCreated,
+        price = this.price
     )
 }

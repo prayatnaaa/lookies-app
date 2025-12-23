@@ -12,5 +12,7 @@ data class CreateEventParams(
     val maxPainting: Int,
     val maxPaintingPerArtist: Int,
     val ticketPrice: Double,
-    val registrationFee: Double
+    val registrationFee: Double,
+    val eventType: Int,
+    val eventFormat: Int
 )

@@ -16,6 +16,8 @@ fun CreateEventRequest.toDomain(): CreateEventParams {
         maxPainting = this.maxPainting,
         maxPaintingPerArtist = this.maxPaintingPerArtist,
         ticketPrice = this.ticketPrice,
-        registrationFee = this.registrationFee
+        registrationFee = this.registrationFee,
+        eventType = this.eventType,
+        eventFormat = this.eventFormat
     )
 }

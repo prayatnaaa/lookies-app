@@ -147,7 +147,6 @@ fun UploadPaintingForm(
             )
         }
 
-        // 🔥 Success Popup ------------------------------------------------------
         if (uiState is UploadPaintingUiState.Success) {
             AlertDialog(
                 title = { Text("Success") },
@@ -161,7 +160,6 @@ fun UploadPaintingForm(
             )
         }
 
-        // 🔥 Error Popup --------------------------------------------------------
         if (uiState is UploadPaintingUiState.Error) {
             AlertDialog(
                 title = { Text("Error") },

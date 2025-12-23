@@ -97,11 +97,6 @@ class RegisterEventViewModel @Inject constructor(
     private fun submitRegistration() {
         val currentState = _state.value
 
-        if (currentState.selectedIds.isEmpty()) {
-            _state.update { it.copy(errorMessage = "Pilih minimal satu lukisan") }
-            return
-        }
-
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
 
@@ -113,7 +108,7 @@ class RegisterEventViewModel @Inject constructor(
             _state.update {
                 when (result) {
                     is DataResult.Success -> {
-                        it.copy(isLoading = false, isSuccess = true)
+                        it.copy(isLoading = false, isSuccess = true, successMessage = result.data.message)
                     }
                     is DataResult.Error -> {
                         it.copy(isLoading = false, errorMessage = result.error)

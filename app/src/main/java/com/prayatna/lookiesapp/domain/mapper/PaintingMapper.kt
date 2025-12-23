@@ -14,6 +14,7 @@ fun AddPaintingParams.toDto(): UploadPaintingRequest {
         medium = this.medium,
         artStyle = this.artStyle,
         subject = this.subject,
-        yearCreated = this.yearCreated
+        yearCreated = this.yearCreated,
+        price = this.price
     )
 }

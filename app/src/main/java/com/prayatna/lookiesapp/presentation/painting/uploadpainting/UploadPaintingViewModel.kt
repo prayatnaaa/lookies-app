@@ -35,7 +35,8 @@ class UploadPaintingViewModel @Inject constructor(
             dimensionHeight = 0.0,
             dimensionWidth = 0.0,
             medium = "",
-            yearCreated = 0
+            yearCreated = 0,
+            price = 0.0
         )
     )
         private set
@@ -100,6 +101,10 @@ class UploadPaintingViewModel @Inject constructor(
 
             UploadPaintingEvent.DismissDialog ->
                 uiState = UploadPaintingUiState.Idle
+
+            is UploadPaintingEvent.OnPriceChange -> {
+                params = params.copy(price = event.value.toDoubleOrNull() ?: 0.0)
+            }
         }
     }
 

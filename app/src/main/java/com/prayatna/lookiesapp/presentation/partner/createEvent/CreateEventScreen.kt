@@ -46,6 +46,10 @@ fun CreateEventScreen(
         viewModel.onEvent(CreateEventFormEvent.BannerChanged(uri))
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(CreateEventFormEvent.LoadEventMeta)
+    }
+
     LaunchedEffect(uiState) {
         when {
             uiState.isSuccess -> {
@@ -111,6 +115,16 @@ fun CreateEventScreen(
                         endDate = formState.endDate,
                         onEndDateChange = {
                             viewModel.onEvent(CreateEventFormEvent.EndDateChanged(it))
+                        },
+                        eventTypes = formState.eventTypes,
+                        selectedEventTypeId = formState.eventType,
+                        onEventTypeChange = {
+                            viewModel.onEvent(CreateEventFormEvent.EventTypeChanged(it))
+                        },
+                        eventFormats = formState.eventFormats,
+                        selectedEventFormatId = formState.eventFormat,
+                        onEventFormatChange = {
+                            viewModel.onEvent(CreateEventFormEvent.EventFormatChanged(it))
                         }
                     )
                 }

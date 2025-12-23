@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.partner.createEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.event.CreateEventParams
+import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.usecase.event.CreateEventUseCase
 import com.prayatna.lookiesapp.presentation.partner.createEvent.state.CreateEventFormEvent
 import com.prayatna.lookiesapp.presentation.partner.createEvent.state.CreateEventFormState
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateEventViewModel @Inject constructor(
-    private val createEventUseCase: CreateEventUseCase
+    private val createEventUseCase: CreateEventUseCase,
+    private val eventRepository: EventRepository
 ) : ViewModel() {
 
     private val _formState = MutableStateFlow(CreateEventFormState())
@@ -58,18 +60,58 @@ class CreateEventViewModel @Inject constructor(
             is CreateEventFormEvent.AboutChanged ->
                 update { copy(about = event.value) }
 
-            CreateEventFormEvent.Submit -> submit()
+            is CreateEventFormEvent.LoadEventMeta -> loadEventMeta()
+
+            is CreateEventFormEvent.Submit -> submit()
+
             is CreateEventFormEvent.ArtistRegistrationFeeChanged ->
                 update { copy(artistRegistrationFee = event.value) }
 
             is CreateEventFormEvent.TicketPriceChanged ->
                 update { copy(ticketPrice = event.value) }
+
+            is CreateEventFormEvent.EventFormatChanged -> {
+                update { copy(eventFormat = event.value) }
+            }
+            is CreateEventFormEvent.EventTypeChanged -> {
+                update { copy(eventType = event.value) }
+            }
         }
     }
 
     private fun update(reducer: CreateEventFormState.() -> CreateEventFormState) {
         _formState.value = _formState.value.reducer()
     }
+
+    private fun loadEventMeta() {
+        viewModelScope.launch {
+            update { copy(isLoadingMeta = true, errorMessage = null) }
+
+            when (val typesResult = eventRepository.getEventTypes()) {
+                is DataResult.Success -> {
+                    update { copy(eventTypes = typesResult.data) }
+                }
+                is DataResult.Error -> {
+                    update { copy(errorMessage = typesResult.error) }
+                    return@launch
+                }
+                else -> Unit
+            }
+
+            when (val formatsResult = eventRepository.getEventFormats()) {
+                is DataResult.Success -> {
+                    update { copy(eventFormats = formatsResult.data) }
+                }
+                is DataResult.Error -> {
+                    update { copy(errorMessage = formatsResult.error) }
+                }
+                else -> Unit
+            }
+
+            update { copy(isLoadingMeta = false) }
+        }
+    }
+
 
     private fun submit() {
         val state = _formState.value
@@ -90,7 +132,9 @@ class CreateEventViewModel @Inject constructor(
                 maxPainting = state.maxPainting.toInt(),
                 maxPaintingPerArtist = state.maxPaintingPerArtist.toInt(),
                 ticketPrice = state.ticketPrice.toDouble(),
-                registrationFee = state.artistRegistrationFee.toDouble()
+                registrationFee = state.artistRegistrationFee.toDouble(),
+                eventType = state.eventType.toInt(),
+                eventFormat = state.eventFormat.toInt()
             )
 
 
@@ -108,4 +152,5 @@ class CreateEventViewModel @Inject constructor(
             }
         }
     }
+
 }

@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.request.artist.RegisterEventRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.artist.RegisterEventResponse
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.rpc
@@ -16,16 +17,15 @@ class SupabaseArtistService @Inject constructor(
         artistId: String,
         eventId:Int,
         paintingIds: List<Int>
-    ): String {
+    ): RegisterEventResponse {
         val parameters = RegisterEventRequest(
             artistId = artistId,
             eventId = eventId,
             paintingIds = paintingIds
         )
         val response = postgrest.rpc(function = "register_event",
-            parameters = parameters)
+            parameters = parameters).decodeAs<RegisterEventResponse>()
 
-        Log.d("REGISTER-EVENT", response.data)
-        return response.data
+        return response
     }
 }

@@ -10,5 +10,6 @@ data class RegisterEventUiState(
     val allPaintings: List<Painting> = emptyList(),
     val selectedIds: Set<Int> = emptySet(),
     val errorMessage: String? = null,
-    val isSuccess: Boolean = false
+    val isSuccess: Boolean = false,
+    val successMessage: String? = null
 )

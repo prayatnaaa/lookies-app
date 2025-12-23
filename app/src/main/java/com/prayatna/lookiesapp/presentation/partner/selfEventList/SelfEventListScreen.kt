@@ -67,6 +67,7 @@ fun SelfEventListScreen(
 
                 uiState.events.isNotEmpty() -> {
                     EventCardList(
+                        showStatus = true,
                         events = uiState.events,
                         modifier = Modifier.fillMaxSize(),
                         onClick = { event ->

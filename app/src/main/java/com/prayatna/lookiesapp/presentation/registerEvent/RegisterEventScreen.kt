@@ -42,16 +42,31 @@ fun RegisterEventScreen(
     }
 
     if (state.isSuccess) {
-        CustomDialog(
-            title = "Success!",
-            message = "Tunggu keputusan apakah anda lolos atau tidak!",
-            onConfirm = {
-                navController.popBackStack()
-            },
-            onDismiss = {
-                navController.popBackStack()
-            }
-        )
+        state.successMessage?.let { message ->
+            CustomDialog(
+                title = "Success!",
+                message = message,
+                onConfirm = {
+                    navController.popBackStack()
+                },
+                onDismiss = {
+                    navController.popBackStack()
+                }
+            )
+        }
+    } else {
+        state.errorMessage?.let { message ->
+            CustomDialog(
+                title = "Error",
+                message = message,
+                onConfirm = {
+                    viewModel.onEvent(RegisterEventEvent.DismissError)
+                },
+                onDismiss = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 
     Scaffold(
@@ -79,12 +94,12 @@ fun RegisterEventScreen(
         }
     ) { padding ->
 
-        if (state.isLoading) {
-            CircularLoading()
-        }
         Box(modifier = Modifier
             .padding(padding)
             .fillMaxSize()) {
+            if (state.isLoading) {
+                CircularLoading()
+            }
             if (state.currentStep == 1) {
                 SelectPaintingContent(state, onEvent)
             } else {

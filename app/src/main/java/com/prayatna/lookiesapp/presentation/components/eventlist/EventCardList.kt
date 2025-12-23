@@ -14,7 +14,8 @@ import com.prayatna.lookiesapp.domain.model.event.Event
 fun EventCardList(
     events: List<Event>,
     modifier: Modifier = Modifier,
-    onClick: (Event) -> Unit
+    onClick: (Event) -> Unit,
+    showStatus: Boolean = false
 ) {
     LazyColumn(
         modifier = modifier
@@ -24,6 +25,7 @@ fun EventCardList(
     ) {
         itemsIndexed(events) { _, event ->
             EventCard(
+                showStatus = showStatus,
                 event = event,
                 onClick = { onClick(event) }
             )

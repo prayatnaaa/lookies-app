@@ -10,9 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prayatna.lookiesapp.domain.model.event.EventFormat
+import com.prayatna.lookiesapp.domain.model.event.TEventType
+import com.prayatna.lookiesapp.presentation.components.CustomDropdownField
 import com.prayatna.lookiesapp.presentation.components.CustomTextField
 
 @Composable
@@ -25,6 +27,13 @@ fun DetailEventForm(
     onStartDateChange: (String) -> Unit,
     endDate: String,
     onEndDateChange: (String) -> Unit,
+    eventTypes: List<TEventType>,
+    selectedEventTypeId: String,
+    onEventTypeChange: (String) -> Unit,
+    eventFormats: List<EventFormat>,
+    selectedEventFormatId: String,
+    onEventFormatChange: (String) -> Unit
+
 ) {
     Column(
         modifier = Modifier
@@ -45,6 +54,31 @@ fun DetailEventForm(
             onValueChange = onEventNameChange,
             label = "Event title"
         )
+
+        CustomDropdownField(
+            label = "Event Type",
+            items = eventTypes,
+            selectedItem = eventTypes.find {
+                it.id.toString() == selectedEventTypeId
+            },
+            itemLabel = { it.name },
+            onItemSelected = {
+                onEventTypeChange(it.id.toString())
+            }
+        )
+
+        CustomDropdownField(
+            label = "Event format",
+            items = eventFormats,
+            selectedItem = eventFormats.find {
+                it.id.toString() == selectedEventFormatId
+            },
+            itemLabel = { it.name },
+            onItemSelected = {
+                onEventFormatChange(it.id.toString())
+            }
+        )
+
         EventDateRangeField(
             startDate = startDate,
             endDate = endDate,
@@ -58,19 +92,4 @@ fun DetailEventForm(
             modifier = Modifier.padding(vertical = 16.dp)
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DetailEventFormPreview() {
-    DetailEventForm(
-        eventName = "Today Art Festival",
-        onEventNameChange = {},
-        imageUri = null,
-        onImageClick = {},
-        startDate = "11-12-2026",
-        onStartDateChange = {},
-        endDate = "21-12-2026",
-        onEndDateChange = {}
-    )
 }

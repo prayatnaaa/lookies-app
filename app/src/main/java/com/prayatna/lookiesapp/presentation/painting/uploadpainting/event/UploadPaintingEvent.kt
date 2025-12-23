@@ -12,6 +12,7 @@ sealed class UploadPaintingEvent {
     data class OnArtStyleChange(val value: PaintingAttribute) : UploadPaintingEvent()
     data class OnSubjectChange(val value: String) : UploadPaintingEvent()
     data class OnYearChange(val value: String) : UploadPaintingEvent()
+    data class OnPriceChange(val value: String) : UploadPaintingEvent()
 
     data class OnImageSelected(val uri: Uri?) : UploadPaintingEvent()
 

@@ -16,6 +16,8 @@ fun CreateEventParams.toDto(): CreateEventRequest {
         maxPainting = this.maxPainting,
         maxPaintingPerArtist = this.maxPaintingPerArtist,
         ticketPrice = this.ticketPrice,
-        registrationFee = this.registrationFee
+        registrationFee = this.registrationFee,
+        eventType = this.eventType,
+        eventFormat = this.eventFormat
     )
 }

@@ -25,6 +25,10 @@ data class CreateEventRequest(
     @SerialName("ticket_price")
     val ticketPrice: Double,
     @SerialName("registration_fee")
-    val registrationFee: Double
+    val registrationFee: Double,
+    @SerialName("event_type_id")
+    val eventType: Int,
+    @SerialName("event_format_id")
+    val eventFormat: Int
 )
 

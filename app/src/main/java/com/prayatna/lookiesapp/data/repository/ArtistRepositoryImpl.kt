@@ -1,7 +1,9 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseArtistService
+import com.prayatna.lookiesapp.domain.model.artist.RegisterEventOutput
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.RestException
@@ -15,7 +17,7 @@ class ArtistRepositoryImpl @Inject constructor(
     override suspend fun registerEvent(
         eventId: Int,
         paintingIds: List<Int>
-    ): DataResult<String> {
+    ): DataResult<RegisterEventOutput> {
         val artistId = auth.currentSessionOrNull()?.user?.id ?: throw Exception("User not logged in")
         return try {
             val response = supabaseArtistService.registerEvent(
@@ -23,8 +25,12 @@ class ArtistRepositoryImpl @Inject constructor(
                 eventId = eventId,
                 paintingIds = paintingIds
             )
-            Log.d("RegisterEvent", response)
-            DataResult.Success(response)
+
+            if (response.status == "error") {
+                return DataResult.Error(response.message)
+            }
+
+            DataResult.Success(response.toDomain())
         } catch (e: RestException) {
             Log.e("RegisterEvent", e.toString())
             DataResult.Error(e.error)
