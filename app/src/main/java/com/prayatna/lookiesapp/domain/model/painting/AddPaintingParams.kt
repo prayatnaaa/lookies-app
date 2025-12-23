@@ -11,4 +11,5 @@ data class AddPaintingParams (
     val artStyle: String? = null,
     val subject: String? = null,
     val yearCreated: Int,
+    val price: Double
 )
