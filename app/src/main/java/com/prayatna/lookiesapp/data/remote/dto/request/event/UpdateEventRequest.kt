@@ -1,14 +1,11 @@
-package com.prayatna.lookiesapp.data.remote.dto
+package com.prayatna.lookiesapp.data.remote.dto.request.event
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class EventDto(
-    val id: String,
+data class UpdateEventRequest(
     val title: String,
-    @SerialName("banner_image_url")
-    val bannerImageUrl: String,
     @SerialName("start_date")
     val startDate: String,
     @SerialName("end_date")
@@ -23,17 +20,12 @@ data class EventDto(
     val maxPainting: Int? = null,
     @SerialName("max_painting_per_artist")
     val maxPaintingPerArtist: Int? = null,
-    val status: String,
     @SerialName("ticket_price")
     val ticketPrice: Double? = null,
     @SerialName("registration_fee")
-    val artistRegistrationFee: Double? = null,
+    val registrationFee: Double? = null,
     @SerialName("event_type_id")
-    val eventType: String,
+    val eventType: Int,
     @SerialName("event_format_id")
-    val eventFormat: String,
-    @SerialName("created_at")
-    val createdAt: String,
-    @SerialName("updated_at")
-    val updatedAt: String? = null
+    val eventFormat: Int
 )

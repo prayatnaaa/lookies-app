@@ -158,15 +158,17 @@ fun DetailEventContent(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        PriceRow(label = "Ticket price", price = event.ticketPrice)
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.2f),
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                        PriceRow(
-                            label = "Artist registration fee",
-                            price = event.artistRegistrationFee
-                        )
+                        if (event.ticketPrice != null && event.artistRegistrationFee != null) {
+                            PriceRow(label = "Ticket price", price = event.ticketPrice)
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.2f),
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                            PriceRow(
+                                label = "Artist registration fee",
+                                price = event.artistRegistrationFee
+                            )
+                        }
                     }
                 }
 
@@ -228,7 +230,7 @@ fun InfoCard(title: String, value: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PriceRow(label: String, price: Int) {
+fun PriceRow(label: String, price: Double) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,

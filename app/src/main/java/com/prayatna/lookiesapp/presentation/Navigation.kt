@@ -26,6 +26,7 @@ import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
 import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScreen
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
+import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
 import com.prayatna.lookiesapp.presentation.partner.main.PartnerMainScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
@@ -161,6 +162,15 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             backStackEntry.arguments?.getString("eventId")?.let { eventId ->
                 DetailEventScreen(navController = navController, eventId = eventId)
             }
+        }
+        composable(
+            route = "${NavigationRoutes.EDIT_EVENT}/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+        ) {backStackEntry ->
+            backStackEntry.arguments?.getString("eventId")?.let { eventId ->
+                EditEventScreen(navController = navController, eventId = eventId)
+            }
+
         }
         composable(
             route = "${NavigationRoutes.DETAIL_PAINTING}/{paintingId}",

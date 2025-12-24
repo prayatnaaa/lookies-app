@@ -22,6 +22,7 @@ fun DetailEventForm(
     eventName: String,
     onEventNameChange: (String) -> Unit,
     imageUri: Uri? = null,
+    imageUriString: String? = null,
     onImageClick: () -> Unit,
     startDate: String,
     onStartDateChange: (String) -> Unit,
@@ -51,7 +52,8 @@ fun DetailEventForm(
         )
         EventBannerCard(
             onClick = onImageClick,
-            imageUri = imageUri
+            imageUri = imageUri,
+            imageUrl = imageUriString
         )
         CustomTextField(
             value = eventName,

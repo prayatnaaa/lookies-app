@@ -2,8 +2,10 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
+import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePartnerService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.partner.DetailPartner
 import com.prayatna.lookiesapp.domain.model.partner.Partner
@@ -55,6 +57,15 @@ class PartnerRepositoryImpl @Inject constructor(
         return try {
             val response = supabasePartnerService.getSelfEvents()
             DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
+    }
+
+    override suspend fun updateEvent(id: String, input: EditEventInput): DataResult<Event> {
+        return try {
+            val response = supabasePartnerService.updateEvent(id = id, request = input.toDto())
+            DataResult.Success(response.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
         }

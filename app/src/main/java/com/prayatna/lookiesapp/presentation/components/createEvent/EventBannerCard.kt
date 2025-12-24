@@ -35,7 +35,8 @@ import com.prayatna.lookiesapp.utils.Constants
 @Composable
 fun EventBannerCard(modifier: Modifier = Modifier,
                     onClick: () -> Unit,
-                    imageUri: Uri? = null) {
+                    imageUri: Uri? = null,
+                    imageUrl: String? = null) {
     val shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
 
     Card(
@@ -63,6 +64,16 @@ fun EventBannerCard(modifier: Modifier = Modifier,
             if (imageUri != null) {
                 AsyncImage(
                     model = imageUri,
+                    contentDescription = "Selected banner image",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(shape),
+                    contentScale = ContentScale.Crop
+                )
+            } else if (imageUrl != null) {
+                AsyncImage(
+                    model = imageUrl
+                        .replace("http://172.21.179.110", "http://10.0.2.2"),
                     contentDescription = "Selected banner image",
                     modifier = Modifier
                         .fillMaxSize()

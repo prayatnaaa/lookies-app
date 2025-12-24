@@ -5,6 +5,8 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.DetailPartnerDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDto
+import com.prayatna.lookiesapp.data.remote.dto.request.event.CreateEventRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
 import com.prayatna.lookiesapp.utils.Helper
 import com.prayatna.lookiesapp.utils.JsonProvider
 import io.github.jan.supabase.gotrue.Auth
@@ -88,6 +90,17 @@ class SupabasePartnerService @Inject constructor(
             }.decodeList<EventDto>()
 
         return events
+    }
+
+    suspend fun updateEvent(id: String, request: UpdateEventRequest): EventDto {
+        val response = postgrest.from("events")
+            .update(request) {
+                select()
+                filter {
+                    eq("id", id)
+                }
+            }.decodeSingle<EventDto>()
+        return response
     }
 
 }

@@ -71,7 +71,7 @@ fun SelfEventListScreen(
                         events = uiState.events,
                         modifier = Modifier.fillMaxSize(),
                         onClick = { event ->
-                            navController.navigate("${NavigationRoutes.DETAIL_EVENT}/${event.id}")
+                            navController.navigate("${NavigationRoutes.EDIT_EVENT}/${event.id}")
                         }
                     )
                 }

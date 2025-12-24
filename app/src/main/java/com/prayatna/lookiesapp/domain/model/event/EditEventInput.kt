@@ -1,9 +1,7 @@
 package com.prayatna.lookiesapp.domain.model.event
 
-data class Event (
-    val id: String,
+data class EditEventInput(
     val title: String,
-    val bannerImageUrl: String,
     val startDate: String,
     val endDate: String,
     val about: String? = null,
@@ -13,10 +11,7 @@ data class Event (
     val maxPainting: Int? = null,
     val maxPaintingPerArtist: Int? = null,
     val ticketPrice: Double? = null,
-    val artistRegistrationFee: Double? = null,
-    val eventType: String,
-    val eventFormat: String,
-    val status: String,
-    val createdAt: String,
-    val updatedAt: String? = null
+    val registrationFee: Double? = null,
+    val eventType: Int,
+    val eventFormat: Int
 )
