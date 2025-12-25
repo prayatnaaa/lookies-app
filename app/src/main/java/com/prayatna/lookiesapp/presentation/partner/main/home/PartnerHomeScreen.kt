@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.partner.ActionButton
 import com.prayatna.lookiesapp.presentation.components.partner.EventCountCard
 import com.prayatna.lookiesapp.presentation.components.partner.SaleOverviewCard
+import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 data class CountInfo(
@@ -44,7 +45,7 @@ fun PartnerHomeScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                shape = RoundedCornerShape(4.dp),
+                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 onClick = {
                     navController.navigate(NavigationRoutes.CREATE_EVENT)
                 },

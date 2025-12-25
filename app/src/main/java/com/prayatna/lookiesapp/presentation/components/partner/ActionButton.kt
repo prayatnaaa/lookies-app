@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun ActionButton(
@@ -26,7 +27,7 @@ fun ActionButton(
             contentColor = MaterialTheme.colorScheme.onPrimary
         ),
         onClick = onClick,
-        shape = RoundedCornerShape(4.dp)
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
     ) {
         Text(
             modifier = Modifier.padding(16.dp),

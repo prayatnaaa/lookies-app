@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
@@ -30,6 +33,9 @@ import com.prayatna.lookiesapp.domain.model.painting.PaintingAttribute
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+
 
 @Composable
 fun UploadPaintingForm(
@@ -40,7 +46,10 @@ fun UploadPaintingForm(
     artStyles: List<PaintingAttribute>,
     mediums: List<PaintingAttribute>,
 ) {
+    val scrollState = rememberScrollState()
+
     Scaffold(
+        contentWindowInsets = WindowInsets.ime,
         containerColor = MaterialTheme.colorScheme.surface,
         floatingActionButton = {
             FloatingActionButton(
@@ -62,6 +71,8 @@ fun UploadPaintingForm(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
+                .verticalScroll(scrollState)
+                .imePadding()
         ) {
 
             Box(

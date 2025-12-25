@@ -2,7 +2,10 @@ package com.prayatna.lookiesapp.presentation.partner.createEvent
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -88,6 +91,7 @@ fun CreateEventScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets.ime,
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             BackTopBar(
@@ -97,9 +101,11 @@ fun CreateEventScreen(
         },
         content = { innerPadding ->
             LazyColumn(
+                contentPadding = innerPadding,
+
                 modifier = Modifier
-                    .padding(innerPadding)
                     .padding(horizontal = 16.dp)
+                    .imePadding()
             ) {
                 item {
                     DetailEventForm(

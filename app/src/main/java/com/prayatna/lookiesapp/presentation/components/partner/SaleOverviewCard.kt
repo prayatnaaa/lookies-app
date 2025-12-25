@@ -1,7 +1,6 @@
 package com.prayatna.lookiesapp.presentation.components.partner
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun SaleOverviewCard(
@@ -28,11 +28,8 @@ fun SaleOverviewCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.onPrimary,
-                shape = RoundedCornerShape(4.dp)
+            .background( color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
             )
     ) {
         Row(

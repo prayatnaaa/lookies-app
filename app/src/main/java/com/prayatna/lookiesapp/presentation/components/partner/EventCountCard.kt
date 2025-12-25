@@ -14,13 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun EventCountCard(
     count: Int,
     title: String,
 ) {
-    val shape = RoundedCornerShape(4.dp)
+    val shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
 
     Column(
         modifier = Modifier
