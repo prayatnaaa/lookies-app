@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.domain.model.event
 data class Event (
     val id: String,
     val title: String,
+    val organizerId: String,
     val bannerImageUrl: String,
     val startDate: String,
     val endDate: String,

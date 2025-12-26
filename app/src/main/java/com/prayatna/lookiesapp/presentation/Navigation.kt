@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScree
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
 import com.prayatna.lookiesapp.presentation.partner.main.PartnerMainScreen
+import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
@@ -50,24 +52,17 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         CircularLoading()
     }
 
-    val startDestination = when (sessionStatus) {
+    val startDestination = when (val status = sessionStatus) {
         is DataResult.Error -> NavigationRoutes.LOGIN
+
         is DataResult.Success -> {
-            if ((sessionStatus as DataResult.Success).data) {
+            if (status.data) {
                 when (roleState) {
-                    "admin" -> {
-                        NavigationRoutes.ADMIN_MAIN
-                    }
-                    "partner" -> {
-                        NavigationRoutes.PARTNER_MAIN_SCREEN
-                    }
-                    "user" -> {
-                        NavigationRoutes.MAIN
-                    }
-                    "artist" -> {
-                        NavigationRoutes.MAIN
-                    }
+                    "admin" -> NavigationRoutes.ADMIN_MAIN
+                    "partner" -> NavigationRoutes.PARTNER_MAIN_SCREEN
+                    "user", "artist" -> NavigationRoutes.MAIN
                     else -> {
+                        Log.d("MainNavigation", "Unknown role: $roleState")
                         NavigationRoutes.MAIN_LOADING
                     }
                 }
@@ -76,8 +71,11 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             }
         }
 
-        else -> NavigationRoutes.MAIN_LOADING
+        DataResult.Idle,
+        DataResult.Loading -> NavigationRoutes.MAIN_LOADING
     }
+
+
 
     NavHost(
         navController = navController,
@@ -146,6 +144,14 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             route = NavigationRoutes.PARTNER_MAIN_SCREEN
         ) {
             PartnerMainScreen(navHostController = navController)
+        }
+        composable(
+            route = "${NavigationRoutes.PARTICIPANT_LIST}/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("eventId")?.let { eventId ->
+                ParticipantListScreen(eventId = eventId, navController = navController)
+            }
         }
         composable(
             route = "${NavigationRoutes.DETAIL_PARTNER}/{partnerId}",

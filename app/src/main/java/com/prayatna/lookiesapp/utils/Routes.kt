@@ -12,6 +12,7 @@ import com.prayatna.lookiesapp.R
 
 object NavigationRoutes {
     const val PARTNER_MAIN_SCREEN = "partner_main_screen"
+    const val PARTICIPANT_LIST = "participant_list"
     const val DETAIL_PAINTING = "detail_painting"
     const val MAIN = "main"
     const val REGISTER = "register"

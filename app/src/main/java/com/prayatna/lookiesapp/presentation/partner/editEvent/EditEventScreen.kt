@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.partner.editEvent
 
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +30,7 @@ import com.prayatna.lookiesapp.presentation.components.createEvent.Participation
 import com.prayatna.lookiesapp.presentation.components.createEvent.PricingForm
 import com.prayatna.lookiesapp.presentation.partner.editEvent.state.EditEventFormEvent
 import com.prayatna.lookiesapp.utils.Constants
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun EditEventScreen(
@@ -183,22 +185,44 @@ fun EditEventScreen(
             }
 
             item {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    enabled = !uiState.isLoading,
-                    onClick = {
-                        viewModel.onEvent(EditEventFormEvent.Submit)
-                    }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = if (uiState.isLoading) "Updating..." else "Update Event",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        enabled = !uiState.isLoading,
+                        onClick = {
+                            viewModel.onEvent(EditEventFormEvent.Submit)
+                        }
+                    ) {
+                        Text(
+                            text = if (uiState.isLoading) "Updating..." else "Update Event",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        enabled = !uiState.isLoading,
+                        onClick = {
+                            navController.navigate("${NavigationRoutes.PARTICIPANT_LIST}/$eventId")
+                        }
+                    ) {
+                        Text(
+                            text = "Participants",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
+
             }
         }
     }

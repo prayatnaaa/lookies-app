@@ -2,19 +2,23 @@ package com.prayatna.lookiesapp.presentation.event.detailevent
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailEventViewModel @Inject constructor(
     private val repository: EventRepository,
-    private val getRoleUseCase: GetRoleUseCase
+    private val getRoleUseCase: GetRoleUseCase,
+    private val userPreference: UserPreference
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailEventUiState())
@@ -25,6 +29,9 @@ class DetailEventViewModel @Inject constructor(
 
     private val _roleState = MutableStateFlow("")
     val roleState = _roleState.asStateFlow()
+
+    private val _isOwner = MutableStateFlow(false)
+    val isOwner = _isOwner.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -48,9 +55,15 @@ class DetailEventViewModel @Inject constructor(
                 is DataResult.Error -> _state.value = DetailEventUiState(errorMessage = result.error)
                 is DataResult.Loading -> _state.value = DetailEventUiState(isLoading = true)
                 is DataResult.Success -> {
+                    val event = result.data
+                    val userId = userPreference.getProfile().first().id
+                    val isEventMine = event.organizerId == userId
+                    _isOwner.value = isEventMine
                     _state.value = DetailEventUiState(info = result.data)
                 }
-                else -> {}
+                else -> {
+                    _state.update { it.copy(isLoading = true) }
+                }
             }
         }
     }

@@ -22,6 +22,7 @@ fun EventDto.toDomain() : Event {
         ticketPrice = ticketPrice,
         artistRegistrationFee = artistRegistrationFee,
         eventType = eventType,
-        eventFormat = eventFormat
+        eventFormat = eventFormat,
+        organizerId = organizerId
     )
 }

@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
 data class EventDto(
     val id: String,
     val title: String,
+    @SerialName("organizer_id")
+    val organizerId: String,
     @SerialName("banner_image_url")
     val bannerImageUrl: String,
     @SerialName("start_date")

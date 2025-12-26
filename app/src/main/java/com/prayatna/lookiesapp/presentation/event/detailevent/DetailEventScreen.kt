@@ -41,6 +41,7 @@ fun DetailEventScreen(
         mutableStateOf(false)
     }
     val role by viewModel.roleState.collectAsStateWithLifecycle()
+    val isOwner by viewModel.isOwner.collectAsStateWithLifecycle()
 
     LaunchedEffect(eventId) {
         viewModel.getEvent(eventId)
@@ -50,7 +51,12 @@ fun DetailEventScreen(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             DetailEventFooter(
+                showManageButton = (role == "partner" && isOwner),
                 showRegisterButton = role == "artist",
+                showBuyButton = role != "partner",
+                onManageButtonClick = {
+                    navController.navigate("${NavigationRoutes.PARTICIPANT_LIST}/${eventId}")
+                },
                 onRegisterButtonClick = {
                     if (detailEventState.info != null)
                     navController.navigate("${NavigationRoutes.REGISTER_EVENT}/${eventId}")

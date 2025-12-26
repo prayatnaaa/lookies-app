@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun DetailEventFooter(
@@ -28,7 +29,10 @@ fun DetailEventFooter(
     onBuyButtonClick: () -> Unit,
     onAddToCartButtonClick: () -> Unit,
     showRegisterButton: Boolean = false,
-    onRegisterButtonClick: () -> Unit = {}
+    onRegisterButtonClick: () -> Unit = {},
+    showManageButton: Boolean = false,
+    showBuyButton: Boolean = false,
+    onManageButtonClick: () -> Unit = {}
 ) {
     ElevatedCard(
         modifier = modifier
@@ -46,7 +50,7 @@ fun DetailEventFooter(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     ),
@@ -55,24 +59,40 @@ fun DetailEventFooter(
                     Text(text = "Register")
                 }
             }
-            Row(
-                modifier = modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            if (showManageButton) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    onClick = onManageButtonClick
+                ) {
+                    Text(text = "Register")
+                }
+            }
+            if (showBuyButton) {
+                Row(
+                    modifier = modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-                AddToCartButton(
-                    modifier = modifier.weight(0.5f),
-                    onClick = onAddToCartButtonClick
-                )
+                    AddToCartButton(
+                        modifier = modifier.weight(0.5f),
+                        onClick = onAddToCartButtonClick
+                    )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
-                BuyButton(
-                    modifier = modifier.weight(0.5f),
-                    onClick = onBuyButtonClick
-                )
+                    BuyButton(
+                        modifier = modifier.weight(0.5f),
+                        onClick = onBuyButtonClick
+                    )
+                }
             }
         }
     }
@@ -91,7 +111,7 @@ fun BuyButton(
             containerColor = MaterialTheme.colorScheme.surface,
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
     ) {
         Text(
             text = "Buy ticket",
@@ -114,7 +134,7 @@ fun AddToCartButton(
             containerColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline)
     ) {
         Text(
