@@ -184,45 +184,47 @@ fun EditEventScreen(
                 )
             }
 
-            item {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        enabled = !uiState.isLoading,
-                        onClick = {
-                            viewModel.onEvent(EditEventFormEvent.Submit)
-                        }
+            if (uiState.data != null) {
+                val event = uiState.data
+                item {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = if (uiState.isLoading) "Updating..." else "Update Event",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ),
+                            enabled = !uiState.isLoading,
+                            onClick = {
+                                viewModel.onEvent(EditEventFormEvent.Submit)
+                            }
+                        ) {
+                            Text(
+                                text = if (uiState.isLoading) "Updating..." else "Update Event",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
 
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        enabled = !uiState.isLoading,
-                        onClick = {
-                            navController.navigate("${NavigationRoutes.PARTICIPANT_LIST}/$eventId")
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ),
+                            enabled = !uiState.isLoading && event?.status != "pending_validation",
+                                    onClick = {
+                                navController.navigate("${NavigationRoutes.PARTICIPANT_LIST}/$eventId")
+                            }
+                        ) {
+                            Text(
+                                text = "Participants",
+                                style = MaterialTheme.typography.titleMedium
+                            )
                         }
-                    ) {
-                        Text(
-                            text = "Participants",
-                            style = MaterialTheme.typography.titleMedium
-                        )
                     }
                 }
-
             }
         }
     }

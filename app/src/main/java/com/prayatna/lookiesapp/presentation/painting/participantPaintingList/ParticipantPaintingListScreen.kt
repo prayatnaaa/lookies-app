@@ -54,7 +54,8 @@ fun ParticipantPaintingListScreen(
                 }
                 else -> {
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
                         if (uiState.eventPaintings.isNotEmpty()) {
 //                            item {

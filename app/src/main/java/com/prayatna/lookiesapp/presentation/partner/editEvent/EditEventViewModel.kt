@@ -85,7 +85,12 @@ class EditEventViewModel @Inject constructor(
         when (val result = eventRepository.getEvent(eventId)) {
             is DataResult.Success -> {
                 prefill(result.data)
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        data = result.data,
+                    )
+                }
             }
             is DataResult.Error -> {
                 _uiState.update {
