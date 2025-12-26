@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.domain.model.event.CreateEventParams
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.event.EventFormat
 import com.prayatna.lookiesapp.domain.model.event.TEventType
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.utils.DataResult
 
 interface EventRepository {
@@ -13,4 +14,5 @@ interface EventRepository {
     suspend fun createEvent(params: CreateEventParams, imageByte: Uri): DataResult<Event>
     suspend fun getEventTypes(): DataResult<List<TEventType>>
     suspend fun getEventFormats(): DataResult<List<EventFormat>>
+    suspend fun getEventPaintings(participantId: String): DataResult<List<EventPainting>>
 }

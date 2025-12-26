@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventService
@@ -10,6 +11,7 @@ import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.event.CreateEventParams
 import com.prayatna.lookiesapp.domain.model.event.EventFormat
 import com.prayatna.lookiesapp.domain.model.event.TEventType
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
@@ -77,6 +79,16 @@ class EventRepositoryImpl @Inject constructor(
             val response = supabaseEventService.getEventFormats()
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
+    }
+
+    override suspend fun getEventPaintings(participantId: String): DataResult<List<EventPainting>> {
+        return try {
+            val response = supabaseEventService.getEventPaintings(participantId = participantId)
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            Log.e("getEventPaintings", e.error)
             DataResult.Error(e.error)
         }
     }

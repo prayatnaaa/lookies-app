@@ -23,6 +23,7 @@ object NavigationRoutes {
     const val ADMIN_MAIN = "admin_main"
     const val EVENT_LIST = "event_list"
     const val ADMIN_EVENT = "admin_event"
+    const val EVENT_PAINTING_LIST = "event_painting_list"
     const val DETAIL_EVENT = "detail_event"
     const val SELF_EVENT_LIST = "self_event_list"
     const val UPLOAD_PAINTING = "upload_painting"

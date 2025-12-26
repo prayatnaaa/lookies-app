@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.partner.ParticipantCard
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +105,7 @@ fun ParticipantListScreen(
                             ParticipantCard(
                                 participant = participant,
                                 onClick = {
-
+                                    navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/${participant.id}")
                                 }
                             )
                         }
