@@ -3,6 +3,9 @@ package com.prayatna.lookiesapp.presentation.painting.participantPaintingList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingsUseCase
+import com.prayatna.lookiesapp.domain.usecase.partner.ApprovePaintingUseCase
+import com.prayatna.lookiesapp.domain.usecase.partner.RejectPaintingUseCase
+import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.state.DialogState
 import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.state.ParticipantPaintingListUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +18,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParticipantPaintingListViewModel @Inject constructor(
-    private val getEventPaintingsUseCase: GetEventPaintingsUseCase
+    private val getEventPaintingsUseCase: GetEventPaintingsUseCase,
+    private val approvePaintingUseCase: ApprovePaintingUseCase,
+    private val rejectPaintingUseCase: RejectPaintingUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(ParticipantPaintingListUiState())
@@ -47,4 +52,84 @@ class ParticipantPaintingListViewModel @Inject constructor(
             }
         }
     }
+
+    fun approvePainting(id: String) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    loadingPaintingId = id,
+                    dialogState = null
+                )
+            }
+
+            when (val result = approvePaintingUseCase(id)) {
+                is DataResult.Success -> {
+                    _uiState.update { state ->
+                        state.copy(
+                            loadingPaintingId = null,
+                            eventPaintings = state.eventPaintings.map { painting ->
+                                if (painting.id == id) result.data else painting
+                            }
+                        )
+                    }
+                }
+                is DataResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            loadingPaintingId = null,
+                            errorMessage = result.error
+                        )
+                    }
+                }
+                else -> Unit
+            }
+        }
+    }
+
+
+    fun rejectPainting(id: String) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    loadingPaintingId = id,
+                    dialogState = null
+                )
+            }
+
+            when (val result = rejectPaintingUseCase(id)) {
+                is DataResult.Success -> {
+                    _uiState.update { state ->
+                        state.copy(
+                            loadingPaintingId = null,
+                            eventPaintings = state.eventPaintings.map { painting ->
+                                if (painting.id == id) result.data else painting
+                            }
+                        )
+                    }
+                }
+                is DataResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            loadingPaintingId = null,
+                            errorMessage = result.error
+                        )
+                    }
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    fun showApproveDialog(id: String) {
+        _uiState.update { it.copy(dialogState = DialogState.Approve(id)) }
+    }
+
+    fun showRejectDialog(id: String) {
+        _uiState.update { it.copy(dialogState = DialogState.Reject(id)) }
+    }
+
+    fun dismissDialog() {
+        _uiState.update { it.copy(dialogState = null) }
+    }
+
 }

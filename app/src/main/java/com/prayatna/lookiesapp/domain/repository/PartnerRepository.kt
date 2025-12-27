@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.domain.repository
 import com.prayatna.lookiesapp.domain.model.EventParticipant
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.model.partner.DetailPartner
 import com.prayatna.lookiesapp.domain.model.partner.Partner
 import com.prayatna.lookiesapp.utils.DataResult
@@ -14,4 +15,6 @@ interface PartnerRepository {
     suspend fun getSelfEvents(): DataResult<List<Event>>
     suspend fun updateEvent(id: String, input: EditEventInput): DataResult<Event>
     suspend fun getParticipantList(eventId: String?): DataResult<List<EventParticipant>>
+    suspend fun approvePainting(id: String): DataResult<EventPainting>
+    suspend fun rejectPainting(id: String): DataResult<EventPainting>
 }

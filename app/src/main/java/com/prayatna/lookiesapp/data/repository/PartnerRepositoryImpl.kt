@@ -8,6 +8,7 @@ import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.EventParticipant
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.model.partner.DetailPartner
 import com.prayatna.lookiesapp.domain.model.partner.Partner
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
@@ -81,6 +82,24 @@ class PartnerRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }
+    }
+
+    override suspend fun approvePainting(id: String): DataResult<EventPainting> {
+        return try {
+            val response = supabasePartnerService.approvePainting(eventPaintingId = id)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
+    }
+
+    override suspend fun rejectPainting(id: String): DataResult<EventPainting> {
+        return try {
+            val response = supabasePartnerService.rejectPainting(eventPaintingId = id)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.message.toString())
         }
     }
 }

@@ -1,26 +1,20 @@
 package com.prayatna.lookiesapp.presentation.painting.participantPaintingList
 
-import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.paintingSubmission.PaintingSubmissionCard
+import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.state.DialogState
+import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -31,64 +25,104 @@ fun ParticipantPaintingListScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(participantId) {
-        viewModel.loadPaintings(participantId = participantId)
+        viewModel.loadPaintings(participantId)
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            snackbarHostState.showSnackbar("Action success")
+        }
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { innerPadding ->
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
+
         Box(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(padding)
                 .fillMaxSize()
-
         ) {
+
             when {
                 uiState.isLoading -> {
-                    CircularLoading()
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-                uiState.errorMessage != null -> {
-                    // Show error message
-                }
+
                 else -> {
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        if (uiState.eventPaintings.isNotEmpty()) {
-//                            item {
-//                                val participantInfo = uiState.eventPaintings.first().participant
-//                                ParticipantHeaderSummary(participant = participantInfo)
-//                            }
-
-                            item {
-                                Text(
-                                    text = "Registered paintings (${uiState.eventPaintings.size})",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(vertical = 8.dp)
-                                )
-                            }
-                        }
-
-                        if (uiState.eventPaintings.isEmpty()) {
-                            item {
-                                Text(text = "empty")
-                            }
-                        }
-
-                        items(uiState.eventPaintings) { paintingItem ->
+                        items(uiState.eventPaintings) { painting ->
                             PaintingSubmissionCard(
-                                item = paintingItem,
+                                item = painting,
+                                isLoading = uiState.loadingPaintingId == painting.id,
                                 onClick = {
-                                     navController.navigate("${NavigationRoutes.DETAIL_PAINTING}/${paintingItem.painting.id}")
+                                    navController.navigate(
+                                        "${NavigationRoutes.DETAIL_PAINTING}/${painting.painting.id}"
+                                    )
+                                },
+                                onApprove = {
+                                    viewModel.showApproveDialog(painting.id)
+                                },
+                                onReject = {
+                                    viewModel.showRejectDialog(painting.id)
                                 }
                             )
                         }
                     }
                 }
+            }
+
+            uiState.dialogState?.let { dialog ->
+                AlertDialog(
+                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    onDismissRequest = { viewModel.dismissDialog() },
+                    title = {
+                        Text(
+                            if (dialog is DialogState.Approve)
+                                "Approve Painting"
+                            else
+                                "Reject Painting"
+                        )
+                    },
+                    text = {
+                        Text(
+                            if (dialog is DialogState.Approve)
+                                "Are you sure you want to approve this painting?"
+                            else
+                                "Are you sure you want to reject this painting?"
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            when (dialog) {
+                                is DialogState.Approve ->
+                                    viewModel.approvePainting(dialog.paintingId)
+                                is DialogState.Reject ->
+                                    viewModel.rejectPainting(dialog.paintingId)
+                            }
+                        }) {
+                            Text("Yes")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { viewModel.dismissDialog() }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
             }
         }
     }
