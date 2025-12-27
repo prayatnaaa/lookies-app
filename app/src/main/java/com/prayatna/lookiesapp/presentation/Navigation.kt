@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,9 +13,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
+import com.prayatna.lookiesapp.presentation.components.SessionState
 import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
-import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
 import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
@@ -36,51 +35,57 @@ import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListS
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
 import com.prayatna.lookiesapp.presentation.user.partnerapplication.partnerApplicationNavGraph
-import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     val navController = rememberNavController()
-    val sessionStatus by viewModel.sessionStatus.collectAsStateWithLifecycle()
+    val sessionState by viewModel.sessionState.collectAsStateWithLifecycle()
     val roleState by viewModel.roleState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.isSessionActive()
     }
 
-    if (sessionStatus == DataResult.Idle || sessionStatus == DataResult.Loading) {
-        CircularLoading()
-    }
+    LaunchedEffect(sessionState, roleState) {
+        val destination = when (sessionState) {
 
-    val startDestination = when (val status = sessionStatus) {
-        is DataResult.Error -> NavigationRoutes.LOGIN
+            SessionState.Loading -> {
+                NavigationRoutes.MAIN_LOADING
+            }
 
-        is DataResult.Success -> {
-            if (status.data) {
+            SessionState.Unauthenticated -> {
+                NavigationRoutes.LOGIN
+            }
+
+            SessionState.Authenticated -> {
                 when (roleState) {
-                    "admin" -> NavigationRoutes.ADMIN_MAIN
-                    "partner" -> NavigationRoutes.PARTNER_MAIN_SCREEN
-                    "user", "artist" -> NavigationRoutes.MAIN
-                    else -> {
-                        Log.d("MainNavigation", "Unknown role: $roleState")
+                    null ->
                         NavigationRoutes.MAIN_LOADING
-                    }
+                    "admin" ->
+                        NavigationRoutes.ADMIN_MAIN
+                    "partner" ->
+                        NavigationRoutes.PARTNER_MAIN_SCREEN
+                    "user", "artist" ->
+                        NavigationRoutes.MAIN
+                    else -> NavigationRoutes.LOGIN
                 }
-            } else {
+            }
+
+            is SessionState.Error -> {
                 NavigationRoutes.LOGIN
             }
         }
 
-        DataResult.Idle,
-        DataResult.Loading -> NavigationRoutes.MAIN_LOADING
+        navController.navigate(destination) {
+            popUpTo(0) { inclusive = true }
+            launchSingleTop = true
+        }
     }
-
-
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = NavigationRoutes.MAIN_LOADING
     ) {
         composable(NavigationRoutes.MAIN_LOADING) {
             MainLoadingScreen()
