@@ -23,6 +23,7 @@ import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.main.MainScreen
+import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
 import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.ParticipantPaintingListScreen
 import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScreen
@@ -89,6 +90,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     ) {
         composable(NavigationRoutes.MAIN_LOADING) {
             MainLoadingScreen()
+        }
+        composable(NavigationRoutes.SEARCH) {
+            SearchScreen(navController = navController)
         }
         composable(NavigationRoutes.MAIN) { backStackEntry ->
             val rootEntry = remember(backStackEntry) {

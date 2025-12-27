@@ -23,13 +23,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.domain.model.painting.Painting
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
-fun HomePaintingCard(painting: Painting) {
+fun HomePaintingCard(
+    data: EventPainting,
+    onClick: () -> Unit) {
 
     Card(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
@@ -39,7 +42,7 @@ fun HomePaintingCard(painting: Painting) {
     ) {
         Column {
             AsyncImage(
-                model = painting.paintingUrl
+                model = data.painting.paintingUrl
                     .replace("http://172.21.179.110", "http://10.0.2.2"),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -48,14 +51,14 @@ fun HomePaintingCard(painting: Painting) {
             )
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(
-                    text = painting.title,
+                    text = data.painting.title,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formatRupiah(painting.price),
+                    text = formatRupiah(data.painting.price),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
@@ -66,7 +69,7 @@ fun HomePaintingCard(painting: Painting) {
                         Color.Gray))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = painting.artistId,
+                        text = data.painting.artistId,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1

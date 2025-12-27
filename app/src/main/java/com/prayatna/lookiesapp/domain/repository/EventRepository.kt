@@ -14,5 +14,5 @@ interface EventRepository {
     suspend fun createEvent(params: CreateEventParams, imageByte: Uri): DataResult<Event>
     suspend fun getEventTypes(): DataResult<List<TEventType>>
     suspend fun getEventFormats(): DataResult<List<EventFormat>>
-    suspend fun getEventPaintings(participantId: String): DataResult<List<EventPainting>>
+    suspend fun getEventPaintings(participantId: String, status: String? = null): DataResult<List<EventPainting>>
 }

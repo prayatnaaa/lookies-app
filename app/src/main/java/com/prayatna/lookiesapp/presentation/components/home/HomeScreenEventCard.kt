@@ -20,8 +20,10 @@ import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.event.Event
 
 @Composable
-fun HomeEventCard(event: Event) {
+fun HomeEventCard(event: Event,
+                  onClick: () -> Unit) {
     Card(
+        onClick = onClick,
         modifier = Modifier
             .width(240.dp)
             .height(160.dp),

@@ -8,8 +8,8 @@ import javax.inject.Inject
 class GetEventPaintingsUseCase @Inject constructor(
     private val eventRepository: EventRepository
 ) {
-    suspend operator fun invoke(participantId: String): DataResult<List<EventPainting>> {
-        val response = eventRepository.getEventPaintings(participantId)
+    suspend operator fun invoke(participantId: String, status: String? = null): DataResult<List<EventPainting>> {
+        val response = eventRepository.getEventPaintings(participantId, status = status)
         return response
     }
 }

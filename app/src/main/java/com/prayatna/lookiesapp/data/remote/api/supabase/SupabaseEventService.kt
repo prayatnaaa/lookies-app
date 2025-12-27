@@ -132,7 +132,7 @@ class SupabaseEventService @Inject constructor(
         return event
     }
 
-    suspend fun getEventPaintings(participantId: String): List<EventPaintingDto> {
+    suspend fun getEventPaintings(participantId: String, status: String? = null): List<EventPaintingDto> {
         // TODO: create FK type to medium_id and artist_id
         //painting_mediums(id, name),
         //user_profiles(user_id, full_name, username, profile_picture_url)
@@ -203,6 +203,9 @@ class SupabaseEventService @Inject constructor(
             ) {
                 filter {
                     eq("participant_id", participantId)
+                    if (status != null) {
+                        eq("status", status)
+                    }
                 }
             }
             .decodeList<EventPaintingDto>()

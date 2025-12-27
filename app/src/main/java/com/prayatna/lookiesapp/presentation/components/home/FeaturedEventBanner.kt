@@ -27,8 +27,10 @@ import com.prayatna.lookiesapp.utils.Constants
 @Composable
 fun FeaturedEventBanner(
     event: Event,
+    onClick: () -> Unit
 ) {
     Card(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(180.dp),

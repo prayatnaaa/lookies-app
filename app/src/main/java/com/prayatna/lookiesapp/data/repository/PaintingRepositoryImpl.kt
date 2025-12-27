@@ -8,6 +8,7 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePaintingService
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
 import com.prayatna.lookiesapp.domain.model.painting.DetailPainting
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.model.painting.PaintingAttribute
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
@@ -23,8 +24,14 @@ class PaintingRepositoryImpl @Inject constructor(
     private val paintingService: SupabasePaintingService,
     @ApplicationContext private val context: Context
 ): PaintingRepository {
-    override suspend fun getPaintings(): DataResult<List<Painting>> {
-        TODO("Not yet implemented")
+    override suspend fun getPaintings(): DataResult<List<EventPainting>> {
+        return try {
+            val response = paintingService.getPaintings()
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            Log.e("PaintingService", e.message.toString())
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
     }
 
     override suspend fun getPaintingsByArtist(id: String?): DataResult<List<Painting>> {
