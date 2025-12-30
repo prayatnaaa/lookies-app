@@ -19,6 +19,7 @@ object NavigationRoutes {
     const val REGISTER_EVENT = "register_event"
     const val LOGIN = "login"
     const val SEARCH = "search"
+    const val CHECKOUT = "checkout"
     const val EDIT_PROFILE = "edit_profile"
     const val CREATE_EVENT = "add_event"
     const val ADMIN_MAIN = "admin_main"

@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
+import com.prayatna.lookiesapp.presentation.checkout.CheckoutScreen
 import com.prayatna.lookiesapp.presentation.components.SessionState
 import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
@@ -90,6 +91,20 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     ) {
         composable(NavigationRoutes.MAIN_LOADING) {
             MainLoadingScreen()
+        }
+        composable("${NavigationRoutes.CHECKOUT}/{type}/{id}",
+                arguments = listOf(
+                navArgument("type") { type = NavType.StringType },
+            navArgument("id") { type = NavType.StringType }
+        )) { backStackEntry ->
+            val type = backStackEntry.arguments?.getString("type") ?: ""
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+            CheckoutScreen(
+                type = type,
+                itemId = id,
+                navController = navController
+            )
+
         }
         composable(NavigationRoutes.SEARCH) {
             SearchScreen(navController = navController)

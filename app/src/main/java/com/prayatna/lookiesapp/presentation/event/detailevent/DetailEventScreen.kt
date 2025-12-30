@@ -119,6 +119,7 @@ fun DetailEventScreen(
                     onValueChange = { viewModel.setQuantityValue(it) },
                     onBuyButtonClick = {
                         isSheetOpen = false
+                        navController.navigate("${NavigationRoutes.CHECKOUT}/event_ticket/${eventId}")
                     }
                 )
             }

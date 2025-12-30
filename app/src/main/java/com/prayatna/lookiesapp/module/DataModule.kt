@@ -8,6 +8,7 @@ import com.prayatna.lookiesapp.data.repository.LocationRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.PaintingRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.PartnerRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.PaymentRepositoryImpl
+import com.prayatna.lookiesapp.data.repository.TransactionRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.UserRepositoryImpl
 import com.prayatna.lookiesapp.domain.repository.AdminRepository
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
@@ -17,6 +18,7 @@ import com.prayatna.lookiesapp.domain.repository.LocationRepository
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.domain.repository.PaymentRepository
+import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -62,4 +64,8 @@ interface DataModule {
     @Singleton
     @Binds
     fun artistPaintingRepository(artistRepositoryImpl: ArtistRepositoryImpl): ArtistRepository
+
+    @Singleton
+    @Binds
+    fun transactionRepository(transactionRepositoryImpl: TransactionRepositoryImpl): TransactionRepository
 }
