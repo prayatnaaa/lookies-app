@@ -20,55 +20,52 @@ fun CheckoutScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val showSuccessDialog = remember { mutableStateOf(false) }
-    val showErrorDialog = remember { mutableStateOf(false) }
+//    val showSuccessDialog = remember { mutableStateOf(false) }
+//    val showErrorDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getDetailItem(type = type, id = itemId)
     }
 
-    LaunchedEffect(uiState.checkoutSuccessData, uiState.errorMessage) {
-        if (uiState.checkoutSuccessData != null) {
-            showSuccessDialog.value = true
-        }
-
-        if (uiState.errorMessage != null) {
-            showErrorDialog.value = true
-        }
-    }
-
-    if (showSuccessDialog.value) {
-        CustomDialog(
-            title = "Success",
-            message = "Checkout berhasil 🎉",
-            confirmText = "OK",
-            onConfirm = {
-                showSuccessDialog.value = false
-                viewModel.onCheckoutResultConsumed()
-                navController.popBackStack()
-            },
-            onDismiss = {
-                showSuccessDialog.value = false
-                viewModel.onCheckoutResultConsumed()
-            }
-        )
-    }
-
-    if (showErrorDialog.value) {
-        CustomDialog(
-            title = "Error",
-            message = uiState.errorMessage.orEmpty(),
-            confirmText = "OK",
-            onConfirm = {
-                showErrorDialog.value = false
-                viewModel.onCheckoutResultConsumed()
-            },
-            onDismiss = {
-                showErrorDialog.value = false
-                viewModel.onCheckoutResultConsumed()
-            }
-        )
-    }
+//    LaunchedEffect(uiState.checkoutSuccessData, uiState.errorMessage) {
+//        if (uiState.checkoutSuccessData != null) {
+//            showSuccessDialog.value = true
+//        }
+//
+//        if (uiState.errorMessage != null) {
+//            showErrorDialog.value = true
+//        }
+//    }
+//
+//    if (showSuccessDialog.value) {
+//        CustomDialog(
+//            title = "Success",
+//            message = "Checkout berhasil",
+//            confirmText = "OK",
+//            onConfirm = {
+//                showSuccessDialog.value = false
+//            },
+//            onDismiss = {
+//                showSuccessDialog.value = false
+//            }
+//        )
+//    }
+//
+//    if (showErrorDialog.value) {
+//        CustomDialog(
+//            title = "Error",
+//            message = uiState.errorMessage.orEmpty(),
+//            confirmText = "OK",
+//            onConfirm = {
+//                showErrorDialog.value = false
+//                viewModel.onCheckoutResultConsumed()
+//            },
+//            onDismiss = {
+//                showErrorDialog.value = false
+//                viewModel.onCheckoutResultConsumed()
+//            }
+//        )
+//    }
 
     CheckoutContent(
         uiState = uiState,

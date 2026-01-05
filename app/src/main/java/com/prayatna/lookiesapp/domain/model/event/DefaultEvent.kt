@@ -1,11 +1,9 @@
 package com.prayatna.lookiesapp.domain.model.event
 
-import com.prayatna.lookiesapp.domain.model.partner.Partner
-
-data class Event (
+data class DefaultEvent(
     val id: String,
     val title: String,
-    val organizer: Partner,
+    val organizerId: String,
     val bannerImageUrl: String,
     val startDate: String,
     val endDate: String,
@@ -17,8 +15,8 @@ data class Event (
     val maxPaintingPerArtist: Int? = null,
     val ticketPrice: Double? = null,
     val artistRegistrationFee: Double? = null,
-    val eventType: TEventType,
-    val eventFormat: EventFormat,
+    val eventType: String,
+    val eventFormat: String,
     val status: String,
     val createdAt: String,
     val updatedAt: String? = null

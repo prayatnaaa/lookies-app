@@ -123,12 +123,13 @@ class SupabaseEventService @Inject constructor(
 
 
     suspend fun getDetailEvent(id: String): EventDto {
-        val event = postgrest.from("events").select {
+        val event = postgrest.from("event_detail_view").select {
             filter {
-                eq("id", id)
+                eq("event_id", id)
             }
         }.decodeSingle<EventDto>()
 
+        Log.d("getDetailEvent", event.toString())
         return event
     }
 

@@ -53,7 +53,7 @@ class CheckoutViewModel @Inject constructor(
                 val itemDisplay = CheckoutItemDisplay(
                     id = event.id,
                     title = event.title,
-                    subtitle = "by ${event.organizerId}",
+                    subtitle = "by ${event.organizer.name}",
                     price = event.ticketPrice,
                     imageUrl = event.bannerImageUrl,
                     type = "event_ticket"

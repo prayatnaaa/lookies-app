@@ -1,11 +1,12 @@
 package com.prayatna.lookiesapp.domain.mapper
 
+import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.domain.model.event.Event
 
 fun EventDto.toDomain() : Event {
     return Event(
-        id = id,
+        id = eventId,
         title = title,
         bannerImageUrl = bannerImageUrl,
         startDate = startDate,
@@ -20,9 +21,9 @@ fun EventDto.toDomain() : Event {
         createdAt = createdAt,
         updatedAt = updatedAt,
         ticketPrice = ticketPrice,
-        artistRegistrationFee = artistRegistrationFee,
-        eventType = eventType,
-        eventFormat = eventFormat,
-        organizerId = organizerId
+        artistRegistrationFee = registrationFee,
+        eventType = eventType.toDomain(),
+        organizer = organizer.toDomain(),
+        eventFormat = eventFormat.toDomain()
     )
 }

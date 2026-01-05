@@ -57,7 +57,7 @@ class DetailEventViewModel @Inject constructor(
                 is DataResult.Success -> {
                     val event = result.data
                     val userId = userPreference.getProfile().first().id
-                    val isEventMine = event.organizerId == userId
+                    val isEventMine = event.organizer.id == userId
                     _isOwner.value = isEventMine
                     _state.value = DetailEventUiState(info = result.data)
                 }

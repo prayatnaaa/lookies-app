@@ -70,8 +70,21 @@ fun DetailEventFooter(
                     ),
                     onClick = onManageButtonClick
                 ) {
-                    Text(text = "Register")
+                    Text(text = "See Participants")
                 }
+            }
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                onClick = onManageButtonClick
+            ) {
+                Text(text = "Register")
             }
             if (showBuyButton) {
                 Row(

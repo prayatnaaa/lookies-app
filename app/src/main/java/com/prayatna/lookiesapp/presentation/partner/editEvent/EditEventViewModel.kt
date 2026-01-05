@@ -148,8 +148,8 @@ class EditEventViewModel @Inject constructor(
                 ticketPrice = event.ticketPrice?.toString(),
                 artistRegistrationFee = event.artistRegistrationFee?.toString(),
                 about = event.about.orEmpty(),
-                eventType = event.eventType,
-                eventFormat = event.eventFormat
+                eventType = event.eventType.id.toString(),
+                eventFormat = event.eventFormat.id.toString()
             )
         }
     }
