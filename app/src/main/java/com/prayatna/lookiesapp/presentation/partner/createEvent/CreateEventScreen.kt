@@ -154,9 +154,10 @@ fun CreateEventScreen(
 
                 val isSelfExhibition = selectedEventType?.slug == "self_exhibition"
 
-                if (!isSelfExhibition && formState.eventType.isNotEmpty()) {
+                if (formState.eventType.isNotEmpty()) {
                     item {
                         ParticipationRulesForm(
+                            isSelfExhibition = isSelfExhibition,
                             maxParticipants = formState.maxParticipant,
                             onMaxParticipantsChange = {
                                 viewModel.onEvent(CreateEventFormEvent.MaxParticipantChanged(it))
@@ -181,9 +182,11 @@ fun CreateEventScreen(
 
                 val isOnlineEvent = selectedEventFormat?.slug == "online"
 
-                if (!isOnlineEvent && formState.eventFormat.isNotEmpty()) {
+                if (formState.eventFormat.isNotEmpty()) {
                     item {
                         PricingForm(
+                            isOnlineEvent = isOnlineEvent,
+                            isSelfExhibition = isSelfExhibition,
                             ticketPrice = formState.ticketPrice,
                             onTicketPriceChange = {
                                 viewModel.onEvent(CreateEventFormEvent.TicketPriceChanged(it))

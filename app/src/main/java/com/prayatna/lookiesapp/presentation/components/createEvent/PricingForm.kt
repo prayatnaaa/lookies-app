@@ -19,6 +19,8 @@ import com.prayatna.lookiesapp.utils.Helper
 
 @Composable
 fun PricingForm(
+    isOnlineEvent: Boolean,
+    isSelfExhibition: Boolean,
     ticketPrice: String?,
     onTicketPriceChange: (String?) -> Unit,
     artistRegistrationFee: String?,
@@ -27,37 +29,50 @@ fun PricingForm(
     Column(modifier = Modifier.fillMaxWidth()) {
 
         Text(
-            text = "Pricing and fees",
+            text = "Pricing & Fees",
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp
         )
         Text(
-            text = "This is the section about the pricing and fees",
+            text = "Set fees for visitors and artists",
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        CustomTextField(
-            value = Helper.formatIdr(ticketPrice ?: ""),
-            onValueChange = { input ->
-                val digitsOnly = input.filter { it.isDigit() }
-                onTicketPriceChange(digitsOnly)
-            },
-            label = "Ticket price",
-            keyboardType = KeyboardType.Number
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(4.dp))
+        if (!isOnlineEvent) {
+            CustomTextField(
+                value = Helper.formatIdr(ticketPrice ?: ""),
+                onValueChange = { input ->
+                    val digitsOnly = input.filter { it.isDigit() }
+                    onTicketPriceChange(digitsOnly)
+                },
+                label = "Visitor Ticket Price",
+                keyboardType = KeyboardType.Number
+            )
+        } else {
+            Text(
+                text = "Online events are set to Free Entry for visitors.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
 
-        CustomTextField(
-            value = Helper.formatIdr(artistRegistrationFee ?: ""),
-            onValueChange = { input ->
-                val digitsOnly = input.filter { it.isDigit() }
-                onArtistRegistrationFeeChange(digitsOnly)
-            },
-            label = "Artist registration fee",
-            keyboardType = KeyboardType.Number
-        )
+        if (!isSelfExhibition) {
+            if (!isOnlineEvent) Spacer(modifier = Modifier.height(12.dp))
+
+            CustomTextField(
+                value = Helper.formatIdr(artistRegistrationFee ?: ""),
+                onValueChange = { input ->
+                    val digitsOnly = input.filter { it.isDigit() }
+                    onArtistRegistrationFeeChange(digitsOnly)
+                },
+                label = "Artist Registration Fee",
+                keyboardType = KeyboardType.Number
+            )
+        }
 
         HorizontalDivider(
             thickness = 1.dp,

@@ -18,6 +18,7 @@ import com.prayatna.lookiesapp.presentation.components.CustomTextField
 
 @Composable
 fun ParticipationRulesForm(
+    isSelfExhibition: Boolean,
     maxParticipants: String?,
     onMaxParticipantsChange: (String) -> Unit,
     maxPainting: String?,
@@ -29,50 +30,54 @@ fun ParticipationRulesForm(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Participants Info",
+            text = "Participants & Artworks Info",
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 4.dp)
         )
         Text(
-            text = "This is the section about the participants information",
+            text = "Set limits for artists and paintings",
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        CustomTextField(
-            value = maxParticipants ?: "",
-            onValueChange = {
-                if (it.all {
-                    isDigit ->
-                        isDigit.isDigit()
-                    }) onMaxParticipantsChange(it)
-            },
-            label = "Maximum participants",
-            keyboardType = KeyboardType.Number
-        )
-        Spacer(modifier = Modifier.height(4.dp))
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (!isSelfExhibition) {
+            CustomTextField(
+                value = maxParticipants ?: "",
+                onValueChange = { input ->
+                    if (input.all { it.isDigit() }) onMaxParticipantsChange(input)
+                },
+                label = "Maximum Artists (Participants)",
+                keyboardType = KeyboardType.Number
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
         CustomTextField(
             value = maxPainting ?: "",
-            onValueChange = {
-                if (it.all {
-                    isDigit ->
-                        isDigit.isDigit()
-                    }) onMaxPaintingChange(it)
+            onValueChange = { input ->
+                if (input.all { it.isDigit() }) onMaxPaintingChange(input)
             },
-            label = "Maximum painting"
+            label = if (isSelfExhibition) "Total Painting Capacity" else "Maximum Total Paintings (Event)",
+            keyboardType = KeyboardType.Number
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        CustomTextField(
-            value = maxPaintingPerArtist ?: "",
-            onValueChange = {
-                if (it.all {
-                    isDigit ->
-                        isDigit.isDigit()
-                    }) onMaxPaintingPerArtistChange(it)
-            },
-            label = "Maximum painting per artist"
-        )
-        HorizontalDivider(thickness = 1.dp,
+
+        if (!isSelfExhibition) {
+            Spacer(modifier = Modifier.height(12.dp))
+            CustomTextField(
+                value = maxPaintingPerArtist ?: "",
+                onValueChange = { input ->
+                    if (input.all { it.isDigit() }) onMaxPaintingPerArtistChange(input)
+                },
+                label = "Max Painting Limit per Artist",
+                keyboardType = KeyboardType.Number
+            )
+        }
+
+        HorizontalDivider(
+            thickness = 1.dp,
             color = MaterialTheme.colorScheme.outline,
             modifier = Modifier.padding(vertical = 16.dp)
         )

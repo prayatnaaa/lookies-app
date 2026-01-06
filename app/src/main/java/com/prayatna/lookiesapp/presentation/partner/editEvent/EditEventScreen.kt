@@ -141,6 +141,8 @@ fun EditEventScreen(
                 )
             }
 
+            val isSelfExhibition = uiState.data?.eventFormat?.slug == "self_exhibition"
+
             item {
                 ParticipationRulesForm(
                     maxParticipants = formState.maxParticipant,
@@ -156,9 +158,12 @@ fun EditEventScreen(
                         viewModel.onEvent(
                             EditEventFormEvent.MaxPaintingPerArtistChanged(it)
                         )
-                    }
+                    },
+                    isSelfExhibition = isSelfExhibition
                 )
             }
+
+            val isOnline = uiState.data?.eventFormat?.slug == "online"
 
             item {
                 PricingForm(
@@ -171,7 +176,9 @@ fun EditEventScreen(
                         viewModel.onEvent(
                             EditEventFormEvent.ArtistRegistrationFeeChanged(it)
                         )
-                    }
+                    },
+                    isSelfExhibition = isSelfExhibition,
+                    isOnlineEvent = isOnline
                 )
             }
 
