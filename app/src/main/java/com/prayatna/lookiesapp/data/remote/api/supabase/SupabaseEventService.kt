@@ -105,7 +105,7 @@ class SupabaseEventService @Inject constructor(
     ): List<EventDto> {
 
         val query = postgrest
-            .from("approved_events")
+            .from("event_detail_view")
             .select {
                 filter {
                     if (title != null) {

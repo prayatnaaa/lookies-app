@@ -21,8 +21,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signIn(email: String, password: String): DataResult<LoginResponse> {
         return try {
             val response = supabaseAuthService.signIn(email = email, password = password)
-            userPreference.setRole(response.role)
             if (response.success) {
+                userPreference.setRole(response.role)
                 DataResult.Success(response)
             }
             else {

@@ -30,6 +30,7 @@ fun DetailEventFooter(
     onAddToCartButtonClick: () -> Unit,
     showRegisterButton: Boolean = false,
     onRegisterButtonClick: () -> Unit = {},
+    onSeePaintingsClick: () -> Unit = {},
     showManageButton: Boolean = false,
     showBuyButton: Boolean = false,
     onManageButtonClick: () -> Unit = {}
@@ -82,9 +83,9 @@ fun DetailEventFooter(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
-                onClick = onManageButtonClick
+                onClick = onSeePaintingsClick
             ) {
-                Text(text = "Register")
+                Text(text = "See Paintings")
             }
             if (showBuyButton) {
                 Row(

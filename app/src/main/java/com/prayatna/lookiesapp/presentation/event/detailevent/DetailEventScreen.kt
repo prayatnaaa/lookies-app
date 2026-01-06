@@ -51,6 +51,7 @@ fun DetailEventScreen(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             DetailEventFooter(
+                onSeePaintingsClick = {},
                 showManageButton = (role == "partner" && isOwner),
                 showRegisterButton = role == "artist",
                 showBuyButton = role != "partner",

@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.event.detailevent
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
