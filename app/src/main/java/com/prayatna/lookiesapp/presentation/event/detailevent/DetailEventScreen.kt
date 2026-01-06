@@ -88,6 +88,7 @@ fun DetailEventScreen(
                     detailEventState.info != null -> {
                         detailEventState.info?.let { data ->
                                 DetailEventContent(
+                                    isUserArtist = role == "artist",
                                     paintings = emptyList(),
                                     event = data,
                                     modifier = Modifier
