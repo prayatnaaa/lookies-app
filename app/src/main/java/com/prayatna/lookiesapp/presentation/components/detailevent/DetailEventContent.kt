@@ -28,6 +28,7 @@ import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.presentation.components.painting.PaintingCard
+import com.prayatna.lookiesapp.utils.DateHelper
 import com.prayatna.lookiesapp.utils.Helper
 
 @Composable
@@ -123,7 +124,7 @@ fun DetailEventContent(
                 EventInfoRow(
                     icon = Icons.Default.DateRange,
                     label = "Event Date",
-                    value = "${(event.startDate)} - ${(event.endDate)}"
+                    value = "${DateHelper.formatDate(event.startDate)} - ${DateHelper.formatDate(event.endDate)}"
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))

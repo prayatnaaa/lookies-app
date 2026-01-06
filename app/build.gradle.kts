@@ -120,4 +120,7 @@ dependencies {
 
     //JWT Decode
     implementation(libs.jwtdecode)
+
+    //Desugar
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
