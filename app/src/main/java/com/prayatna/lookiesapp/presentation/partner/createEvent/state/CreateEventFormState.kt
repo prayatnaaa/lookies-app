@@ -30,8 +30,6 @@ data class CreateEventFormState(
                     bannerUri != null &&
                     startDate.isNotBlank() &&
                     endDate.isNotBlank() &&
-                    location.isNotBlank() &&
-                    locationUrl.isNotBlank() &&
                     eventType.toIntOrNull() != null &&
                     eventFormat.toIntOrNull() != null
 }

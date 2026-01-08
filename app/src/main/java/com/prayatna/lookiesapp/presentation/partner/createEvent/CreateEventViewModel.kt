@@ -89,10 +89,10 @@ class CreateEventViewModel @Inject constructor(
 
             when (val typesResult = eventRepository.getEventTypes()) {
                 is DataResult.Success -> {
-                    update { copy(eventTypes = typesResult.data) }
+                    update { copy(eventTypes = typesResult.data, isLoadingMeta = false) }
                 }
                 is DataResult.Error -> {
-                    update { copy(errorMessage = typesResult.error) }
+                    update { copy(errorMessage = typesResult.error, isLoadingMeta = false) }
                     return@launch
                 }
                 else -> Unit
@@ -140,10 +140,18 @@ class CreateEventViewModel @Inject constructor(
 
             when(val result = createEventUseCase(params = params, imageUri = state.bannerUri!!)) {
                 is DataResult.Error -> {
-                    _uiState.update { it.copy(errorMessage = result.error) }
+                    _uiState.update { it.copy(
+                        errorMessage = result.error,
+                        isSuccess = false,
+                        isLoading = false
+                    ) }
                 }
                 is DataResult.Success -> {
-                    _uiState.update { it.copy(isSuccess = true) }
+                    _uiState.update { it.copy(
+                        isSuccess = true,
+                        errorMessage = null,
+                        isLoading = false
+                    ) }
                 }
                 is DataResult.Loading -> {
                     _uiState.update { it.copy(isLoading = true) }

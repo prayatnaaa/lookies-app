@@ -124,8 +124,10 @@ fun DetailEventContent(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
-                            RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE))
+                        .border(
+                            width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant,
+                            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
+                        )
                         .padding(12.dp)
                 ) {
                     AsyncImage(

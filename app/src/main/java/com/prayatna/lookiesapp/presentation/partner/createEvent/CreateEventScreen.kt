@@ -137,17 +137,24 @@ fun CreateEventScreen(
                         }
                     )
                 }
-                item {
-                   EventLocationForm(
-                       locationName = formState.location,
-                       onLocationNameChange = {
-                           viewModel.onEvent(CreateEventFormEvent.LocationChanged(it))
-                       },
-                       locationUrl = formState.locationUrl,
-                       onLocationUrlChange = {
-                           viewModel.onEvent(CreateEventFormEvent.LocationUrlChanged(it))
-                       }
-                   )
+
+                val selectedEventFormat =
+                    formState.eventFormats.find { it.id.toString() == formState.eventFormat }
+                val isOnlineEvent = selectedEventFormat?.slug == "online"
+
+                if (!isOnlineEvent && selectedEventFormat?.slug != null) {
+                    item {
+                        EventLocationForm(
+                            locationName = formState.location,
+                            onLocationNameChange = {
+                                viewModel.onEvent(CreateEventFormEvent.LocationChanged(it))
+                            },
+                            locationUrl = formState.locationUrl,
+                            onLocationUrlChange = {
+                                viewModel.onEvent(CreateEventFormEvent.LocationUrlChanged(it))
+                            }
+                        )
+                    }
                 }
                 val selectedEventType =
                     formState.eventTypes.find { it.id.toString() == formState.eventType }
@@ -177,10 +184,6 @@ fun CreateEventScreen(
                         )
                     }
                 }
-                val selectedEventFormat =
-                    formState.eventFormats.find { it.id.toString() == formState.eventFormat }
-
-                val isOnlineEvent = selectedEventFormat?.slug == "online"
 
                 if (formState.eventFormat.isNotEmpty()) {
                     item {
@@ -219,7 +222,7 @@ fun CreateEventScreen(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         ),
-//                        enabled = formState.isValid && !uiState.isLoading,
+                        enabled = formState.isValid && !uiState.isLoading,
                         onClick = {
                             viewModel.onEvent(CreateEventFormEvent.Submit)
                         },
