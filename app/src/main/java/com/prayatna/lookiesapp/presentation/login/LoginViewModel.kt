@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.login
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
-import com.prayatna.lookiesapp.presentation.components.SessionState
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,13 +47,17 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onSignIn() {
+        Log.d("LOGIN_DEBUG", "onSignIn clicked")
         _authState.value = AuthState.Loading
 
         viewModelScope.launch {
             when (val result = authRepository.signIn(emailValue, passwordValue)) {
 
                 is DataResult.Success -> {
-                    loadAuthenticatedUser()
+                    val role = result.data.role
+                    Log.d("LOGIN_DEBUG", "Authenticated as $role")
+
+                    _authState.value = AuthState.Authenticated(role)
                 }
 
                 is DataResult.Error -> {
@@ -87,8 +91,6 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
-
-
 
     private fun loadAuthenticatedUser() {
         viewModelScope.launch {

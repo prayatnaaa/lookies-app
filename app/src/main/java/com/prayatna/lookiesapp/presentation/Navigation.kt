@@ -135,7 +135,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             SelfEventListScreen(navController = navController)
         }
         composable(NavigationRoutes.LOGIN) {
-            LoginScreen(navController = navController)
+            LoginScreen(navController = navController, viewModel = viewModel)
         }
         composable(NavigationRoutes.REGISTER) {
             RegisterScreen(navController = navController)

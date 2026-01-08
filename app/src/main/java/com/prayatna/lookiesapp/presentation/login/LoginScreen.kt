@@ -38,7 +38,7 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier,
                 navController: NavController,
-                viewModel: LoginViewModel = hiltViewModel(),
+                viewModel: LoginViewModel,
 ) {
 
     val loginStatus = viewModel.loginStatus.collectAsStateWithLifecycle()
@@ -46,57 +46,15 @@ fun LoginScreen(modifier: Modifier = Modifier,
 
     LaunchedEffect(loginStatus.value) {
         val status = loginStatus.value
-
-        if (status is DataResult.Success) {
-            val role = status.data.role
-
-            when (role) {
-                "admin" -> {
-                    navController.navigate(NavigationRoutes.ADMIN_MAIN) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
-                "user" -> {
-                    navController.navigate(NavigationRoutes.MAIN){
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
-                "artist" -> {
-                    navController.navigate(NavigationRoutes.MAIN){
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
-                else -> {
-                    navController.navigate(NavigationRoutes.PARTNER_MAIN_SCREEN){
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
-            }
-
-        } else if (status is DataResult.Error) {
-            val errorMsg = status.error
-
-            errorMsg.let {
-                snackBarHostState.showSnackbar(
-                    message = it,
-                    duration = SnackbarDuration.Long,
-                    withDismissAction = true
-                )
-            }
+        if (status is DataResult.Error) {
+            snackBarHostState.showSnackbar(
+                message = status.error,
+                duration = SnackbarDuration.Long,
+                withDismissAction = true
+            )
         }
     }
+
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) },
