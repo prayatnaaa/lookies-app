@@ -14,7 +14,6 @@ import androidx.navigation.navArgument
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
 import com.prayatna.lookiesapp.presentation.checkout.CheckoutScreen
-import com.prayatna.lookiesapp.presentation.components.SessionState
 import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
@@ -23,6 +22,7 @@ import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
+import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
@@ -43,48 +43,48 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 @Composable
 fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     val navController = rememberNavController()
-    val sessionState by viewModel.sessionState.collectAsStateWithLifecycle()
-    val roleState by viewModel.roleState.collectAsStateWithLifecycle()
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.isSessionActive()
     }
 
-    LaunchedEffect(sessionState, roleState) {
-        val destination = when (sessionState) {
+    LaunchedEffect(authState) {
 
-            SessionState.Loading -> {
+        val destination = when (val state = authState) {
+
+            AuthState.Loading ->
                 NavigationRoutes.MAIN_LOADING
-            }
 
-            SessionState.Unauthenticated -> {
+            AuthState.Unauthenticated ->
                 NavigationRoutes.LOGIN
-            }
 
-            SessionState.Authenticated -> {
-                when (roleState) {
-                    null ->
-                        NavigationRoutes.MAIN_LOADING
-                    "admin" ->
-                        NavigationRoutes.ADMIN_MAIN
-                    "partner" ->
-                        NavigationRoutes.PARTNER_MAIN_SCREEN
-                    "user", "artist" ->
-                        NavigationRoutes.MAIN
+            is AuthState.Authenticated -> {
+                when (state.role) {
+                    "admin" -> NavigationRoutes.ADMIN_MAIN
+                    "partner" -> NavigationRoutes.PARTNER_MAIN_SCREEN
+                    "user", "artist" -> NavigationRoutes.MAIN
                     else -> NavigationRoutes.LOGIN
                 }
             }
 
-            is SessionState.Error -> {
+            is AuthState.Error ->
                 NavigationRoutes.LOGIN
-            }
         }
 
+        val currentRoute =
+            navController.currentBackStackEntry?.destination?.route
+        if (currentRoute == destination) return@LaunchedEffect
+
         navController.navigate(destination) {
-            popUpTo(0) { inclusive = true }
+            popUpTo(navController.graph.startDestinationId) {
+                inclusive = true
+            }
             launchSingleTop = true
         }
     }
+
+
 
     NavHost(
         navController = navController,

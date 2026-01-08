@@ -9,11 +9,13 @@ import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.presentation.components.SessionState
+import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,13 +35,8 @@ class LoginViewModel @Inject constructor(
         MutableStateFlow<DataResult<LoginResponse>>(DataResult.Idle)
     val loginStatus = _loginStatus.asStateFlow()
 
-    private val _sessionState =
-        MutableStateFlow<SessionState>(SessionState.Loading)
-    val sessionState: StateFlow<SessionState> = _sessionState.asStateFlow()
-
-    private val _roleState =
-        MutableStateFlow<String?>(null)
-    val roleState: StateFlow<String?> = _roleState.asStateFlow()
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
+    val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     fun onEmailChange(emailValue: String) {
         this.emailValue = emailValue
@@ -50,56 +47,59 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onSignIn() {
-        _loginStatus.value = DataResult.Loading
+        _authState.value = AuthState.Loading
+
         viewModelScope.launch {
-            val result = authRepository.signIn(
-                email = emailValue,
-                password = passwordValue
-            )
+            when (val result = authRepository.signIn(emailValue, passwordValue)) {
 
-            _loginStatus.value = result
+                is DataResult.Success -> {
+                    loadAuthenticatedUser()
+                }
 
-            if (result is DataResult.Success) {
-                _sessionState.value = SessionState.Authenticated
-                loadUserRole()
+                is DataResult.Error -> {
+                    _authState.value = AuthState.Error(result.error)
+                }
+
+                else -> Unit
             }
         }
     }
 
     fun isSessionActive() {
         viewModelScope.launch {
-            _sessionState.value = SessionState.Loading
+            _authState.value = AuthState.Loading
 
-            when (val result = authRepository.isSessionActive()) {
+            when (val sessionResult = authRepository.isSessionActive()) {
 
                 is DataResult.Success -> {
-                    if (result.data) {
-                        _sessionState.value = SessionState.Authenticated
-                        loadUserRole()
+                    if (sessionResult.data) {
+                        loadAuthenticatedUser()
                     } else {
-                        _sessionState.value = SessionState.Unauthenticated
+                        _authState.value = AuthState.Unauthenticated
                     }
                 }
 
                 is DataResult.Error -> {
-                    _sessionState.value =
-                        SessionState.Error(result.error)
+                    _authState.value = AuthState.Error(sessionResult.error)
                 }
 
-                DataResult.Idle,
-                DataResult.Loading -> {
-                    _sessionState.value = SessionState.Loading
-                }
+                else -> Unit
             }
         }
     }
 
-    private fun loadUserRole() {
+
+
+    private fun loadAuthenticatedUser() {
         viewModelScope.launch {
-            userPreference.getRole().collect { role ->
-                _roleState.value =
-                    role.takeIf { it.isNotBlank() }
+            val role = userPreference.getRole().firstOrNull()
+
+            if (role.isNullOrBlank()) {
+                _authState.value = AuthState.Error("Role not found")
+            } else {
+                _authState.value = AuthState.Authenticated(role)
             }
         }
     }
+
 }

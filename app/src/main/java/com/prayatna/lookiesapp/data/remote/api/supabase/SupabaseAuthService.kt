@@ -56,6 +56,7 @@ class SupabaseAuthService @Inject constructor(
         if (role == "unknown") {
             throw Exception("Role not found")
         }
+        Log.d("ROLE", role.toString())
         return role.toString()
     }
 }

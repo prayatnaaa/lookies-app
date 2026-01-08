@@ -98,7 +98,7 @@ fun RegisterScreen(
                 color = GreyTextLight,
                 style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 30.sp,
+                    fontSize = 20.sp,
                 ),
                 textAlign = TextAlign.Start
             )

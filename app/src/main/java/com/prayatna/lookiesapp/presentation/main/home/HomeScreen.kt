@@ -132,7 +132,7 @@ fun HomeScreen(
                 if (state.events.isNotEmpty()) {
                     item(span = StaggeredGridItemSpan.FullLine) {
                         Column {
-                            SectionHeader(title = "Ongoing Events", onSeeAll = {})
+                            SectionHeader(title = "Events", onSeeAll = {})
                             LazyRow(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                                 modifier = Modifier.fillMaxWidth()
