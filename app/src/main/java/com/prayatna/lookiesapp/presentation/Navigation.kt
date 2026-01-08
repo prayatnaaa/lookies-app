@@ -131,13 +131,27 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         composable(NavigationRoutes.CREATE_EVENT) {
             CreateEventScreen(navController = navController)
         }
-        composable(route = "${NavigationRoutes.REGISTER_EVENT}/{eventId}",
-            arguments = listOf(navArgument("eventId") { type = NavType.IntType })
+        composable(
+            route = "${NavigationRoutes.REGISTER_EVENT}/{eventId}/{maxPaintingPerArtist}",
+            arguments = listOf(
+                navArgument("eventId") { type = NavType.IntType },
+                navArgument("maxPaintingPerArtist") { type = NavType.IntType }
+            )
         ) { backStackEntry ->
-            backStackEntry.arguments?.getInt("eventId")?.let { eventId ->
-                RegisterEventScreen(navController = navController, eventId = eventId)
+
+            val eventId = backStackEntry.arguments?.getInt("eventId")
+            val maxPaintingPerArtist =
+                backStackEntry.arguments?.getInt("maxPaintingPerArtist")
+
+            if (eventId != null && maxPaintingPerArtist != null) {
+                RegisterEventScreen(
+                    navController = navController,
+                    eventId = eventId,
+                    maxPaintingPerArtist = maxPaintingPerArtist
+                )
             }
         }
+
         composable(
             route = "${NavigationRoutes.EVENT_PAINTING_LIST}/{participantId}",
             arguments = listOf(navArgument("participantId") { type = NavType.StringType })

@@ -26,11 +26,11 @@ fun UploadPaintingScreen(
         listOf(NONE_ITEM) + viewModel.dropdownState.artStyles
     }
 
-    LaunchedEffect(uiState) {
-        if (uiState is UploadPaintingUiState.Success) {
-            navController.popBackStack()
-        }
-    }
+//    LaunchedEffect(uiState) {
+//        if (uiState is UploadPaintingUiState.Success) {
+//            navController.popBackStack()
+//        }
+//    }
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()

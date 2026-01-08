@@ -31,7 +31,8 @@ import com.prayatna.lookiesapp.presentation.registerEvent.state.RegisterEventEve
 fun RegisterEventScreen(
     viewModel: RegisterEventViewModel = hiltViewModel(),
     navController: NavController,
-    eventId: Int
+    eventId: Int,
+    maxPaintingPerArtist: Int
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -78,8 +79,8 @@ fun RegisterEventScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Kuota Event: ${state.selectedIds.size} / ${state.maxLimit}",
-                    color = if (state.selectedIds.size > state.maxLimit) Color.Red else Color.Gray
+                    text = "Kuota Event: ${state.selectedIds.size} / $maxPaintingPerArtist",
+                    color = if (state.selectedIds.size > maxPaintingPerArtist) Color.Red else Color.Gray
                 )
                 LinearProgressIndicator(
                     progress = { if (state.currentStep == 1) 0.5f else 1f },

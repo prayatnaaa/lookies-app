@@ -27,13 +27,10 @@ import com.prayatna.lookiesapp.utils.Constants
 fun DetailEventFooter(
     modifier: Modifier = Modifier,
     onBuyButtonClick: () -> Unit,
-    onAddToCartButtonClick: () -> Unit,
     showRegisterButton: Boolean = false,
     onRegisterButtonClick: () -> Unit = {},
     onSeePaintingsClick: () -> Unit = {},
-    showManageButton: Boolean = false,
     showBuyButton: Boolean = false,
-    onManageButtonClick: () -> Unit = {}
 ) {
     ElevatedCard(
         modifier = modifier
@@ -60,33 +57,7 @@ fun DetailEventFooter(
                     Text(text = "Register")
                 }
             }
-            if (showManageButton) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    onClick = onManageButtonClick
-                ) {
-                    Text(text = "See Participants")
-                }
-            }
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                onClick = onSeePaintingsClick
-            ) {
-                Text(text = "See Paintings")
-            }
             if (showBuyButton) {
                 Row(
                     modifier = modifier
@@ -95,9 +66,9 @@ fun DetailEventFooter(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    AddToCartButton(
+                    SeeArtsButton (
                         modifier = modifier.weight(0.5f),
-                        onClick = onAddToCartButtonClick
+                        onClick = onSeePaintingsClick
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -136,7 +107,7 @@ fun BuyButton(
 }
 
 @Composable
-fun AddToCartButton(
+fun SeeArtsButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -152,7 +123,7 @@ fun AddToCartButton(
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline)
     ) {
         Text(
-            text = "Add to cart",
+            text = "See all arts",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimary
         )
@@ -164,6 +135,5 @@ fun AddToCartButton(
 fun DetailEventFooterPreview() {
     DetailEventFooter(
         onBuyButtonClick = {},
-        onAddToCartButtonClick = {}
     )
 }
