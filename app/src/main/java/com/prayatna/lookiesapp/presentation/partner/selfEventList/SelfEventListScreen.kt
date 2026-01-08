@@ -74,7 +74,7 @@ fun SelfEventListScreen(
                             if (event.status != "approved") {
                                 navController.navigate("${NavigationRoutes.EDIT_EVENT}/${event.id}")
                             } else {
-                                //TODO: to manage event screen
+                                navController.navigate("${NavigationRoutes.PARTNER_EVENT_MANAGE}/${event.id}")
                             }
                         }
                     )

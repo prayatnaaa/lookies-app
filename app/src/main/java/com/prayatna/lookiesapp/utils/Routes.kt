@@ -11,6 +11,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.prayatna.lookiesapp.R
 
 object NavigationRoutes {
+    const val PARTNER_EVENT_MANAGE = "partner_event_manage"
+    const val MANAGE_PAINTINGS = "manage_paintings"
     const val PARTNER_MAIN_SCREEN = "partner_main_screen"
     const val PARTICIPANT_LIST = "participant_list"
     const val DETAIL_PAINTING = "detail_painting"

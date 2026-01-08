@@ -101,7 +101,8 @@ class SupabaseEventService @Inject constructor(
 
     suspend fun getEvents(
         title: String? = null,
-        organizerId: String? = null
+        organizerId: String? = null,
+        status: String? = null
     ): List<EventDto> {
 
         val query = postgrest
@@ -109,16 +110,18 @@ class SupabaseEventService @Inject constructor(
             .select {
                 filter {
                     if (title != null) {
-                        eq("title", title)
+                        ilike("title", "%$title%")
                     }
                     if (organizerId != null) {
                         eq("organizer_id", organizerId)
+                    }
+                    if (status != null) {
+                        eq("status", status)
                     }
                 }
             }
 
         return query.decodeList()
-
     }
 
 
@@ -134,76 +137,11 @@ class SupabaseEventService @Inject constructor(
     }
 
     suspend fun getEventPaintings(participantId: String, status: String? = null): List<EventPaintingDto> {
-        // TODO: create FK type to medium_id and artist_id
-        //painting_mediums(id, name),
-        //user_profiles(user_id, full_name, username, profile_picture_url)
         val response = postgrest
-            .from("event_paintings")
-            .select(
-                columns = Columns.raw(
-                    """
-                id,
-                final_price,
-                status,
-                created_at,
-                paintings(
-                    id,
-                    title,
-                    description,
-                    price,
-                    painting_url,
-                    year_created,
-                    subject,
-                    dimension_height,
-                    dimension_width,
-                    created_at,
-                    medium_id,
-                    artist_id,
-                    painting_art_styles(
-                        id,
-                        name
-                    )
-                ),
-                event_participants(
-                    id,
-                    status,
-                    event:events(
-                        id,
-                        title,
-                        organizer_id,
-                        banner_image_url,
-                        start_date,
-                        end_date,
-                        about,
-                        location,
-                        location_url,
-                        max_participant,
-                        max_painting,
-                        max_painting_per_artist,
-                        status,
-                        ticket_price,
-                        registration_fee,
-                        event_type_id,
-                        event_format_id,
-                        created_at,
-                        updated_at
-                    ),
-                    artist:user_profiles(
-                        user_id,
-                        full_name,
-                        bio,
-                        address,
-                        username,
-                        profile_picture_url,
-                        has_partner_sub,
-                        is_artist
-                    )
-                )
-                """.trimIndent()
-                )
-            ) {
+            .from("event_paintings_view")
+            .select {
                 filter {
-                    eq("participant_id", participantId)
+                    eq("event_participants->>id", participantId)
                     if (status != null) {
                         eq("status", status)
                     }

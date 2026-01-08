@@ -45,7 +45,7 @@ fun DetailPaintingSection(
     painting: DetailPainting,
     showStatus: Boolean = false
 ) {
-    val scrollState = rememberScrollState()
+        val scrollState = rememberScrollState()
 
         Column(
             modifier = Modifier

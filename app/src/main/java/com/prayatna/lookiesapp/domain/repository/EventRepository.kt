@@ -9,7 +9,11 @@ import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.utils.DataResult
 
 interface EventRepository {
-    suspend fun getEvents(): DataResult<List<Event>>
+    suspend fun getEvents(
+        title: String?,
+        organizerId: String?,
+        status: String?
+    ): DataResult<List<Event>>
     suspend fun getEvent(eventId: String, forceRefresh: Boolean = false): DataResult<Event>
     suspend fun createEvent(params: CreateEventParams, imageByte: Uri): DataResult<Event>
     suspend fun getEventTypes(): DataResult<List<TEventType>>

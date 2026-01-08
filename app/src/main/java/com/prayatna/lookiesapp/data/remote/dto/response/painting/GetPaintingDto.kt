@@ -17,9 +17,9 @@ data class GetPaintingDto(
     val dimensionHeight: Double,
     @SerialName("dimension_width")
     val dimensionWidth: Double,
-    @SerialName("medium_id")
+    @SerialName("medium")
     val medium: String,
-    @SerialName("art_style_id")
+    @SerialName("art_style")
     val artStyle: String? = null,
     val subject: String? = null,
     @SerialName("year_created")

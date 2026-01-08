@@ -8,7 +8,15 @@ import javax.inject.Inject
 class GetEventsUseCase @Inject constructor(
     private val repository: EventRepository
 ) {
-    suspend operator fun invoke(): DataResult<List<Event>> {
-        return repository.getEvents()
+    suspend operator fun invoke(
+        title: String? = null,
+        organizerId: String? = null,
+        status: String? = null
+    ): DataResult<List<Event>> {
+        return repository.getEvents(
+            title = title,
+            organizerId = organizerId,
+            status = status
+        )
     }
 }

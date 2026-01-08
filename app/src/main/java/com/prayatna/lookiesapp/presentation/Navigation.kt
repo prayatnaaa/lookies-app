@@ -31,6 +31,7 @@ import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScree
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
 import com.prayatna.lookiesapp.presentation.partner.main.PartnerMainScreen
+import com.prayatna.lookiesapp.presentation.partner.manageEvent.PartnerManageEventScreen
 import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
@@ -91,6 +92,17 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     ) {
         composable(NavigationRoutes.MAIN_LOADING) {
             MainLoadingScreen()
+        }
+        composable(
+            route = "${NavigationRoutes.PARTNER_EVENT_MANAGE}/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("eventId")?.let { eventId ->
+                PartnerManageEventScreen(
+                    navController = navController,
+                    eventId = eventId
+                )
+            }
         }
         composable("${NavigationRoutes.CHECKOUT}/{type}/{id}",
                 arguments = listOf(

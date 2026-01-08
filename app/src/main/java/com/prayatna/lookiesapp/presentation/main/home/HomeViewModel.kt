@@ -54,7 +54,9 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            when (val result = getEventsUseCase()) {
+            when (val result = getEventsUseCase(
+                status = "approved"
+            )) {
                 is DataResult.Success -> {
                     _uiState.update {
                         it.copy(

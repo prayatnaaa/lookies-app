@@ -23,9 +23,17 @@ class EventRepositoryImpl @Inject constructor(
     private val supabaseEventService: SupabaseEventService,
     @ApplicationContext private val context: Context
 ): EventRepository {
-    override suspend fun getEvents(): DataResult<List<Event>> {
+    override suspend fun getEvents(
+        title: String?,
+        organizerId: String?,
+        status: String?
+    ): DataResult<List<Event>> {
         return try {
-            val response = supabaseEventService.getEvents()
+            val response = supabaseEventService.getEvents(
+                title = title,
+                organizerId = organizerId,
+                status = status
+            )
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
