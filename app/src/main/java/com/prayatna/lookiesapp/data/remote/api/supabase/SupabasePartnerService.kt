@@ -107,49 +107,11 @@ class SupabasePartnerService @Inject constructor(
 
     suspend fun getParticipantList(eventId: String?): List<EventParticipantDto> {
         val response = postgrest
-            .from("event_participants")
-            .select(
-                columns = Columns.raw(
-                    """
-                id,
-                status,
-                event:events (
-                    id,
-                    organizer_id,
-                    title,
-                    banner_image_url,
-                    start_date,
-                    end_date,
-                    about,
-                    location,
-                    location_url,
-                    max_participant,
-                    max_painting,
-                    max_painting_per_artist,
-                    status,
-                    ticket_price,
-                    registration_fee,
-                    event_type_id,
-                    event_format_id,
-                    created_at,
-                    updated_at
-                ),
-                artist:user_profiles (
-                    user_id,
-                    bio,
-                    address,
-                    username,
-                    full_name,
-                    has_partner_sub,
-                    profile_picture_url,
-                    is_artist
-                )
-                """.trimIndent()
-                )
-            ) {
+            .from("event_participant_view")
+            .select {
                 if (eventId != null) {
                     filter {
-                        eq("event_id", eventId)
+                        eq("event->>event_id", eventId)
                     }
                 }
             }
