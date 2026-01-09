@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.remote.dto.EventPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.request.artist.RegisterEventRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.artist.RegisterEventResponse
 import io.github.jan.supabase.gotrue.Auth
@@ -26,6 +27,16 @@ class SupabaseArtistService @Inject constructor(
         val response = postgrest.rpc(function = "register_event",
             parameters = parameters).decodeAs<RegisterEventResponse>()
 
+        return response
+    }
+
+    suspend fun getArtistEventPaintings(artistId: String): List<EventPaintingDto> {
+        val response = postgrest.from("event_paintings_view")
+            .select {
+                filter {
+                    eq("event_participants->>artist->>user_id", artistId)
+                }
+            }.decodeList<EventPaintingDto>()
         return response
     }
 }

@@ -77,7 +77,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         if (currentRoute == destination) return@LaunchedEffect
 
         navController.navigate(destination) {
-            popUpTo(navController.graph.startDestinationId) {
+            popUpTo(0) {
                 inclusive = true
             }
             launchSingleTop = true

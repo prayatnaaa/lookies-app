@@ -18,10 +18,13 @@ class SupabasePaintingService @Inject constructor(
     private val storage: Storage,
 ) {
     suspend fun getPaintings(): List<EventPaintingDto> {
+        val user = auth.currentUserOrNull() ?:
+        throw IllegalStateException("User not logged in")
         val result = postgrest.from("event_paintings_view")
             .select {
                 filter {
                     eq("status", "accepted")
+                    neq("user_id", user.id)
                 }
             }
             .decodeList<EventPaintingDto>()
@@ -42,7 +45,7 @@ class SupabasePaintingService @Inject constructor(
         ?: throw IllegalStateException("Artist ID is required")
 
         return postgrest
-            .from("paintings")
+            .from("painting_view")
             .select {
                 filter {
                     eq("artist_id", artistId)

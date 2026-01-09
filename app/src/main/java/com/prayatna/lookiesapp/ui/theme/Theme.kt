@@ -13,43 +13,66 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     primary = PureWhite,
     onPrimary = AmoledBlack,
+    primaryContainer = SoftGrey,
+    onPrimaryContainer = PureWhite,
+
+    secondary = GreyText,
+    onSecondary = AmoledBlack,
+    secondaryContainer = DarkGrey,
+    onSecondaryContainer = PureWhite,
+
+    tertiary = MaroonLight,
+    onTertiary = AmoledBlack,
+    tertiaryContainer = Maroon.copy(alpha = 0.3f),
+    onTertiaryContainer = MaroonContainer,
 
     background = AmoledBlack,
     onBackground = PureWhite,
-
-    surface = DarkSurface,
+    surface = DeepCharcoal,
     onSurface = PureWhite,
+    surfaceVariant = DarkGrey,
+    onSurfaceVariant = GreyText,
 
-    surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = SoftWhite,
+    error = Error,
+    onError = OnError,
+    errorContainer = Error.copy(alpha = 0.3f),
+    onErrorContainer = ErrorContainer,
 
-    secondary = GreyText,
-    onSecondary = PureWhite,
-
-    outline = GreyTextLight
+    outline = GreyText,
+    outlineVariant = SoftGrey
 )
-
 
 private val LightColorScheme = lightColorScheme(
     primary = BlackText,
     onPrimary = PureWhite,
-
-    background = LightBackground,
-    onBackground = BlackText,
-
-    surface = LightSurface,
-    onSurface = BlackText,
-
-    surfaceVariant = LightSurfaceVariant,
-    onSurfaceVariant = BlackText,
+    primaryContainer = LightGrey,
+    onPrimaryContainer = BlackText,
 
     secondary = GreyTextLight,
     onSecondary = PureWhite,
+    secondaryContainer = SoftWhite,
+    onSecondaryContainer = BlackText,
 
-    outline = GreyTextLight
+    tertiary = Maroon,
+    onTertiary = PureWhite,
+    tertiaryContainer = MaroonContainer,
+    onTertiaryContainer = OnMaroonContainer,
+
+    background = OffWhite,
+    onBackground = BlackText,
+    surface = PureWhite,
+    onSurface = BlackText,
+    surfaceVariant = SoftWhite,
+    onSurfaceVariant = GreyTextLight,
+
+    error = Error,
+    onError = OnError,
+    errorContainer = ErrorContainer,
+    onErrorContainer = OnErrorContainer,
+
+    outline = GreyTextLight,
+    outlineVariant = LightGrey
 )
-
-
 
 @Composable
 fun LookiesAppTheme(

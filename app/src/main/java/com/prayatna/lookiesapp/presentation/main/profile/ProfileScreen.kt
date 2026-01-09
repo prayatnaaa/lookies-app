@@ -4,9 +4,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Handshake
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -41,6 +53,7 @@ fun ProfileScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val logoutStatus by viewModel.logoutStatus.collectAsState()
     val profileState by sharedViewModel.profileState.collectAsStateWithLifecycle()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(viewModel.isError) {
         if (viewModel.isError) {
@@ -59,7 +72,6 @@ fun ProfileScreen(
                     popUpTo(NavigationRoutes.MAIN) { inclusive = true }
                 }
             }
-
             is DataResult.Error -> {
                 snackBarHostState.showSnackbar(
                     message = (logoutStatus as DataResult.Error).error,
@@ -67,7 +79,6 @@ fun ProfileScreen(
                     withDismissAction = true
                 )
             }
-
             else -> Unit
         }
     }
@@ -78,19 +89,22 @@ fun ProfileScreen(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
 
-        innerPadding.calculateTopPadding()
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.Center,
+                .padding(innerPadding)
+                .padding(horizontal = 20.dp)
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(20.dp))
+
             when (profileState) {
 
                 is DataResult.Success -> {
                     val profile = (profileState as DataResult.Success).data
 
+                    // --- Profile Header ---
                     ProfileCard(
                         username = profile.username ?: "Unknown",
                         onEditProfileClick = {
@@ -98,21 +112,35 @@ fun ProfileScreen(
                         }
                     )
 
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(24.dp))
 
+                    // --- Settings Section Header ---
+                    Text(
+                        text = "Dashboard",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp, start = 4.dp)
+                    )
+
+                    // --- 1. Partner Menu ---
                     if (profile.hasPartnerSub == false) {
                         SettingsSection(
-                            title = "Become our partner",
-                            subtitle = "Apply to become our partner",
+                            title = "Become a Partner",
+                            subtitle = "Join us and expand your reach",
+                            icon = Icons.Default.Handshake,
                             onClick = {
                                 navController.navigate(NavigationRoutes.ADD_LOCATION)
                             }
                         )
                     }
 
+                    // --- 2. Arts Menu (Portfolio) ---
                     SettingsSection(
-                        title = "Arts",
-                        subtitle = if (profile.isArtist == true) "Upload or see your arts" else "Upload your first art",
+                        title = "My Artworks",
+                        subtitle = if (profile.isArtist == true) "Manage your gallery portfolio" else "Start uploading your art",
+                        icon = Icons.Default.Palette,
                         onClick = {
                             if (profile.isArtist == false) {
                                 navController.navigate(NavigationRoutes.UPLOAD_PAINTING)
@@ -122,18 +150,64 @@ fun ProfileScreen(
                         }
                     )
 
-                    Button(onClick = { viewModel.logout() }) {
-                        Text("Logout")
+                    if (profile.isArtist == true) {
+                        SettingsSection(
+                            title = "Event Submissions",
+                            subtitle = "Track paintings registered to events",
+                            icon = Icons.Default.Event,
+                            onClick = {
+                               //TODO: add this route
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = { viewModel.logout() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.Logout,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Log Out")
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+
+                is DataResult.Loading -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularLoading()
                     }
                 }
 
-                is DataResult.Loading -> CircularLoading()
-
                 is DataResult.Error -> {
-                    Text("Failed to load profile")
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Failed to load profile",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
 
-                DataResult.Idle -> {  }
+                DataResult.Idle -> { }
             }
         }
     }
