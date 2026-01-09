@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.EventPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.UploadPaintingRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetDetailPaintingDto
@@ -24,10 +25,11 @@ class SupabasePaintingService @Inject constructor(
             .select {
                 filter {
                     eq("status", "accepted")
-                    neq("user_id", user.id)
+                    neq("artist_user_id", user.id)
                 }
             }
             .decodeList<EventPaintingDto>()
+        Log.d("PaintingService", "getPaintings: $result")
         return result
     }
 

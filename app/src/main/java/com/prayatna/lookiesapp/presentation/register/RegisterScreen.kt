@@ -9,14 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -41,34 +44,32 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    val snackBarHostState = remember { SnackbarHostState() }
     val registerStatus = viewModel.registerStatus.collectAsStateWithLifecycle()
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isErrorDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
 
-                is RegisterEvent.ShowSnackbar -> {
-                    snackBarHostState.showSnackbar(
-                        message = event.message,
-                        duration = SnackbarDuration.Long,
-                        withDismissAction = true
-                    )
+                is RegisterEvent.ShowSuccessDialog -> {
+                    dialogMessage = event.message
+                    isErrorDialog = false
+                    showDialog = true
                 }
 
-                RegisterEvent.NavigateToLogin -> {
-                    navController.navigate(NavigationRoutes.LOGIN) {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
-                    }
+                is RegisterEvent.ShowErrorDialog -> {
+                    dialogMessage = event.message
+                    isErrorDialog = true
+                    showDialog = true
                 }
             }
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) }
-    ) { padding -> padding.calculateTopPadding()
+    Scaffold { padding -> padding.calculateTopPadding()
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -119,6 +120,35 @@ fun RegisterScreen(
                 passwordValue = viewModel.passwordValue,
                 onEmailChange = viewModel::onEmailChange,
                 onPasswordChange = viewModel::onPasswordChange
+            )
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                containerColor = MaterialTheme.colorScheme.primary,
+                shape = MaterialTheme.shapes.medium,
+                textContentColor = MaterialTheme.colorScheme.onPrimary,
+                onDismissRequest = {},
+                title = {
+                    Text(if (isErrorDialog) "Error" else "Success",
+                        color = MaterialTheme.colorScheme.onPrimary)
+                },
+                text = {
+                    Text(dialogMessage, color = MaterialTheme.colorScheme.onPrimary)
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDialog = false
+                        if (!isErrorDialog) {
+                            navController.navigate(NavigationRoutes.LOGIN) {
+                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
+                    }) {
+                        Text("OK", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                }
             )
         }
 

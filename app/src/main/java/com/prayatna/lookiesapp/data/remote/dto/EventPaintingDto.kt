@@ -9,6 +9,12 @@ data class EventPaintingDto(
     @SerialName("id")
     val id: String,
 
+    @SerialName("artist_user_id")
+    val artistId: String,
+
+    @SerialName("event_id")
+    val eventId: String,
+
     @SerialName("final_price")
     val finalPrice: Double,
 

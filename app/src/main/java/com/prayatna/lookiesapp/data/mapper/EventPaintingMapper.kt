@@ -10,6 +10,8 @@ fun EventPaintingDto.toDomain(): EventPainting {
         status = this.status,
         createdAt = this.createdAt,
         painting = this.painting.toDomain(),
-        participant = this.participant.toDomain()
+        participant = this.participant.toDomain(),
+        artistId = this.artistId,
+        eventId = this.eventId
     )
 }

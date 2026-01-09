@@ -48,13 +48,12 @@ class RegisterViewModel @Inject constructor(
 
             when (val result = authRepository.signUp(emailValue, passwordValue)) {
                 is DataResult.Success -> {
-                    _events.emit(RegisterEvent.ShowSnackbar("Register success!"))
-                    _events.emit(RegisterEvent.NavigateToLogin)
+                    _events.emit(RegisterEvent.ShowSuccessDialog("Register success!"))
                     _registerStatus.value = DataResult.Success(result.data)
                 }
 
                 is DataResult.Error -> {
-                    _events.emit(RegisterEvent.ShowSnackbar(result.error))
+                    _events.emit(RegisterEvent.ShowErrorDialog(result.error))
                     _registerStatus.value = DataResult.Error(result.error)
                 }
                 else -> Unit

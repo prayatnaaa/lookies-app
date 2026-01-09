@@ -56,7 +56,4 @@ data class EventDto(
 
     @SerialName("event_format")
     val eventFormat: EventFormatDto,
-
-
-//    val stats: EventStatsDto
 )
