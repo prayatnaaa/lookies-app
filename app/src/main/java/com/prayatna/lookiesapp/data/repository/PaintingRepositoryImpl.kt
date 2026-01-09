@@ -44,6 +44,17 @@ class PaintingRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getEventPaintingDetail(id: String): DataResult<EventPainting> {
+        return try {
+            val response = paintingService.getEventPaintingDetail(id = id)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong!")
+        }
+    }
+
     override suspend fun getPaintingsByArtist(id: String?): DataResult<List<Painting>> {
         return try {
             val response = paintingService.getPaintingByArtistId(id)

@@ -154,7 +154,7 @@ fun HomeScreen(
 
                 items(state.eventPaintings) { painting ->
                     HomePaintingCard(data = painting, onClick = {
-                        navController.navigate("${NavigationRoutes.DETAIL_PAINTING}/${painting.painting.id}")
+                        navController.navigate("${NavigationRoutes.DETAIL_EVENT_PAINTING}/${painting.id}")
                     })
                 }
             }

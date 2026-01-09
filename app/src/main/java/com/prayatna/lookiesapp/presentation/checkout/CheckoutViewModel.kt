@@ -68,15 +68,15 @@ class CheckoutViewModel @Inject constructor(
     }
 
     private suspend fun handlePaintingFetch(id: String) {
-        when (val result = paintingRepository.getPaintingDetail(id.toInt())) {
+        when (val result = paintingRepository.getEventPaintingDetail(id)) {
             is DataResult.Success -> {
-                val painting = result.data
+                val data = result.data
                 val itemDisplay = CheckoutItemDisplay(
-                    id = painting.id.toString(),
-                    title = painting.title,
-                    subtitle = "by ${painting.artistName}",
-                    price = 0.9,
-                    imageUrl = painting.paintingUrl,
+                    id = data.id,
+                    title = data.painting.title,
+                    subtitle = "by ${data.participant.artist.fullName}",
+                    price = data.finalPrice,
+                    imageUrl = data.painting.paintingUrl,
                     type = "painting"
                 )
                 _uiState.update { it.copy(isLoading = false, itemToBuy = itemDisplay) }
@@ -129,9 +129,5 @@ class CheckoutViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun onCheckoutResultConsumed() {
-        _uiState.update { it.copy(checkoutSuccessData = null, errorMessage = null) }
     }
 }

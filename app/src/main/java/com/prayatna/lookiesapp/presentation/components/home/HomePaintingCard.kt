@@ -58,7 +58,7 @@ fun HomePaintingCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formatRupiah(data.painting.price),
+                    text = formatRupiah(data.finalPrice),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
@@ -69,7 +69,7 @@ fun HomePaintingCard(
                         Color.Gray))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = data.painting.artistId,
+                        text = data.participant.artist.username.toString(),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1

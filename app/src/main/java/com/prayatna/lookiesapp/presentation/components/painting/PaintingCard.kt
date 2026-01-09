@@ -28,13 +28,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.utils.Constants
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
 fun PaintingCard(
     modifier: Modifier = Modifier,
     paintingUrl: String,
     name: String,
-    price: Number? = null,
+    price: Double? = null,
     isSelected: Boolean = false,
     onClick: () -> Unit,
 ) {
@@ -85,7 +86,7 @@ fun PaintingCard(
                     )
                     price?.let {
                         Text(
-                            text = "Rp. $it",
+                            text = formatRupiah(it),
                             color = Color.White,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium

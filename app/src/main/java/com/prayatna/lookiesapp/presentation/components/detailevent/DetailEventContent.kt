@@ -222,7 +222,7 @@ fun DetailEventContent(
                                 paintingUrl = painting.painting.paintingUrl,
                                 name = painting.painting.title,
                                 price = painting.finalPrice,
-                                onClick = { onPaintingClick(painting.painting.id.toString()) }
+                                onClick = { onPaintingClick(painting.id) }
                             )
                         }
                     }

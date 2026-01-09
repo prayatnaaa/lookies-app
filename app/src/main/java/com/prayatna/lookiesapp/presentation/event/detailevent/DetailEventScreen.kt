@@ -90,6 +90,10 @@ fun DetailEventScreen(
                         DetailEventContent(
                             isUserArtist = role == "artist",
                             paintings = paintings,
+                            onPaintingClick = { id ->
+                                navController
+                                    .navigate("${NavigationRoutes.DETAIL_EVENT_PAINTING}/$id")
+                            },
                             event = detailEvent ?: detailEventState.info!!,
                             modifier = Modifier.padding(innerPadding)
                         )
