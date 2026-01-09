@@ -24,9 +24,19 @@ class PaintingRepositoryImpl @Inject constructor(
     private val paintingService: SupabasePaintingService,
     @ApplicationContext private val context: Context
 ): PaintingRepository {
-    override suspend fun getPaintings(): DataResult<List<EventPainting>> {
+    override suspend fun getPaintings(
+        id: String?,
+        status: String?,
+        eventId: String?,
+        showSelfPaintings: Boolean
+    ): DataResult<List<EventPainting>> {
         return try {
-            val response = paintingService.getPaintings()
+            val response = paintingService.getPaintings(
+                id = id,
+                status = status,
+                eventId = eventId,
+                showSelfPaintings = showSelfPaintings
+            )
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             Log.e("PaintingService", e.message.toString())

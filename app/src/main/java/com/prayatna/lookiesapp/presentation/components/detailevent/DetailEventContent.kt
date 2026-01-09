@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.event.Event
-import com.prayatna.lookiesapp.domain.model.painting.Painting
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.presentation.components.painting.PaintingCard
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.DateHelper
@@ -41,7 +41,7 @@ import com.prayatna.lookiesapp.utils.Helper
 fun DetailEventContent(
     modifier: Modifier = Modifier,
     event: Event,
-    paintings: List<Painting> = emptyList(),
+    paintings: List<EventPainting> = emptyList(),
     showStatus: Boolean = false,
     isUserArtist: Boolean = false,
     onPaintingClick: (String) -> Unit = {}
@@ -212,17 +212,17 @@ fun DetailEventContent(
                 if (paintings.isNotEmpty()) {
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(horizontal = 4.dp) // Slight padding to show scroll hint
+                        contentPadding = PaddingValues(horizontal = 4.dp)
                     ) {
                         items(paintings.take(5)) { painting ->
                             PaintingCard(
                                 modifier = Modifier
                                     .width(150.dp)
                                     .height(210.dp),
-                                paintingUrl = painting.paintingUrl,
-                                name = painting.title,
-                                price = painting.price,
-                                onClick = { onPaintingClick(painting.id.toString()) }
+                                paintingUrl = painting.painting.paintingUrl,
+                                name = painting.painting.title,
+                                price = painting.finalPrice,
+                                onClick = { onPaintingClick(painting.painting.id.toString()) }
                             )
                         }
                     }

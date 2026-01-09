@@ -9,7 +9,12 @@ import com.prayatna.lookiesapp.domain.model.painting.PaintingAttribute
 import com.prayatna.lookiesapp.utils.DataResult
 
 interface PaintingRepository {
-    suspend fun getPaintings(): DataResult<List<EventPainting>>
+    suspend fun getPaintings(
+        id: String?,
+        status: String?,
+        eventId: String?,
+        showSelfPaintings: Boolean = false
+    ): DataResult<List<EventPainting>>
     suspend fun getPaintingsByArtist(id: String?): DataResult<List<Painting>>
     suspend fun getPaintingDetail(id: Int): DataResult<DetailPainting>
     suspend fun uploadPainting(painting: AddPaintingParams, image: Uri): DataResult<Painting>

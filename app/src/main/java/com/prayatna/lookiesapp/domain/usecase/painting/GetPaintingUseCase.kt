@@ -8,7 +8,17 @@ import javax.inject.Inject
 class GetPaintingUseCase @Inject constructor(
     private val paintingRepository: PaintingRepository
 ) {
-    suspend operator fun invoke(): DataResult<List<EventPainting>> {
-        return paintingRepository.getPaintings()
+    suspend operator fun invoke(
+        id: String? = null,
+        status: String? = null,
+        eventId: String? = null,
+        showSelfPaintings: Boolean = false
+    ): DataResult<List<EventPainting>> {
+        return paintingRepository.getPaintings(
+            id = id,
+            status = status,
+            eventId = eventId,
+            showSelfPaintings = showSelfPaintings
+        )
     }
 }

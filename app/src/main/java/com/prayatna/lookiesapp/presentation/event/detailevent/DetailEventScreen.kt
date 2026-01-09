@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -44,6 +43,7 @@ fun DetailEventScreen(
 
     LaunchedEffect(eventId) {
         viewModel.getEvent(eventId)
+        viewModel.getEventPaintings(eventId)
     }
 
     Scaffold (
@@ -85,31 +85,28 @@ fun DetailEventScreen(
                             }
                     }
                     detailEventState.info != null -> {
-                        detailEventState.info?.let { data ->
-                                DetailEventContent(
-                                    isUserArtist = role == "artist",
-                                    paintings = emptyList(),
-                                    event = data,
-                                    modifier = Modifier
-                                        .padding(innerPadding)
-                                )
-                        }
+                        val detailEvent = detailEventState.info
+                        val paintings = detailEventState.paintings
+                        DetailEventContent(
+                            isUserArtist = role == "artist",
+                            paintings = paintings,
+                            event = detailEvent ?: detailEventState.info!!,
+                            modifier = Modifier.padding(innerPadding)
+                        )
                     }
-                    detailEventState.errorMessage != null -> {
+
+                    detailEventState.detailEventError != null -> {
                             Box(
                                 modifier = modifier
                                     .padding(16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = detailEventState.errorMessage
+                                    text = detailEventState.detailEventError
                                         ?: "Unknown error occurred.",
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Button(onClick = { viewModel.retry(eventId) }) {
-                                    Text("Retry")
-                                }
                             }
 
                     }

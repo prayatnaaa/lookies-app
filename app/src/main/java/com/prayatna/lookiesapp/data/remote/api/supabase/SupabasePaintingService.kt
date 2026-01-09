@@ -18,14 +18,30 @@ class SupabasePaintingService @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage,
 ) {
-    suspend fun getPaintings(): List<EventPaintingDto> {
+    suspend fun getPaintings(
+        id: String?,
+        status: String?,
+        eventId: String?,
+        showSelfPaintings: Boolean = false
+    ): List<EventPaintingDto> {
         val user = auth.currentUserOrNull() ?:
         throw IllegalStateException("User not logged in")
         val result = postgrest.from("event_paintings_view")
             .select {
                 filter {
+                    if (eventId != null) {
+                        eq("event_id", eventId)
+                    }
+                    if (status != null) {
+                        eq("status", status)
+                    }
+                    if (id != null) {
+                        eq("id", id)
+                    }
                     eq("status", "accepted")
-                    neq("artist_user_id", user.id)
+                    if (!showSelfPaintings) {
+                        neq("artist_user_id", user.id)
+                    }
                 }
             }
             .decodeList<EventPaintingDto>()

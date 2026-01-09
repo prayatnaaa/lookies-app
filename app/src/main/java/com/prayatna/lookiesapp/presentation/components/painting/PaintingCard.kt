@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun PaintingCard(
@@ -38,7 +41,10 @@ fun PaintingCard(
     val highlightColor = MaterialTheme.colorScheme.primary
 
     ElevatedCard(
-        shape = RoundedCornerShape(4.dp),
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         modifier = modifier
             .fillMaxWidth()
             .then(
@@ -51,7 +57,8 @@ fun PaintingCard(
             AsyncImage(
                 model = paintingUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
                 contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxSize(),
                 contentScale = ContentScale.FillWidth
             )
 
