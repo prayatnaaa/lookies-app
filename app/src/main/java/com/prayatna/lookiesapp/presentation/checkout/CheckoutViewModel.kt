@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.checkout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
@@ -89,9 +90,7 @@ class CheckoutViewModel @Inject constructor(
     }
 
     fun createCheckout(
-        totalAmount: Double,
-        type: String,
-        description: String?,
+        items: List<OrderItemInput>
     ) {
         viewModelScope.launch {
             val currentItem = _uiState.value.itemToBuy
@@ -103,12 +102,8 @@ class CheckoutViewModel @Inject constructor(
 
             _uiState.update { it.copy(isLoading = true, errorMessage = null, checkoutSuccessData = null) }
 
-
             val result = transactionRepository.createOrder(
-                totalAmount = totalAmount,
-                orderType = type,
-                description = description,
-                transactionType = type
+                items = items
             )
 
             _uiState.update { currentState ->
@@ -128,6 +123,15 @@ class CheckoutViewModel @Inject constructor(
                     else -> currentState.copy(isLoading = false)
                 }
             }
+        }
+    }
+
+    fun onCheckoutResultConsumed() {
+        _uiState.update {
+            it.copy(
+                errorMessage = null,
+                checkoutSuccessData = null
+            )
         }
     }
 }

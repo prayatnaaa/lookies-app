@@ -1,9 +1,8 @@
 package com.prayatna.lookiesapp.data.repository
 
-import android.util.Log
-import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseTransactionService
-import com.prayatna.lookiesapp.domain.model.transaction.CheckoutOutput
+import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.RestException
@@ -13,24 +12,17 @@ class TransactionRepositoryImpl @Inject constructor(
     private val transactionService: SupabaseTransactionService
 ) : TransactionRepository {
     override suspend fun createOrder(
-        userId: String?,
-        totalAmount: Double,
-        orderType: String,
-        description: String?,
-        transactionType: String
-    ): DataResult<CheckoutOutput> {
+        items: List<OrderItemInput>
+    ): DataResult<Long> {
         return try {
             val response = transactionService.createOrder(
-                userId = userId,
-                totalAmount = totalAmount,
-                orderType = orderType,
-                description = description,
-                transactionType = transactionType
+                items = items.map { it.toDto() },
             )
-            DataResult.Success(response.toDomain())
+            DataResult.Success(response)
         } catch (e: RestException) {
-            Log.d("TransactionService", "Error: ${e.message}")
-            DataResult.Error(e.message ?: "Unknown error")
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
         }
     }
 }

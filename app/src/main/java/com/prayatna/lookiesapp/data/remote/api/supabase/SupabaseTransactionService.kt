@@ -1,8 +1,8 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
-import com.prayatna.lookiesapp.data.remote.dto.request.transaction.CreateOrderRequest
-import com.prayatna.lookiesapp.data.remote.dto.response.transaction.CheckoutResponse
+import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
+import com.prayatna.lookiesapp.data.remote.dto.request.order.OrderItemRequest
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.rpc
@@ -14,31 +14,25 @@ class SupabaseTransactionService @Inject constructor(
 ) {
 
     suspend fun createOrder(
-        userId: String? = null,
-        totalAmount: Double,
-        orderType: String,
-        description: String? = null,
-        transactionType: String
-    ): CheckoutResponse {
+        items: List<OrderItemRequest>
+    ): Long {
 
-        val finalId = userId ?: auth.currentUserOrNull()?.id
-        ?: throw IllegalStateException("User not authenticated")
+        val userId = auth.currentUserOrNull()?.id
+            ?: throw IllegalStateException("User not authenticated")
 
-        val params = CreateOrderRequest(
-            userId = finalId,
-            totalAmount = totalAmount,
-            orderType = orderType,
-            description = description,
-            transactionType = transactionType
+        val params = CreateOrderRpcParams(
+            buyerId = userId,
+            items = items
         )
 
-        val response = postgrest.rpc(
-            function = "checkout_order",
+        val orderId = postgrest.rpc(
+            function = "create_order_with_items",
             parameters = params
-        ).decodeAs<CheckoutResponse>()
+        ).decodeAs<Long>()
 
-        Log.d("TransactionService", "Response: $response")
+        Log.d("OrderService", "Order created with ID: $orderId")
 
-        return response
+        return orderId
     }
+
 }
