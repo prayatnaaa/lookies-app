@@ -48,7 +48,7 @@ import com.prayatna.lookiesapp.presentation.main.home.HomeScreen
 import com.prayatna.lookiesapp.presentation.main.inbox.InboxScreen
 import com.prayatna.lookiesapp.presentation.main.profile.ProfileScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
-import com.prayatna.lookiesapp.presentation.main.transaction.StarredScreen
+import com.prayatna.lookiesapp.presentation.main.transactionList.TransactionListScreen
 import com.prayatna.lookiesapp.utils.BottomNavItem
 
 @Composable
@@ -108,7 +108,7 @@ fun Content(modifier: Modifier = Modifier,
         }
 
         composable(BottomNavItem.Transaction.route) {
-            StarredScreen()
+            TransactionListScreen(navController = navHostController)
         }
 
         composable(BottomNavItem.Profile.route) {

@@ -1,0 +1,17 @@
+package com.prayatna.lookiesapp.data.remote.dto
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class PaymentInfoDto(
+    @SerialName("payment_id")
+    val paymentId: String,
+
+    @SerialName("invoice_id")
+    val invoiceId: String,
+
+    val status: String,
+
+    val provider: String
+)

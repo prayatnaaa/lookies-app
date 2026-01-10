@@ -1,8 +1,10 @@
 package com.prayatna.lookiesapp.data.repository
 
+import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseTransactionService
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
+import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.RestException
@@ -23,6 +25,15 @@ class TransactionRepositoryImpl @Inject constructor(
             DataResult.Error(e.error)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
+
+    override suspend fun getUserTransactions(): DataResult<List<Transaction>> {
+        return try {
+            val response = transactionService.getUserTransactions()
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
         }
     }
 }
