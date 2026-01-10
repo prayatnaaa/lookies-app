@@ -5,7 +5,6 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.DefaultEventDto
 import com.prayatna.lookiesapp.data.remote.dto.DetailPartnerDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
-import com.prayatna.lookiesapp.data.remote.dto.EventPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.EventParticipantDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
@@ -120,8 +119,8 @@ class SupabasePartnerService @Inject constructor(
         return response
     }
 
-    suspend fun approvePainting(eventPaintingId: String): EventPaintingDto {
-        val result = postgrest
+    suspend fun approvePainting(eventPaintingId: String): String {
+        postgrest
             .from("event_paintings")
             .update(
                 mapOf(
@@ -129,80 +128,19 @@ class SupabasePartnerService @Inject constructor(
                     "updated_at" to "now()"
                 )
             ) {
-                select(
-                    columns = Columns.raw(
-                        """
-                id,
-                final_price,
-                status,
-                created_at,
-                paintings(
-                    id,
-                    title,
-                    description,
-                    price,
-                    painting_url,
-                    year_created,
-                    subject,
-                    dimension_height,
-                    dimension_width,
-                    created_at,
-                    medium_id,
-                    artist_id,
-                    painting_art_styles(
-                        id,
-                        name
-                    )
-                ),
-                event_participants(
-                    id,
-                    status,
-                    event:events(
-                        id,
-                        title,
-                        organizer_id,
-                        banner_image_url,
-                        start_date,
-                        end_date,
-                        about,
-                        location,
-                        location_url,
-                        max_participant,
-                        max_painting,
-                        max_painting_per_artist,
-                        status,
-                        ticket_price,
-                        registration_fee,
-                        event_type_id,
-                        event_format_id,
-                        created_at,
-                        updated_at
-                    ),
-                    artist:user_profiles(
-                        user_id,
-                        full_name,
-                        bio,
-                        address,
-                        username,
-                        profile_picture_url,
-                        has_partner_sub,
-                        is_artist
-                    )
-                )
-                """.trimIndent()
-                    )
-                )
                 filter {
                     eq("id", eventPaintingId)
-                    eq("status", "pending")
+                    or {
+                        eq("status", "pending")
+                        eq("status", "rejected")
+                    }
                 }
-            }.decodeSingle<EventPaintingDto>()
-        Log.d("ApprovePainting", result.toString())
-        return result
+            }
+        return "Painting approved"
     }
 
-    suspend fun rejectPainting(eventPaintingId: String): EventPaintingDto {
-        val result = postgrest
+    suspend fun rejectPainting(eventPaintingId: String): String {
+        postgrest
             .from("event_paintings")
             .update(
                 mapOf(
@@ -210,74 +148,14 @@ class SupabasePartnerService @Inject constructor(
                     "updated_at" to "now()"
                 )
             ) {
-                select(
-                    columns = Columns.raw(
-                        """
-                id,
-                final_price,
-                status,
-                created_at,
-                paintings(
-                    id,
-                    title,
-                    description,
-                    price,
-                    painting_url,
-                    year_created,
-                    subject,
-                    dimension_height,
-                    dimension_width,
-                    created_at,
-                    medium_id,
-                    artist_id,
-                    painting_art_styles(
-                        id,
-                        name
-                    )
-                ),
-                event_participants(
-                    id,
-                    status,
-                    event:events(
-                        id,
-                        title,
-                        organizer_id,
-                        banner_image_url,
-                        start_date,
-                        end_date,
-                        about,
-                        location,
-                        location_url,
-                        max_participant,
-                        max_painting,
-                        max_painting_per_artist,
-                        status,
-                        ticket_price,
-                        registration_fee,
-                        event_type_id,
-                        event_format_id,
-                        created_at,
-                        updated_at
-                    ),
-                    artist:user_profiles(
-                        user_id,
-                        full_name,
-                        bio,
-                        address,
-                        username,
-                        profile_picture_url,
-                        has_partner_sub,
-                        is_artist
-                    )
-                )
-                """.trimIndent()
-                    )
-                )
                 filter {
                     eq("id", eventPaintingId)
-                    eq("status", "pending")
+                    or {
+                        eq("status", "pending")
+                        eq("status", "accepted")
+                    }
                 }
-            }.decodeSingle<EventPaintingDto>()
-        return result
+            }
+        return "Painting rejected"
     }
 }

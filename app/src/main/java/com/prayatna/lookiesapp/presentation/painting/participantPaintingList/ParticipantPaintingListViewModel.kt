@@ -67,8 +67,11 @@ class ParticipantPaintingListViewModel @Inject constructor(
                     _uiState.update { state ->
                         state.copy(
                             loadingPaintingId = null,
-                            eventPaintings = state.eventPaintings.map { painting ->
-                                if (painting.id == id) result.data else painting
+                            isSuccess = true,
+                            eventPaintings = state.eventPaintings.map {
+                                if (it.id == id) {
+                                    it.copy(status = "accepted")
+                                } else it
                             }
                         )
                     }
@@ -101,8 +104,11 @@ class ParticipantPaintingListViewModel @Inject constructor(
                     _uiState.update { state ->
                         state.copy(
                             loadingPaintingId = null,
-                            eventPaintings = state.eventPaintings.map { painting ->
-                                if (painting.id == id) result.data else painting
+                            isSuccess = true,
+                            eventPaintings = state.eventPaintings.map {
+                                if (it.id == id) {
+                                    it.copy(status = "rejected")
+                                } else it
                             }
                         )
                     }

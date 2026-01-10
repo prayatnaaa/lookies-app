@@ -5,7 +5,7 @@ data class CheckoutUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val itemToBuy: CheckoutItemDisplay? = null,
-    val checkoutSuccessData: Long? = null
+    val checkoutSuccessData: String? = null
 )
 
 data class CheckoutItemDisplay(

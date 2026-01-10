@@ -6,5 +6,5 @@ import com.prayatna.lookiesapp.utils.DataResult
 interface TransactionRepository {
     suspend fun createOrder(
         items: List<OrderItemInput>
-    ): DataResult<Long>
+    ): DataResult<String>
 }

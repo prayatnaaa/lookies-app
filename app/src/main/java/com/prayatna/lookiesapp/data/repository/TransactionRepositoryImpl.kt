@@ -13,7 +13,7 @@ class TransactionRepositoryImpl @Inject constructor(
 ) : TransactionRepository {
     override suspend fun createOrder(
         items: List<OrderItemInput>
-    ): DataResult<Long> {
+    ): DataResult<String> {
         return try {
             val response = transactionService.createOrder(
                 items = items.map { it.toDto() },

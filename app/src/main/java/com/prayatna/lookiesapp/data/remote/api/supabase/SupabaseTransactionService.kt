@@ -15,7 +15,7 @@ class SupabaseTransactionService @Inject constructor(
 
     suspend fun createOrder(
         items: List<OrderItemRequest>
-    ): Long {
+    ): String {
 
         val userId = auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not authenticated")
@@ -28,7 +28,7 @@ class SupabaseTransactionService @Inject constructor(
         val orderId = postgrest.rpc(
             function = "create_order_with_items",
             parameters = params
-        ).decodeAs<Long>()
+        ).decodeAs<String>()
 
         Log.d("OrderService", "Order created with ID: $orderId")
 
