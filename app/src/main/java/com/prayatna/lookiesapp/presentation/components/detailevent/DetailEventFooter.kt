@@ -58,21 +58,21 @@ fun DetailEventFooter(
                 }
             }
 
-            if (showBuyButton) {
-                Row(
-                    modifier = modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            Row(
+                modifier = modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-                    SeeArtsButton (
-                        modifier = modifier.weight(0.5f),
-                        onClick = onSeePaintingsClick
-                    )
+                SeeArtsButton (
+                    modifier = modifier.weight(0.5f),
+                    onClick = onSeePaintingsClick
+                )
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
+                if (showBuyButton) {
                     BuyButton(
                         modifier = modifier.weight(0.5f),
                         onClick = onBuyButtonClick

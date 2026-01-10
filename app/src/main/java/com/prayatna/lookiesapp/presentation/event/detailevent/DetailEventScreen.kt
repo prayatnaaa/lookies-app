@@ -49,23 +49,25 @@ fun DetailEventScreen(
     Scaffold (
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            DetailEventFooter(
-                onSeePaintingsClick = {},
-                showRegisterButton = role == "artist",
-                showBuyButton = role != "partner",
-                onRegisterButtonClick = {
-                    if (detailEventState.info != null)
-                    navController
-                        .navigate(
-                            "${
-                                NavigationRoutes.REGISTER_EVENT
-                            }/${eventId}/${detailEventState.info?.maxPaintingPerArtist}"
-                        )
-                },
-                onBuyButtonClick = {
-                    isSheetOpen = true
-                },
-            )
+            if (detailEventState.info != null) {
+                DetailEventFooter(
+                    onSeePaintingsClick = {},
+                    showRegisterButton = role == "artist",
+                    showBuyButton = role != "partner"
+                            && detailEventState.info?.eventFormat?.slug != "online",
+                    onRegisterButtonClick = {
+                            navController
+                                .navigate(
+                                    "${
+                                        NavigationRoutes.REGISTER_EVENT
+                                    }/${eventId}/${detailEventState.info?.maxPaintingPerArtist}"
+                                )
+                    },
+                    onBuyButtonClick = {
+                        isSheetOpen = true
+                    },
+                )
+            }
         },
         topBar = {
             BackTopBar(
