@@ -11,6 +11,7 @@ import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.partner.DetailPartner
 import com.prayatna.lookiesapp.domain.model.partner.Partner
+import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
@@ -97,11 +98,18 @@ class PartnerRepositoryImpl @Inject constructor(
     override suspend fun rejectPainting(id: String): DataResult<String> {
         return try {
             val response = supabasePartnerService.rejectPainting(eventPaintingId = id)
-            Log.d("RejectPainting", response)
             DataResult.Success(response)
         } catch (e: RestException) {
-            Log.d("RejectPainting", e.error)
             DataResult.Error(e.message.toString())
+        }
+    }
+
+    override suspend fun getDashboardSummary(): DataResult<PartnerDashboard> {
+        return try {
+            val result = supabasePartnerService.getDashboardSummary()
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
         }
     }
 }

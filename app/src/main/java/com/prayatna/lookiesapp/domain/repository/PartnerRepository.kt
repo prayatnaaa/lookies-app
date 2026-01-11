@@ -6,6 +6,7 @@ import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.partner.DetailPartner
 import com.prayatna.lookiesapp.domain.model.partner.Partner
+import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
@@ -17,4 +18,5 @@ interface PartnerRepository {
     suspend fun getParticipantList(eventId: String?): DataResult<List<EventParticipant>>
     suspend fun approvePainting(id: String): DataResult<String>
     suspend fun rejectPainting(id: String): DataResult<String>
+    suspend fun getDashboardSummary(): DataResult<PartnerDashboard>
 }

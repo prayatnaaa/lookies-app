@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.event.Event
-import com.prayatna.lookiesapp.utils.Helper
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
 fun EventCard(
@@ -76,7 +76,7 @@ fun EventCard(
                     if (showTicketPrice) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = Helper.formatIdr(event.ticketPrice.toString()),
+                            text = formatRupiah(event.ticketPrice ?: 0.0),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

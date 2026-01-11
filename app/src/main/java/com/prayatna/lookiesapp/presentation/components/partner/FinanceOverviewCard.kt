@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowUp
+import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -19,7 +20,8 @@ import com.prayatna.lookiesapp.utils.Constants
 @Composable
 fun FinancialOverviewCard(
     totalRevenue: String,
-    salesGrowth: String
+    salesGrowth: String,
+    pendingPayout: String? = null
 ) {
     Card(
         shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
@@ -65,6 +67,17 @@ fun FinancialOverviewCard(
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
+                if (pendingPayout != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Pending, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.Gray)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Pending Payout: $pendingPayout", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                    }
+                } else {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 

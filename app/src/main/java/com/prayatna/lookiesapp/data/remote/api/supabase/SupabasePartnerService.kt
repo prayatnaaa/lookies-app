@@ -6,6 +6,7 @@ import com.prayatna.lookiesapp.data.remote.dto.DefaultEventDto
 import com.prayatna.lookiesapp.data.remote.dto.DetailPartnerDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventParticipantDto
+import com.prayatna.lookiesapp.data.remote.dto.PartnerDashboardDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
 import com.prayatna.lookiesapp.utils.Helper
@@ -157,5 +158,26 @@ class SupabasePartnerService @Inject constructor(
                 }
             }
         return "Painting rejected"
+    }
+
+    suspend fun getDashboardSummary(): PartnerDashboardDto {
+        val userId = auth.currentUserOrNull()?.id
+            ?: throw Exception("user not logged in")
+        return postgrest.from("partner_dashboard_summary_view")
+            .select {
+                filter {
+                    eq("partner_id", userId)
+                }
+            }
+            .decodeSingleOrNull<PartnerDashboardDto>()
+            ?: PartnerDashboardDto(
+                partnerId = userId,
+                partnerName = null,
+                totalEventsCreated = 0,
+                activeEvents = 0,
+                totalTicketsSold = 0,
+                totalRevenue = 0.0,
+                pendingPayout = 0.0
+            )
     }
 }

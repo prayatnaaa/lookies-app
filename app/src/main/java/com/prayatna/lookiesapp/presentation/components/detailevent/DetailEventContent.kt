@@ -35,7 +35,7 @@ import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.presentation.components.painting.PaintingCard
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.DateHelper
-import com.prayatna.lookiesapp.utils.Helper
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
 fun DetailEventContent(
@@ -232,20 +232,14 @@ fun DetailEventContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // --- 6. VISITOR TICKET INFO (Visible to All) ---
-                // Info tiket pengunjung dipisah agar visitor langsung lihat ini
                 if (event.ticketPrice != null) {
                     val ticketLabel = if (isOnlineEvent) "Digital Access Fee" else "Visitor Ticket"
-                    val ticketValue = if (event.ticketPrice == 0.0) "Free Entry" else Helper.formatIdr(event.ticketPrice.toString())
+                    val ticketValue = if (event.ticketPrice == 0.0) "Free Entry" else formatRupiah(event.ticketPrice)
 
                     TicketInfoCard(label = ticketLabel, value = ticketValue)
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
-                // ================================================================
-                // --- 7. ARTIST ZONE (RESTRICTED AREA) ---
-                // Hanya muncul jika user adalah Artist. Visitor tidak melihat ini.
-                // ================================================================
                 if (isUserArtist) {
                     ArtistRestrictedSection(
                         event = event,
@@ -308,7 +302,6 @@ fun ArtistRestrictedSection(
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                // 1. Total Capacity (Kapasitas Gedung/Event) - Artis perlu tahu
                 CompactInfoCard(
                     title = "Max Paintings",
                     value = event.maxPainting.toString(),
@@ -316,7 +309,6 @@ fun ArtistRestrictedSection(
                     modifier = Modifier.weight(1f)
                 )
 
-                // 2. Max Artists (Jika Group)
                 if (!isSelfExhibition) {
                     CompactInfoCard(
                         title = "Max Artists",
@@ -327,7 +319,6 @@ fun ArtistRestrictedSection(
                 }
             }
 
-            // 3. Limit per Artist (Jika Group)
             if (!isSelfExhibition) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -337,7 +328,6 @@ fun ArtistRestrictedSection(
                 )
             }
 
-            // --- REGISTRATION FEE INFO ---
             if (!isSelfExhibition && event.artistRegistrationFee != null) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -347,7 +337,7 @@ fun ArtistRestrictedSection(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                val feeValue = if (event.artistRegistrationFee == 0.0) "Free" else Helper.formatIdr(event.artistRegistrationFee.toString())
+                val feeValue = if (event.artistRegistrationFee == 0.0) "Free" else formatRupiah(event.artistRegistrationFee)
 
                 Row(
                     modifier = Modifier

@@ -15,7 +15,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.presentation.components.CustomTextField
-import com.prayatna.lookiesapp.utils.Helper
 
 @Composable
 fun PricingForm(
@@ -43,7 +42,7 @@ fun PricingForm(
 
         if (!isOnlineEvent) {
             CustomTextField(
-                value = Helper.formatIdr(ticketPrice ?: ""),
+                value = ticketPrice ?: "",
                 onValueChange = { input ->
                     val digitsOnly = input.filter { it.isDigit() }
                     onTicketPriceChange(digitsOnly)
@@ -64,7 +63,7 @@ fun PricingForm(
             if (!isOnlineEvent) Spacer(modifier = Modifier.height(12.dp))
 
             CustomTextField(
-                value = Helper.formatIdr(artistRegistrationFee ?: ""),
+                value = artistRegistrationFee ?: "",
                 onValueChange = { input ->
                     val digitsOnly = input.filter { it.isDigit() }
                     onArtistRegistrationFeeChange(digitsOnly)
