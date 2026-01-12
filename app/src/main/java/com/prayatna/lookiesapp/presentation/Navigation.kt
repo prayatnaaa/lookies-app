@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
+import com.prayatna.lookiesapp.presentation.artistDashboard.ArtistDashboardScreen
 import com.prayatna.lookiesapp.presentation.checkout.CheckoutScreen
 import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
@@ -219,6 +220,11 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             backStackEntry.arguments?.getString("eventId")?.let { eventId ->
                 ParticipantListScreen(eventId = eventId, navController = navController)
             }
+        }
+        composable(
+            route = NavigationRoutes.ARTIST_DASHBOARD
+        ) {
+            ArtistDashboardScreen(navController = navController)
         }
         composable(
             route = "${NavigationRoutes.DETAIL_PARTNER}/{partnerId}",

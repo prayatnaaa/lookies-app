@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.SavedSearch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -104,7 +105,6 @@ fun ProfileScreen(
                 is DataResult.Success -> {
                     val profile = (profileState as DataResult.Success).data
 
-                    // --- Profile Header ---
                     ProfileCard(
                         username = profile.username ?: "Unknown",
                         onEditProfileClick = {
@@ -114,7 +114,6 @@ fun ProfileScreen(
 
                     Spacer(Modifier.height(24.dp))
 
-                    // --- Settings Section Header ---
                     Text(
                         text = "Dashboard",
                         style = MaterialTheme.typography.titleMedium,
@@ -124,7 +123,6 @@ fun ProfileScreen(
                             .padding(bottom = 8.dp, start = 4.dp)
                     )
 
-                    // --- 1. Partner Menu ---
                     if (profile.hasPartnerSub == false) {
                         SettingsSection(
                             title = "Become a Partner",
@@ -136,7 +134,6 @@ fun ProfileScreen(
                         )
                     }
 
-                    // --- 2. Arts Menu (Portfolio) ---
                     SettingsSection(
                         title = "My Artworks",
                         subtitle = if (profile.isArtist == true) "Manage your gallery portfolio" else "Start uploading your art",
@@ -157,6 +154,15 @@ fun ProfileScreen(
                             icon = Icons.Default.Event,
                             onClick = {
                                //TODO: add this route
+                            }
+                        )
+
+                        SettingsSection(
+                            title = "My Stats",
+                            subtitle = "See statistics",
+                            icon = Icons.Default.SavedSearch,
+                            onClick = {
+                                navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
                             }
                         )
                     }

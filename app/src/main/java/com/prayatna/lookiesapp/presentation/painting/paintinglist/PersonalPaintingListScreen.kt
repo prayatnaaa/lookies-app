@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.painting.PaintingCardList
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -34,6 +35,12 @@ fun PersonalPaintingListScreen(
     }
 
     Scaffold(
+        topBar = {
+            BackTopBar(
+                title = "My arts",
+                navController = navController
+            )
+        },
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             ElevatedButton(

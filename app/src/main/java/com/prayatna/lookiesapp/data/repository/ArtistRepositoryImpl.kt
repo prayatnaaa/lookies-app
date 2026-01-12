@@ -3,12 +3,17 @@ package com.prayatna.lookiesapp.data.repository
 import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseArtistService
+import com.prayatna.lookiesapp.data.remote.dto.ArtistDashboardDataDto
+import com.prayatna.lookiesapp.domain.model.artist.ArtistDashboardData
 import com.prayatna.lookiesapp.domain.model.artist.RegisterEventOutput
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class ArtistRepositoryImpl @Inject constructor(
@@ -35,6 +40,25 @@ class ArtistRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             Log.e("RegisterEvent", e.toString())
             DataResult.Error(e.error)
+        }
+    }
+
+    override fun getDashboardData(): Flow<DataResult<ArtistDashboardData>> {
+        return try {
+            combine(
+                supabaseArtistService.getDashboardSummary(),
+                supabaseArtistService.getMonthlySalesStream()
+            ) { summary, salesList ->
+
+                val data = ArtistDashboardDataDto(
+                    summary = summary,
+                    monthlySales = salesList.sortedByDescending { it.monthYear }.take(6)
+                )
+
+                DataResult.Success(data.toDomain())
+            }
+        } catch (e: RestException) {
+            flowOf(DataResult.Error(e.error))
         }
     }
 
