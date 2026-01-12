@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
 
 enum class EventStatus(val value: String) {
     PendingValidation("pending_validation"),
-    Approved("approved"),
+    Published("published"),
     Ongoing("ongoing"),
     Completed("completed"),
     Cancelled("cancelled"),
@@ -35,7 +35,7 @@ fun EventStatusText(
 
     val (text, color) = when (eventStatus) {
         EventStatus.PendingValidation -> "Pending" to Color(0xFFFFC107) // Amber
-        EventStatus.Approved -> "Approved" to Color(0xFF4CAF50) // Green
+        EventStatus.Published -> "Published" to Color(0xFF4CAF50) // Green
         EventStatus.Ongoing -> "Ongoing" to MaterialTheme.colorScheme.surface
         EventStatus.Completed -> "Completed" to Color(0xFF2196F3) // Blue
         EventStatus.Cancelled -> "Cancelled" to Color.Gray

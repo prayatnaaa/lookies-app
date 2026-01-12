@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.utils.DateHelper
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
@@ -68,7 +69,10 @@ fun EventCard(
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = event.startDate)
+                    Text(
+                        text = DateHelper.formatDate(event.startDate) + " - " +
+                            DateHelper.formatDate(event.endDate)
+                    )
 
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = event.location)
@@ -76,7 +80,11 @@ fun EventCard(
                     if (showTicketPrice) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = formatRupiah(event.ticketPrice ?: 0.0),
+                            text = if (event.ticketPrice == 0.0 || event.ticketPrice == null) {
+                                "Online"
+                            } else {
+                                formatRupiah(event.ticketPrice)
+                            },
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

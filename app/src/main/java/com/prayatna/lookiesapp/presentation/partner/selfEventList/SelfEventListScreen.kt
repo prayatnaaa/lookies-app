@@ -71,7 +71,7 @@ fun SelfEventListScreen(
                         events = uiState.events,
                         modifier = Modifier.fillMaxSize(),
                         onClick = { event ->
-                            if (event.status != "approved") {
+                            if (event.status != "published") {
                                 navController.navigate("${NavigationRoutes.EDIT_EVENT}/${event.id}")
                             } else {
                                 navController.navigate("${NavigationRoutes.PARTNER_EVENT_MANAGE}/${event.id}")

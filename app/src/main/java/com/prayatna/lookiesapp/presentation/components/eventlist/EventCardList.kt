@@ -15,7 +15,8 @@ fun EventCardList(
     events: List<Event>,
     modifier: Modifier = Modifier,
     onClick: (Event) -> Unit,
-    showStatus: Boolean = false
+    showStatus: Boolean = false,
+    showTicketPrice: Boolean = true
 ) {
     LazyColumn(
         modifier = modifier
@@ -25,6 +26,7 @@ fun EventCardList(
     ) {
         itemsIndexed(events) { _, event ->
             EventCard(
+                showTicketPrice = showTicketPrice,
                 showStatus = showStatus,
                 event = event,
                 onClick = { onClick(event) }

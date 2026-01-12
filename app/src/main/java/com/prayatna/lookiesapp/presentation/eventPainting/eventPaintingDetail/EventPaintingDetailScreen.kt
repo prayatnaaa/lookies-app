@@ -79,11 +79,6 @@ fun EventPaintingDetailScreen(
             BackTopBar(
                 navController = navController,
                 title = "Artwork Detail",
-//                actions = {
-//                    IconButton(onClick = { /* TODO: Implement Share */ }) {
-//                        Icon(Icons.Default.Share, contentDescription = "Share")
-//                    }
-//                }
             )
         },
         bottomBar = {
@@ -117,9 +112,6 @@ fun EventPaintingDetailScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                // ==========================================
-                // 1. HERO IMAGE SECTION
-                // ==========================================
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -131,10 +123,9 @@ fun EventPaintingDetailScreen(
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 300.dp, max = 550.dp) // Dynamic height
+                            .heightIn(min = 300.dp, max = 550.dp)
                     )
 
-                    // Zoom Hint
                     Icon(
                         imageVector = Icons.Default.ZoomInMap,
                         contentDescription = "Zoom",
@@ -149,9 +140,6 @@ fun EventPaintingDetailScreen(
 
                 Column(modifier = Modifier.padding(20.dp)) {
 
-                    // ==========================================
-                    // 2. TITLE & HEADER
-                    // ==========================================
                     Text(
                         text = painting.title,
                         style = MaterialTheme.typography.headlineMedium,
@@ -167,14 +155,10 @@ fun EventPaintingDetailScreen(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 20.dp))
 
-                    // ==========================================
-                    // 3. ARTIST PROFILE
-                    // ==========================================
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                // Navigasi ke profil Artist
                                 artist.id?.let {
                                     // navController.navigate(...)
                                 }
@@ -214,9 +198,6 @@ fun EventPaintingDetailScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // ==========================================
-                    // 4. EVENT ORIGIN & DEADLINE CARD (NEW)
-                    // ==========================================
                     EventOriginCard(
                         eventTitle = event.title,
                         organizerName = event.organizer.name,
@@ -230,9 +211,6 @@ fun EventPaintingDetailScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // ==========================================
-                    // 5. SPECIFICATIONS GRID
-                    // ==========================================
                     Text(
                         text = "Artwork Details",
                         style = MaterialTheme.typography.titleMedium,
@@ -247,7 +225,7 @@ fun EventPaintingDetailScreen(
                         SpecItem(
                             icon = Icons.Outlined.Brush,
                             label = "Medium",
-                            value = painting.medium, // String name from View JOIN
+                            value = painting.medium,
                             modifier = Modifier.weight(1f)
                         )
                         SpecItem(
@@ -260,7 +238,6 @@ fun EventPaintingDetailScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Tags Chips
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         painting.artStyle?.let { style ->
                             SuggestionChip(
@@ -292,9 +269,6 @@ fun EventPaintingDetailScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // ==========================================
-                    // 6. DESCRIPTION
-                    // ==========================================
                     Text(
                         text = "Description",
                         style = MaterialTheme.typography.titleMedium,
@@ -308,17 +282,12 @@ fun EventPaintingDetailScreen(
                         lineHeight = 24.sp
                     )
 
-                    // Space untuk menghindari tertutup bottom bar
                     Spacer(modifier = Modifier.height(100.dp))
                 }
             }
         }
     }
 }
-
-// ====================================================================
-//                          SUB - COMPONENTS
-// ====================================================================
 
 @Composable
 fun SpecItem(

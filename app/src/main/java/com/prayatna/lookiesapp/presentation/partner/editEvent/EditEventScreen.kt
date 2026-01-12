@@ -128,58 +128,72 @@ fun EditEventScreen(
                 )
             }
 
-            item {
-                EventLocationForm(
-                    locationName = formState.location,
-                    onLocationNameChange = {
-                        viewModel.onEvent(EditEventFormEvent.LocationChanged(it))
-                    },
-                    locationUrl = formState.locationUrl,
-                    onLocationUrlChange = {
-                        viewModel.onEvent(EditEventFormEvent.LocationUrlChanged(it))
-                    }
-                )
+            val selectedEventFormat =
+                formState.eventFormats.find { it.id.toString() == formState.eventFormat }
+            val isOnlineEvent = selectedEventFormat?.slug == "online"
+
+            if (!isOnlineEvent && selectedEventFormat?.slug != null) {
+                item {
+                    EventLocationForm(
+                        locationName = formState.location,
+                        onLocationNameChange = {
+                            viewModel.onEvent(EditEventFormEvent.LocationChanged(it))
+                        },
+                        locationUrl = formState.locationUrl,
+                        onLocationUrlChange = {
+                            viewModel.onEvent(EditEventFormEvent.LocationUrlChanged(it))
+                        }
+                    )
+                }
+            }
+            val selectedEventType =
+                formState.eventTypes.find { it.id.toString() == formState.eventType }
+
+            val isSelfExhibition = selectedEventType?.slug == "self_exhibition"
+
+            if (formState.eventType.isNotEmpty()) {
+                item {
+                    ParticipationRulesForm(
+                        isSelfExhibition = isSelfExhibition,
+                        maxParticipants = formState.maxParticipant,
+                        onMaxParticipantsChange = {
+                            viewModel.onEvent(EditEventFormEvent.MaxParticipantChanged(it))
+                        },
+                        maxPainting = formState.maxPainting,
+                        onMaxPaintingChange = {
+                            viewModel.onEvent(EditEventFormEvent.MaxPaintingChanged(it))
+                        },
+                        maxPaintingPerArtist = formState.maxPaintingPerArtist,
+                        onMaxPaintingPerArtistChange = {
+                            viewModel.onEvent(
+                                EditEventFormEvent.MaxPaintingPerArtistChanged(
+                                    it
+                                )
+                            )
+                        }
+                    )
+                }
             }
 
-            val isSelfExhibition = uiState.data?.eventFormat?.slug == "self_exhibition"
-
-            item {
-                ParticipationRulesForm(
-                    maxParticipants = formState.maxParticipant,
-                    onMaxParticipantsChange = {
-                        viewModel.onEvent(EditEventFormEvent.MaxParticipantChanged(it))
-                    },
-                    maxPainting = formState.maxPainting,
-                    onMaxPaintingChange = {
-                        viewModel.onEvent(EditEventFormEvent.MaxPaintingChanged(it))
-                    },
-                    maxPaintingPerArtist = formState.maxPaintingPerArtist,
-                    onMaxPaintingPerArtistChange = {
-                        viewModel.onEvent(
-                            EditEventFormEvent.MaxPaintingPerArtistChanged(it)
-                        )
-                    },
-                    isSelfExhibition = isSelfExhibition
-                )
-            }
-
-            val isOnline = uiState.data?.eventFormat?.slug == "online"
-
-            item {
-                PricingForm(
-                    ticketPrice = formState.ticketPrice,
-                    onTicketPriceChange = {
-                        viewModel.onEvent(EditEventFormEvent.TicketPriceChanged(it))
-                    },
-                    artistRegistrationFee = formState.artistRegistrationFee,
-                    onArtistRegistrationFeeChange = {
-                        viewModel.onEvent(
-                            EditEventFormEvent.ArtistRegistrationFeeChanged(it)
-                        )
-                    },
-                    isSelfExhibition = isSelfExhibition,
-                    isOnlineEvent = isOnline
-                )
+            if (formState.eventFormat.isNotEmpty()) {
+                item {
+                    PricingForm(
+                        isOnlineEvent = isOnlineEvent,
+                        isSelfExhibition = isSelfExhibition,
+                        ticketPrice = formState.ticketPrice,
+                        onTicketPriceChange = {
+                            viewModel.onEvent(EditEventFormEvent.TicketPriceChanged(it))
+                        },
+                        artistRegistrationFee = formState.artistRegistrationFee,
+                        onArtistRegistrationFeeChange = {
+                            viewModel.onEvent(
+                                EditEventFormEvent.ArtistRegistrationFeeChanged(
+                                    it
+                                )
+                            )
+                        }
+                    )
+                }
             }
 
             item {
