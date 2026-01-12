@@ -55,7 +55,6 @@ fun DetailEventContent(
             .background(MaterialTheme.colorScheme.background)
     ) {
         item {
-            // --- 1. HERO BANNER ---
             Box {
                 AsyncImage(
                     model = event.bannerImageUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
@@ -67,7 +66,6 @@ fun DetailEventContent(
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 )
 
-                // Status Chips Overlay
                 if (showStatus) {
                     Row(
                         modifier = Modifier
@@ -75,13 +73,11 @@ fun DetailEventContent(
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Status: Open/Closed
                         StatusChip(
                             label = event.status,
                             isOpen = event.status.equals("Open", true)
                         )
 
-                        // Format: Online/Offline
                         SuggestionChip(
                             onClick = {},
                             label = { Text(event.eventFormat.name) },
@@ -107,7 +103,6 @@ fun DetailEventContent(
                     .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
 
-                // --- 2. HEADER TITLE & ORGANIZER ---
                 Text(
                     text = event.title,
                     style = MaterialTheme.typography.headlineMedium.copy(
@@ -119,7 +114,6 @@ fun DetailEventContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Organizer Row (Refined UI)
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -157,10 +151,8 @@ fun DetailEventContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // --- 3. EVENT DETAILS (Date & Location) ---
                 Column(modifier = Modifier
                     .fillMaxSize()) {
-                    // Date
                     EventDetailItem(
                         icon = Icons.Default.DateRange,
                         label = "Date",
@@ -168,7 +160,6 @@ fun DetailEventContent(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    // Location
                     EventDetailItem(
                         icon = if (isOnlineEvent) Icons.Default.Videocam else Icons.Default.LocationOn,
                         label = if (isOnlineEvent) "This is" else "Location",
@@ -179,7 +170,6 @@ fun DetailEventContent(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 24.dp))
 
-                // --- 4. ABOUT SECTION ---
                 SectionTitle(title = "About Event")
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -191,7 +181,6 @@ fun DetailEventContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // --- 5. GALLERY SECTION (Visible to All) ---
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
