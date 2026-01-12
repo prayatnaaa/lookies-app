@@ -20,6 +20,7 @@ import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPainti
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
 import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListScreen
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
@@ -220,6 +221,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             backStackEntry.arguments?.getString("eventId")?.let { eventId ->
                 ParticipantListScreen(eventId = eventId, navController = navController)
             }
+        }
+        composable(route = NavigationRoutes.EVENT_PAINTING_LIST) {
+            EventPaintingListScreen(navController = navController)
         }
         composable(
             route = NavigationRoutes.ARTIST_DASHBOARD

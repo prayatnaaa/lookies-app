@@ -7,19 +7,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,14 +22,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.SearchBar
-import com.prayatna.lookiesapp.presentation.components.home.CategoryChip
 import com.prayatna.lookiesapp.presentation.components.home.FeaturedEventBanner
 import com.prayatna.lookiesapp.presentation.components.home.HomeEventCard
 import com.prayatna.lookiesapp.presentation.components.home.HomePaintingCard
@@ -49,11 +41,6 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-
-    val categories = remember {
-        listOf("All", "Abstract", "Realism", "Impressionism", "Surrealism", "Portrait")
-    }
-
     val featuredEvent = state.events.firstOrNull()
 
     Scaffold(
@@ -64,8 +51,6 @@ fun HomeScreen(
                 user?.let { data ->
                     HomeTopBar(
                         userName = data.username!!,
-                        onCartClick = { },
-                        onNotifClick = { }
                     )
                 }
             }
@@ -113,26 +98,12 @@ fun HomeScreen(
                     }
                 }
 
-                item(span = StaggeredGridItemSpan.FullLine) {
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp)
-                    ) {
-                        items(categories) { category ->
-                            CategoryChip(
-                                label = category,
-                                isSelected = category == "All"
-                            )
-                        }
-                    }
-                }
-
                 if (state.events.isNotEmpty()) {
                     item(span = StaggeredGridItemSpan.FullLine) {
                         Column {
-                            SectionHeader(title = "Events", onSeeAll = {})
+                            SectionHeader(title = "Events", onSeeAll = {
+                                navController.navigate(NavigationRoutes.EVENT_LIST)
+                            })
                             LazyRow(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                                 modifier = Modifier.fillMaxWidth()
@@ -167,8 +138,6 @@ fun HomeScreen(
 @Composable
 fun HomeTopBar(
     userName: String,
-    onCartClick: () -> Unit,
-    onNotifClick: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -185,14 +154,14 @@ fun HomeTopBar(
                 )
             }
         },
-        actions = {
-            IconButton(onClick = onNotifClick) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notification")
-            }
-            IconButton(onClick = onCartClick) {
-                Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
-            }
-        },
+//        actions = {
+//            IconButton(onClick = onNotifClick) {
+//                Icon(Icons.Default.Notifications, contentDescription = "Notification")
+//            }
+//            IconButton(onClick = onCartClick) {
+//                Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+//            }
+//        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
             scrolledContainerColor = MaterialTheme.colorScheme.surface

@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -24,6 +26,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -35,7 +38,9 @@ fun PaintingCard(
     modifier: Modifier = Modifier,
     paintingUrl: String,
     name: String,
+    artistName: String,
     price: Double? = null,
+    isSold: Boolean = false,
     isSelected: Boolean = false,
     onClick: () -> Unit,
 ) {
@@ -57,11 +62,37 @@ fun PaintingCard(
         Box {
             AsyncImage(
                 model = paintingUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
-                contentDescription = null,
+                contentDescription = name,
                 modifier = Modifier
                     .fillMaxSize(),
                 contentScale = ContentScale.FillWidth
             )
+
+            if (isSold) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.6f))
+                )
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .background(
+                            color = Color.Red.copy(alpha = 0.8f),
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "SOLD",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        letterSpacing = 1.sp
+                    )
+                }
+            }
 
             Box(
                 modifier = Modifier
@@ -71,7 +102,7 @@ fun PaintingCard(
                         Brush.verticalGradient(
                             colors = listOf(
                                 Color.Transparent,
-                                Color.Black.copy(alpha = 0.8f)
+                                Color.Black.copy(alpha = 0.9f)
                             )
                         )
                     )
@@ -82,14 +113,28 @@ fun PaintingCard(
                         text = name,
                         color = Color.White,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
+
+                    Text(
+                        text = artistName,
+                        color = Color.LightGray,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
                     price?.let {
                         Text(
                             text = formatRupiah(it),
-                            color = Color.White,
+                            color = if (isSold) Color.LightGray else MaterialTheme.colorScheme.primaryContainer,
                             fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -100,7 +145,7 @@ fun PaintingCard(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
-                        .background(Color.White, CircleShape) // Background putih biar icon jelas
+                        .background(Color.White, CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.CheckCircle,

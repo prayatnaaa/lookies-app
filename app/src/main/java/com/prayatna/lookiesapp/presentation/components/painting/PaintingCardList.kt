@@ -23,7 +23,8 @@ fun PaintingCardList(
             PaintingCard(
                 paintingUrl = paintings[painting].paintingUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
                 name = paintings[painting].title,
-                onClick = { onClick(paintings[painting].id) }
+                onClick = { onClick(paintings[painting].id) },
+                artistName = ""
             )
         }
     }

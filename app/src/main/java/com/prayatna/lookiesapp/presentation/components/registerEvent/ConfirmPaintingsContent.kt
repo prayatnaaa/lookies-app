@@ -49,7 +49,8 @@ fun ConfirmPaintingsContent(
                     paintingUrl = painting.paintingUrl,
                     name = painting.title,
                     price = painting.price,
-                    onClick = {}
+                    onClick = {},
+                    artistName = ""
                 )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(

@@ -211,7 +211,8 @@ fun DetailEventContent(
                                 paintingUrl = painting.painting.paintingUrl,
                                 name = painting.painting.title,
                                 price = painting.finalPrice,
-                                onClick = { onPaintingClick(painting.id) }
+                                onClick = { onPaintingClick(painting.id) },
+                                artistName = painting.participant.artist.fullName ?: "Unknown Artist"
                             )
                         }
                     }

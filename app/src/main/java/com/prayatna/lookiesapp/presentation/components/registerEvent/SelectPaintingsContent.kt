@@ -33,6 +33,7 @@ fun SelectPaintingContent(
                 name = painting.title,
                 price = painting.price,
                 isSelected = isSelected,
+                artistName = "",
                 onClick = {
                     if (isClickable) {
                         onEvent(RegisterEventEvent.TogglePainting(painting.id))

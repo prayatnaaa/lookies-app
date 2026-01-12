@@ -63,7 +63,7 @@ fun SearchScreen(navController: NavController) {
 
     val categories = listOf(
         SearchCategory("Events", Icons.Default.Event, NavigationRoutes.EVENT_LIST),
-        SearchCategory("Paintings", Icons.Default.Palette, null),
+        SearchCategory("Paintings", Icons.Default.Palette, NavigationRoutes.EVENT_PAINTING_LIST),
         SearchCategory("Artists", Icons.Default.Brush, null),
         SearchCategory("Partners", Icons.Default.Handshake, NavigationRoutes.PARTNER_LIST)
     )

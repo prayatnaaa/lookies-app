@@ -1,13 +1,18 @@
-package com.prayatna.lookiesapp.presentation.event.eventlist
+package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -31,34 +36,32 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
-import com.prayatna.lookiesapp.presentation.components.eventlist.EventCardList
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.utils.Constants
+import com.prayatna.lookiesapp.presentation.components.painting.PaintingCard
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
-fun EventListScreen(
+fun EventPaintingListScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    viewModel: EventListViewModel = hiltViewModel()
+    viewModel: PaintingListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.getEvents()
+        viewModel.getPaintings()
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
-        topBar = { BackTopBar(navController = navController, title = "Events") }
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = { BackTopBar(navController = navController, title = "Gallery") }
     ) { innerPadding ->
         Column(
             modifier = modifier
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            // --- SEARCH BAR SECTION ---
-            SearchBar(
+            PaintingSearchBar(
                 query = uiState.searchQuery,
                 onQueryChange = viewModel::onSearchQueryChange,
                 modifier = Modifier
@@ -66,7 +69,6 @@ fun EventListScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            // --- CONTENT SECTION ---
             Box(modifier = Modifier.fillMaxSize()) {
                 when {
                     uiState.isLoading -> {
@@ -74,25 +76,39 @@ fun EventListScreen(
                     }
 
                     uiState.errorMessage != null -> {
-                        ErrorState(
+                        ErrorView(
                             message = uiState.errorMessage ?: "Unknown error",
                             onRetry = { viewModel.retry() },
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
 
-                    uiState.filteredEvents.isNotEmpty() -> {
-                        EventCardList(
-                            events = uiState.filteredEvents,
-                            modifier = Modifier.fillMaxSize(),
-                            onClick = { event ->
-                                navController.navigate("${NavigationRoutes.DETAIL_EVENT}/${event.id}")
+                    uiState.filteredPaintings.isNotEmpty() -> {
+                        LazyVerticalStaggeredGrid(
+                            modifier = modifier,
+                            contentPadding = PaddingValues(16.dp),
+                            columns = StaggeredGridCells.Adaptive(200.dp),
+                            verticalItemSpacing = 4.dp,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            items(uiState.filteredPaintings.size) { item ->
+                                PaintingCard(
+                                    paintingUrl = uiState.filteredPaintings[item].painting.paintingUrl,
+                                    name = uiState.filteredPaintings[item].painting.title,
+                                    price = uiState.filteredPaintings[item].finalPrice,
+                                    artistName = uiState.filteredPaintings[item].participant.artist.fullName!!,
+                                    isSold = uiState.filteredPaintings[item].status.equals("sold", ignoreCase = true),
+                                    onClick = {
+                                        navController
+                                            .navigate("${NavigationRoutes.DETAIL_EVENT_PAINTING}/${uiState.filteredPaintings[item].id}")
+                                    }
+                                )
                             }
-                        )
+                        }
                     }
 
                     else -> {
-                        EmptyState(
+                        EmptyView(
                             query = uiState.searchQuery,
                             modifier = Modifier.align(Alignment.Center)
                         )
@@ -104,7 +120,7 @@ fun EventListScreen(
 }
 
 @Composable
-fun SearchBar(
+fun PaintingSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -113,22 +129,20 @@ fun SearchBar(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier,
-        placeholder = { Text("Search event or location...") },
-        leadingIcon = {
-            Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.Gray)
-        },
+        placeholder = { Text("Search artwork, artist...") },
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
         trailingIcon = {
             if (query.isNotEmpty()) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Clear",
-                    tint = Color.Gray,
-                    modifier = Modifier.clickable { onQueryChange("") }
+                    modifier = Modifier.clickable { onQueryChange("") },
+                    tint = Color.Gray
                 )
             }
         },
         singleLine = true,
-        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+        shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -139,21 +153,16 @@ fun SearchBar(
 }
 
 @Composable
-fun EmptyState(query: String, modifier: Modifier = Modifier) {
+fun EmptyView(query: String, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.padding(32.dp),
+        modifier = modifier.padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = Icons.Default.Search,
-            contentDescription = null,
-            modifier = Modifier.height(48.dp),
-            tint = Color.Gray
-        )
+        Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(48.dp))
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = if (query.isEmpty()) "No events available." else "No results found for \"$query\"",
-            style = MaterialTheme.typography.bodyLarge,
+            text = if (query.isEmpty()) "No artworks available yet." else "No artwork found for \"$query\"",
+            style = MaterialTheme.typography.bodyMedium,
             color = Color.Gray,
             textAlign = TextAlign.Center
         )
@@ -161,20 +170,9 @@ fun EmptyState(query: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.error,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = onRetry) {
-            Text("Retry")
-        }
+fun ErrorView(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = message, color = MaterialTheme.colorScheme.error)
+        Button(onClick = onRetry) { Text("Retry") }
     }
 }

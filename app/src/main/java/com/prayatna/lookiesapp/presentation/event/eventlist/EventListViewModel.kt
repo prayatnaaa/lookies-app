@@ -1,9 +1,7 @@
 package com.prayatna.lookiesapp.presentation.event.eventlist
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.usecase.event.GetEventsUseCase
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,15 +26,44 @@ class EventListViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             when (val result = getEventsUseCase()) {
-                is DataResult.Success -> _uiState.update {
-                    it.copy(isLoading = false, events = result.data, errorMessage = null)
+                is DataResult.Success -> {
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            events = result.data,
+                            filteredEvents = result.data,
+                            errorMessage = null
+                        )
+                    }
                 }
-                is DataResult.Error -> _uiState.update {
-                    it.copy(isLoading = false, errorMessage = result.error)
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
                 }
                 else -> _uiState.update { it.copy(isLoading = false) }
             }
         }
+    }
+
+    fun onSearchQueryChange(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
+        filterEvents(query)
+    }
+
+    private fun filterEvents(query: String) {
+        val currentEvents = _uiState.value.events
+
+        if (query.isBlank()) {
+            _uiState.update { it.copy(filteredEvents = currentEvents) }
+            return
+        }
+
+        val filtered = currentEvents.filter { event ->
+            event.title.contains(query, ignoreCase = true) ||
+                    event.location.contains(query, ignoreCase = true) ||
+                    event.organizer.name.contains(query, ignoreCase = true)
+        }
+
+        _uiState.update { it.copy(filteredEvents = filtered) }
     }
 
     fun retry() = getEvents(forceRefresh = true)
