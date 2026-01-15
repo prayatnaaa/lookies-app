@@ -50,7 +50,7 @@ fun HomeEventCard(event: Event,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = event.location,
+                    text = event.location ?: "Online",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

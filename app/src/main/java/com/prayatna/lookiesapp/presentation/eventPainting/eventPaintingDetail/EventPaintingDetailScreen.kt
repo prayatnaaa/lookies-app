@@ -167,7 +167,7 @@ fun EventPaintingDetailScreen(
                     ) {
                         AsyncImage(
                             model = artist.profileUrl?.replace("http://172.21.179.110", "http://10.0.2.2")
-                                ?: "https://ui-avatars.com/api/?name=${artist.fullName}",
+                                ?: "https://ui-avatars.com/api/?name=${artist.username}",
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier

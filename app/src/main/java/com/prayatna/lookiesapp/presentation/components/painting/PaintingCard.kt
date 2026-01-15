@@ -24,13 +24,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
@@ -38,7 +38,7 @@ fun PaintingCard(
     modifier: Modifier = Modifier,
     paintingUrl: String,
     name: String,
-    artistName: String,
+    artistName: String? = null,
     price: Double? = null,
     isSold: Boolean = false,
     isSelected: Boolean = false,
@@ -47,14 +47,14 @@ fun PaintingCard(
     val highlightColor = MaterialTheme.colorScheme.primary
 
     ElevatedCard(
-        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+        shape = RectangleShape,
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         modifier = modifier
             .fillMaxWidth()
             .then(
-                if (isSelected) Modifier.border(3.dp, highlightColor, RoundedCornerShape(4.dp))
+                if (isSelected) Modifier.border(3.dp, highlightColor)
                 else Modifier
             ),
         onClick = onClick
@@ -118,15 +118,16 @@ fun PaintingCard(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    Text(
-                        text = artistName,
-                        color = Color.LightGray,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
+                    if (artistName != null) {
+                        Text(
+                            text = artistName,
+                            color = Color.LightGray,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Normal,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                     Spacer(modifier = Modifier.height(4.dp))
 
                     price?.let {

@@ -85,15 +85,15 @@ fun ProfileScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
         modifier = Modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
 
+        innerPadding.calculateTopPadding()
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .padding(horizontal = 20.dp)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -106,6 +106,7 @@ fun ProfileScreen(
                     val profile = (profileState as DataResult.Success).data
 
                     ProfileCard(
+                        profileImageUrl = profile.profileUrl,
                         username = profile.username ?: "Unknown",
                         onEditProfileClick = {
                             navController.navigate("${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup=false")

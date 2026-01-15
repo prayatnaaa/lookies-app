@@ -114,14 +114,17 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 )
             }
         }
-        composable("${NavigationRoutes.CHECKOUT}/{type}/{id}",
-                arguments = listOf(
+        composable("${NavigationRoutes.CHECKOUT}/{type}/{id}/{quantity}",
+            arguments = listOf(
                 navArgument("type") { type = NavType.StringType },
-            navArgument("id") { type = NavType.StringType }
+                navArgument("id") { type = NavType.StringType },
+                navArgument("quantity") { type = NavType.IntType }
         )) { backStackEntry ->
             val type = backStackEntry.arguments?.getString("type") ?: ""
             val id = backStackEntry.arguments?.getString("id") ?: ""
+            val quantity = backStackEntry.arguments?.getInt("quantity") ?: 1
             CheckoutScreen(
+                quantity = quantity,
                 type = type,
                 itemId = id,
                 navController = navController
@@ -154,7 +157,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             CreateEventScreen(navController = navController)
         }
         composable(
-            route = "${NavigationRoutes.REGISTER_EVENT}/{eventId}/{maxPaintingPerArtist}",
+            route = "${NavigationRoutes.REGISTER_EVENT}/{eventId}?maxPaintingPerArtist={maxPaintingPerArtist}",
             arguments = listOf(
                 navArgument("eventId") { type = NavType.IntType },
                 navArgument("maxPaintingPerArtist") { type = NavType.IntType }

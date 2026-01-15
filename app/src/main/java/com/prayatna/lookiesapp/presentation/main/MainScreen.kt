@@ -131,19 +131,19 @@ fun BottomNavigationBar(
     )
 
     Column {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(8.dp)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.15f),
-                        )
-                    )
-                )
-        )
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(8.dp)
+//                .background(
+//                    brush = Brush.verticalGradient(
+//                        colors = listOf(
+//                            Color.Transparent,
+//                            Color.Black.copy(alpha = 0.15f),
+//                        )
+//                    )
+//                )
+//        )
 
         NavigationBar(
             modifier = Modifier

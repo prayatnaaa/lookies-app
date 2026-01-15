@@ -15,6 +15,7 @@ import com.prayatna.lookiesapp.presentation.components.checkout.CheckoutContent
 @Composable
 fun CheckoutScreen(
     type: String,
+    quantity: Int = 1,
     itemId: String,
     viewModel: CheckoutViewModel = hiltViewModel(),
     navController: NavController
@@ -77,13 +78,14 @@ fun CheckoutScreen(
         onBackClick = {
             navController.popBackStack()
         },
+        quantity = quantity,
         onPayClick = {
             val currentItem = uiState.itemToBuy
             if (currentItem != null) {
                 val orderItem = OrderItemInput(
                     itemType = currentItem.type,
                     itemRefId = currentItem.id,
-                    quantity = 1
+                    quantity = quantity
                 )
                 viewModel.createCheckout(
                     items = listOf(orderItem)

@@ -11,6 +11,7 @@ import com.prayatna.lookiesapp.domain.model.painting.DetailPainting
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.model.painting.PaintingAttribute
+import com.prayatna.lookiesapp.domain.model.painting.UploadPaintingOutput
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
@@ -75,11 +76,10 @@ class PaintingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun uploadPainting(painting: AddPaintingParams, image: Uri): DataResult<Painting> {
+    override suspend fun uploadPainting(painting: AddPaintingParams, image: Uri): DataResult<UploadPaintingOutput> {
         val compressedImage = image.compressImage(context, 500_000L)
         return try {
             val response = paintingService.uploadPainting(painting = painting.toDto(), image = compressedImage)
-            Log.d("UPLOAD-PAINTING", response.toString())
             DataResult.Success(response.toDomain())
         } catch (e: Exception) {
             Log.d("UPLOAD-PAINTING", e.message.toString())

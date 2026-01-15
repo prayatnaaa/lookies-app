@@ -44,6 +44,7 @@ import com.prayatna.lookiesapp.utils.formatRupiah
 fun CheckoutContent(
     uiState: CheckoutUiState,
     onBackClick: () -> Unit,
+    quantity: Int,
     onPayClick: (String) -> Unit,
     onRefresh: () -> Unit,
     snackbarHost: @Composable () -> Unit = {}
@@ -63,10 +64,9 @@ fun CheckoutContent(
             )
         },
         bottomBar = {
-            // Bottom Bar hanya muncul jika data item sudah siap
             if (uiState.itemToBuy != null) {
                 CheckoutBottomBar(
-                    totalPrice = uiState.itemToBuy.price ?: 0.0,
+                    totalPrice = uiState.itemToBuy.price!!.times(quantity),
                     isLoading = uiState.isLoading,
                     onPayClick = { onPayClick(description) }
                 )
@@ -111,7 +111,7 @@ fun CheckoutContent(
                         imageUrl = uiState.itemToBuy.imageUrl,
                         price = uiState.itemToBuy.price ?: 0.0,
                         subtitle = uiState.itemToBuy.subtitle,
-                        quantity = 1,
+                        quantity = quantity,
                         onQuantityChange = null
                     )
 
@@ -153,7 +153,7 @@ fun CheckoutContent(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = formatRupiah(uiState.itemToBuy.price ?: 0.0),
+                            text = formatRupiah((uiState.itemToBuy.price?.times(quantity)) ?: 0.0),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

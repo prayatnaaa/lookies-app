@@ -6,9 +6,11 @@ import com.prayatna.lookiesapp.data.remote.dto.request.painting.UploadPaintingRe
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetDetailPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.PaintingAttributeResponse
+import com.prayatna.lookiesapp.data.remote.dto.response.painting.UploadPaintingResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import java.util.UUID
 import javax.inject.Inject
@@ -99,7 +101,7 @@ class SupabasePaintingService @Inject constructor(
         return artStyles
     }
 
-    suspend fun uploadPainting(painting: UploadPaintingRequest, image: ByteArray?): GetPaintingDto {
+    suspend fun uploadPainting(painting: UploadPaintingRequest, image: ByteArray?): UploadPaintingResponse {
         val artistId = auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not logged in")
 
@@ -123,7 +125,7 @@ class SupabasePaintingService @Inject constructor(
             )
 
             return postgrest.from("paintings").insert(finalPainting) {
-                select()
+                select(Columns.list("id", "title"))
             }.decodeSingle()
 
         } catch (e: Exception) {

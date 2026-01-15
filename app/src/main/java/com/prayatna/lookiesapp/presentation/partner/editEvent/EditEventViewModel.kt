@@ -140,7 +140,7 @@ class EditEventViewModel @Inject constructor(
                 title = event.title,
                 startDate = event.startDate,
                 endDate = event.endDate,
-                location = event.location,
+                location = event.location ?: "",
                 locationUrl = event.locationUrl,
                 maxParticipant = event.maxParticipant?.toString(),
                 maxPainting = event.maxPainting?.toString(),

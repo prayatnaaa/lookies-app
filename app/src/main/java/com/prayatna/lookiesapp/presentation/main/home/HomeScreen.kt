@@ -44,7 +44,7 @@ fun HomeScreen(
     val featuredEvent = state.events.firstOrNull()
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             if (state.user != null) {
                 val user = state.user

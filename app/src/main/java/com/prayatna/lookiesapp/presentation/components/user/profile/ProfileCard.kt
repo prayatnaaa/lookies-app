@@ -1,7 +1,6 @@
 package com.prayatna.lookiesapp.presentation.components.user.profile
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,22 +20,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.rememberAsyncImagePainter
-import com.prayatna.lookiesapp.R
+import coil3.compose.AsyncImage
+import com.prayatna.lookiesapp.utils.Constants
+import com.prayatna.lookiesapp.utils.Helper
 
 @Composable
 fun ProfileCard(
     modifier: Modifier = Modifier,
-    // Gunakan painterResource untuk preview/default
-    imagePainter: Painter = rememberAsyncImagePainter(model = R.drawable.default_avatar),
     username: String,
+    profileImageUrl: String?,
     onEditProfileClick: () -> Unit
 ) {
     ElevatedCard(
@@ -44,7 +40,7 @@ fun ProfileCard(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp), // Sudut lebih modern
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -54,14 +50,16 @@ fun ProfileCard(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Avatar Image Circular
-            Image(
-                painter = imagePainter,
+            AsyncImage(
+                model = profileImageUrl
+                    ?.takeIf { it.isNotBlank() && it != "null" }
+                    ?.replace("http://172.21.179.110", "http://10.0.2.2")?:
+                    Helper.defaultAvatar(username),
                 contentDescription = "Profile Picture",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(CircleShape) // Lingkaran
+                    .clip(CircleShape)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -79,7 +77,7 @@ fun ProfileCard(
 
             OutlinedButton(
                 onClick = onEditProfileClick,
-                shape = RoundedCornerShape(50), // Pill shape button
+                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 ),
@@ -92,14 +90,4 @@ fun ProfileCard(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun ProfileCardPreview() {
-    ProfileCard(
-        imagePainter = painterResource(id = R.drawable.default_avatar),
-        username = "Pratanu",
-        onEditProfileClick = {}
-    )
 }

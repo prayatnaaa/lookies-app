@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation.login
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -46,8 +45,12 @@ class LoginViewModel @Inject constructor(
         this.passwordValue = passwordValue
     }
 
+    private fun resetForm() {
+        emailValue = ""
+        passwordValue = ""
+    }
+
     fun onSignIn() {
-        Log.d("LOGIN_DEBUG", "onSignIn clicked")
         _authState.value = AuthState.Loading
 
         viewModelScope.launch {
@@ -55,8 +58,7 @@ class LoginViewModel @Inject constructor(
 
                 is DataResult.Success -> {
                     val role = result.data.role
-                    Log.d("LOGIN_DEBUG", "Authenticated as $role")
-
+                    resetForm()
                     _authState.value = AuthState.Authenticated(role)
                 }
 

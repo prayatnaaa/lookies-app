@@ -75,7 +75,7 @@ fun EventCard(
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = event.location)
+                    Text(text = event.location ?: "Online")
 
                     if (showTicketPrice) {
                         Spacer(modifier = Modifier.height(4.dp))

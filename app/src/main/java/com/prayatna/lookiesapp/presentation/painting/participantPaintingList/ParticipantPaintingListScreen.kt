@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.paintingSubmission.PaintingSubmissionCard
 import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.state.DialogState
 import com.prayatna.lookiesapp.utils.Constants
@@ -44,6 +45,12 @@ fun ParticipantPaintingListScreen(
     }
 
     Scaffold(
+        topBar = {
+            BackTopBar(
+                navController = navController,
+                title = "Participant paintings"
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
 

@@ -52,7 +52,8 @@ fun DetailEventScreen(
             if (detailEventState.info != null) {
                 DetailEventFooter(
                     onSeePaintingsClick = {},
-                    showRegisterButton = role == "artist",
+                    showRegisterButton = role == "artist"
+                            && detailEventState.info?.eventType?.slug == "open_call",
                     showBuyButton = role != "partner"
                             && detailEventState.info?.eventFormat?.slug != "online",
                     onRegisterButtonClick = {
@@ -60,7 +61,7 @@ fun DetailEventScreen(
                                 .navigate(
                                     "${
                                         NavigationRoutes.REGISTER_EVENT
-                                    }/${eventId}/${detailEventState.info?.maxPaintingPerArtist}"
+                                    }/${eventId}?maxPaintingPerArtist=${detailEventState.info?.maxPaintingPerArtist}"
                                 )
                     },
                     onBuyButtonClick = {
@@ -124,7 +125,7 @@ fun DetailEventScreen(
                     onValueChange = { viewModel.setQuantityValue(it) },
                     onBuyButtonClick = {
                         isSheetOpen = false
-                        navController.navigate("${NavigationRoutes.CHECKOUT}/event_ticket/${eventId}")
+                        navController.navigate("${NavigationRoutes.CHECKOUT}/event_ticket/${eventId}/${quantity}")
                     }
                 )
             }

@@ -125,13 +125,14 @@ fun DetailEventContent(
                         .padding(12.dp)
                 ) {
                     AsyncImage(
-                        model = event.organizer.logoUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
+                        model = event.organizer.logoUrl
+                            .replace("http://172.21.179.110", "http://10.0.2.2"),
                         contentDescription = null,
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
                             .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
-                            .background(MaterialTheme.colorScheme.surface),
+                            .background(MaterialTheme.colorScheme.secondary),
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -212,7 +213,7 @@ fun DetailEventContent(
                                 name = painting.painting.title,
                                 price = painting.finalPrice,
                                 onClick = { onPaintingClick(painting.id) },
-                                artistName = painting.participant.artist.fullName ?: "Unknown Artist"
+                                artistName = painting.participant.artist.fullName
                             )
                         }
                     }
