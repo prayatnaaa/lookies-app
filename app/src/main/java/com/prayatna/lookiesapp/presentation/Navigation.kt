@@ -40,7 +40,6 @@ import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScree
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
-import com.prayatna.lookiesapp.presentation.user.partnerapplication.partnerApplicationNavGraph
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -280,7 +279,6 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             backStackEntry.arguments?.getString("artistId")?.let { artistId ->
                 PersonalPaintingListScreen(artistId = artistId, navController = navController)
             }
-            partnerApplicationNavGraph(navController = navController)
         }
     }
 }

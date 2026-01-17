@@ -14,5 +14,4 @@ interface UserRepository {
         username: String
     ): DataResult<String>
     suspend fun editProfileImage(image: ByteArray): DataResult<String>
-    suspend fun submitPartnerApplication(params: PartnerSubmissionParams): DataResult<String>
 }
