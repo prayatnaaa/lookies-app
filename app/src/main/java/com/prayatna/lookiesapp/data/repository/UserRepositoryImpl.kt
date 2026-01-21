@@ -1,14 +1,20 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.content.Context
+import android.net.Uri
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.mapper.toDto
+import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
+import com.prayatna.lookiesapp.utils.compressImage
 import com.prayatna.lookiesapp.utils.extractSupabaseError
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
@@ -26,6 +32,7 @@ class UserRepositoryImpl @Inject constructor(
     private val storage: Storage,
     private val userPreference: UserPreference,
     private val supabaseUserService: SupabaseUserService,
+    @ApplicationContext private val context: Context
 ): UserRepository {
 
     override fun getProfile(): Flow<DataResult<ProfileDto>> =
@@ -109,6 +116,28 @@ class UserRepositoryImpl @Inject constructor(
             DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
             DataResult.Error("Something went wrong! Please check your connection")
+        }
+    }
+
+    override suspend fun registerBusiness(
+        request: CreateAccountHolderInput,
+        kycFile: Uri,
+        fileName: String
+    ): DataResult<String> {
+        val compressedImage = kycFile.compressImage(context, 500_000L)
+            ?: return DataResult.Error("Image is not selected")
+        return try {
+            val result = supabaseUserService.registerBusiness(
+                request = request.toDto(),
+                kycFile = compressedImage,
+                fileName = fileName
+            )
+            DataResult.Success(result)
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }
 

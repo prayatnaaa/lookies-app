@@ -42,7 +42,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.SharedViewModel
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.presentation.components.user.partnerapplication.PartnerApplicationFooter
 import com.prayatna.lookiesapp.presentation.components.user.profile.EditProfileCard
 import com.prayatna.lookiesapp.presentation.components.user.profile.EditProfileImageCard
 import com.prayatna.lookiesapp.utils.DataResult
@@ -131,25 +130,6 @@ fun EditProfileScreen(
                 )
             )
         },
-        bottomBar = {
-            if (isPartnerSignup) {
-                PartnerApplicationFooter(
-                    route = "${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup=true",
-                    onBackButton = { navController.popBackStack() },
-                    onProfileButton = {
-                        if (!viewModel.isChanged) {
-                            navController.navigate(NavigationRoutes.ADD_LOCATION) {
-                                popUpTo(NavigationRoutes.EDIT_PROFILE) { inclusive = true }
-                            }
-                        } else {
-                            viewModel.onEditProfile()
-                        }
-                    },
-                    onLocationButton = {},
-                    onSubmissionButton = {},
-                )
-            }
-        }
     ) { innerPadding ->
 
         Box(modifier = Modifier.fillMaxSize()) {

@@ -1,10 +1,13 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateAccountHolderRequest
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.upload
 import java.util.UUID
 import javax.inject.Inject
 
@@ -13,6 +16,8 @@ class SupabaseUserService @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage
 ) {
+
+
     suspend fun editProfile(
         fullName: String,
         bio: String,
@@ -77,5 +82,71 @@ class SupabaseUserService @Inject constructor(
             }
 
         return updateResult.data
+    }
+
+    suspend fun registerBusiness(
+        request: CreateAccountHolderRequest,
+        kycFile: ByteArray,
+        fileName: String
+    ): String {
+
+        val userId = auth.currentUserOrNull()?.id
+            ?: throw IllegalStateException("User not logged in")
+
+        var uploadedPath: String? = null
+
+        try {
+            val safeFileName = fileName.replace(" ", "_")
+            val path = "$userId/$safeFileName"
+
+            storage.from("private_documents").upload(
+                path = path,
+                data = kycFile,
+                upsert = true
+            )
+
+            uploadedPath = path
+            Log.d("Supabase", "File uploaded successfully at: $path")
+
+            val updatedKycList = request.kycDocuments.toMutableList()
+
+            if (updatedKycList.isNotEmpty()) {
+                updatedKycList[0] = updatedKycList[0].copy(
+                    fileId = path
+                )
+            } else {
+                throw IllegalStateException("List kycDocuments tidak boleh kosong")
+            }
+
+            val finalRequest = request.copy(
+                kycDocuments = updatedKycList,
+                userId = userId
+            )
+
+            val params = mapOf("payload" to finalRequest)
+
+            val result = postgrest.rpc(
+                function = "create_business_with_kyc",
+                parameters = params
+            )
+
+            val businessIdString = result.decodeAs<String>()
+            Log.d("Supabase", "Business Registered with ID: $businessIdString")
+
+            return businessIdString
+
+        } catch (e: Exception) {
+            Log.e("Supabase", "Error logic, rolling back file...", e)
+
+            uploadedPath?.let { pathToDelete ->
+                try {
+                    storage.from("private_documents").delete(pathToDelete)
+                    Log.d("Supabase", "Rollback: File deleted $pathToDelete")
+                } catch (deleteErr: Exception) {
+                    Log.e("Supabase", "Failed to rollback file", deleteErr)
+                }
+            }
+            throw e
+        }
     }
 }

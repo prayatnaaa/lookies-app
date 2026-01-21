@@ -40,6 +40,7 @@ import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScree
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
+import com.prayatna.lookiesapp.presentation.user.partnerSubmission.PartnerSubmissionScreen
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -271,6 +272,11 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             route = NavigationRoutes.UPLOAD_PAINTING
         ) {
             UploadPaintingScreen(navController = navController)
+        }
+        composable(
+            route = NavigationRoutes.PARTNER_APPLICATION
+        ) {
+            PartnerSubmissionScreen(navController = navController)
         }
         composable(
             route = "${NavigationRoutes.PERSONAL_PAINTING}/{artistId}",

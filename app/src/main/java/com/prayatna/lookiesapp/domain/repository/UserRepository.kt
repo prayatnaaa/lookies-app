@@ -1,7 +1,8 @@
 package com.prayatna.lookiesapp.domain.repository
 
+import android.net.Uri
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
-import com.prayatna.lookiesapp.domain.model.user.PartnerSubmissionParams
+import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
@@ -14,4 +15,9 @@ interface UserRepository {
         username: String
     ): DataResult<String>
     suspend fun editProfileImage(image: ByteArray): DataResult<String>
+    suspend fun registerBusiness(
+        request: CreateAccountHolderInput,
+        kycFile: Uri,
+        fileName: String
+    ): DataResult<String>
 }
