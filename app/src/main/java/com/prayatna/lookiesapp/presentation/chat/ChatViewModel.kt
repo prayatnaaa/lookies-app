@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.presentation.chat.state.ChatEvent
 import com.prayatna.lookiesapp.presentation.chat.state.ChatUiState
@@ -10,13 +11,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val chatRepository: ChatRepository
+    private val chatRepository: ChatRepository,
+    private val userPreferences: UserPreference
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -26,9 +29,6 @@ class ChatViewModel @Inject constructor(
 
     fun onEvent(event: ChatEvent) {
         when (event) {
-            is ChatEvent.LoadMessages -> {
-                loadMessages()
-            }
             is ChatEvent.UpdateInput -> {
                 _uiState.update { it.copy(messageInput = event.value) }
             }
@@ -38,18 +38,20 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun loadMessages() {
+    fun loadMessages(targetId: String) {
         messageJob?.cancel()
 
         _uiState.update { it.copy(isLoading = true) }
 
-        when (val result = chatRepository.getMessages()) {
+        when (val result = chatRepository.getMessages(targetId = targetId)) {
             is DataResult.Success -> {
                 messageJob = viewModelScope.launch {
+                    val user = userPreferences.getProfile().first()
                     result.data.collect { listMessages ->
                         val sortedMessages = listMessages.sortedBy { it.sentAt }
                         _uiState.update {
                             it.copy(
+                                currentUserId = user.id ?: "",
                                 messages = sortedMessages,
                                 isLoading = false,
                                 error = null

@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -59,7 +61,7 @@ fun ChatScreen(
     val listState = rememberLazyListState()
 
     LaunchedEffect(targetId) {
-        viewModel.onEvent(ChatEvent.LoadMessages(targetId))
+        viewModel.loadMessages(targetId = targetId)
     }
 
     LaunchedEffect(uiState.messages.size) {
@@ -136,55 +138,64 @@ fun MessageBubble(
 ) {
     val bubbleColor = if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
     val textColor = if (isMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-    val alignment = if (isMe) Alignment.End else Alignment.Start
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = alignment
+    val rowArrangement = if (isMe) Arrangement.End else Arrangement.Start
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = rowArrangement,
+        verticalAlignment = Alignment.Bottom
     ) {
-        Row(
-            verticalAlignment = Alignment.Bottom
-        ) {
-            if (!isMe) {
-                AsyncImage(
-                    model = message.senderAvatar,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(Color.Gray),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
-
-            Column(
+        if (!isMe) {
+            AsyncImage(
+                model = message.senderAvatar,
+                contentDescription = null,
                 modifier = Modifier
-                    .widthIn(max = 280.dp)
-                    .background(
-                        color = bubbleColor,
-                        shape = RoundedCornerShape(
-                            topStart = 16.dp,
-                            topEnd = 16.dp,
-                            bottomStart = if (isMe) 16.dp else 4.dp,
-                            bottomEnd = if (isMe) 4.dp else 16.dp
-                        )
-                    )
-                    .padding(12.dp)
-            ) {
-                Text(
-                    text = message.content,
-                    color = textColor,
-                    fontSize = 15.sp
-                )
-                Text(
-                    text = message.sentAt.takeLast(8).take(5),
-                    color = textColor.copy(alpha = 0.7f),
-                    fontSize = 10.sp,
-                    modifier = Modifier.align(Alignment.End)
-                )
-            }
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(8.dp))
         }
+
+        Column(
+            modifier = Modifier
+                .widthIn(max = 280.dp)
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomStart = if (isMe) 16.dp else 4.dp,
+                        bottomEnd = if (isMe) 4.dp else 16.dp
+                    )
+                )
+                .background(bubbleColor)
+                .padding(12.dp)
+        ) {
+            Text(
+                text = message.content,
+                color = textColor,
+                fontSize = 15.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = formatTime(message.sentAt),
+                color = textColor.copy(alpha = 0.7f),
+                fontSize = 10.sp,
+                modifier = Modifier.align(Alignment.End)
+            )
+        }
+    }
+}
+
+fun formatTime(isoString: String): String {
+    return try {
+        isoString.takeLast(8).take(5)
+    } catch (e: Exception) {
+        ""
     }
 }
 

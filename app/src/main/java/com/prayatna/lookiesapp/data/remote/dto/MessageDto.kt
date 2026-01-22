@@ -38,5 +38,8 @@ data class MessageDto(
     @SerialName("receiver_is_artist")
     val receiverIsArtist: Boolean,
     @SerialName("receiver_has_partner_sub")
-    val receiverHasPartnerSub: Boolean
+    val receiverHasPartnerSub: Boolean,
+
+    @SerialName("conversation_id")
+    val conversationId: String? = null
 )
