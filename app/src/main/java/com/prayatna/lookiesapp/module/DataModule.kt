@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.module
 import com.prayatna.lookiesapp.data.repository.AdminRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.ArtistRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.AuthRepositoryImpl
+import com.prayatna.lookiesapp.data.repository.ChatRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.EventRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.LocationRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.PaintingRepositoryImpl
@@ -13,6 +14,7 @@ import com.prayatna.lookiesapp.data.repository.UserRepositoryImpl
 import com.prayatna.lookiesapp.domain.repository.AdminRepository
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
+import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.repository.LocationRepository
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
@@ -68,4 +70,8 @@ interface DataModule {
     @Singleton
     @Binds
     fun transactionRepository(transactionRepositoryImpl: TransactionRepositoryImpl): TransactionRepository
+
+    @Singleton
+    @Binds
+    fun chatRepository(chatRepositoryImpl: ChatRepositoryImpl): ChatRepository
 }
