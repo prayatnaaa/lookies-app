@@ -13,6 +13,12 @@ data class EventDto(
     @SerialName("banner_image_url")
     val bannerImageUrl: String,
 
+    @SerialName("remaining_participant_quota")
+    val remainingParticipantQuota: Int? = null,
+
+    @SerialName("remaining_painting_quota")
+    val remainingPaintingQuota: Int? = null,
+
     val status: String,
 
     @SerialName("start_date")

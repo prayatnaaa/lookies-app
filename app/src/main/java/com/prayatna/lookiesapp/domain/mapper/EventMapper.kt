@@ -24,6 +24,8 @@ fun EventDto.toDomain() : Event {
         artistRegistrationFee = registrationFee,
         eventType = eventType.toDomain(),
         organizer = organizer.toDomain(),
-        eventFormat = eventFormat.toDomain()
+        eventFormat = eventFormat.toDomain(),
+        remainingParticipantQuota = remainingParticipantQuota,
+        remainingPaintingQuota = remainingPaintingQuota
     )
 }

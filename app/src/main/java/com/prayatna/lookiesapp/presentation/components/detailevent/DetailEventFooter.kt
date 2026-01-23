@@ -31,6 +31,7 @@ fun DetailEventFooter(
     onRegisterButtonClick: () -> Unit = {},
     onSeePaintingsClick: () -> Unit = {},
     showBuyButton: Boolean = false,
+    isRegisterButtonEnabled: Boolean = true
 ) {
     ElevatedCard(
         modifier = modifier
@@ -45,6 +46,7 @@ fun DetailEventFooter(
         Column {
             if (showRegisterButton) {
                 Button(
+                    enabled = isRegisterButtonEnabled,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, top = 16.dp),

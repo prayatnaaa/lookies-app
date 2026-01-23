@@ -12,7 +12,6 @@ import com.prayatna.lookiesapp.data.remote.dto.response.event.CreateEventRespons
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -118,7 +117,7 @@ class SupabaseEventService @Inject constructor(
     ): List<EventDto> {
 
         val query = postgrest
-            .from("event_detail_view")
+            .from("events_view")
             .select {
                 filter {
                     if (title != null) {
@@ -138,7 +137,7 @@ class SupabaseEventService @Inject constructor(
 
 
     suspend fun getDetailEvent(id: String): EventDto {
-        val event = postgrest.from("event_detail_view").select {
+        val event = postgrest.from("events_view").select {
             filter {
                 eq("event_id", id)
             }

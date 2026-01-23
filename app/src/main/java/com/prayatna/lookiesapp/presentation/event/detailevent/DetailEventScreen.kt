@@ -51,6 +51,8 @@ fun DetailEventScreen(
         bottomBar = {
             if (detailEventState.info != null) {
                 DetailEventFooter(
+                    isRegisterButtonEnabled = detailEventState
+                        .info?.status == "published",
                     onSeePaintingsClick = {},
                     showRegisterButton = role == "artist"
                             && detailEventState.info?.eventType?.slug == "open_call",

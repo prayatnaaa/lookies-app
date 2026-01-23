@@ -294,16 +294,16 @@ fun ArtistRestrictedSection(
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 CompactInfoCard(
-                    title = "Max Paintings",
-                    value = event.maxPainting.toString(),
+                    title = "Paintings Quota",
+                    value = event.remainingPaintingQuota.toString(),
                     icon = Icons.Default.Palette,
                     modifier = Modifier.weight(1f)
                 )
 
                 if (!isSelfExhibition) {
                     CompactInfoCard(
-                        title = "Max Artists",
-                        value = event.maxParticipant.toString(),
+                        title = "Artists Quota",
+                        value = event.remainingParticipantQuota.toString(),
                         icon = Icons.Default.Person,
                         modifier = Modifier.weight(1f)
                     )

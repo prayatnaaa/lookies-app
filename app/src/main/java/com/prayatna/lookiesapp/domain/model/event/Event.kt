@@ -13,6 +13,8 @@ data class Event (
     val location: String,
     val locationUrl: String,
     val maxParticipant: Int? = null,
+    val remainingParticipantQuota: Int? = null,
+    val remainingPaintingQuota: Int? = null,
     val maxPainting: Int? = null,
     val maxPaintingPerArtist: Int? = null,
     val ticketPrice: Double? = null,

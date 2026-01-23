@@ -29,13 +29,14 @@ enum class EventStatus(val value: String) {
 @Composable
 fun EventStatusText(
     status: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isPublishTextToHome: Boolean = false
 ) {
     val eventStatus = EventStatus.from(status)
 
     val (text, color) = when (eventStatus) {
         EventStatus.PendingValidation -> "Pending" to Color(0xFFFFC107) // Amber
-        EventStatus.Published -> "Published" to Color(0xFF4CAF50) // Green
+        EventStatus.Published -> (if (isPublishTextToHome) "Starting soon" else "Published") to Color(0xFF4CAF50) // Green
         EventStatus.Ongoing -> "Ongoing" to MaterialTheme.colorScheme.surface
         EventStatus.Completed -> "Completed" to Color(0xFF2196F3) // Blue
         EventStatus.Cancelled -> "Cancelled" to Color.Gray

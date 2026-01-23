@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.presentation.components.eventlist.EventStatusText
 
 @Composable
 fun HomeEventCard(event: Event,
@@ -26,7 +27,7 @@ fun HomeEventCard(event: Event,
         onClick = onClick,
         modifier = Modifier
             .width(240.dp)
-            .height(160.dp),
+            .height(180.dp),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
@@ -54,6 +55,7 @@ fun HomeEventCard(event: Event,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                EventStatusText( status = event.status, isPublishTextToHome = true)
             }
         }
     }
