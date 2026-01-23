@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventFormatDto
 import com.prayatna.lookiesapp.data.remote.dto.EventPaintingDto
+import com.prayatna.lookiesapp.data.remote.dto.EventStatisticDto
 import com.prayatna.lookiesapp.data.remote.dto.EventTypeDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.CreateEventRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.event.CreateEventResponse
@@ -83,6 +84,17 @@ class SupabaseEventService @Inject constructor(
             }
             throw e
         }
+    }
+
+    suspend fun getEventStatistics(eventId: String): EventStatisticDto {
+        val eventStatistics = postgrest.from("event_statistics_view")
+            .select {
+                filter {
+                    eq("event_id", eventId)
+                }
+            }
+            .decodeSingle<EventStatisticDto>()
+        return eventStatistics
     }
 
     suspend fun getEventTypes(): List<EventTypeDto> {

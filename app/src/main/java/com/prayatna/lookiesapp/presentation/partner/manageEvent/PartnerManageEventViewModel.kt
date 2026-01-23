@@ -46,4 +46,31 @@ class PartnerManageEventViewModel @Inject constructor(
              }
          }
      }
+
+    fun getEventStatistic(eventId: String) {
+        viewModelScope.launch {
+            val result = eventRepository.getEventStatistics(eventId)
+            result.collect { data ->
+                when(data) {
+                    is DataResult.Error -> {
+                        _state.update {
+                            it.copy(
+                                errorMessage = data.error,
+                                isLoading = false
+                            )
+                        }
+                    }
+                    is DataResult.Success-> {
+                        _state.update {
+                            it.copy(
+                                statistics = data.data,
+                                isLoading = false
+                            )
+                        }
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
 }

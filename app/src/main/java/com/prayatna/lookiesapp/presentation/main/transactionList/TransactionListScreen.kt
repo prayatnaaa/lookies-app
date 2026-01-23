@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,6 +18,7 @@ import com.prayatna.lookiesapp.presentation.components.transactionList.EmptyTran
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionItemCard
 import com.prayatna.lookiesapp.presentation.main.transactionList.state.TransactionListUiState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionListScreen(
     navController: NavController,
@@ -25,20 +27,15 @@ fun TransactionListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text("My Orders", fontWeight = FontWeight.SemiBold) },
-//                navigationIcon = {
-//                    IconButton(onClick = { navController.popBackStack() }) {
-//                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-//                    }
-//                },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = MaterialTheme.colorScheme.surface
-//                )
-//            )
-//        },
-        containerColor = MaterialTheme.colorScheme.surface
+        topBar = {
+            TopAppBar(
+                title = { Text("My Orders", fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(
             modifier = Modifier

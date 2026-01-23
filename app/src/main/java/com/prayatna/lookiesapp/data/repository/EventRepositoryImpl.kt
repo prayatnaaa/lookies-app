@@ -6,6 +6,7 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventService
+import com.prayatna.lookiesapp.data.remote.dto.EventStatisticDto
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.event.CreateEventParams
@@ -17,6 +18,8 @@ import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.RestException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class EventRepositoryImpl @Inject constructor(
@@ -52,6 +55,22 @@ class EventRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getEventStatistics(eventId: String): Flow<DataResult<EventStatisticDto>> = flow {
+        emit(DataResult.Loading)
+        try {
+            val idInt = eventId.toIntOrNull()
+            if (idInt == null) {
+                emit(DataResult.Error("Invalid Event ID"))
+                return@flow
+            }
+
+            val result = supabaseEventService.getEventStatistics(eventId)
+            emit(DataResult.Success(result))
+
+        } catch (e: Exception) {
+            emit(DataResult.Error(e.message ?: "Failed to load statistics"))
+        }
+    }
     override suspend fun createEvent(
         params: CreateEventParams,
         imageByte: Uri
