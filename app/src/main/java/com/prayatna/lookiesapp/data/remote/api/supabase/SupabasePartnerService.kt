@@ -81,13 +81,19 @@ class SupabasePartnerService @Inject constructor(
         return JsonProvider.json.decodeFromString(response.body())
     }
 
-    suspend fun getSelfEvents(): List<EventDto> {
+    suspend fun getSelfEvents(status: String? = null, name: String? = null): List<EventDto> {
         val user = auth.currentUserOrNull()
             ?: throw Exception("user not logged in")
         val events = postgrest.from("event_detail_view")
             .select {
                 filter {
                     eq("organizer_id", user.id)
+                    if (status != null) {
+                        eq("status", status)
+                    }
+                    if (name != null) {
+                        ilike("title", "%$name%")
+                    }
                 }
             }.decodeList<EventDto>()
 

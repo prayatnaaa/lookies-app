@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,28 +27,43 @@ class SelfEventListViewModel @Inject constructor(
 
     private fun loadSelfEvents() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            when (val response = partnerRepository.getSelfEvents()) {
-                is DataResult.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        errorMessage = response.error,
-                        isLoading = false
-                    )
-                }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
+            val currentStatus = _uiState.value.selectedStatus
+            val currentQuery = _uiState.value.searchQuery.ifBlank { null }
+
+            when (val response = partnerRepository.getSelfEvents(status = currentStatus, name = currentQuery)) {
+                is DataResult.Error -> {
+                    _uiState.update {
+                        it.copy(errorMessage = response.error, isLoading = false)
+                    }
+                }
                 is DataResult.Success -> {
-                    _uiState.value = _uiState.value.copy(
-                        events = response.data,
-                        isLoading = false
-                    )
+                    _uiState.update {
+                        it.copy(events = response.data, isLoading = false)
+                    }
                 }
                 else -> Unit
             }
         }
     }
 
-    fun retry() {
+    fun onSearchQueryChange(newQuery: String) {
+        _uiState.update { it.copy(searchQuery = newQuery) }
+    }
+
+    fun onSearchTriggered() {
         loadSelfEvents()
     }
 
+    fun onFilterSelected(status: String?) {
+        val newStatus = if (_uiState.value.selectedStatus == status) null else status
+
+        _uiState.update { it.copy(selectedStatus = newStatus) }
+        loadSelfEvents()
+    }
+
+    fun retry() {
+        loadSelfEvents()
+    }
 }
