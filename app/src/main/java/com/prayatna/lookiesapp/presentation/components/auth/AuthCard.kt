@@ -43,6 +43,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.ui.theme.AmoledBlack
+import com.prayatna.lookiesapp.ui.theme.BlackText
+import com.prayatna.lookiesapp.ui.theme.GreyTextLight
+import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
 fun AuthCard(
@@ -201,24 +204,24 @@ fun AuthTextField(
         shape = RoundedCornerShape(12.dp),
         textStyle = TextStyle(fontSize = 12.sp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+            focusedBorderColor = PureWhite,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
 
-            focusedContainerColor = MaterialTheme.colorScheme.primary,
-            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = BlackText,
+            unfocusedContainerColor = BlackText,
 
-            focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+            focusedLabelColor = PureWhite,
             unfocusedLabelColor = MaterialTheme.colorScheme.onSecondary,
 
             cursorColor = MaterialTheme.colorScheme.onPrimary,
 
-            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
+            focusedTextColor = PureWhite,
+            unfocusedTextColor = GreyTextLight,
 
-            focusedTrailingIconColor = MaterialTheme.colorScheme.onPrimary,
+            focusedTrailingIconColor = PureWhite,
             unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline,
 
-            focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+            focusedLeadingIconColor = PureWhite,
             unfocusedLeadingIconColor = MaterialTheme.colorScheme.outline
         ),
         keyboardOptions = keyboardOptions

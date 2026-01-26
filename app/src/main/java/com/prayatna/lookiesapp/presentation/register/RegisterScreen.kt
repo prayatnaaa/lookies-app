@@ -33,6 +33,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.register.events.RegisterEvent
+import com.prayatna.lookiesapp.ui.theme.BlackText
 import com.prayatna.lookiesapp.ui.theme.GreyTextLight
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.Constants
@@ -111,8 +112,9 @@ fun RegisterScreen(
                 onRegister = { viewModel.onSignUp() },
                 onLogin = {
                     navController.navigate(NavigationRoutes.LOGIN) {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
+                        popUpTo(NavigationRoutes.REGISTER) {
+                            inclusive = true
+                        }
                     }
                 },
                 inRegister = true,
@@ -125,16 +127,16 @@ fun RegisterScreen(
 
         if (showDialog) {
             AlertDialog(
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = BlackText,
                 shape = MaterialTheme.shapes.medium,
-                textContentColor = MaterialTheme.colorScheme.onPrimary,
+                textContentColor = PureWhite,
                 onDismissRequest = {},
                 title = {
                     Text(if (isErrorDialog) "Error" else "Success",
-                        color = MaterialTheme.colorScheme.onPrimary)
+                        color = PureWhite)
                 },
                 text = {
-                    Text(dialogMessage, color = MaterialTheme.colorScheme.onPrimary)
+                    Text(dialogMessage, color = PureWhite)
                 },
                 confirmButton = {
                     TextButton(onClick = {
@@ -146,7 +148,7 @@ fun RegisterScreen(
                             }
                         }
                     }) {
-                        Text("OK", color = MaterialTheme.colorScheme.onPrimary)
+                        Text("OK", color = PureWhite)
                     }
                 }
             )

@@ -9,14 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -24,11 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.login.state.AuthState
+import com.prayatna.lookiesapp.ui.theme.BlackText
 import com.prayatna.lookiesapp.ui.theme.GreyTextLight
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.Constants
@@ -42,22 +45,25 @@ fun LoginScreen(modifier: Modifier = Modifier,
 ) {
 
     val loginStatus = viewModel.loginStatus.collectAsStateWithLifecycle()
-    val snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isErrorDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(loginStatus.value) {
-        val status = loginStatus.value
-        if (status is DataResult.Error) {
-            snackBarHostState.showSnackbar(
-                message = status.error,
-                duration = SnackbarDuration.Long,
-                withDismissAction = true
-            )
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.resetLoginState()
+    }
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Error) {
+            showDialog = true
+            dialogMessage = (authState as AuthState.Error).message
+            isErrorDialog = true
         }
     }
 
-
     Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) },
         modifier = modifier.fillMaxSize(),
         content = { padding -> padding.calculateTopPadding()
             Column(modifier = modifier
@@ -110,6 +116,23 @@ fun LoginScreen(modifier: Modifier = Modifier,
                     onPasswordChange = { viewModel.onPasswordChange(it) }
                 )
             }
+            if (showDialog) {
+                AlertDialog(
+                    containerColor = BlackText,
+                    shape = MaterialTheme.shapes.medium,
+                    textContentColor = PureWhite,
+                    onDismissRequest = {},
+                    title = {
+                        Text(if (isErrorDialog) "Error" else "Success",
+                            color = PureWhite)
+                    },
+                    text = {
+                        Text(dialogMessage, color = PureWhite)
+                    },
+                    confirmButton = {}
+                )
+            }
+
             if (loginStatus.value is DataResult.Loading) {
                 CircularLoading()
             }

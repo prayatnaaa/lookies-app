@@ -50,6 +50,12 @@ class LoginViewModel @Inject constructor(
         passwordValue = ""
     }
 
+    fun resetLoginState() {
+        emailValue = ""
+        passwordValue = ""
+        _authState.value = AuthState.Unauthenticated
+    }
+
     fun onSignIn() {
         _authState.value = AuthState.Loading
 
@@ -99,7 +105,7 @@ class LoginViewModel @Inject constructor(
             val role = userPreference.getRole().firstOrNull()
 
             if (role.isNullOrBlank()) {
-                _authState.value = AuthState.Error("Role not found")
+                _authState.value = AuthState.Unauthenticated
             } else {
                 _authState.value = AuthState.Authenticated(role)
             }
