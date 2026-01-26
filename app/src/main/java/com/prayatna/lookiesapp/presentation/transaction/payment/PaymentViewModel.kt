@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.transaction.payment
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.*
@@ -98,6 +99,7 @@ class PaymentViewModel @Inject constructor(
                     }
                 }
                 is DataResult.Error -> {
+                    Log.e("PaymentViewModel", "processPayment: ${result.error}")
                     _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
                 }
                 else -> Unit

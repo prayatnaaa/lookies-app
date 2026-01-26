@@ -43,7 +43,11 @@ class TransactionRepositoryImpl @Inject constructor(
     override suspend fun  createPayment(request: CreateXenditPaymentRequest): DataResult<CreateXenditPaymentResponse> {
         return try {
             val response = transactionService.createPayment(request = request)
-            DataResult.Success(response)
+            if (response.status != "error") {
+                DataResult.Success(response)
+            } else {
+                DataResult.Error(response.message)
+            }
         } catch (e: RestException) {
             DataResult.Error(e.error)
         } catch (e: HttpRequestException) {
