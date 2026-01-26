@@ -87,7 +87,7 @@ fun EventPaintingDetailScreen(
                     price = data.finalPrice,
                     isSold = data.status == "sold",
                     onBuyClick = {
-                        navController.navigate("${NavigationRoutes.CHECKOUT}/painting/${data.id}")
+                        navController.navigate("${NavigationRoutes.CHECKOUT}/painting/${data.id}/1")
                     }
                 )
             }

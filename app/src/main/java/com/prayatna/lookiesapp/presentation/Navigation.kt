@@ -41,6 +41,7 @@ import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScree
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
+import com.prayatna.lookiesapp.presentation.transaction.payment.PaymentScreen
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.PartnerSubmissionScreen
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -92,6 +93,30 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         navController = navController,
         startDestination = NavigationRoutes.MAIN_LOADING
     ) {
+        composable(
+            route = "${NavigationRoutes.PAYMENT}/{orderId}/{merchantId}/{amount}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType },
+                navArgument("merchantId") { type = NavType.StringType },
+                navArgument("amount") { type = NavType.FloatType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            val merchantId = backStackEntry.arguments?.getString("merchantId") ?: ""
+            val amount = backStackEntry.arguments?.getFloat("amount")?.toDouble() ?: 0.0
+
+            PaymentScreen(
+                orderId = orderId,
+                merchantId = merchantId,
+                amount = amount,
+                onPaymentSuccess = {
+                    navController.navigate("transaction_history") {
+                        popUpTo("home")
+                    }
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
         composable(NavigationRoutes.MAIN_LOADING) {
             MainLoadingScreen()
         }
@@ -298,10 +323,10 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             PartnerSubmissionScreen(navController = navController)
         }
         composable(
-            route = "${NavigationRoutes.PERSONAL_PAINTING}/{artistId}",
-            arguments = listOf(navArgument("artistId") { type = NavType.StringType })
+            route = "${NavigationRoutes.PERSONAL_PAINTING}/{merchantId}",
+            arguments = listOf(navArgument("merchantId") { type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry.arguments?.getString("artistId")?.let { artistId ->
+            backStackEntry.arguments?.getString("merchantId")?.let { artistId ->
                 PersonalPaintingListScreen(artistId = artistId, navController = navController)
             }
         }

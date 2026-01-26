@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
 import com.prayatna.lookiesapp.presentation.components.CustomDialog
 import com.prayatna.lookiesapp.presentation.components.checkout.CheckoutContent
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun CheckoutScreen(
@@ -45,9 +46,20 @@ fun CheckoutScreen(
             confirmText = "Bayar Sekarang",
             onConfirm = {
                 showSuccessDialog.value = false
+
+                val orderId = uiState.checkoutSuccessData
+                val merchantId = uiState.itemToBuy?.merchantId
+
+                val price = uiState.itemToBuy?.price
+                val totalAmount = price?.times(quantity)
+
                 viewModel.onCheckoutResultConsumed()
 
-//              todo: create navigation to payment gateway
+                navController.navigate(
+                    "${NavigationRoutes.PAYMENT}/$orderId/$merchantId/$totalAmount"
+                ) {
+                    popUpTo("checkout_route") { inclusive = true }
+                }
             },
             onDismiss = {
                 showSuccessDialog.value = false

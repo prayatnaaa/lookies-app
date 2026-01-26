@@ -41,7 +41,6 @@ fun TransactionItemCard(
     onClick: () -> Unit
 ) {
     val firstItem = transaction.items.firstOrNull()
-    Log.d("TransactionItemCard", "Transaction: $firstItem")
     val otherItemsCount = transaction.items.size - 1
 
     Card(

@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.prayatna.lookiesapp.R
 
 object NavigationRoutes {
-    const val CHAT = "chat"
+    const val PAYMENT = "payment"
     const val MESSAGES = "messages"
     const val ARTIST_DASHBOARD = "artist_dashboard"
     const val DETAIL_EVENT_PAINTING = "detail_event_painting"

@@ -17,6 +17,7 @@ import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.transactionList.EmptyTransactionState
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionItemCard
 import com.prayatna.lookiesapp.presentation.main.transactionList.state.TransactionListUiState
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +70,9 @@ fun TransactionListScreen(
                             TransactionItemCard(
                                 transaction = transaction,
                                 onClick = {
-//                                    navController.navigate("${NavigationRoutes.TRANSACTION_DETAIL}/${transaction.id}")
+//                                    if (transaction.status == "awaiting_payment") {
+//                                        navController.navigate("${NavigationRoutes.PAYMENT}/${transaction.id}/${transaction.items[0].}/${transaction.totalAmount}")
+//                                    }
                                 }
                             )
                         }

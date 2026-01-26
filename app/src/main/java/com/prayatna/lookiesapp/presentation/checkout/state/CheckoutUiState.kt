@@ -10,6 +10,7 @@ data class CheckoutUiState(
 
 data class CheckoutItemDisplay(
     val id: String,
+    val merchantId: String,
     val title: String,
     val subtitle: String,
     val price: Double?,

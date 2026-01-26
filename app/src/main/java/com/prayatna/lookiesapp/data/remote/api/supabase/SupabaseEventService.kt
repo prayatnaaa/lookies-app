@@ -164,4 +164,8 @@ class SupabaseEventService @Inject constructor(
         return response
     }
 
+    suspend fun uploadEventPaintings() {
+
+    }
+
 }

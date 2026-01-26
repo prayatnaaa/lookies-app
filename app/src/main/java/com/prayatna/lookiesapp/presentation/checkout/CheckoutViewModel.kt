@@ -57,7 +57,8 @@ class CheckoutViewModel @Inject constructor(
                     subtitle = "by ${event.organizer.name}",
                     price = event.ticketPrice,
                     imageUrl = event.bannerImageUrl,
-                    type = "event_ticket"
+                    type = "event_ticket",
+                    merchantId = event.organizer.id
                 )
                 _uiState.update { it.copy(isLoading = false, itemToBuy = itemDisplay) }
             }
@@ -78,7 +79,8 @@ class CheckoutViewModel @Inject constructor(
                     subtitle = "by ${data.participant.artist.fullName}",
                     price = data.finalPrice,
                     imageUrl = data.painting.paintingUrl,
-                    type = "painting"
+                    type = "painting",
+                    merchantId = data.participant.id
                 )
                 _uiState.update { it.copy(isLoading = false, itemToBuy = itemDisplay) }
             }

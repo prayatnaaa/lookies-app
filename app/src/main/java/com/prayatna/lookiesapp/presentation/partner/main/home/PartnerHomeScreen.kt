@@ -197,11 +197,11 @@ fun PartnerHomeScreen(
                                 )
 
                                 DashboardActionItem(
-                                    title = "Collaborators",
-                                    subtitle = "Manage artists and partners",
+                                    title = "Paintings",
+                                    subtitle = "Manage paintings",
                                     icon = Icons.Filled.Group,
                                     onClick = {
-                                        navController.navigate(NavigationRoutes.PARTICIPANT_LIST)
+                                        navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${data.partnerId}")
                                     }
                                 )
                             }
