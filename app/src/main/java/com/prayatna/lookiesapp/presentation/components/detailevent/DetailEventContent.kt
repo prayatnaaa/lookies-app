@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.components.detailevent
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -44,6 +45,7 @@ fun DetailEventContent(
     paintings: List<EventPainting> = emptyList(),
     showStatus: Boolean = false,
     isUserArtist: Boolean = false,
+    onPartnerClick: (String) -> Unit = {},
     onPaintingClick: (String) -> Unit = {}
 ) {
     val isOnlineEvent = remember(event.eventFormat) { event.eventFormat.slug == "online" }
@@ -117,6 +119,9 @@ fun DetailEventContent(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
+                        .clickable {
+                            onPartnerClick(event.organizer.id)
+                        }
                         .fillMaxWidth()
                         .border(
                             width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant,

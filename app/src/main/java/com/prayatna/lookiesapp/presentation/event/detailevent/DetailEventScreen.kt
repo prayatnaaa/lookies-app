@@ -93,6 +93,11 @@ fun DetailEventScreen(
                         val detailEvent = detailEventState.info
                         val paintings = detailEventState.paintings
                         DetailEventContent(
+                            onPartnerClick = { id ->
+                                navController
+                                    .navigate("${NavigationRoutes.MESSAGES}/$id/${detailEvent?.organizer?.name}")
+
+                            },
                             isUserArtist = role == "artist",
                             paintings = paintings,
                             onPaintingClick = { id ->
