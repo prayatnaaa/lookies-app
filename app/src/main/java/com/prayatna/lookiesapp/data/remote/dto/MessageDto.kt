@@ -18,7 +18,7 @@ data class MessageDto(
     @SerialName("sender_username")
     val senderUsername: String,
     @SerialName("sender_full_name")
-    val senderFullName: String,
+    val senderFullName: String? = null,
     @SerialName("sender_avatar")
     val senderAvatar: String? = null,
     @SerialName("sender_is_artist")
@@ -32,7 +32,7 @@ data class MessageDto(
     @SerialName("receiver_username")
     val receiverUsername: String,
     @SerialName("receiver_full_name")
-    val receiverFullName: String,
+    val receiverFullName: String? = null,
     @SerialName("receiver_avatar")
     val receiverAvatar: String? = null,
     @SerialName("receiver_is_artist")

@@ -3,6 +3,8 @@ package com.prayatna.lookiesapp.data.repository
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseChatService
 import com.prayatna.lookiesapp.data.remote.dto.ChatRoomDto
 import com.prayatna.lookiesapp.data.remote.dto.MessageDto
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.chat.CreateMessageResponse
 import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.RestException
@@ -31,6 +33,15 @@ class ChatRepositoryImpl @Inject constructor(
 
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Error")
+        }
+    }
+
+    override suspend fun createMessage(data: CreateMessageRequest): DataResult<CreateMessageResponse> {
+        return try {
+            val result = supabaseChatService.createMessage(data)
+            DataResult.Success(result)
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
         }
     }
 }

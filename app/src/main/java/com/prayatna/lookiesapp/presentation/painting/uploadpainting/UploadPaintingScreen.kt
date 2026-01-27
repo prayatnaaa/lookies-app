@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
 import com.prayatna.lookiesapp.presentation.components.painting.UploadPaintingForm
@@ -26,11 +27,11 @@ fun UploadPaintingScreen(
         listOf(NONE_ITEM) + viewModel.dropdownState.artStyles
     }
 
-//    LaunchedEffect(uiState) {
-//        if (uiState is UploadPaintingUiState.Success) {
-//            navController.popBackStack()
-//        }
-//    }
+    LaunchedEffect(uiState) {
+        if (uiState is UploadPaintingUiState.Success) {
+            navController.popBackStack()
+        }
+    }
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
@@ -39,6 +40,9 @@ fun UploadPaintingScreen(
     }
 
     UploadPaintingForm(
+        topBar = {
+            BackTopBar(navController = navController, title = "Upload Painting")
+        },
         params = params,
         selectedImage = image,
         uiState = uiState,

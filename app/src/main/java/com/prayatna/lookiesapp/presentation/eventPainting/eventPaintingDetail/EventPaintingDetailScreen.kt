@@ -160,7 +160,7 @@ fun EventPaintingDetailScreen(
                             .fillMaxWidth()
                             .clickable {
                                 artist.id?.let {
-                                    // navController.navigate(...)
+                                    navController.navigate("${NavigationRoutes.MESSAGES}/$it/${artist.username}")
                                 }
                             },
                         verticalAlignment = Alignment.CenterVertically

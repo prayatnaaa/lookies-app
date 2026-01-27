@@ -1,7 +1,10 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.ChatRoomDto
 import com.prayatna.lookiesapp.data.remote.dto.MessageDto
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.chat.CreateMessageResponse
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -35,6 +38,17 @@ class SupabaseChatService @Inject constructor(
                 MessageDto::id,
                 filter = FilterOperation("conversation_id", FilterOperator.EQ, conversationId),
             )
+        return response
+    }
+
+    suspend fun createMessage(data: CreateMessageRequest): CreateMessageResponse {
+        val senderId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
+        val finalData = data.copy(senderId = senderId)
+        val response = postgrest.from("messages").insert(finalData) {
+            select()
+        }.decodeSingle<CreateMessageResponse>()
+
+        Log.d("CHAT", "createMessage: $response")
         return response
     }
 

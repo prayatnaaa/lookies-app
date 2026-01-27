@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
 import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.presentation.chat.state.ChatEvent
 import com.prayatna.lookiesapp.presentation.chat.state.ChatUiState
@@ -33,7 +34,7 @@ class ChatViewModel @Inject constructor(
                 _uiState.update { it.copy(messageInput = event.value) }
             }
             is ChatEvent.SendMessage -> {
-                sendMessage()
+                sendMessage(event.receiverId)
             }
         }
     }
@@ -73,12 +74,37 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun sendMessage() {
-        val content = _uiState.value.messageInput
+    private fun sendMessage(receiverId: String) {
+        val content = uiState.value.messageInput.trim()
         if (content.isBlank()) return
 
         viewModelScope.launch {
+            val senderId = userPreferences.getProfile().first().id.orEmpty()
+
+            val request = CreateMessageRequest(
+                senderId = senderId,
+                receiverId = receiverId,
+                content = content
+            )
+
             _uiState.update { it.copy(messageInput = "") }
+
+            when (val result = chatRepository.createMessage(request)) {
+                is DataResult.Success -> {
+
+                }
+
+                is DataResult.Error -> {
+                    _uiState.update {
+                        it.copy(error = result.error)
+                    }
+                }
+
+                is DataResult.Loading -> {
+                    _uiState.update { it.copy(isLoading = true) }
+                }
+                else -> Unit
+            }
         }
     }
 }

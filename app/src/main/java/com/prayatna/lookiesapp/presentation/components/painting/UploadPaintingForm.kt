@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
 import com.prayatna.lookiesapp.domain.model.painting.PaintingAttribute
+import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
@@ -61,10 +62,12 @@ fun UploadPaintingForm(
     onEvent: (UploadPaintingEvent) -> Unit,
     artStyles: List<PaintingAttribute>,
     mediums: List<PaintingAttribute>,
+    topBar: @Composable () -> Unit
 ) {
     val scrollState = rememberScrollState()
 
     Scaffold(
+        topBar = topBar,
         contentWindowInsets = WindowInsets.ime,
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {

@@ -42,6 +42,11 @@ fun HomeScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val featuredEvent = state.events.firstOrNull()
+    val isLoading = state.isLoadingEvents || state.isLoadingPaintings
+
+    val isDataEmpty = state.events.isEmpty() && state.eventPaintings.isEmpty()
+
+    val isError = state.errorMessage != null
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -61,27 +62,28 @@ fun ChatScreen(
     val listState = rememberLazyListState()
 
     LaunchedEffect(targetId) {
-        viewModel.loadMessages(targetId = targetId)
+        viewModel.loadMessages(targetId)
     }
 
     LaunchedEffect(uiState.messages.size) {
         if (uiState.messages.isNotEmpty()) {
-            listState.animateScrollToItem(uiState.messages.size - 1)
+            listState.animateScrollToItem(uiState.messages.lastIndex)
         }
     }
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(text = targetName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    }
+                    Text(
+                        text = targetName,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
@@ -91,7 +93,9 @@ fun ChatScreen(
             ChatInputBar(
                 value = uiState.messageInput,
                 onValueChange = { viewModel.onEvent(ChatEvent.UpdateInput(it)) },
-                onSendClick = { viewModel.onEvent(ChatEvent.SendMessage) }
+                onSendClick = {
+                    viewModel.onEvent(ChatEvent.SendMessage(receiverId = targetId))
+                }
             )
         }
     ) { paddingValues ->
@@ -100,36 +104,41 @@ fun ChatScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (uiState.isLoading && uiState.messages.isEmpty()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (uiState.error != null) {
-                Text(
-                    text = uiState.error ?: "Unknown error",
-                    color = Color.Red,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(uiState.messages) { message ->
-                        val isMe = message.senderId == uiState.currentUserId
+            when {
+                uiState.isLoading && uiState.messages.isEmpty() -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
 
-                        MessageBubble(
-                            message = message,
-                            isMe = isMe
-                        )
+                uiState.error != null -> {
+                    Text(
+                        text = uiState.error ?: "Unknown error",
+                        color = Color.Red,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                else -> {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(uiState.messages) { message ->
+                            MessageBubble(
+                                message = message,
+                                isMe = message.senderId == uiState.currentUserId
+                            )
+                        }
+                        item { Spacer(modifier = Modifier.height(8.dp)) }
                     }
-                    item { Spacer(modifier = Modifier.padding(8.dp)) }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun MessageBubble(
@@ -182,7 +191,7 @@ fun MessageBubble(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = formatTime(message.sentAt),
+                text = message.sentAt,
                 color = textColor.copy(alpha = 0.7f),
                 fontSize = 10.sp,
                 modifier = Modifier.align(Alignment.End)
@@ -215,21 +224,29 @@ fun ChatInputBar(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            placeholder = { Text("Write messages...") },
-            modifier = Modifier
-                .weight(1f)
-                .background(Color.Transparent),
+            placeholder = { Text("Write message…") },
+            modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(24.dp),
+            maxLines = 4,
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             )
         )
-        IconButton(onClick = onSendClick) {
+
+        Spacer(modifier = Modifier.width(4.dp))
+
+        IconButton(
+            onClick = onSendClick,
+            enabled = value.isNotBlank()
+        ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = "Send",
-                tint = MaterialTheme.colorScheme.primary
+                tint = if (value.isNotBlank())
+                    MaterialTheme.colorScheme.primary
+                else
+                    Color.Gray
             )
         }
     }
