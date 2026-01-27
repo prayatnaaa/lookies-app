@@ -50,7 +50,9 @@ class SupabaseTransactionService @Inject constructor(
     suspend fun getUserTransactions(): List<TransactionDto> {
         val user = auth.currentUserOrNull() ?: throw IllegalStateException("User not logged in")
 
-        val result = postgrest.from("user_orders_view")
+        val result = postgrest
+//            .from("user_orders_view")
+            .from("transaction_view")
             .select {
                 filter {
                     eq("buyer_id", user.id)

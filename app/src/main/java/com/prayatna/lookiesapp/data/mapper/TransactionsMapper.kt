@@ -18,7 +18,8 @@ fun TransactionDto.toDomain(): Transaction {
         status = status,
         createdAt = createdAt,
         paymentInfo = paymentInfo?.toDomain(),
-        items = items.map { it.toDomain() }
+        items = items.map { it.toDomain() },
+        merchantId = merchantId
     )
 }
 

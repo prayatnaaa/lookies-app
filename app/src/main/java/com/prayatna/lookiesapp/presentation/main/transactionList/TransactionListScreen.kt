@@ -70,9 +70,9 @@ fun TransactionListScreen(
                             TransactionItemCard(
                                 transaction = transaction,
                                 onClick = {
-//                                    if (transaction.status == "awaiting_payment") {
-//                                        navController.navigate("${NavigationRoutes.PAYMENT}/${transaction.id}/${transaction.items[0].}/${transaction.totalAmount}")
-//                                    }
+                                    if (transaction.status == "awaiting_payment") {
+                                        navController.navigate("${NavigationRoutes.PAYMENT}/${transaction.id}/${transaction.merchantId}/${transaction.totalAmount}")
+                                    }
                                 }
                             )
                         }

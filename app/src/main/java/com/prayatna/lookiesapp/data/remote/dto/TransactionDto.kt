@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 data class TransactionDto(
     val id: String,
 
+    @SerialName("merchant_id")
+    val merchantId: String,
+
     @SerialName("buyer_id")
     val buyerId: String,
 

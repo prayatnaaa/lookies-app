@@ -1,11 +1,9 @@
 package com.prayatna.lookiesapp.presentation.transaction.payment
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.data.remote.dto.request.payment.*
 import com.prayatna.lookiesapp.domain.usecase.payment.CreateXenditPaymentUseCase
-import com.prayatna.lookiesapp.presentation.transaction.payment.state.PaymentMethod
+import com.prayatna.lookiesapp.presentation.transaction.payment.state.PaymentEvent
 import com.prayatna.lookiesapp.presentation.transaction.payment.state.PaymentUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,82 +24,70 @@ class PaymentViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun onMethodSelected(method: PaymentMethod) {
-        _uiState.update { it.copy(selectedMethod = method) }
+    fun onEvent(event: PaymentEvent) {
+        when (event) {
+
+            is PaymentEvent.SelectMethod ->
+                _uiState.update { it.copy(selectedMethod = event.method) }
+
+            is PaymentEvent.PhoneChanged ->
+                _uiState.update { it.copy(phoneNumber = event.value) }
+
+            is PaymentEvent.CardNumberChanged ->
+                _uiState.update { it.copy(cardNumber = event.value) }
+
+            is PaymentEvent.CardExpiryChanged ->
+                _uiState.update { it.copy(cardExpiry = event.value) }
+
+            is PaymentEvent.CardCvvChanged ->
+                _uiState.update { it.copy(cardCvv = event.value) }
+
+            is PaymentEvent.SubmitPayment ->
+                submitPayment(event)
+        }
     }
 
-    fun onPhoneNumberChange(value: String) = _uiState.update { it.copy(phoneNumber = value) }
-    fun onCardNumberChange(value: String) = _uiState.update { it.copy(cardNumber = value) }
-    fun onExpiryChange(value: String) = _uiState.update { it.copy(cardExpiry = value) }
-    fun onCvvChange(value: String) = _uiState.update { it.copy(cardCvv = value) }
-
-    fun processPayment(orderId: String, merchantId: String, amount: Double) {
+    private fun submitPayment(event: PaymentEvent.SubmitPayment) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val referenceId = "TRX-${System.currentTimeMillis()}"
-            val currentState = _uiState.value
-
-            val result = when (currentState.selectedMethod) {
-                PaymentMethod.GOPAY -> {
-                    val props = GopayChannelProperties(
-                        accountMobileNumber = currentState.phoneNumber.ifBlank { "+62810000000" }
-                    )
-                    val request = CreateXenditPaymentRequest(
-                        merchantId = merchantId,
-                        orderId = orderId,
-                        referenceId = referenceId,
-                        requestAmount = amount,
-                        channelCode = "GOPAY_RECURRING",
-                        channelProperties = props,
-                    )
-                    createXenditPaymentUseCase(request)
-                }
-                PaymentMethod.CREDIT_CARD -> {
-                    val (month, year) = if (currentState.cardExpiry.contains("/")) {
-                        currentState.cardExpiry.split("/")
-                    } else listOf("01", "2030")
-
-                    val props = CardChannelProperties(
-                        skipThreeDs = false,
-                        cardDetails = CardDetails(
-                            cardNumber = currentState.cardNumber,
-                            expiryMonth = month,
-                            expiryYear = "20$year",
-                            cardholderFirstName = "Customer",
-                            cardholderLastName = "Name",
-                            cardholderEmail = "customer@example.com"
-                        )
-                    )
-                    val request = CreateXenditPaymentRequest(
-                        merchantId = merchantId,
-                        orderId = orderId,
-                        referenceId = referenceId,
-                        requestAmount = amount,
-                        channelCode = "CARDS",
-                        channelProperties = props
-                    )
-                    createXenditPaymentUseCase(request)
-                }
-            }
+            val result = createXenditPaymentUseCase(
+                state = _uiState.value,
+                orderId = event.orderId,
+                merchantId = event.merchantId,
+                amount = event.amount
+            )
 
             when (result) {
                 is DataResult.Success -> {
-                    val actions = result.data.paymentToken?.get("actions")?.jsonArray
-                    val redirectUrl = actions?.firstOrNull()?.jsonObject?.get("url")?.jsonPrimitive?.content
+                    val redirectUrl =
+                        result.data.paymentToken
+                            ?.get("actions")
+                            ?.jsonArray
+                            ?.firstOrNull()
+                            ?.jsonObject
+                            ?.get("value")
+                            ?.jsonPrimitive
+                            ?.content
 
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            paymentSuccessUrl = redirectUrl,
-                            isSuccess = true
+                            isSuccess = true,
+                            paymentSuccessUrl = redirectUrl
                         )
                     }
                 }
+
                 is DataResult.Error -> {
-                    Log.e("PaymentViewModel", "processPayment: ${result.error}")
-                    _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.error
+                        )
+                    }
                 }
+
                 else -> Unit
             }
         }

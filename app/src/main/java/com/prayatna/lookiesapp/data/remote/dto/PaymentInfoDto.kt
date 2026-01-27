@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PaymentInfoDto(
     @SerialName("payment_id")
-    val paymentId: String,
+    val paymentId: String? = null,
 
     @SerialName("invoice_id")
     val invoiceId: String,
