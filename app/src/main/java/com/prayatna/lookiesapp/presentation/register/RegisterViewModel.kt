@@ -5,11 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.domain.model.auth.RegisterInput
+import com.prayatna.lookiesapp.domain.model.auth.RegisterOutput
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.presentation.register.events.RegisterEvent
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jan.supabase.gotrue.user.UserInfo
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -20,42 +21,71 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val authRepository: AuthRepository
-): ViewModel() {
+) : ViewModel() {
 
-        var emailValue by mutableStateOf("")
-            private set
+    var fullName by mutableStateOf("")
+        private set
 
-        var passwordValue by mutableStateOf("")
-            private set
+    var email by mutableStateOf("")
+        private set
 
-        private val _registerStatus = MutableStateFlow<DataResult<UserInfo?>>(DataResult.Idle)
-        val registerStatus = _registerStatus.asStateFlow()
+    var password by mutableStateOf("")
+        private set
 
-        private val _events = MutableSharedFlow<RegisterEvent>()
-        val events = _events.asSharedFlow()
+    var verifyPassword by mutableStateOf("")
+        private set
 
-        fun onEmailChange(emailValue: String) {
-            this.emailValue = emailValue
-        }
+    private val _registerStatus =
+        MutableStateFlow<DataResult<RegisterOutput>>(DataResult.Idle)
+    val registerStatus = _registerStatus.asStateFlow()
 
-        fun onPasswordChange(passwordValue: String) {
-            this.passwordValue = passwordValue
-        }
+    private val _events = MutableSharedFlow<RegisterEvent>()
+    val events = _events.asSharedFlow()
+
+    fun onFullNameChange(value: String) {
+        fullName = value
+    }
+
+    fun onEmailChange(value: String) {
+        email = value
+    }
+
+    fun onPasswordChange(value: String) {
+        password = value
+    }
+
+    fun onVerifyPasswordChange(value: String) {
+        verifyPassword = value
+    }
 
     fun onSignUp() {
+        val input = RegisterInput(
+            fullName = fullName.trim(),
+            email = email.trim(),
+            password = password,
+            verifyPassword = verifyPassword
+        )
+
         viewModelScope.launch {
             _registerStatus.value = DataResult.Loading
 
-            when (val result = authRepository.signUp(emailValue, passwordValue)) {
+            when (val result = authRepository.signUp(input)) {
                 is DataResult.Success -> {
-                    _events.emit(RegisterEvent.ShowSuccessDialog("Register success!"))
-                    _registerStatus.value = DataResult.Success(result.data)
+                    _registerStatus.value = result
+                    _events.emit(
+                        RegisterEvent.ShowSuccessDialog(
+                            result.data.message
+                        )
+                    )
                 }
 
                 is DataResult.Error -> {
-                    _events.emit(RegisterEvent.ShowErrorDialog(result.error))
-                    _registerStatus.value = DataResult.Error(result.error)
+                    _registerStatus.value = result
+                    _events.emit(
+                        RegisterEvent.ShowErrorDialog(result.error)
+                    )
                 }
+
                 else -> Unit
             }
         }

@@ -108,6 +108,9 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             AuthCard(
+                verifyPasswordValue = viewModel.verifyPassword,
+                onVerifyPasswordChange = viewModel::onVerifyPasswordChange,
+                isRegister = true,
                 title = "Lookies",
                 onRegister = { viewModel.onSignUp() },
                 onLogin = {
@@ -118,8 +121,10 @@ fun RegisterScreen(
                     }
                 },
                 inRegister = true,
-                emailValue = viewModel.emailValue,
-                passwordValue = viewModel.passwordValue,
+                emailValue = viewModel.email,
+                passwordValue = viewModel.password,
+                fullNameValue = viewModel.fullName,
+                onFullNameChange = viewModel::onFullNameChange,
                 onEmailChange = viewModel::onEmailChange,
                 onPasswordChange = viewModel::onPasswordChange
             )

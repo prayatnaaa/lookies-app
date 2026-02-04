@@ -1,36 +1,13 @@
 package com.prayatna.lookiesapp.presentation.components.auth
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -42,66 +19,91 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.AmoledBlack
-import com.prayatna.lookiesapp.ui.theme.BlackText
-import com.prayatna.lookiesapp.ui.theme.GreyTextLight
-import com.prayatna.lookiesapp.ui.theme.PureWhite
+import com.prayatna.lookiesapp.ui.theme.*
 
 @Composable
 fun AuthCard(
     modifier: Modifier = Modifier,
     title: String,
+
+    // actions
     onLogin: () -> Unit,
     onRegister: () -> Unit,
+
+    // state flags
     inRegister: Boolean = false,
+    isRegister: Boolean = false,
+
+    // values
+    fullNameValue: String = "",
     emailValue: String,
     passwordValue: String,
+    verifyPasswordValue: String = "",
+
+    // callbacks
+    onFullNameChange: (String) -> Unit = {},
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
+    onVerifyPasswordChange: (String) -> Unit = {}
 ) {
 
+    var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    var isConfirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
+
     ElevatedCard(
-        colors = CardDefaults.cardColors(containerColor = AmoledBlack),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ),
         modifier = modifier.width(340.dp),
         shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = AmoledBlack),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Column(
-            modifier = modifier.padding(16.dp),
-            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Text(
                 text = title,
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                ),
-                modifier = modifier.width(148.dp),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onPrimary
             )
 
-            Spacer(modifier = modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
+            // ✅ FULL NAME
+            if (isRegister) {
+                AuthTextField(
+                    title = "Full Name",
+                    value = fullNameValue,
+                    onValueChange = onFullNameChange,
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Full Name"
+                        )
+                    }
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+            }
+
+            // EMAIL
             AuthTextField(
+                title = "Email",
                 value = emailValue,
                 onValueChange = onEmailChange,
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.Email,
-                        contentDescription = "Filled Email"
+                        contentDescription = "Email"
                     )
                 },
-                title = "Email",
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
 
-            Spacer(modifier = modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
+            // PASSWORD
             AuthTextField(
                 title = "Password",
                 value = passwordValue,
@@ -109,62 +111,97 @@ fun AuthCard(
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.Lock,
-                        contentDescription = "Filled Locked"
+                        contentDescription = "Password"
                     )
                 },
                 trailingIcon = {
-                    IconButton(onClick = {isPasswordVisible = !isPasswordVisible}) {
+                    IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                         Icon(
-                            imageVector = if (isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                            contentDescription = "Filled Visibility"
+                            imageVector =
+                                if (isPasswordVisible) Icons.Filled.VisibilityOff
+                                else Icons.Filled.Visibility,
+                            contentDescription = "Toggle Password"
                         )
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
+                visualTransformation =
+                    if (isPasswordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation()
             )
 
-            Spacer(modifier = modifier.height(18.dp))
+            // CONFIRM PASSWORD
+            if (isRegister) {
+                Spacer(modifier = Modifier.height(14.dp))
+
+                AuthTextField(
+                    title = "Confirm Password",
+                    value = verifyPasswordValue,
+                    onValueChange = onVerifyPasswordChange,
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Lock,
+                            contentDescription = "Confirm Password"
+                        )
+                    },
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                isConfirmPasswordVisible = !isConfirmPasswordVisible
+                            }
+                        ) {
+                            Icon(
+                                imageVector =
+                                    if (isConfirmPasswordVisible)
+                                        Icons.Filled.VisibilityOff
+                                    else Icons.Filled.Visibility,
+                                contentDescription = "Toggle Confirm Password"
+                            )
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    visualTransformation =
+                        if (isConfirmPasswordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             Row(
-                modifier = modifier.width(303.dp),
+                modifier = Modifier.width(303.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+
                 TextButton(
                     onClick = { if (inRegister) onLogin() else onRegister() },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.size(109.dp, 34.dp)
                 ) {
                     Text(
                         text = if (inRegister) "Sign in" else "Sign up",
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                        ),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
-                Button (
-                    enabled = if (inRegister) emailValue.isNotBlank() && passwordValue.isNotBlank() else emailValue.isNotBlank() && passwordValue.isNotBlank(),
+                Button(
+                    enabled =
+                        if (isRegister)
+                            fullNameValue.isNotBlank() &&
+                                    emailValue.isNotBlank() &&
+                                    passwordValue.isNotBlank()
+                        else
+                            emailValue.isNotBlank() && passwordValue.isNotBlank(),
+
                     onClick = { if (inRegister) onRegister() else onLogin() },
                     shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.size(109.dp, 34.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        disabledContainerColor = MaterialTheme.colorScheme.secondary,
-                    ),
+                    modifier = Modifier.size(109.dp, 34.dp)
                 ) {
                     Text(
                         text = if (inRegister) "Sign up" else "Sign in",
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                        ),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -172,73 +209,55 @@ fun AuthCard(
     }
 }
 
-
-
 @Composable
 fun AuthTextField(
     modifier: Modifier = Modifier,
     title: String,
     value: String,
     onValueChange: (String) -> Unit,
-    icon: @Composable (() -> Unit),
+    icon: @Composable () -> Unit,
     trailingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     OutlinedTextField(
         value = value,
-        onValueChange = {
-            if (!it.contains("\n")) onValueChange(it)
-        },
+        onValueChange = { if (!it.contains("\n")) onValueChange(it) },
         placeholder = {
-            Text(
-                text = title,
-                style = TextStyle(fontSize = 12.sp),
-                color = MaterialTheme.colorScheme.secondary
-            )
+            Text(text = title, fontSize = 12.sp)
         },
         leadingIcon = icon,
         trailingIcon = trailingIcon,
         modifier = modifier.size(303.dp, 48.dp),
-        visualTransformation = visualTransformation,
         shape = RoundedCornerShape(12.dp),
         textStyle = TextStyle(fontSize = 12.sp),
+        keyboardOptions = keyboardOptions,
+        visualTransformation = visualTransformation,
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = PureWhite,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-
             focusedContainerColor = BlackText,
             unfocusedContainerColor = BlackText,
-
-            focusedLabelColor = PureWhite,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSecondary,
-
-            cursorColor = MaterialTheme.colorScheme.onPrimary,
-
             focusedTextColor = PureWhite,
-            unfocusedTextColor = GreyTextLight,
-
-            focusedTrailingIconColor = PureWhite,
-            unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline,
-
-            focusedLeadingIconColor = PureWhite,
-            unfocusedLeadingIconColor = MaterialTheme.colorScheme.outline
-        ),
-        keyboardOptions = keyboardOptions
+            unfocusedTextColor = GreyTextLight
+        )
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-fun AuthCardPreview() {
+fun AuthCardRegisterPreview() {
     AuthCard(
         title = "Register",
-        onLogin = {},
-        onRegister = {},
+        isRegister = true,
         inRegister = true,
-        emailValue = "newuser@email.com",
+        fullNameValue = "John Doe",
+        emailValue = "john@email.com",
         passwordValue = "password123",
+        onFullNameChange = {},
         onEmailChange = {},
-        onPasswordChange = {}
+        onPasswordChange = {},
+        onRegister = {},
+        onLogin = {}
     )
 }

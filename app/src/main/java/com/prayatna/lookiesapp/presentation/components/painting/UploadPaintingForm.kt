@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
 import com.prayatna.lookiesapp.domain.model.painting.PaintingAttribute
-import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.event.UploadPaintingEvent
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.state.UploadPaintingUiState
@@ -178,6 +177,16 @@ fun UploadPaintingForm(
             )
 
             OutlinedTextField(
+                value = if (params.price == 0.0) "" else params.price.toString() ,
+                onValueChange = { onEvent(UploadPaintingEvent.OnSubjectChange(it)) },
+                label = { Text("Price") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
+            )
+
+            OutlinedTextField(
                 value = params.description,
                 onValueChange = { onEvent(UploadPaintingEvent.OnDescriptionChange(it)) },
                 label = { Text("Description") },
@@ -244,6 +253,7 @@ fun UploadPaintingForm(
             )
 
             Spacer(modifier = Modifier.height(80.dp))
+
         }
 
         if (uiState is UploadPaintingUiState.Success) {

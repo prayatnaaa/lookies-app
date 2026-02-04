@@ -73,10 +73,18 @@ fun PartnerSubmissionScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is PartnerSubmissionUiState.Success -> {
-                Toast.makeText(context, "Registrasi Berhasil! Mohon tunggu verifikasi.", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    context,
+                    "Registration successful! Please wait for verification.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
             is PartnerSubmissionUiState.Error -> {
-                Toast.makeText(context, (uiState as PartnerSubmissionUiState.Error).message, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    context,
+                    (uiState as PartnerSubmissionUiState.Error).message,
+                    Toast.LENGTH_LONG
+                ).show()
                 viewModel.onEvent(PartnerSubmissionEvent.DismissError)
             }
             else -> {}
@@ -87,12 +95,15 @@ fun PartnerSubmissionScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Daftar Partner", fontWeight = FontWeight.SemiBold) },
+                title = { Text("Partner Registration", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.navigateUp()
                     }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                 }
             )
@@ -104,7 +115,7 @@ fun PartnerSubmissionScreen(
             formState = formState,
             isLoading = uiState is PartnerSubmissionUiState.Loading,
             onEvent = viewModel::onEvent,
-            onPickFileClick = { launcher.launch("image/*") } // Hanya gambar
+            onPickFileClick = { launcher.launch("image/*") }
         )
     }
 }
@@ -127,12 +138,12 @@ fun PartnerSubmissionContent(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
 
-        FormSection(title = "Detail Bisnis") {
+        FormSection(title = "Business Details") {
             OutlinedTextField(
                 shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 value = formState.legalName,
                 onValueChange = { onEvent(PartnerSubmissionEvent.LegalNameChanged(it)) },
-                label = { Text("Nama Legal (PT/CV)") },
+                label = { Text("Legal Name (Ltd / LLC)") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -142,7 +153,7 @@ fun PartnerSubmissionContent(
                 shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 value = formState.tradingName,
                 onValueChange = { onEvent(PartnerSubmissionEvent.TradingNameChanged(it)) },
-                label = { Text("Nama Toko / Brand") },
+                label = { Text("Store / Brand Name") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -152,19 +163,19 @@ fun PartnerSubmissionContent(
                 shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 value = formState.description,
                 onValueChange = { onEvent(PartnerSubmissionEvent.DescriptionChanged(it)) },
-                label = { Text("Deskripsi Singkat") },
+                label = { Text("Short Description") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5
             )
         }
 
-        FormSection(title = "Alamat & Kontak") {
+        FormSection(title = "Address & Contact") {
             OutlinedTextField(
                 shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 value = formState.streetLine1,
                 onValueChange = { onEvent(PartnerSubmissionEvent.AddressChanged(it)) },
-                label = { Text("Alamat Jalan") },
+                label = { Text("Street Address") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
@@ -174,7 +185,7 @@ fun PartnerSubmissionContent(
                     shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                     value = formState.city,
                     onValueChange = { onEvent(PartnerSubmissionEvent.CityChanged(it)) },
-                    label = { Text("Kota") },
+                    label = { Text("City") },
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
@@ -182,7 +193,7 @@ fun PartnerSubmissionContent(
                     shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                     value = formState.province,
                     onValueChange = { onEvent(PartnerSubmissionEvent.ProvinceChanged(it)) },
-                    label = { Text("Provinsi") },
+                    label = { Text("Province") },
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
@@ -192,20 +203,23 @@ fun PartnerSubmissionContent(
                 shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 value = formState.postalCode,
                 onValueChange = { onEvent(PartnerSubmissionEvent.PostalCodeChanged(it)) },
-                label = { Text("Kode Pos") },
+                label = { Text("Postal Code") },
                 modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
                 singleLine = true
             )
         }
 
-        FormSection(title = "Informasi Pemilik") {
+        FormSection(title = "Owner Information") {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                     value = formState.ownerFirstName,
                     onValueChange = { onEvent(PartnerSubmissionEvent.OwnerFirstNameChanged(it)) },
-                    label = { Text("Nama Depan") },
+                    label = { Text("First Name") },
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
@@ -213,7 +227,7 @@ fun PartnerSubmissionContent(
                     shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                     value = formState.ownerLastName,
                     onValueChange = { onEvent(PartnerSubmissionEvent.OwnerLastNameChanged(it)) },
-                    label = { Text("Nama Belakang") },
+                    label = { Text("Last Name") },
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
@@ -223,9 +237,12 @@ fun PartnerSubmissionContent(
                 shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 value = formState.ownerEmail,
                 onValueChange = { onEvent(PartnerSubmissionEvent.OwnerEmailChanged(it)) },
-                label = { Text("Email Pemilik") },
+                label = { Text("Owner Email") },
                 modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
                 singleLine = true
             )
 
@@ -233,16 +250,21 @@ fun PartnerSubmissionContent(
                 shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 value = formState.ownerPhone,
                 onValueChange = { onEvent(PartnerSubmissionEvent.OwnerPhoneChanged(it)) },
-                label = { Text("No. HP Pemilik") },
+                label = { Text("Owner Phone Number") },
                 modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Done
+                ),
                 singleLine = true
             )
         }
 
-        FormSection(title = "Dokumen Legalitas (KYC)") {
+        FormSection(title = "Legal Documents (KYC)") {
             Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                ),
                 shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -258,7 +280,7 @@ fun PartnerSubmissionContent(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Upload KTP / SIUP / NIB",
+                        text = "Upload ID Card / Business License / Registration Number",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                     )
@@ -266,7 +288,9 @@ fun PartnerSubmissionContent(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
@@ -279,7 +303,7 @@ fun PartnerSubmissionContent(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     OutlinedButton(onClick = onPickFileClick) {
-                        Text("Ganti File")
+                        Text("Change File")
                     }
                 }
             }
@@ -301,7 +325,11 @@ fun PartnerSubmissionContent(
                     modifier = Modifier.size(24.dp)
                 )
             } else {
-                Text(text = "Daftarkan Bisnis", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = "Register Business",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
 

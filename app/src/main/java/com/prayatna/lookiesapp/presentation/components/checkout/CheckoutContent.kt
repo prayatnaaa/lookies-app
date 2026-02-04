@@ -22,15 +22,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,11 +40,10 @@ fun CheckoutContent(
     uiState: CheckoutUiState,
     onBackClick: () -> Unit,
     quantity: Int,
-    onPayClick: (String) -> Unit,
+    onPayClick: () -> Unit,
     onRefresh: () -> Unit,
     snackbarHost: @Composable () -> Unit = {}
 ) {
-    var description by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         snackbarHost = snackbarHost,
@@ -68,7 +62,7 @@ fun CheckoutContent(
                 CheckoutBottomBar(
                     totalPrice = uiState.itemToBuy.price!!.times(quantity),
                     isLoading = uiState.isLoading,
-                    onPayClick = { onPayClick(description) }
+                    onPayClick = { onPayClick() }
                 )
             }
         }
@@ -87,9 +81,9 @@ fun CheckoutContent(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Gagal memuat data item.")
+                    Text("Failed to load item")
                     Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = onRefresh) { Text("Coba Lagi") }
+                    Button(onClick = onRefresh) { Text("Try again") }
                 }
             }
             else if (uiState.itemToBuy != null) {
@@ -101,7 +95,7 @@ fun CheckoutContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Barang yang dibeli",
+                        text = "Purchased Item",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -118,28 +112,13 @@ fun CheckoutContent(
                     HorizontalDivider()
 
                     Text(
-                        text = "Catatan (Opsional)",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    OutlinedTextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Contoh: Tolong bungkus yang rapi...") },
-                        maxLines = 3
-                    )
-
-                    HorizontalDivider()
-
-                    Text(
-                        text = "Ringkasan Pembayaran",
+                        text = "Payments Summary",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
 
-                    PaymentSummaryRow(label = "Harga Satuan", amount = uiState.itemToBuy.price ?: 0.0)
-                    PaymentSummaryRow(label = "Biaya Layanan", amount = 0.0) // Bisa ditambah logic tax
+                    PaymentSummaryRow(label = "Unit price", amount = uiState.itemToBuy.price ?: 0.0)
+//                    PaymentSummaryRow(label = "Service fee", amount = 0.0)
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -148,7 +127,7 @@ fun CheckoutContent(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Total Tagihan",
+                            text = "Total",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -213,7 +192,7 @@ fun CheckoutBottomBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Total: ${formatRupiah(totalPrice)}")
-                    Text("Bayar Sekarang", fontWeight = FontWeight.Bold)
+                    Text("Pay", fontWeight = FontWeight.Bold)
                 }
             }
         }

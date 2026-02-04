@@ -105,6 +105,7 @@ fun LoginScreen(modifier: Modifier = Modifier,
                 val emailValue = viewModel.emailValue
                 val passwordValue = viewModel.passwordValue
                 AuthCard(
+                    isRegister = false,
                     title = "Lookies",
                     onLogin = {
                         viewModel.onSignIn()

@@ -2,14 +2,23 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.auth0.android.jwt.JWT
+import com.prayatna.lookiesapp.BuildConfig
+import com.prayatna.lookiesapp.data.remote.dto.request.auth.RegisterRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
+import com.prayatna.lookiesapp.data.remote.dto.response.auth.RegisterResponse
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.gotrue.user.UserInfo
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import javax.inject.Inject
 
 class SupabaseAuthService @Inject constructor(
     private val auth: Auth,
+    private val httpClient: HttpClient
 ) {
 
     suspend fun signIn(email: String, password: String): LoginResponse {
@@ -36,12 +45,13 @@ class SupabaseAuthService @Inject constructor(
         return LoginResponse(success = true, role = role.toString())
     }
 
-    suspend fun signUp(email: String, password: String): UserInfo? {
-        val result = auth.signUpWith(Email) {
-            this.email = email
-            this.password = password
+    suspend fun signUp(request: RegisterRequest): RegisterResponse {
+        val response = httpClient.post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/register") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
         }
-        return result
+
+        return response.body()
     }
 
     fun getRole(): String {

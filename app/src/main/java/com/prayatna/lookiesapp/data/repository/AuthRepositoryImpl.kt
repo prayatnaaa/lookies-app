@@ -1,15 +1,18 @@
 package com.prayatna.lookiesapp.data.repository
 
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
+import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthService
 import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
+import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.auth.RegisterInput
+import com.prayatna.lookiesapp.domain.model.auth.RegisterOutput
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.user.UserInfo
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -38,20 +41,19 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun signUp(email: String, password: String): DataResult<UserInfo?> {
+    override suspend fun signUp(data: RegisterInput): DataResult<RegisterOutput> {
         return try {
-            val result = supabaseAuthService.signUp(email = email, password = password)
-            DataResult.Success(result)
+            val result = supabaseAuthService.signUp(request = data.toDto())
+            if (result.status != "success") {
+                DataResult.Error(result.message)
+            } else {
+                DataResult.Success(result.toDomain())
+            }
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
-        } catch (e: HttpRequestException) {
-            DataResult.Error(e.message ?: "Network error")
-        } catch (e: Exception) {
-            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
-
 
     override suspend fun isSessionActive(): DataResult<Boolean> {
         return try {
