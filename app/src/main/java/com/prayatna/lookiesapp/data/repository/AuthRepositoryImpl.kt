@@ -13,6 +13,8 @@ import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.SessionStatus
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -20,6 +22,15 @@ class AuthRepositoryImpl @Inject constructor(
     private val supabaseAuthService: SupabaseAuthService,
     private val userPreference: UserPreference
 ): AuthRepository {
+    override fun listenUserSession(): DataResult<Flow<SessionStatus>> {
+        return try {
+            val response = supabaseAuthService.listenUserSession()
+            DataResult.Success(response)
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
 
     override suspend fun signIn(email: String, password: String): DataResult<LoginResponse> {
         return try {

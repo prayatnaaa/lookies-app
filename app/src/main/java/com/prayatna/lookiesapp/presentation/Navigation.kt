@@ -51,7 +51,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.isSessionActive()
+        viewModel.observeSession()
     }
 
     LaunchedEffect(authState) {

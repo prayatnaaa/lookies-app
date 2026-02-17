@@ -8,9 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
+import com.prayatna.lookiesapp.domain.usecase.auth.ListenUserSessionUseCase
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jan.supabase.gotrue.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val userPreference: UserPreference
+    private val userPreference: UserPreference,
+    private val listenUserSessionUseCase: ListenUserSessionUseCase
 ) : ViewModel() {
 
     var emailValue by mutableStateOf("")
@@ -73,6 +76,34 @@ class LoginViewModel @Inject constructor(
                 }
 
                 else -> Unit
+            }
+        }
+    }
+
+    fun observeSession() {
+        viewModelScope.launch {
+            when (val result = listenUserSessionUseCase()) {
+                is DataResult.Error -> {
+                    _authState.value = AuthState.Error(result.error)
+                }
+                DataResult.Idle -> TODO()
+                DataResult.Loading -> TODO()
+                is DataResult.Success -> {
+                    val session = result.data
+
+                    session.collect { sessionStatus ->
+                        when (sessionStatus) {
+                            is SessionStatus.Authenticated -> {
+                                loadAuthenticatedUser()
+                            }
+                            is SessionStatus.NotAuthenticated -> {
+                                _authState.value = AuthState.Unauthenticated
+                            }
+                            else -> {}
+                        }
+
+                    }
+                }
             }
         }
     }

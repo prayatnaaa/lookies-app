@@ -14,12 +14,15 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SupabaseAuthService @Inject constructor(
     private val auth: Auth,
     private val httpClient: HttpClient
 ) {
+
+    fun listenUserSession() = auth.sessionStatus
 
     suspend fun signIn(email: String, password: String): LoginResponse {
         auth.signInWith(Email) {
