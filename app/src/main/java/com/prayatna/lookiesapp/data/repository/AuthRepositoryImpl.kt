@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthService
@@ -35,6 +36,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signIn(email: String, password: String): DataResult<LoginResponse> {
         return try {
             val response = supabaseAuthService.signIn(email = email, password = password)
+            Log.d("SignIn", "Response: $response")
             if (response.success) {
                 userPreference.setRole(response.role)
                 DataResult.Success(response)
@@ -91,7 +93,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun logout(): DataResult<Any> {
         return try {
-            auth.clearSession()
+            auth.signOut()
             userPreference.logout()
             DataResult.Success(Any())
         } catch (e: RestException) {

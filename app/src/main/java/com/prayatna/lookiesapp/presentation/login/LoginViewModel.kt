@@ -1,11 +1,11 @@
 package com.prayatna.lookiesapp.presentation.login
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
 import com.prayatna.lookiesapp.domain.usecase.auth.ListenUserSessionUseCase
@@ -16,14 +16,12 @@ import io.github.jan.supabase.gotrue.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val userPreference: UserPreference,
     private val listenUserSessionUseCase: ListenUserSessionUseCase
 ) : ViewModel() {
 
@@ -66,9 +64,7 @@ class LoginViewModel @Inject constructor(
             when (val result = authRepository.signIn(emailValue, passwordValue)) {
 
                 is DataResult.Success -> {
-                    val role = result.data.role
                     resetForm()
-                    _authState.value = AuthState.Authenticated(role)
                 }
 
                 is DataResult.Error -> {
@@ -94,9 +90,11 @@ class LoginViewModel @Inject constructor(
                     session.collect { sessionStatus ->
                         when (sessionStatus) {
                             is SessionStatus.Authenticated -> {
+                                Log.d("SignIn", "Authenticated")
                                 loadAuthenticatedUser()
                             }
                             is SessionStatus.NotAuthenticated -> {
+                                Log.d("SignIn", "Not authenticated")
                                 _authState.value = AuthState.Unauthenticated
                             }
                             else -> {}
@@ -108,34 +106,11 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun isSessionActive() {
-        viewModelScope.launch {
-            _authState.value = AuthState.Loading
-
-            when (val sessionResult = authRepository.isSessionActive()) {
-
-                is DataResult.Success -> {
-                    if (sessionResult.data) {
-                        loadAuthenticatedUser()
-                    } else {
-                        _authState.value = AuthState.Unauthenticated
-                    }
-                }
-
-                is DataResult.Error -> {
-                    _authState.value = AuthState.Error(sessionResult.error)
-                }
-
-                else -> Unit
-            }
-        }
-    }
-
     private fun loadAuthenticatedUser() {
         viewModelScope.launch {
-            val role = userPreference.getRole().firstOrNull()
-
-            if (role.isNullOrBlank()) {
+            val role = authRepository.getRole()
+            Log.d("SignIn", "Role in lAU: $role")
+            if (role.isBlank()) {
                 _authState.value = AuthState.Unauthenticated
             } else {
                 _authState.value = AuthState.Authenticated(role)

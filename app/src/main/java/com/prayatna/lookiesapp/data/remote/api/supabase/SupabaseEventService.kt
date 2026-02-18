@@ -67,6 +67,8 @@ class SupabaseEventService @Inject constructor(
             val session = auth.currentSessionOrNull()
                 ?: throw IllegalStateException("No active session")
 
+            Log.d("Create-Event", "Access token: ${session.accessToken}")
+
             val response =  httpClient.post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/create-event") {
                 contentType(ContentType.Application.Json)
                 header("Authorization", "Bearer ${session.accessToken}")

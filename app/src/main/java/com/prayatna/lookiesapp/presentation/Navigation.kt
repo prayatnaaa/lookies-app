@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -65,6 +66,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 NavigationRoutes.LOGIN
 
             is AuthState.Authenticated -> {
+                Log.d("SignIn", "role: " + state.role)
                 when (state.role) {
                     "admin" -> NavigationRoutes.ADMIN_MAIN
                     "partner" -> NavigationRoutes.PARTNER_MAIN_SCREEN
@@ -73,16 +75,14 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 }
             }
 
-            is AuthState.Error ->
+            is AuthState.Error -> {
+                Log.d("SignIn", "Error: ${state.message}")
                 NavigationRoutes.LOGIN
+            }
         }
 
-        val currentRoute =
-            navController.currentBackStackEntry?.destination?.route
-        if (currentRoute == destination) return@LaunchedEffect
-
         navController.navigate(destination) {
-            popUpTo(0) {
+            popUpTo(navController.graph.startDestinationId) {
                 inclusive = true
             }
             launchSingleTop = true
