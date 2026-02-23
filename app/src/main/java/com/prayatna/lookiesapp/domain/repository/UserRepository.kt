@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.domain.repository
 
 import android.net.Uri
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
+import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
@@ -19,5 +20,5 @@ interface UserRepository {
         request: CreateAccountHolderInput,
         kycFile: Uri,
         fileName: String
-    ): DataResult<String>
+    ): DataResult<RoleApplicationResponse>
 }

@@ -1,20 +1,28 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateAccountHolderRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.storage.Storage
-import io.github.jan.supabase.storage.upload
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import java.util.UUID
 import javax.inject.Inject
 
 class SupabaseUserService @Inject constructor(
     private val auth: Auth,
     private val postgrest: Postgrest,
-    private val storage: Storage
+    private val storage: Storage,
+    private val httpClient: HttpClient
 ) {
 
 
@@ -88,7 +96,10 @@ class SupabaseUserService @Inject constructor(
         request: CreateAccountHolderRequest,
         kycFile: ByteArray,
         fileName: String
-    ): String {
+    ): RoleApplicationResponse {
+
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
 
         val userId = auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not logged in")
@@ -115,7 +126,7 @@ class SupabaseUserService @Inject constructor(
                     fileId = path
                 )
             } else {
-                throw IllegalStateException("List kycDocuments tidak boleh kosong")
+                throw IllegalStateException("List kycDocuments cannot be empty")
             }
 
             val finalRequest = request.copy(
@@ -123,17 +134,14 @@ class SupabaseUserService @Inject constructor(
                 userId = userId
             )
 
-            val params = mapOf("payload" to finalRequest)
-
-            val result = postgrest.rpc(
-                function = "create_business_with_kyc",
-                parameters = params
-            )
-
-            val businessIdString = result.decodeAs<String>()
-            Log.d("Supabase", "Business Registered with ID: $businessIdString")
-
-            return businessIdString
+            val response = httpClient
+                .post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/role-application") {
+                    contentType(ContentType.Application.Json)
+                    header("Authorization", "Bearer ${session.accessToken}")
+                    setBody(finalRequest)
+                }
+            Log.d("RegisterBusiness", "Response: ${response.body<RoleApplicationResponse>()}")
+            return response.body()
 
         } catch (e: Exception) {
             Log.e("Supabase", "Error logic, rolling back file...", e)

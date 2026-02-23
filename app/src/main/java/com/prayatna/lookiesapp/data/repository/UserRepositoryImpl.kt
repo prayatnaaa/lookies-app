@@ -7,6 +7,7 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.mapper.toDto
+import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
 import com.prayatna.lookiesapp.domain.repository.UserRepository
@@ -123,7 +124,7 @@ class UserRepositoryImpl @Inject constructor(
         request: CreateAccountHolderInput,
         kycFile: Uri,
         fileName: String
-    ): DataResult<String> {
+    ): DataResult<RoleApplicationResponse> {
         val compressedImage = kycFile.compressImage(context, 500_000L)
             ?: return DataResult.Error("Image is not selected")
         return try {
