@@ -9,7 +9,7 @@ import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.mapper.toDto
-import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
+import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
@@ -121,7 +121,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun registerBusiness(
-        request: CreateAccountHolderInput,
+        request: RoleApplicationInput,
         kycFile: Uri,
         fileName: String
     ): DataResult<RoleApplicationResponse> {
@@ -133,7 +133,11 @@ class UserRepositoryImpl @Inject constructor(
                 kycFile = compressedImage,
                 fileName = fileName
             )
-            DataResult.Success(result)
+            if (result.status == "success") {
+                DataResult.Success(result)
+            } else {
+                DataResult.Error(result.message)
+            }
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)

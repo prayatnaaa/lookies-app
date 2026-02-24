@@ -1,5 +1,13 @@
 package com.prayatna.lookiesapp.domain.model.user
 
+data class RoleApplicationInput(
+    val useLoginEmail: Boolean,
+
+    val businessEmail: String? = null,
+
+    val businessPayload: CreateAccountHolderInput
+)
+
 data class CreateAccountHolderInput(
     val userId: String? = null,
     val businessDetail: BusinessDetail,

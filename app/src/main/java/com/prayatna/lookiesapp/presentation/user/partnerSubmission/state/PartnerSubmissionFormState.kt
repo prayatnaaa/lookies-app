@@ -15,6 +15,9 @@ data class PartnerSubmissionFormState(
     val province: String = "",
     val postalCode: String = "",
 
+    val useLoginEmail: Boolean = true,
+    val businessEmail: String = "",
+
     val ownerFirstName: String = "",
     val ownerLastName: String = "",
     val ownerEmail: String = "",

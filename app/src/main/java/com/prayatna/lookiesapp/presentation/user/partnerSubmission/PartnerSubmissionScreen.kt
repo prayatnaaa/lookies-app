@@ -1,8 +1,13 @@
 package com.prayatna.lookiesapp.presentation.user.partnerSubmission
 
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,11 +23,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.UploadFile
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,17 +39,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -60,7 +71,7 @@ fun PartnerSubmissionScreen(
     val uiState by viewModel.uiState.collectAsState()
     val formState by viewModel.formState.collectAsState()
 
-    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -71,35 +82,32 @@ fun PartnerSubmissionScreen(
     }
 
     LaunchedEffect(uiState) {
-        when (uiState) {
-            is PartnerSubmissionUiState.Success -> {
-                Toast.makeText(
-                    context,
-                    "Registration successful! Please wait for verification.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-            is PartnerSubmissionUiState.Error -> {
-                Toast.makeText(
-                    context,
-                    (uiState as PartnerSubmissionUiState.Error).message,
-                    Toast.LENGTH_LONG
-                ).show()
-                viewModel.onEvent(PartnerSubmissionEvent.DismissError)
-            }
-            else -> {}
+        if (uiState is PartnerSubmissionUiState.Error) {
+            val errorMessage = (uiState as PartnerSubmissionUiState.Error).message
+            snackbarHostState.showSnackbar(message = errorMessage)
+            viewModel.onEvent(PartnerSubmissionEvent.DismissError)
         }
+    }
+
+    if (uiState is PartnerSubmissionUiState.Success) {
+        val response = (uiState as PartnerSubmissionUiState.Success).businessId
+        SuccessDialog(
+            message = response.message,
+            onConfirm = {
+                viewModel.onEvent(PartnerSubmissionEvent.DismissError)
+                navController.navigateUp()
+            }
+        )
     }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Partner Registration", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        navController.navigateUp()
-                    }) {
+                    IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -109,7 +117,6 @@ fun PartnerSubmissionScreen(
             )
         }
     ) { paddingValues ->
-
         PartnerSubmissionContent(
             modifier = Modifier.padding(paddingValues),
             formState = formState,
@@ -118,6 +125,46 @@ fun PartnerSubmissionScreen(
             onPickFileClick = { launcher.launch("image/*") }
         )
     }
+}
+
+@Composable
+fun SuccessDialog(
+    message: String,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { /* Prevent dismiss on outside click */ },
+        icon = {
+            Icon(
+                imageVector = Icons.Filled.CheckCircle,
+                contentDescription = "Success",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(48.dp)
+            )
+        },
+        title = {
+            Text(
+                text = "Registration Successful",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        },
+        text = {
+            Text(
+                text = message,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("OK")
+            }
+        }
+    )
 }
 
 @Composable
@@ -137,6 +184,43 @@ fun PartnerSubmissionContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+
+        FormSection(title = "Account Preference") {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Checkbox(
+                    checked = formState.useLoginEmail,
+                    onCheckedChange = { onEvent(PartnerSubmissionEvent.UseLoginEmailChanged(it)) }
+                )
+                Text(
+                    text = "Use current login email for business",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            AnimatedVisibility(
+                visible = !formState.useLoginEmail,
+                enter = fadeIn(tween(300)) + expandVertically(tween(300)),
+                exit = fadeOut(tween(300)) + shrinkVertically(tween(300))
+            ) {
+                OutlinedTextField(
+                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                    value = formState.businessEmail,
+                    onValueChange = { onEvent(PartnerSubmissionEvent.BusinessEmailChanged(it)) },
+                    label = { Text("Business Email") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
+                    )
+                )
+            }
+        }
 
         FormSection(title = "Business Details") {
             OutlinedTextField(
@@ -282,7 +366,8 @@ fun PartnerSubmissionContent(
                     Text(
                         text = "Upload ID Card / Business License / Registration Number",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -322,7 +407,8 @@ fun PartnerSubmissionContent(
             if (isLoading) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.5.dp
                 )
             } else {
                 Text(

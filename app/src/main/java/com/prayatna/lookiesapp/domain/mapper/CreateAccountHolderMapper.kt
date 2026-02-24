@@ -4,6 +4,14 @@ package com.prayatna.lookiesapp.domain.mapper
 import com.prayatna.lookiesapp.domain.model.user.*
 import com.prayatna.lookiesapp.data.remote.dto.request.user.*
 
+fun RoleApplicationInput.toDto(): RoleApplicationRequest {
+    return RoleApplicationRequest(
+        useLoginEmail = useLoginEmail,
+        businessEmail = businessEmail,
+        businessPayload = businessPayload.toDto()
+    )
+}
+
 fun CreateAccountHolderInput.toDto(): CreateAccountHolderRequest =
     CreateAccountHolderRequest(
         businessDetail = businessDetail.toDto(),

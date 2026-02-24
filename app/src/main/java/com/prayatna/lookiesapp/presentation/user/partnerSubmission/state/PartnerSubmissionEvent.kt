@@ -16,6 +16,9 @@ sealed interface PartnerSubmissionEvent {
     data class OwnerEmailChanged(val value: String) : PartnerSubmissionEvent
     data class OwnerPhoneChanged(val value: String) : PartnerSubmissionEvent
 
+    data class UseLoginEmailChanged(val isChecked: Boolean) : PartnerSubmissionEvent
+    data class BusinessEmailChanged(val value: String) : PartnerSubmissionEvent
+
     data class KycFileSelected(val uri: Uri) : PartnerSubmissionEvent
 
     data object Submit : PartnerSubmissionEvent

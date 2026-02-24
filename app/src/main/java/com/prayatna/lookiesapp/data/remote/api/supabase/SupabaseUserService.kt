@@ -2,7 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
-import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateAccountHolderRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.user.RoleApplicationRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
@@ -93,7 +93,7 @@ class SupabaseUserService @Inject constructor(
     }
 
     suspend fun registerBusiness(
-        request: CreateAccountHolderRequest,
+        request: RoleApplicationRequest,
         kycFile: ByteArray,
         fileName: String
     ): RoleApplicationResponse {
@@ -119,7 +119,7 @@ class SupabaseUserService @Inject constructor(
             uploadedPath = path
             Log.d("Supabase", "File uploaded successfully at: $path")
 
-            val updatedKycList = request.kycDocuments.toMutableList()
+            val updatedKycList = request.businessPayload.kycDocuments.toMutableList()
 
             if (updatedKycList.isNotEmpty()) {
                 updatedKycList[0] = updatedKycList[0].copy(
@@ -129,9 +129,13 @@ class SupabaseUserService @Inject constructor(
                 throw IllegalStateException("List kycDocuments cannot be empty")
             }
 
-            val finalRequest = request.copy(
+            val updatedBusinessPayload = request.businessPayload.copy(
                 kycDocuments = updatedKycList,
                 userId = userId
+            )
+
+            val finalRequest = request.copy(
+                businessPayload = updatedBusinessPayload
             )
 
             val response = httpClient
@@ -140,7 +144,6 @@ class SupabaseUserService @Inject constructor(
                     header("Authorization", "Bearer ${session.accessToken}")
                     setBody(finalRequest)
                 }
-            Log.d("RegisterBusiness", "Response: ${response.body<RoleApplicationResponse>()}")
             return response.body()
 
         } catch (e: Exception) {

@@ -3,6 +3,19 @@ package com.prayatna.lookiesapp.data.remote.dto.request.user
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
+@Serializable
+data class RoleApplicationRequest(
+    @SerialName("use_login_email")
+    val useLoginEmail: Boolean,
+
+    @SerialName("business_email")
+    val businessEmail: String? = null,
+
+    @SerialName("business_payload")
+    val businessPayload: CreateAccountHolderRequest
+)
+
 @Serializable
 data class CreateAccountHolderRequest(
     @SerialName("user_id")

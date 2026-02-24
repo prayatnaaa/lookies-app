@@ -7,6 +7,7 @@ import com.prayatna.lookiesapp.domain.model.user.BusinessDetail
 import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
 import com.prayatna.lookiesapp.domain.model.user.IndividualDetail
 import com.prayatna.lookiesapp.domain.model.user.KycDocument
+import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionFormState
@@ -33,74 +34,39 @@ class PartnerSubmissionViewModel @Inject constructor(
 
     fun onEvent(event: PartnerSubmissionEvent) {
         when (event) {
-            is PartnerSubmissionEvent.LegalNameChanged -> {
-                _formState.update { it.copy(legalName = event.value) }
-            }
-            is PartnerSubmissionEvent.TradingNameChanged -> {
-                _formState.update { it.copy(tradingName = event.value) }
-            }
-            is PartnerSubmissionEvent.DescriptionChanged -> {
-                _formState.update { it.copy(description = event.value) }
-            }
-            is PartnerSubmissionEvent.AddressChanged -> {
-                _formState.update { it.copy(streetLine1 = event.value) }
-            }
-            is PartnerSubmissionEvent.CityChanged -> {
-                _formState.update { it.copy(city = event.value) }
-            }
-            is PartnerSubmissionEvent.ProvinceChanged -> {
-                _formState.update { it.copy(province = event.value) }
-            }
-            is PartnerSubmissionEvent.PostalCodeChanged -> {
-                _formState.update { it.copy(postalCode = event.value) }
-            }
-            is PartnerSubmissionEvent.OwnerFirstNameChanged -> {
-                _formState.update { it.copy(ownerFirstName = event.value) }
-            }
-            is PartnerSubmissionEvent.OwnerLastNameChanged -> {
-                _formState.update { it.copy(ownerLastName = event.value) }
-            }
-            is PartnerSubmissionEvent.OwnerEmailChanged -> {
-                _formState.update { it.copy(ownerEmail = event.value) }
-            }
-            is PartnerSubmissionEvent.OwnerPhoneChanged -> {
-                _formState.update { it.copy(ownerPhone = event.value) }
-            }
+            is PartnerSubmissionEvent.LegalNameChanged -> _formState.update { it.copy(legalName = event.value) }
+            is PartnerSubmissionEvent.TradingNameChanged -> _formState.update { it.copy(tradingName = event.value) }
+            is PartnerSubmissionEvent.DescriptionChanged -> _formState.update { it.copy(description = event.value) }
+            is PartnerSubmissionEvent.AddressChanged -> _formState.update { it.copy(streetLine1 = event.value) }
+            is PartnerSubmissionEvent.CityChanged -> _formState.update { it.copy(city = event.value) }
+            is PartnerSubmissionEvent.ProvinceChanged -> _formState.update { it.copy(province = event.value) }
+            is PartnerSubmissionEvent.PostalCodeChanged -> _formState.update { it.copy(postalCode = event.value) }
+            is PartnerSubmissionEvent.OwnerFirstNameChanged -> _formState.update { it.copy(ownerFirstName = event.value) }
+            is PartnerSubmissionEvent.OwnerLastNameChanged -> _formState.update { it.copy(ownerLastName = event.value) }
+            is PartnerSubmissionEvent.OwnerEmailChanged -> _formState.update { it.copy(ownerEmail = event.value) }
+            is PartnerSubmissionEvent.OwnerPhoneChanged -> _formState.update { it.copy(ownerPhone = event.value) }
 
-            is PartnerSubmissionEvent.KycFileSelected -> {
-                _formState.update {
-                    it.copy(
-                        kycFileBytes = event.uri,
-                    )
-                }
-            }
+            is PartnerSubmissionEvent.UseLoginEmailChanged -> _formState.update { it.copy(useLoginEmail = event.isChecked) }
+            is PartnerSubmissionEvent.BusinessEmailChanged -> _formState.update { it.copy(businessEmail = event.value) }
 
-            is PartnerSubmissionEvent.Submit -> {
-                submitRegistration()
-            }
-
-            is PartnerSubmissionEvent.DismissError -> {
-                _uiState.value = PartnerSubmissionUiState.Idle
-            }
+            is PartnerSubmissionEvent.KycFileSelected -> _formState.update { it.copy(kycFileBytes = event.uri) }
+            is PartnerSubmissionEvent.Submit -> submitRegistration()
+            is PartnerSubmissionEvent.DismissError -> _uiState.value = PartnerSubmissionUiState.Idle
         }
     }
 
     private fun submitRegistration() {
         val form = _formState.value
 
-        if (form.legalName.isBlank()) {
-            _uiState.value = PartnerSubmissionUiState.Error("Nama Legal wajib diisi!")
-            return
-        }
         if (form.kycFileBytes == null) {
-            _uiState.value = PartnerSubmissionUiState.Error("Dokumen wajib diupload!")
+            _uiState.value = PartnerSubmissionUiState.Error("Input KYC file!")
             return
         }
 
         _uiState.value = PartnerSubmissionUiState.Loading
 
         viewModelScope.launch {
-            val requestInput = CreateAccountHolderInput(
+            val accountHolderData = CreateAccountHolderInput(
                 businessDetail = BusinessDetail(
                     type = form.businessType,
                     legalName = form.legalName,
@@ -134,6 +100,13 @@ class PartnerSubmissionViewModel @Inject constructor(
                     )
                 ),
                 email = form.ownerEmail
+            )
+
+            // Dynamic payload
+            val requestInput = RoleApplicationInput(
+                useLoginEmail = form.useLoginEmail,
+                businessEmail = if (form.useLoginEmail) null else form.businessEmail,
+                businessPayload = accountHolderData
             )
 
             val result = userRepository.registerBusiness(
