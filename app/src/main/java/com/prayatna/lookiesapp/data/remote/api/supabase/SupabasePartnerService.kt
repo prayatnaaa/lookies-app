@@ -1,26 +1,16 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
-import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.DefaultEventDto
-import com.prayatna.lookiesapp.data.remote.dto.DetailPartnerDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventParticipantDto
+import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDashboardDto
-import com.prayatna.lookiesapp.data.remote.dto.PartnerDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
 import com.prayatna.lookiesapp.utils.Helper
-import com.prayatna.lookiesapp.utils.JsonProvider
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
 import java.util.UUID
 import javax.inject.Inject
 
@@ -28,7 +18,6 @@ class SupabasePartnerService @Inject constructor(
     private val auth: Auth,
     private val postgrest: Postgrest,
     private val storage: Storage,
-    private val httpClient: HttpClient
 ) {
     private suspend fun uploadPartnerLogo(image: ByteArray): String {
         if (image.isEmpty()) throw Exception("Image is empty")
@@ -58,27 +47,22 @@ class SupabasePartnerService @Inject constructor(
         return fullPublicUrl
     }
 
-    suspend fun getPartners(): List<PartnerDto> {
+    suspend fun getPartners(): List<MerchantBusinessDto> {
         val result = postgrest
-            .from("partner_profiles").select(
-                columns = Columns.list("user_id", "name", "logo_url", "status")
-            )
-            .decodeList<PartnerDto>()
+            .from("merchant_businesses_views").select()
+            .decodeList<MerchantBusinessDto>()
         return result
     }
 
-    suspend fun getDetailPartner(id: String): DetailPartnerDto {
-        Log.d("PartnerRepository", "Getting detail partner with id: $id")
-        val response: HttpResponse = httpClient
-            .get("${BuildConfig.SUPABASE_EDGE_BASE_URL}/get-detail-partner?id=${id}") {
-                auth.currentSessionOrNull()?.let {
-                    header("Authorization", "Bearer ${it.accessToken}")
+    suspend fun getDetailPartner(id: String): MerchantBusinessDto {
+        val result = postgrest
+            .from("merchant_businesses_views")
+            .select {
+                filter {
+                    eq("id", id)
                 }
-            }
-        if (response.status != HttpStatusCode.OK) {
-            throw Exception("Failed! ${response.status}")
-        }
-        return JsonProvider.json.decodeFromString(response.body())
+            }.decodeSingle<MerchantBusinessDto>()
+        return result
     }
 
     suspend fun getSelfEvents(status: String? = null, name: String? = null): List<EventDto> {

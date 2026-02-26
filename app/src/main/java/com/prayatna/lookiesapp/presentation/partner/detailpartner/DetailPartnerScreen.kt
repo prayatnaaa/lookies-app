@@ -81,10 +81,7 @@ fun DetailPartnerScreen(
                         PartnerProfileSection(
                             data = data,
                             onPortofolioClick = {
-                                data.portofolioLink?.let(onPortfolioClick)
-                            },
-                            onDocumentClick = {
-                                data.ktpOwnerUrl?.let(onPortfolioClick)
+                                data.websiteUrl?.let(onPortfolioClick)
                             },
                             isAdmin = showAdminButtons
                         )

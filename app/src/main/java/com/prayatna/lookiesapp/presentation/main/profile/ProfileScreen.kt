@@ -133,6 +133,15 @@ fun ProfileScreen(
                                 navController.navigate(NavigationRoutes.PARTNER_APPLICATION)
                             }
                         )
+                    } else {
+                        SettingsSection(
+                            title = "Partner Section",
+                            subtitle = "Your stats as a partner",
+                            icon = Icons.Default.Handshake,
+                            onClick = {
+                                navController.navigate(NavigationRoutes.PARTNER_MAIN_SCREEN)
+                            }
+                        )
                     }
 
                     SettingsSection(

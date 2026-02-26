@@ -2,7 +2,6 @@ package com.prayatna.lookiesapp.presentation.partner.detailpartner
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.mapper.toUi
 import com.prayatna.lookiesapp.domain.usecase.admin.ApprovePartnerUseCase
 import com.prayatna.lookiesapp.domain.usecase.admin.RejectPartnerUseCase
 import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
@@ -99,7 +98,7 @@ class DetailPartnerViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 isLoading = false,
-                                data = result.data.toUi(),
+                                data = result.data,
                                 error = null
                             )
                         }

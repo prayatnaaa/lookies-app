@@ -22,15 +22,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.presentation.partner.partnerlist.state.PartnerUiModel
+import com.prayatna.lookiesapp.domain.model.user.MerchantBusiness
 
 @Composable
 fun PartnerCard(
-    data: PartnerUiModel,
+    data: MerchantBusiness,
     onClick: () -> Unit,
     showStatus: Boolean = false
 ) {
@@ -47,8 +46,8 @@ fun PartnerCard(
             verticalAlignment = Alignment.Top
         ) {
             AsyncImage(
-                model = data.logoUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
-                contentDescription = data.name,
+                model = data.pictureUrl?.replace("http://172.21.179.110", "http://10.0.2.2"),
+                contentDescription = data.legalName,
                 modifier = Modifier
                     .size(60.dp)
                     .clip(CircleShape),
@@ -65,7 +64,7 @@ fun PartnerCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = data.name,
+                    text = data.legalName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -80,31 +79,4 @@ fun PartnerCard(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PartnerListCardPreview() {
-    val dummyList = listOf(
-        PartnerUiModel(
-            id = "info",
-            name = "Stark Industries",
-            logoUrl = "https://example.com/logo.png",
-            status = "pending",
-        ),
-        PartnerUiModel(
-            id = "saa",
-            name = "Wayne Enterprises",
-            logoUrl = "https://example.com/logo.png",
-            status = "approved",
-        ),
-        PartnerUiModel(
-            id = "kids",
-            name = "Hello World",
-            logoUrl = "https://example.com/logo.png",
-            status = "rejected",
-        )
-    )
-
-    PartnerListCard(partnerList = dummyList, onPartnerClick = {}, showStatus = true)
 }

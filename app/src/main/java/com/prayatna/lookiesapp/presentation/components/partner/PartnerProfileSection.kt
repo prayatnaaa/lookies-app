@@ -15,15 +15,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.presentation.partner.detailpartner.state.DetailPartnerUiModel
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import com.prayatna.lookiesapp.domain.model.user.MerchantBusiness
 
 @Composable
 fun PartnerProfileSection(
-    data: DetailPartnerUiModel,
+    data: MerchantBusiness,
     onPortofolioClick: () -> Unit,
-    onDocumentClick: (String) -> Unit,
     isAdmin: Boolean = false
 ) {
     LazyColumn(
@@ -35,8 +32,8 @@ fun PartnerProfileSection(
 
         item {
             AsyncImage(
-                model = data.logoUrl?.replace("http://172.21.179.110", "http://10.0.2.2"),
-                contentDescription = data.name,
+                model = data.pictureUrl?.replace("http://172.21.179.110", "http://10.0.2.2"),
+                contentDescription = data.tradingName,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
@@ -51,7 +48,7 @@ fun PartnerProfileSection(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = data.name,
+                        text = data.legalName,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                     )
@@ -72,55 +69,16 @@ fun PartnerProfileSection(
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
-                InfoRow(Icons.Outlined.LocationOn, data.locations.firstOrNull()?.name ?: "Location not set")
-                InfoRow(Icons.Outlined.AccountCircle, "User ID: ${data.userId}")
-                InfoRow(Icons.Outlined.DateRange, "Created: ${data.createdAt.toFormattedDate()}")
 
-                if (!data.portofolioLink.isNullOrBlank()) {
+                if (!data.websiteUrl.isNullOrBlank()) {
                     InfoRowClickable(
                         icon = Icons.Outlined.Link,
                         text = "View Portfolio",
                         onClick = onPortofolioClick
                     )
                 }
-
-                if (!data.ktpOwnerUrl.isNullOrBlank()) {
-                    InfoRowClickable(
-                        icon = Icons.Outlined.DocumentScanner,
-                        text = "View KTP Owner",
-                        onClick = { onDocumentClick(data.ktpOwnerUrl) }
-                    )
-                }
-
-                if (!data.businessLicenseUrl.isNullOrBlank()) {
-                    InfoRowClickable(
-                        icon = Icons.Outlined.DocumentScanner,
-                        text = "View Business License",
-                        onClick = { onDocumentClick(data.businessLicenseUrl) }
-                    )
-                }
             }
         }
-
-        if (data.userBanks.isNotEmpty()) {
-            item { HorizontalDivider() }
-            item {
-                Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Bank Accounts", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    data.userBanks.forEach { bank ->
-                        InfoRow(Icons.Outlined.AccountBalance, "${bank.bankName} - ${bank.bankAccountNumber}")
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun InfoRow(icon: ImageVector, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        Text(text = text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -141,9 +99,4 @@ private fun InfoRowClickable(icon: ImageVector, text: String, onClick: () -> Uni
             textDecoration = TextDecoration.Underline
         )
     }
-}
-
-private fun kotlinx.datetime.Instant.toFormattedDate(): String {
-    val localDateTime = this.toLocalDateTime(TimeZone.currentSystemDefault())
-    return "${localDateTime.date.dayOfMonth}-${localDateTime.date.monthNumber}-${localDateTime.date.year}"
 }

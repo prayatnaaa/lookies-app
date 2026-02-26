@@ -9,9 +9,8 @@ import com.prayatna.lookiesapp.domain.model.EventParticipant
 import com.prayatna.lookiesapp.domain.model.event.DefaultEvent
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
-import com.prayatna.lookiesapp.domain.model.partner.DetailPartner
-import com.prayatna.lookiesapp.domain.model.partner.Partner
 import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
+import com.prayatna.lookiesapp.domain.model.user.MerchantBusiness
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
@@ -24,7 +23,7 @@ import javax.inject.Inject
 class PartnerRepositoryImpl @Inject constructor(
     private val supabasePartnerService: SupabasePartnerService
 ): PartnerRepository {
-    override fun getPartners(): Flow<DataResult<List<Partner>>> = flow {
+    override fun getPartners(): Flow<DataResult<List<MerchantBusiness>>> = flow {
         emit(DataResult.Loading)
         try {
             val response = supabasePartnerService.getPartners()
@@ -40,11 +39,10 @@ class PartnerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDetailPartner(id: String): DataResult<DetailPartner> {
+    override suspend fun getDetailPartner(id: String): DataResult<MerchantBusiness> {
         return try {
             val response = supabasePartnerService.getDetailPartner(id)
-            Log.d("PartnerRepository", response.toString())
-            DataResult.Success(response.toDomain()!!)
+            DataResult.Success(response.toDomain())
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)

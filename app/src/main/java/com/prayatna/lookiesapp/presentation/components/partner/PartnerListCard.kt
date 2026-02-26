@@ -8,12 +8,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.presentation.partner.partnerlist.state.PartnerUiModel
+import com.prayatna.lookiesapp.domain.model.user.MerchantBusiness
 
 @Composable
 fun PartnerListCard(
-    partnerList: List<PartnerUiModel>,
-    onPartnerClick: (PartnerUiModel) -> Unit,
+    partnerList: List<MerchantBusiness>,
+    onPartnerClick: (MerchantBusiness) -> Unit,
     modifier: Modifier = Modifier,
     showStatus: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(0.dp)
