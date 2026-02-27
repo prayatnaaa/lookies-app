@@ -1,12 +1,18 @@
 package com.prayatna.lookiesapp.presentation.partner.partnerlist
 
-import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -14,7 +20,6 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.partner.PartnerListCard
 import com.prayatna.lookiesapp.presentation.error.ErrorScreen
-import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -57,20 +62,33 @@ fun PartnerListScreen(
                     onRetry = { viewModel.loadPartners() }
                 )
             } else {
-                Scaffold(
-                    containerColor = PureWhite,
-                    content = { innerPadding ->
-                        PartnerListCard(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            contentPadding = innerPadding,
-                            onPartnerClick = {
-                                navController.navigate("${NavigationRoutes.DETAIL_PARTNER}/${it.id}")
-                            },
-                            partnerList = result.data,
-                            showStatus = roleState == "admin"
-                        )
-                    }
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .statusBarsPadding()
+                ) {
+                    // Top header
+                    Text(
+                        text = "Partners",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 16.dp)
+                    )
+
+                    // Partner list
+                    PartnerListCard(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onPartnerClick = {
+                            navController.navigate("${NavigationRoutes.DETAIL_PARTNER}/${it.id}")
+                        },
+                        partnerList = result.data,
+                        showStatus = roleState == "admin"
+                    )
+                }
             }
         }
     }

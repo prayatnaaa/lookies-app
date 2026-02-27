@@ -13,10 +13,6 @@ class AdminRepositoryImpl @Inject constructor(
     private val supabaseAdminService: SupabaseAdminService
 ): AdminRepository {
 
-    companion object {
-        private const val DEFAULT_ERROR_MESSAGE = "Something went wrong"
-    }
-
     override suspend fun getPendingPartners(): DataResult<List<Partner>> {
         TODO("Not yet implemented")
     }
@@ -27,7 +23,7 @@ class AdminRepositoryImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val response = supabaseAdminService.decidePartnerApplication(status, id)
-            DataResult.Success(response)
+            DataResult.Success(response.data)
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)

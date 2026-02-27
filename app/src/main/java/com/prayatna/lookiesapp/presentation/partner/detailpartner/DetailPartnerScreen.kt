@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.partner.detailpartner
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -66,8 +67,14 @@ fun DetailPartnerScreen(
                     role == "admin" && data.status == "pending"
 
                 Scaffold(
+                    containerColor = MaterialTheme.colorScheme.background,
                     snackbarHost = { SnackbarHost(snackbarHostState) },
-                    topBar = { BackTopBar(navController = navController) },
+                    topBar = {
+                        BackTopBar(
+                            navController = navController,
+                            title = "Partner Details"
+                        )
+                    },
                     bottomBar = {
                         if (showAdminButtons) {
                             AdminPartnerButtons(
