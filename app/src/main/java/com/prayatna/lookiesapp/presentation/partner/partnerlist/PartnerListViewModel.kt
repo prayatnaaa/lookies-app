@@ -4,12 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.domain.model.user.MerchantBusiness
+import com.prayatna.lookiesapp.domain.usecase.admin.ApprovePartnerUseCase
+import com.prayatna.lookiesapp.domain.usecase.admin.RejectPartnerUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.GetPartnersUseCase
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,7 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class PartnerListViewModel @Inject constructor(
     private val getPartnersUseCase: GetPartnersUseCase,
-    private val userPref: UserPreference
+    private val userPref: UserPreference,
+    private val approvePartnerUseCase: ApprovePartnerUseCase,
+    private val rejectPartnerUseCase: RejectPartnerUseCase
 ): ViewModel() {
 
     private val _partnerState = MutableStateFlow<DataResult<List<MerchantBusiness>>>(DataResult.Idle)
@@ -25,6 +31,9 @@ class PartnerListViewModel @Inject constructor(
 
     val roleState: StateFlow<String> = userPref.getRole()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    private val _actionMessage = MutableSharedFlow<String>()
+    val actionMessage = _actionMessage.asSharedFlow()
 
     init {
         loadPartners()
@@ -36,6 +45,32 @@ class PartnerListViewModel @Inject constructor(
                 .collect { result ->
                     _partnerState.value = result
                 }
+        }
+    }
+
+    fun approvePartner(partnerId: String) {
+        decidePartner(partnerId, approvePartnerUseCase::invoke)
+    }
+
+    fun rejectPartner(partnerId: String) {
+        decidePartner(partnerId, rejectPartnerUseCase::invoke)
+    }
+
+    private fun decidePartner(
+        partnerId: String,
+        action: suspend (String) -> DataResult<String>
+    ) {
+        viewModelScope.launch {
+            when (val result = action(partnerId)) {
+                is DataResult.Success -> {
+                    _actionMessage.emit(result.data)
+                    loadPartners()
+                }
+                is DataResult.Error -> {
+                    _actionMessage.emit(result.error)
+                }
+                else -> Unit
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
@@ -19,6 +20,7 @@ class SupabaseAdminService @Inject constructor(
                 eq("business_id", id)
             }
         }
+        Log.d("AdminDecision", result.data)
         return result
     }
 }
