@@ -47,10 +47,33 @@ class SupabasePartnerService @Inject constructor(
         return fullPublicUrl
     }
 
-    suspend fun getPartners(): List<MerchantBusinessDto> {
+    suspend fun getPartners(
+        status: String? = null,
+        name: String? = null,
+        kycStatus: String? = null,
+        merchantType: String = "partner"
+    ): List<MerchantBusinessDto> {
         val result = postgrest
-            .from("merchant_businesses_views").select()
+            .from("merchant_businesses_views")
+            .select {
+                filter {
+                    if (status != null) {
+                        eq("status", status)
+                    }
+
+                    if (name != null) {
+                        ilike("legal_name", "%$name%")
+                    }
+
+                    if (kycStatus != null) {
+                        eq("kyc_status", kycStatus)
+                    }
+
+                    eq("merchant_type", merchantType)
+                }
+            }
             .decodeList<MerchantBusinessDto>()
+
         return result
     }
 

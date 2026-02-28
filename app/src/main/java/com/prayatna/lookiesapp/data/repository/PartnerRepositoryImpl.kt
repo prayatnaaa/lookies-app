@@ -23,7 +23,12 @@ import javax.inject.Inject
 class PartnerRepositoryImpl @Inject constructor(
     private val supabasePartnerService: SupabasePartnerService
 ): PartnerRepository {
-    override fun getPartners(): Flow<DataResult<List<MerchantBusiness>>> = flow {
+    override fun getPartners(
+        status: String?,
+        name: String?,
+        kycStatus: String?,
+        merchantType: String?
+    ): Flow<DataResult<List<MerchantBusiness>>> = flow {
         emit(DataResult.Loading)
         try {
             val response = supabasePartnerService.getPartners()

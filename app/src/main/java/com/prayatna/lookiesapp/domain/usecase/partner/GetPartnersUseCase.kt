@@ -23,7 +23,7 @@ class GetPartnersUseCase @Inject constructor(
             Log.d("ROLE", result.toString())
             result.map { partners ->
                 if (role == "admin") partners
-                else partners.filter { it.status == "approved" }
+                else partners.filter { it.status == "approve" }
             }
         }
     }

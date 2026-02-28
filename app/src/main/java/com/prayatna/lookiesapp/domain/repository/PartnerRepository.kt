@@ -10,7 +10,12 @@ import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface PartnerRepository {
-    fun getPartners(): Flow<DataResult<List<MerchantBusiness>>>
+    fun getPartners(
+        status: String? = null,
+        name: String? = null,
+        kycStatus: String? = null,
+        merchantType: String? = null
+    ): Flow<DataResult<List<MerchantBusiness>>>
     suspend fun getDetailPartner(id: String): DataResult<MerchantBusiness>
     suspend fun getSelfEvents(status: String? = null, name: String? = null): DataResult<List<Event>>
     suspend fun updateEvent(id: String, input: EditEventInput): DataResult<DefaultEvent>
