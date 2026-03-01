@@ -11,8 +11,6 @@ fun ProfileDto.asDomainModel(): Profile {
         fullName = this.fullName,
         address = this.address,
         bio = this.bio,
-        hasPartnerSub = this.hasPartnerSub,
-        isArtist = this.isArtist
     )
 }
 
@@ -23,6 +21,4 @@ fun Profile.toDto(): ProfileDto = ProfileDto(
     bio = bio,
     address = address,
     profilePictureUrl = profileUrl,
-    hasPartnerSub = hasPartnerSub,
-    isArtist = isArtist
 )

@@ -7,6 +7,4 @@ data class Profile (
     val fullName: String?,
     val address: String?,
     val bio: String?,
-    val hasPartnerSub: Boolean?,
-    val isArtist: Boolean?
 )

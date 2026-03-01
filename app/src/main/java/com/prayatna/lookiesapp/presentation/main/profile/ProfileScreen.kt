@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.SavedSearch
@@ -124,58 +123,32 @@ fun ProfileScreen(
                             .padding(bottom = 8.dp, start = 4.dp)
                     )
 
-                    if (profile.hasPartnerSub == false) {
-                        SettingsSection(
-                            title = "Become a Partner",
-                            subtitle = "Join us and expand your reach",
-                            icon = Icons.Default.Handshake,
-                            onClick = {
-                                navController.navigate(NavigationRoutes.PARTNER_APPLICATION)
-                            }
-                        )
-                    } else {
-                        SettingsSection(
-                            title = "Partner Section",
-                            subtitle = "Your stats as a partner",
-                            icon = Icons.Default.Handshake,
-                            onClick = {
-                                navController.navigate(NavigationRoutes.PARTNER_MAIN_SCREEN)
-                            }
-                        )
-                    }
-
                     SettingsSection(
-                        title = "My Artworks",
-                        subtitle = if (profile.isArtist == true) "Manage your gallery portfolio" else "Start uploading your art",
-                        icon = Icons.Default.Palette,
+                        title = "Become a Partner",
+                        subtitle = "Join us and expand your reach",
+                        icon = Icons.Default.Handshake,
                         onClick = {
-                            if (profile.isArtist == false) {
-                                navController.navigate(NavigationRoutes.UPLOAD_PAINTING)
-                            } else {
-                                navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${profile.id}")
-                            }
+                            navController.navigate(NavigationRoutes.PARTNER_APPLICATION)
                         }
                     )
 
-                    if (profile.isArtist == true) {
-                        SettingsSection(
-                            title = "Event Submissions",
-                            subtitle = "Track paintings registered to events",
-                            icon = Icons.Default.Event,
-                            onClick = {
-                               //TODO: add this route
-                            }
-                        )
+                    SettingsSection(
+                        title = "My Artworks",
+                        subtitle = "Manage your gallery portfolio",
+                        icon = Icons.Default.Palette,
+                        onClick = {
+                            navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${profile.id}")
+                        }
+                    )
 
-                        SettingsSection(
-                            title = "My Stats",
-                            subtitle = "See statistics",
-                            icon = Icons.Default.SavedSearch,
-                            onClick = {
-                                navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
-                            }
-                        )
-                    }
+                    SettingsSection(
+                        title = "Selling",
+                        subtitle = "Create or see listing",
+                        icon = Icons.Default.SavedSearch,
+                        onClick = {
+                            navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
+                        }
+                    )
 
                     Spacer(modifier = Modifier.height(32.dp))
 
