@@ -1,23 +1,18 @@
 package com.prayatna.lookiesapp.domain.model.artist
 
 data class ArtistDashboardSummary(
-    val artistId: String,
-    val fullName: String?,
+    val userId: String,
     val totalPaintings: Int,
-    val paintingsSold: Int,
-    val paintingsOnSale: Int,
-    val totalEarnings: Double,
+    val totalCatalogValue: Double,
+    val activeEventPaintings: Int,
+    val totalSoldPaintings: Int,
+    val conversionRatePercent: Double,
+    val totalReviews: Int,
+    val avgRating: Double,
+    val totalOrders: Int,
+    val totalRevenue: Double,
     val pendingPayout: Double,
-    val averageRating: Double
-)
-
-data class ArtistMonthlySales(
-    val monthYear: String,
-    val totalTransactions: Int,
-    val totalIncome: Double
-)
-
-data class ArtistDashboardData(
-    val summary: ArtistDashboardSummary,
-    val monthlySales: List<ArtistMonthlySales>
+    val totalPaidOut: Double,
+    val currentMonthRevenue: Double,
+    val ordersToShip: Int
 )

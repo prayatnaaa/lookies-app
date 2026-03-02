@@ -5,24 +5,46 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ArtistDashboardSummaryDto(
-    @SerialName("artist_id") val artistId: String,
-    @SerialName("full_name") val fullName: String?,
-    @SerialName("total_paintings_created") val totalPaintings: Int,
-    @SerialName("paintings_sold") val paintingsSold: Int,
-    @SerialName("paintings_on_sale") val paintingsOnSale: Int,
-    @SerialName("total_earnings_all_time") val totalEarnings: Double,
-    @SerialName("pending_payout") val pendingPayout: Double,
-    @SerialName("average_rating") val averageRating: Double
-)
 
-@Serializable
-data class ArtistMonthlySalesDto(
-    @SerialName("month_year") val monthYear: String,
-    @SerialName("total_transactions") val totalTransactions: Int,
-    @SerialName("total_income") val totalIncome: Double
-)
+    @SerialName("user_id")
+    val userId: String,
 
-data class ArtistDashboardDataDto(
-    val summary: ArtistDashboardSummaryDto,
-    val monthlySales: List<ArtistMonthlySalesDto>
+    @SerialName("total_paintings")
+    val totalPaintings: Int,
+
+    @SerialName("total_catalog_value")
+    val totalCatalogValue: Double,
+
+    @SerialName("active_event_paintings")
+    val activeEventPaintings: Int,
+
+    @SerialName("total_sold_paintings")
+    val totalSoldPaintings: Int,
+
+    @SerialName("conversion_rate_percent")
+    val conversionRatePercent: Double,
+
+    @SerialName("total_reviews")
+    val totalReviews: Int,
+
+    @SerialName("avg_rating")
+    val avgRating: Double,
+
+    @SerialName("total_orders")
+    val totalOrders: Int,
+
+    @SerialName("total_revenue")
+    val totalRevenue: Double,
+
+    @SerialName("pending_payout")
+    val pendingPayout: Double,
+
+    @SerialName("total_paid_out")
+    val totalPaidOut: Double,
+
+    @SerialName("current_month_revenue")
+    val currentMonthRevenue: Double,
+
+    @SerialName("orders_to_ship")
+    val ordersToShip: Int
 )

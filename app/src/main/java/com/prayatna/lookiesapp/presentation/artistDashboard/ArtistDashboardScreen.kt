@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material.icons.outlined.Inventory2
@@ -46,7 +48,6 @@ import com.prayatna.lookiesapp.presentation.artistDashboard.state.ArtistDashboar
 import com.prayatna.lookiesapp.presentation.components.artistDashboard.DashboardActionItem
 import com.prayatna.lookiesapp.presentation.components.artistDashboard.DashboardStatCard
 import com.prayatna.lookiesapp.presentation.components.artistDashboard.EarningsOverviewCard
-import com.prayatna.lookiesapp.presentation.components.artistDashboard.RevenueBarChart
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 import com.prayatna.lookiesapp.utils.formatRupiah
 
@@ -146,8 +147,7 @@ fun ArtistDashboardScreen(
                 }
 
                 is ArtistDashboardUiState.Success -> {
-                    val summary = currentState.data.summary
-                    val sales = currentState.data.monthlySales
+                    val summary = currentState.data
 
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
@@ -156,7 +156,7 @@ fun ArtistDashboardScreen(
                     ) {
                         item {
                             EarningsOverviewCard(
-                                totalEarnings = formatRupiah(summary.totalEarnings),
+                                totalEarnings = formatRupiah(summary.totalRevenue),
                                 pendingPayout = formatRupiah(summary.pendingPayout)
                             )
                         }
@@ -175,7 +175,7 @@ fun ArtistDashboardScreen(
                                 DashboardStatCard(
                                     modifier = Modifier.weight(1f),
                                     title = "Items Sold",
-                                    value = summary.paintingsSold.toString(),
+                                    value = summary.totalSoldPaintings.toString(),
                                     icon = Icons.Outlined.MonetizationOn,
                                     iconTint = Color(0xFF4CAF50),
                                     containerColor = Color(0xFFE8F5E9)
@@ -183,15 +183,15 @@ fun ArtistDashboardScreen(
                                 DashboardStatCard(
                                     modifier = Modifier.weight(1f),
                                     title = "Rating",
-                                    value = String.format("%.1f", summary.averageRating),
+                                    value = String.format("%.1f", summary.avgRating),
                                     icon = Icons.Default.Star,
-                                    iconTint = Color(0xFFFFB300), // Amber
-                                    containerColor = Color(0xFFFFF8E1) // Light Amber
+                                    iconTint = Color(0xFFFFB300),
+                                    containerColor = Color(0xFFFFF8E1)
                                 )
                                 DashboardStatCard(
                                     modifier = Modifier.weight(1f),
                                     title = "On Sale",
-                                    value = summary.paintingsOnSale.toString(),
+                                    value = summary.totalPaintings.toString(),
                                     icon = Icons.Outlined.Inventory2,
                                     iconTint = MaterialTheme.colorScheme.primary,
                                     containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
@@ -201,12 +201,32 @@ fun ArtistDashboardScreen(
 
                         item {
                             Text(
-                                "Revenue Trend",
+                                "Overview",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(bottom = 12.dp)
                             )
-                            RevenueBarChart(data = sales)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                DashboardStatCard(
+                                    modifier = Modifier.weight(1f),
+                                    title = "This Month",
+                                    value = formatRupiah(summary.currentMonthRevenue),
+                                    icon = Icons.AutoMirrored.Outlined.TrendingUp,
+                                    iconTint = Color(0xFF2196F3),
+                                    containerColor = Color(0xFFE3F2FD)
+                                )
+                                DashboardStatCard(
+                                    modifier = Modifier.weight(1f),
+                                    title = "To Ship",
+                                    value = summary.ordersToShip.toString(),
+                                    icon = Icons.Default.LocalShipping,
+                                    iconTint = Color(0xFFFF7043),
+                                    containerColor = Color(0xFFFBE9E7)
+                                )
+                            }
                         }
 
                         item {
@@ -222,7 +242,7 @@ fun ArtistDashboardScreen(
                                     subtitle = "Manage portfolio, pricing & stock",
                                     icon = Icons.Filled.Brush,
                                     onClick = {
-                                        navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${currentState.data.summary.artistId}")
+                                        navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${currentState.data.userId}")
                                     }
                                 )
                                 DashboardActionItem(
