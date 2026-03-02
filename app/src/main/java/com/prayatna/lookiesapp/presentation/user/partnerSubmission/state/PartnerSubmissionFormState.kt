@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.user.partnerSubmission.state
 import android.net.Uri
 
 data class PartnerSubmissionFormState(
+    val merchantType: String = "partner",
     val legalName: String = "",
     val tradingName: String = "",
     val description: String = "",

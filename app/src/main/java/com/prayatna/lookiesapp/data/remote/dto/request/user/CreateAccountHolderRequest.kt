@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RoleApplicationRequest(
+    @SerialName("merchant_type")
+    val merchantType: String,
+
     @SerialName("use_login_email")
     val useLoginEmail: Boolean,
 

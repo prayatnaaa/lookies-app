@@ -1,10 +1,9 @@
 package com.prayatna.lookiesapp.domain.model.user
 
 data class RoleApplicationInput(
+    val merchantType: String,
     val useLoginEmail: Boolean,
-
     val businessEmail: String? = null,
-
     val businessPayload: CreateAccountHolderInput
 )
 

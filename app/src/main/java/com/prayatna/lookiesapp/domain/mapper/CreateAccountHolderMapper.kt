@@ -8,7 +8,8 @@ fun RoleApplicationInput.toDto(): RoleApplicationRequest {
     return RoleApplicationRequest(
         useLoginEmail = useLoginEmail,
         businessEmail = businessEmail,
-        businessPayload = businessPayload.toDto()
+        businessPayload = businessPayload.toDto(),
+        merchantType = merchantType
     )
 }
 

@@ -102,11 +102,11 @@ class PartnerSubmissionViewModel @Inject constructor(
                 email = form.ownerEmail
             )
 
-            // Dynamic payload
             val requestInput = RoleApplicationInput(
                 useLoginEmail = form.useLoginEmail,
                 businessEmail = if (form.useLoginEmail) null else form.businessEmail,
-                businessPayload = accountHolderData
+                businessPayload = accountHolderData,
+                merchantType = form.merchantType
             )
 
             val result = userRepository.registerBusiness(
