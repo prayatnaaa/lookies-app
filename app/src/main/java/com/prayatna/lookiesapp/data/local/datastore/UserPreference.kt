@@ -60,6 +60,7 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
             preferences[USER_ADDRESS_KEY] = profile.address ?: ""
             preferences[USER_BIO_KEY] = profile.bio ?: ""
             preferences[USER_FULL_NAME_KEY] = profile.fullName ?: ""
+            preferences[USER_ROLE] = profile.role ?: ""
         }
     }
 
@@ -73,6 +74,7 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
                     fullName = preference[USER_FULL_NAME_KEY] ?: "",
                     address = preference[USER_ADDRESS_KEY] ?: "",
                     bio = preference[USER_BIO_KEY] ?: "",
+                    role = preference[USER_ROLE] ?: ""
                 )
             }
     }

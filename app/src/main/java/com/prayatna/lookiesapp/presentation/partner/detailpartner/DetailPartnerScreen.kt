@@ -247,7 +247,7 @@ fun DetailPartnerScreen(
             state.data?.let { data ->
 
                 val showAdminButtons =
-                    role == "admin" && data.status == "pending"
+                    role == "admin"
 
                 Scaffold(
                     containerColor = MaterialTheme.colorScheme.background,

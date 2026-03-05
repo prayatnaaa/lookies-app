@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.main.profile
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.Handshake
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.SavedSearch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -133,20 +133,16 @@ fun ProfileScreen(
                     )
 
                     SettingsSection(
-                        title = "My Artworks",
-                        subtitle = "Manage your gallery portfolio",
-                        icon = Icons.Default.Palette,
-                        onClick = {
-                            navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${profile.id}")
-                        }
-                    )
-
-                    SettingsSection(
                         title = "Selling",
                         subtitle = "Create or see listing",
                         icon = Icons.Default.SavedSearch,
                         onClick = {
-                            navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
+                            Log.d("ProfileScreen", "Role: $profile")
+                            if (profile.role != "user") {
+                                navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
+                            } else {
+                                navController.navigate(NavigationRoutes.PARTNER_APPLICATION)
+                            }
                         }
                     )
 

@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.user.partnerSubmission
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.user.BusinessAddress
@@ -108,6 +109,7 @@ class PartnerSubmissionViewModel @Inject constructor(
                 businessPayload = accountHolderData,
                 merchantType = form.merchantType
             )
+            Log.d("REGIS", form.merchantType)
 
             val result = userRepository.registerBusiness(
                 request = requestInput,

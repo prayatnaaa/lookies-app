@@ -20,6 +20,7 @@ data class ProfileDto(
     @SerialName("profile_picture_url")
     val profilePictureUrl: String? = null,
     @SerialName("is_artist")
-    val isArtist: Boolean? = false
+    val isArtist: Boolean? = false,
+    val role: String? = null
 
 )

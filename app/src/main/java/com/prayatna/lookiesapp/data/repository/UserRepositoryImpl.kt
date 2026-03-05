@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
@@ -50,11 +51,13 @@ class UserRepositoryImpl @Inject constructor(
                     val userId = auth.currentUserOrNull()?.id ?: return@onStart
 
                     val remoteProfile = postgrest
-                        .from("user_profiles")
+                        .from("users_view")
                         .select {
                             filter { eq("user_id", userId) }
                         }
                         .decodeSingle<ProfileDto>()
+
+                    Log.d("ProfileScreen", "Remote Profile: $remoteProfile")
 
                     userPreference.setProfile(remoteProfile.asDomainModel())
 
