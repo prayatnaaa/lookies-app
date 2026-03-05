@@ -27,5 +27,11 @@ data class PartnerSubmissionFormState(
 
     val kycFileName: String = "ktp.png",
     val kycFileBytes: Uri? = null,
-    val kycFileType: String = "AUTHORIZED_PERSON_KTP_DOCUMENT"
+    val kycFileType: String = "AUTHORIZED_PERSON_KTP_DOCUMENT",
+
+    val bankName: String = "",
+    val bankCode: String = "",
+    val accountNumber: String = "",
+    val accountHolderName: String = "",
+    val isPrimary: Boolean = true
 )

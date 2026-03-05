@@ -9,7 +9,8 @@ fun RoleApplicationInput.toDto(): RoleApplicationRequest {
         useLoginEmail = useLoginEmail,
         businessEmail = businessEmail,
         businessPayload = businessPayload.toDto(),
-        merchantType = merchantType
+        merchantType = merchantType,
+        bankAccounts = bankAccounts.toDto()
     )
 }
 
@@ -24,6 +25,15 @@ fun CreateAccountHolderInput.toDto(): CreateAccountHolderRequest =
         email = email,
         userId = userId
     )
+
+fun BankAccount.toDto(): BankAccountDto {
+    return BankAccountDto(
+        bankCode = bankCode,
+        bankName = bankName,
+        accountNumber = accountNumber,
+        accountHolderName
+    )
+}
 
 fun BusinessDetail.toDto(): BusinessDetailDto =
     BusinessDetailDto(

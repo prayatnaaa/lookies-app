@@ -4,7 +4,16 @@ data class RoleApplicationInput(
     val merchantType: String,
     val useLoginEmail: Boolean,
     val businessEmail: String? = null,
-    val businessPayload: CreateAccountHolderInput
+    val businessPayload: CreateAccountHolderInput,
+    val bankAccounts: BankAccount
+)
+
+data class BankAccount(
+    val bankCode: String,
+    val bankName: String,
+    val accountNumber: String,
+    val accountHolderName: String,
+    val isPrimary: Boolean? = null
 )
 
 data class CreateAccountHolderInput(

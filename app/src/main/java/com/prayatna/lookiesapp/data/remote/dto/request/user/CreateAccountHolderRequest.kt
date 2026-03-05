@@ -16,7 +16,29 @@ data class RoleApplicationRequest(
     val businessEmail: String? = null,
 
     @SerialName("business_payload")
-    val businessPayload: CreateAccountHolderRequest
+    val businessPayload: CreateAccountHolderRequest,
+
+    @SerialName("bank_accounts")
+    val bankAccounts: BankAccountDto
+)
+
+@Serializable
+data class BankAccountDto(
+    @SerialName("bank_code")
+    val bankCode: String,
+
+    @SerialName("bank_name")
+    val bankName: String,
+
+    @SerialName("account_number")
+    val accountNumber: String,
+
+    @SerialName("account_holder_name")
+    val accountHolderName: String,
+
+    @SerialName("is_primary")
+    val isPrimary: String? = null
+
 )
 
 @Serializable

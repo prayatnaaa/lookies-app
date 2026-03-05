@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.user.partnerSubmission
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.domain.model.user.BankAccount
 import com.prayatna.lookiesapp.domain.model.user.BusinessAddress
 import com.prayatna.lookiesapp.domain.model.user.BusinessDetail
 import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
@@ -50,6 +51,11 @@ class PartnerSubmissionViewModel @Inject constructor(
             is PartnerSubmissionEvent.UseLoginEmailChanged -> _formState.update { it.copy(useLoginEmail = event.isChecked) }
             is PartnerSubmissionEvent.BusinessEmailChanged -> _formState.update { it.copy(businessEmail = event.value) }
 
+            is PartnerSubmissionEvent.BankCodeChanged -> _formState.update { it.copy(bankCode = event.value) }
+            is PartnerSubmissionEvent.BankNameChanged -> _formState.update { it.copy(bankName = event.value) }
+            is PartnerSubmissionEvent.AccountNumberChanged -> _formState.update { it.copy(accountNumber = event.value) }
+            is PartnerSubmissionEvent.AccountHolderNameChanged -> _formState.update { it.copy(accountHolderName = event.value) }
+
             is PartnerSubmissionEvent.KycFileSelected -> _formState.update { it.copy(kycFileBytes = event.uri) }
             is PartnerSubmissionEvent.Submit -> submitRegistration()
             is PartnerSubmissionEvent.DismissError -> _uiState.value = PartnerSubmissionUiState.Idle
@@ -61,6 +67,13 @@ class PartnerSubmissionViewModel @Inject constructor(
 
         if (form.kycFileBytes == null) {
             _uiState.value = PartnerSubmissionUiState.Error("Input KYC file!")
+            return
+        }
+
+        if (form.bankCode.isBlank() || form.bankName.isBlank() ||
+            form.accountNumber.isBlank() || form.accountHolderName.isBlank()
+        ) {
+            _uiState.value = PartnerSubmissionUiState.Error("Please fill in all bank account details!")
             return
         }
 
@@ -103,11 +116,20 @@ class PartnerSubmissionViewModel @Inject constructor(
                 email = form.ownerEmail
             )
 
+            val bankAccount = BankAccount(
+                bankCode = form.bankCode,
+                bankName = form.bankName,
+                accountNumber = form.accountNumber,
+                accountHolderName = form.accountHolderName,
+                isPrimary = form.isPrimary
+            )
+
             val requestInput = RoleApplicationInput(
                 useLoginEmail = form.useLoginEmail,
                 businessEmail = if (form.useLoginEmail) null else form.businessEmail,
                 businessPayload = accountHolderData,
-                merchantType = form.merchantType
+                merchantType = form.merchantType,
+                bankAccounts = bankAccount
             )
             Log.d("REGIS", form.merchantType)
 
