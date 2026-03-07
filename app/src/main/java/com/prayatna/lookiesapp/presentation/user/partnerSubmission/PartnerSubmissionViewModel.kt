@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.user.partnerSubmission
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.user.BankAccount
@@ -25,8 +26,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PartnerSubmissionViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val merchantType: String =
+        savedStateHandle["merchantType"] ?: ""
 
     private val _uiState = MutableStateFlow<PartnerSubmissionUiState>(PartnerSubmissionUiState.Idle)
     val uiState: StateFlow<PartnerSubmissionUiState> = _uiState.asStateFlow()
@@ -57,12 +62,13 @@ class PartnerSubmissionViewModel @Inject constructor(
             is PartnerSubmissionEvent.AccountHolderNameChanged -> _formState.update { it.copy(accountHolderName = event.value) }
 
             is PartnerSubmissionEvent.KycFileSelected -> _formState.update { it.copy(kycFileBytes = event.uri) }
-            is PartnerSubmissionEvent.Submit -> submitRegistration()
+            is PartnerSubmissionEvent.Submit -> submitRegistration(merchantType = merchantType)
             is PartnerSubmissionEvent.DismissError -> _uiState.value = PartnerSubmissionUiState.Idle
         }
     }
 
-    private fun submitRegistration() {
+    private fun submitRegistration(merchantType: String) {
+        Log.d("PartnerSubmissionViewModel", merchantType)
         val form = _formState.value
 
         if (form.kycFileBytes == null) {
@@ -128,10 +134,9 @@ class PartnerSubmissionViewModel @Inject constructor(
                 useLoginEmail = form.useLoginEmail,
                 businessEmail = if (form.useLoginEmail) null else form.businessEmail,
                 businessPayload = accountHolderData,
-                merchantType = form.merchantType,
+                merchantType = merchantType,
                 bankAccounts = bankAccount
             )
-            Log.d("REGIS", form.merchantType)
 
             val result = userRepository.registerBusiness(
                 request = requestInput,

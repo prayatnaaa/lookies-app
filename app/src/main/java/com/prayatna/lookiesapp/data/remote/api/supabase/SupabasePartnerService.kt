@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.data.remote.dto.DefaultEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventParticipantDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
+import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDashboardDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
 import com.prayatna.lookiesapp.utils.Helper

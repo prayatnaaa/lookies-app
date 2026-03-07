@@ -95,7 +95,7 @@ fun DetailEventScreen(
                         DetailEventContent(
                             onPartnerClick = { id ->
                                 navController
-                                    .navigate("${NavigationRoutes.MESSAGES}/$id/${detailEvent?.organizer?.name}")
+                                    .navigate("${NavigationRoutes.MESSAGES}/$id/${detailEvent?.organizer?.legalName}")
 
                             },
                             isUserArtist = role == "artist",

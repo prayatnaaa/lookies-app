@@ -2,7 +2,7 @@ package com.prayatna.lookiesapp.data.mapper
 
 
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
-import com.prayatna.lookiesapp.domain.model.user.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 
 fun MerchantBusinessDto.toDomain(): MerchantBusiness {
     return MerchantBusiness(

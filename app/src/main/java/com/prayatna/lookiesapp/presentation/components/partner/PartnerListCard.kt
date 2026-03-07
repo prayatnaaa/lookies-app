@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.domain.model.user.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 
 @Composable
 fun PartnerListCard(

@@ -1,11 +1,11 @@
 package com.prayatna.lookiesapp.domain.model.event
 
-import com.prayatna.lookiesapp.domain.model.partner.Partner
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 
 data class Event (
     val id: String,
     val title: String,
-    val organizer: Partner,
+    val organizer: MerchantBusiness,
     val bannerImageUrl: String,
     val startDate: String,
     val endDate: String,

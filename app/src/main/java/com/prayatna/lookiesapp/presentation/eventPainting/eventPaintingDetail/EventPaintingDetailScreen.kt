@@ -200,7 +200,7 @@ fun EventPaintingDetailScreen(
 
                     EventOriginCard(
                         eventTitle = event.title,
-                        organizerName = event.organizer.name,
+                        organizerName = event.organizer.legalName,
                         endDate = event.endDate,
                         location = event.location,
                         eventFormat = event.eventFormat.name,

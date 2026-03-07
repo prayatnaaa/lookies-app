@@ -55,7 +55,7 @@ data class EventDto(
     @SerialName("updated_at")
     val updatedAt: String? = null,
 
-    val organizer: PartnerProfileDto,
+    val organizer: MerchantBusinessDto,
 
     @SerialName("event_type")
     val eventType: EventTypeDto,

@@ -10,7 +10,7 @@ import com.prayatna.lookiesapp.domain.model.event.DefaultEvent
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
-import com.prayatna.lookiesapp.domain.model.user.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError

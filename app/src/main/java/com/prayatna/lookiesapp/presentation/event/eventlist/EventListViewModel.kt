@@ -59,8 +59,8 @@ class EventListViewModel @Inject constructor(
 
         val filtered = currentEvents.filter { event ->
             event.title.contains(query, ignoreCase = true) ||
-                    event.location!!.contains(query, ignoreCase = true) ||
-                    event.organizer.name.contains(query, ignoreCase = true)
+                    event.location.contains(query, ignoreCase = true) ||
+                    event.organizer.legalName.contains(query, ignoreCase = true)
         }
 
         _uiState.update { it.copy(filteredEvents = filtered) }

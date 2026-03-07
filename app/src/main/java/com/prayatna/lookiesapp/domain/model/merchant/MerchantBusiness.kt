@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.domain.model.user
+package com.prayatna.lookiesapp.domain.model.merchant
 
 data class MerchantBusiness(
     val id: String,

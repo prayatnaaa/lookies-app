@@ -69,7 +69,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 Log.d("SignIn", "role: " + state.role)
                 when (state.role) {
                     "admin" -> NavigationRoutes.ADMIN_MAIN
-                    "partner" -> NavigationRoutes.PARTNER_MAIN_SCREEN
+                    "partner" -> NavigationRoutes.MAIN
                     "user", "artist" -> NavigationRoutes.MAIN
                     else -> NavigationRoutes.LOGIN
                 }
@@ -318,7 +318,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             UploadPaintingScreen(navController = navController)
         }
         composable(
-            route = NavigationRoutes.PARTNER_APPLICATION
+            route = "${NavigationRoutes.PARTNER_APPLICATION}/{merchantType}",
+            arguments = listOf(navArgument("merchantType") { type = NavType.StringType })
         ) {
             PartnerSubmissionScreen(navController = navController)
         }

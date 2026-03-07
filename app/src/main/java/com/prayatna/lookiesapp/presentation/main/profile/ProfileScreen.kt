@@ -128,7 +128,7 @@ fun ProfileScreen(
                         subtitle = "Join us and expand your reach",
                         icon = Icons.Default.Handshake,
                         onClick = {
-                            navController.navigate(NavigationRoutes.PARTNER_APPLICATION)
+                            navController.navigate("${NavigationRoutes.PARTNER_APPLICATION}/partner")
                         }
                     )
 
@@ -141,7 +141,7 @@ fun ProfileScreen(
                             if (profile.role != "user") {
                                 navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
                             } else {
-                                navController.navigate(NavigationRoutes.PARTNER_APPLICATION)
+                                navController.navigate("${NavigationRoutes.PARTNER_APPLICATION}/artist")
                             }
                         }
                     )

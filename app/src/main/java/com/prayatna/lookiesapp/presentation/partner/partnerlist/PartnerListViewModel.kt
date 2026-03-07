@@ -3,7 +3,7 @@ package com.prayatna.lookiesapp.presentation.partner.partnerlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.domain.model.user.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.usecase.admin.ApprovePartnerUseCase
 import com.prayatna.lookiesapp.domain.usecase.admin.RejectPartnerUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.GetPartnersUseCase

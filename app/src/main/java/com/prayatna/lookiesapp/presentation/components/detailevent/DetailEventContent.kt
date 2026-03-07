@@ -130,8 +130,8 @@ fun DetailEventContent(
                         .padding(12.dp)
                 ) {
                     AsyncImage(
-                        model = event.organizer.logoUrl
-                            .replace("http://172.21.179.110", "http://10.0.2.2"),
+                        model = event.organizer.pictureUrl
+                            ?.replace("http://172.21.179.110", "http://10.0.2.2"),
                         contentDescription = null,
                         modifier = Modifier
                             .size(40.dp)
@@ -148,7 +148,7 @@ fun DetailEventContent(
                             color = MaterialTheme.colorScheme.outline
                         )
                         Text(
-                            text = event.organizer.name,
+                            text = event.organizer.legalName,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold
                         )
