@@ -30,6 +30,7 @@ import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
+import com.prayatna.lookiesapp.presentation.merchant.merchantMember.MerchantMemberListScreen
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
 import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.ParticipantPaintingListScreen
 import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScreen
@@ -140,6 +141,22 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 )
             }
         }
+
+        composable(
+//            route = "${NavigationRoutes.MERCHANT_MEMBER_LIST}/{userId}",
+//            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+            route = NavigationRoutes.MERCHANT_MEMBER_LIST
+        ) {
+//            backStackEntry ->
+//            backStackEntry.arguments?.getString("userId")?.let { id ->
+//                MerchantMemberListScreen(
+//                    navController = navController,
+//                    userId = id
+//                )
+//            }
+            MerchantMemberListScreen(navController = navController)
+        }
+
         composable("${NavigationRoutes.CHECKOUT}/{type}/{id}/{quantity}",
             arguments = listOf(
                 navArgument("type") { type = NavType.StringType },
