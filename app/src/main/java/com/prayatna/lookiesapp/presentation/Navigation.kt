@@ -256,9 +256,12 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             PartnerListScreen(navController = navController)
         }
         composable(
-            route = NavigationRoutes.PARTNER_MAIN_SCREEN
-        ) {
-            PartnerMainScreen(navHostController = navController)
+            route = "${NavigationRoutes.PARTNER_MAIN_SCREEN}/{businessId}",
+            arguments = listOf(navArgument("businessId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("businessId")?.let { businessId ->
+                PartnerMainScreen(navHostController = navController, businessId = businessId)
+            }
         }
         composable(
             route = "${NavigationRoutes.PARTICIPANT_LIST}/{eventId}",

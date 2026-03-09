@@ -31,6 +31,8 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.error.ErrorScreen
+import com.prayatna.lookiesapp.utils.NavigationRoutes
+import com.prayatna.lookiesapp.utils.PartnerBottomNavItem
 
 @Composable
 fun MerchantMemberListScreen(
@@ -83,7 +85,7 @@ fun MerchantMemberListScreen(
                 ) {
                     items(uiState.merchantMembers) { member ->
                         MerchantMemberCard(member = member, onClick = {
-                            // TODO
+                            navController.navigate("${NavigationRoutes.PARTNER_MAIN_SCREEN}/${member.businessId}")
                         })
                     }
                 }

@@ -32,7 +32,8 @@ import com.prayatna.lookiesapp.utils.PartnerBottomNavItem
 fun PartnerMainScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    sharedViewModel: SharedViewModel = hiltViewModel()
+    sharedViewModel: SharedViewModel = hiltViewModel(),
+    businessId: String
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -60,13 +61,15 @@ fun PartnerMainScreen(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
             navHostController = navHostController,
-            sharedViewModel = sharedViewModel
+            sharedViewModel = sharedViewModel,
+            businessId = businessId
         )
     }
 }
 
 @Composable
 fun PartnerContent(
+    businessId: String,
     modifier: Modifier = Modifier,
     navController: NavHostController,
     navHostController: NavHostController,
@@ -77,14 +80,15 @@ fun PartnerContent(
         startDestination = PartnerBottomNavItem.Home.route,
         modifier = modifier
     ) {
-        composable(PartnerBottomNavItem.Home.route) {
-            PartnerHomeScreen(navController = navHostController)
+        composable(
+            route = PartnerBottomNavItem.Home.route,
+        ) {
+            PartnerHomeScreen(navController = navHostController, businessId = businessId)
         }
 
         composable(PartnerBottomNavItem.Chat.route) {
             ChatRoomScreen(navController = navHostController)
         }
-
         composable(PartnerBottomNavItem.Transaction.route) {
 //            StarredScreen()
         }
