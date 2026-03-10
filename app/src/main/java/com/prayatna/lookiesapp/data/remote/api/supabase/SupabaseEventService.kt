@@ -35,9 +35,6 @@ class SupabaseEventService @Inject constructor(
         bannerImage: ByteArray?
     ): CreateEventResponse {
 
-        val userId = auth.currentUserOrNull()?.id
-            ?: throw IllegalStateException("User not logged in")
-
         if (bannerImage == null) {
             throw IllegalArgumentException("Banner image cannot be null")
         }
@@ -45,7 +42,7 @@ class SupabaseEventService @Inject constructor(
         var uploadedPath: String? = null
 
         try {
-            val path = "events/$userId/${UUID.randomUUID()}.png"
+            val path = "events/${request.organizerId}/${UUID.randomUUID()}.png"
 
             storage.from("partner_assets").upload(
                 path = path,
@@ -165,9 +162,4 @@ class SupabaseEventService @Inject constructor(
         Log.d("getEventPaintings", response.toString())
         return response
     }
-
-    suspend fun uploadEventPaintings() {
-
-    }
-
 }

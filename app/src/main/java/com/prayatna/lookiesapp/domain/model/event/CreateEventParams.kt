@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.domain.model.event
 
 data class CreateEventParams(
+    val organizerId: String,
     val title: String,
     val bannerImageUrl: String,
     val startDate: String,

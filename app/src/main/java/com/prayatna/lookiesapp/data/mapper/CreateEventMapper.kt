@@ -18,6 +18,7 @@ fun CreateEventRequest.toDomain(): CreateEventParams {
         ticketPrice = this.ticketPrice,
         registrationFee = this.registrationFee,
         eventType = this.eventType,
-        eventFormat = this.eventFormat
+        eventFormat = this.eventFormat,
+        organizerId = this.organizerId
     )
 }

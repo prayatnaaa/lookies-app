@@ -22,14 +22,14 @@ data class CreateEventFormState(
     val eventTypes: List<TEventType> = emptyList(),
     val eventFormats: List<EventFormat> = emptyList(),
     val isLoadingMeta: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 ) {
     val isValid: Boolean
         get() =
             title.isNotBlank() &&
-                    bannerUri != null &&
-                    startDate.isNotBlank() &&
-                    endDate.isNotBlank() &&
-                    eventType.toIntOrNull() != null &&
-                    eventFormat.toIntOrNull() != null
+            bannerUri != null &&
+            startDate.isNotBlank() &&
+            endDate.isNotBlank() &&
+            eventType.toIntOrNull() != null &&
+            eventFormat.toIntOrNull() != null
 }

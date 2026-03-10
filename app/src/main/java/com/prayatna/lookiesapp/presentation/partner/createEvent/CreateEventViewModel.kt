@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.partner.createEvent
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.event.CreateEventParams
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateEventViewModel @Inject constructor(
     private val createEventUseCase: CreateEventUseCase,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _formState = MutableStateFlow(CreateEventFormState())
@@ -114,6 +116,7 @@ class CreateEventViewModel @Inject constructor(
 
 
     private fun submit() {
+        val businessId: String = savedStateHandle["businessId"] ?: ""
         val state = _formState.value
         if (!state.isValid) return
 
@@ -134,7 +137,8 @@ class CreateEventViewModel @Inject constructor(
                 ticketPrice = state.ticketPrice?.toDouble(),
                 registrationFee = state.artistRegistrationFee?.toDouble(),
                 eventType = state.eventType.toInt(),
-                eventFormat = state.eventFormat.toInt()
+                eventFormat = state.eventFormat.toInt(),
+                organizerId = businessId
             )
 
 

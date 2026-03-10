@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateEventRequest(
+    @SerialName("organizer_id")
+    val organizerId: String,
     val title: String,
     @SerialName("banner_image_url")
     val bannerImageUrl: String,

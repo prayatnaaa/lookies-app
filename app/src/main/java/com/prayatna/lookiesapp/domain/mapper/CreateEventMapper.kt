@@ -18,6 +18,7 @@ fun CreateEventParams.toDto(): CreateEventRequest {
         ticketPrice = this.ticketPrice,
         registrationFee = this.registrationFee,
         eventType = this.eventType,
-        eventFormat = this.eventFormat
+        eventFormat = this.eventFormat,
+        organizerId = this.organizerId
     )
 }

@@ -196,8 +196,14 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         composable(NavigationRoutes.REGISTER) {
             RegisterScreen(navController = navController)
         }
-        composable(NavigationRoutes.CREATE_EVENT) {
-            CreateEventScreen(navController = navController)
+        composable(
+            route = "${NavigationRoutes.CREATE_EVENT}/{businessId}",
+            arguments = listOf(navArgument("businessId") { type = NavType.StringType })
+            ) {
+            backStackEntry ->
+            backStackEntry.arguments?.getString("businessId")?.let {
+                CreateEventScreen(navController = navController)
+            }
         }
         composable(
             route = "${NavigationRoutes.REGISTER_EVENT}/{eventId}?maxPaintingPerArtist={maxPaintingPerArtist}",
