@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EventDto(
-    @SerialName("event_id")
+    @SerialName("id")
     val eventId: String,
 
     val title: String,

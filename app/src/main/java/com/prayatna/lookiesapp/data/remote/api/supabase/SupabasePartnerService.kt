@@ -89,13 +89,11 @@ class SupabasePartnerService @Inject constructor(
         return result
     }
 
-    suspend fun getSelfEvents(status: String? = null, name: String? = null): List<EventDto> {
-        val user = auth.currentUserOrNull()
-            ?: throw Exception("user not logged in")
-        val events = postgrest.from("event_detail_view")
+    suspend fun getSelfEvents(businessId: String, status: String? = null, name: String? = null): List<EventDto> {
+        val events = postgrest.from("events_view")
             .select {
                 filter {
-                    eq("organizer_id", user.id)
+                    eq("organizer->>id", businessId)
                     if (status != null) {
                         eq("status", status)
                     }

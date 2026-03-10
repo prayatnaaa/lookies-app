@@ -187,8 +187,14 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         composable(NavigationRoutes.EVENT_LIST) {
             EventListScreen(navController = navController)
         }
-        composable(NavigationRoutes.SELF_EVENT_LIST) {
-            SelfEventListScreen(navController = navController)
+        composable(
+            route = "${NavigationRoutes.SELF_EVENT_LIST}/{businessId}",
+            arguments = listOf(navArgument("businessId") { type = NavType.StringType })
+        ) {
+            backStackEntry ->
+            backStackEntry.arguments?.getString("businessId")?.let {
+                SelfEventListScreen(navController = navController)
+            }
         }
         composable(NavigationRoutes.LOGIN) {
             LoginScreen(navController = navController, viewModel = viewModel)

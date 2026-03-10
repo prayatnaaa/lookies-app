@@ -95,12 +95,12 @@ fun PartnerCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    StatusPill(text = data.status)
+                    StatusPill(text = data.status!!)
                 }
             }
 
             // Admin quick-action buttons for pending partners
-            if (showAdminActions && data.status.lowercase() == "pending") {
+            if (showAdminActions && data.status!!.lowercase() == "pending") {
                 Spacer(Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),

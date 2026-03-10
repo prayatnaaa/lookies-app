@@ -1,8 +1,9 @@
 package com.prayatna.lookiesapp.presentation.partner.selfEventList
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.repository.PartnerRepository
+import com.prayatna.lookiesapp.domain.usecase.partner.GetSelfEventsUseCase
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.state.SelfEventListUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SelfEventListViewModel @Inject constructor(
-    private val partnerRepository: PartnerRepository
+    private val getSelfEventsUseCase: GetSelfEventsUseCase,
+    private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(SelfEventListUiState())
@@ -31,8 +33,13 @@ class SelfEventListViewModel @Inject constructor(
 
             val currentStatus = _uiState.value.selectedStatus
             val currentQuery = _uiState.value.searchQuery.ifBlank { null }
+            val businessId: String = savedStateHandle.get<String>("businessId") ?: ""
 
-            when (val response = partnerRepository.getSelfEvents(status = currentStatus, name = currentQuery)) {
+            when (val response = getSelfEventsUseCase(
+                status = currentStatus,
+                name = currentQuery,
+                businessId = businessId
+            )) {
                 is DataResult.Error -> {
                     _uiState.update {
                         it.copy(errorMessage = response.error, isLoading = false)

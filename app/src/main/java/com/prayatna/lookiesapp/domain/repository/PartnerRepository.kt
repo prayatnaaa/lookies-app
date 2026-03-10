@@ -17,7 +17,11 @@ interface PartnerRepository {
         merchantType: String? = null
     ): Flow<DataResult<List<MerchantBusiness>>>
     suspend fun getDetailPartner(id: String): DataResult<MerchantBusiness>
-    suspend fun getSelfEvents(status: String? = null, name: String? = null): DataResult<List<Event>>
+    suspend fun getSelfEvents(
+        businessId: String,
+        status: String? = null,
+        name: String? = null
+    ): DataResult<List<Event>>
     suspend fun updateEvent(id: String, input: EditEventInput): DataResult<DefaultEvent>
     suspend fun getParticipantList(eventId: String?): DataResult<List<EventParticipant>>
     suspend fun approvePainting(id: String): DataResult<String>

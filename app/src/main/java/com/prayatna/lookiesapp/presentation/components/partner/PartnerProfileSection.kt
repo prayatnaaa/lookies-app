@@ -147,7 +147,7 @@ fun PartnerProfileSection(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                     )
-                    if (isAdmin && data.status.isNotBlank()) {
+                    if (isAdmin && data.status!!.isNotBlank()) {
                         StatusPill(text = data.status)
                     }
                 }

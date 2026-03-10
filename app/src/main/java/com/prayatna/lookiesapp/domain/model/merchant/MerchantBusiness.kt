@@ -16,5 +16,5 @@ data class MerchantBusiness(
     val updatedAt: String?,
     val pictureUrl: String?,
     val merchantType: String,
-    val status: String
+    val status: String? = null
 )

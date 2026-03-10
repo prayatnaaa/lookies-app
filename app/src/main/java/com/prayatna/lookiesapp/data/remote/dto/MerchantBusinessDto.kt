@@ -51,5 +51,5 @@ data class MerchantBusinessDto(
     val merchantType: String,
 
     @SerialName("kyc_status")
-    val status: String
+    val status: String? = null
 )
