@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.transaction.payment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.domain.model.transaction.CreatePaymentParams
 import com.prayatna.lookiesapp.domain.usecase.payment.CreateXenditPaymentUseCase
 import com.prayatna.lookiesapp.presentation.transaction.payment.state.PaymentEvent
 import com.prayatna.lookiesapp.presentation.transaction.payment.state.PaymentUiState
@@ -11,9 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,8 +49,20 @@ class PaymentViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
+            val currentState = _uiState.value
+
+            val params = CreatePaymentParams(
+                selectedMethod = currentState.selectedMethod,
+                phoneNumber = currentState.phoneNumber,
+                cardNumber = currentState.cardNumber,
+                cardExpiry = currentState.cardExpiry,
+                cardCvv = currentState.cardCvv
+            )
+
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
             val result = createXenditPaymentUseCase(
-                state = _uiState.value,
+                state = params,
                 orderId = event.orderId,
                 merchantId = event.merchantId,
                 amount = event.amount
@@ -61,14 +71,7 @@ class PaymentViewModel @Inject constructor(
             when (result) {
                 is DataResult.Success -> {
                     val redirectUrl =
-                        result.data.paymentToken
-                            ?.get("actions")
-                            ?.jsonArray
-                            ?.firstOrNull()
-                            ?.jsonObject
-                            ?.get("value")
-                            ?.jsonPrimitive
-                            ?.content
+                        result.data.paymentToken!!.actions[0].value
 
                     _uiState.update {
                         it.copy(

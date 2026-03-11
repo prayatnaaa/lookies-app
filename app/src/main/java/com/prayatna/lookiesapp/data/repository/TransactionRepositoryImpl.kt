@@ -11,6 +11,7 @@ import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
+import io.ktor.client.network.sockets.ConnectTimeoutException
 import javax.inject.Inject
 
 class TransactionRepositoryImpl @Inject constructor(
@@ -40,9 +41,9 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun  createPayment(request: CreateXenditPaymentRequest): DataResult<CreateXenditPaymentResponse> {
+    override suspend fun  createPaymentRequest(request: CreateXenditPaymentRequest): DataResult<CreateXenditPaymentResponse> {
         return try {
-            val response = transactionService.createPayment(request = request)
+            val response = transactionService.createPaymentRequest(request = request)
             if (response.status != "error") {
                 DataResult.Success(response)
             } else {
@@ -52,6 +53,8 @@ class TransactionRepositoryImpl @Inject constructor(
             DataResult.Error(e.error)
         } catch (e: HttpRequestException) {
             DataResult.Error(e.message ?: "Something went wrong!")
+        } catch (e: ConnectTimeoutException) {
+            DataResult.Error("Connection timeout")
         }
     }
 }

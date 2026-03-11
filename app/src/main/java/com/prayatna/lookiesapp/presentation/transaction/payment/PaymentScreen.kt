@@ -42,9 +42,6 @@ fun PaymentScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    /**
-     * Handle redirect / success
-     */
     LaunchedEffect(state.isSuccess, state.paymentSuccessUrl) {
         if (state.isSuccess && state.paymentSuccessUrl != null) {
             val intent = Intent(Intent.ACTION_VIEW, state.paymentSuccessUrl!!.toUri())

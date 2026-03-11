@@ -2,8 +2,8 @@ package com.prayatna.lookiesapp.domain.usecase.payment
 
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.*
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateXenditPaymentResponse
+import com.prayatna.lookiesapp.domain.model.transaction.CreatePaymentParams
 import com.prayatna.lookiesapp.presentation.transaction.payment.state.PaymentMethod
-import com.prayatna.lookiesapp.presentation.transaction.payment.state.PaymentUiState
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import javax.inject.Inject
@@ -13,7 +13,7 @@ class CreateXenditPaymentUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(
-        state: PaymentUiState,
+        state: CreatePaymentParams,
         orderId: String,
         merchantId: String,
         amount: Double
@@ -35,7 +35,7 @@ class CreateXenditPaymentUseCase @Inject constructor(
                     requestAmount = amount,
                     channelCode = PaymentMethod.GOPAY.code,
                     channelProperties = GopayChannelProperties(
-                        accountMobileNumber = state.phoneNumber
+                        accountMobileNumber = "+62" + state.phoneNumber
                     )
                 )
             }
@@ -78,6 +78,6 @@ class CreateXenditPaymentUseCase @Inject constructor(
             }
         }
 
-        return transactionRepository.createPayment(request)
+        return transactionRepository.createPaymentRequest(request)
     }
 }

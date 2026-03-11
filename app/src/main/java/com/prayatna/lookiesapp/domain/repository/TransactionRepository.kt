@@ -11,5 +11,5 @@ interface TransactionRepository {
         items: List<OrderItemInput>
     ): DataResult<String>
     suspend fun getUserTransactions(): DataResult<List<Transaction>>
-    suspend fun createPayment(request: CreateXenditPaymentRequest): DataResult<CreateXenditPaymentResponse>
+    suspend fun createPaymentRequest(request: CreateXenditPaymentRequest): DataResult<CreateXenditPaymentResponse>
 }

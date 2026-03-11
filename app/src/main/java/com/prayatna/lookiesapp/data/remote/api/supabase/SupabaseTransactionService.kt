@@ -64,7 +64,7 @@ class SupabaseTransactionService @Inject constructor(
         return result
     }
 
-    suspend fun createPayment(request: CreateXenditPaymentRequest): CreateXenditPaymentResponse {
+    suspend fun createPaymentRequest(request: CreateXenditPaymentRequest): CreateXenditPaymentResponse {
         val session = auth.currentSessionOrNull()
             ?: throw IllegalStateException("No active session")
 

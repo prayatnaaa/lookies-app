@@ -111,9 +111,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 merchantId = merchantId,
                 amount = amount,
                 onPaymentSuccess = {
-                    navController.navigate("transaction_history") {
-                        popUpTo("home")
-                    }
+                    navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() }
             )

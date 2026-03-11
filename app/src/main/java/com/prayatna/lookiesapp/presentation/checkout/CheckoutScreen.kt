@@ -42,8 +42,8 @@ fun CheckoutScreen(
     if (showSuccessDialog.value) {
         CustomDialog(
             title = "Order Created!",
-            message = "Pesanan berhasil dibuat. Lanjutkan ke pembayaran?",
-            confirmText = "Bayar Sekarang",
+            message = "Continue to payment?",
+            confirmText = "Pay now",
             onConfirm = {
                 showSuccessDialog.value = false
 

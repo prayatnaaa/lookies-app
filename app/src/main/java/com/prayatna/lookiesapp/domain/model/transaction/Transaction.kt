@@ -11,3 +11,10 @@ data class Transaction(
     val paymentInfo: PaymentInfo? = null,
     val items: List<TransactionItem>
 )
+
+data class PaymentInfo(
+    val paymentId: String? = null,
+    val invoiceId: String,
+    val status: String,
+    val provider: String
+)
