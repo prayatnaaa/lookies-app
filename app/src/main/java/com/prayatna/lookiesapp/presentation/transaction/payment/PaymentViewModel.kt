@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import toDomain
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,12 +48,11 @@ class PaymentViewModel @Inject constructor(
 
     private fun submitPayment(event: PaymentEvent.SubmitPayment) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             val currentState = _uiState.value
 
             val params = CreatePaymentParams(
-                selectedMethod = currentState.selectedMethod,
+                selectedMethod = currentState.selectedMethod.toDomain(),
                 phoneNumber = currentState.phoneNumber,
                 cardNumber = currentState.cardNumber,
                 cardExpiry = currentState.cardExpiry,

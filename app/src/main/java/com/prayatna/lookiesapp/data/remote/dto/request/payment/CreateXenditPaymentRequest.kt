@@ -12,14 +12,14 @@ data class CreateXenditPaymentRequest(
     val country: String = "ID",
     val currency: String = "IDR",
     @SerialName("channel_code") val channelCode: String,
-    @SerialName("channel_properties") val channelProperties: ChannelProperties,
+    @SerialName("channel_properties") val channelProperties: ChannelPropertiesDto,
     @SerialName("request_amount") val requestAmount: Double,
     @SerialName("capture_method") val captureMethod: String = "AUTOMATIC",
     @SerialName("customer_id") val customerId: String? = null
 )
 
 @Serializable
-sealed interface ChannelProperties
+sealed interface ChannelPropertiesDto
 
 
 @Serializable
@@ -32,7 +32,7 @@ data class CardChannelProperties(
     @SerialName("success_return_url") val successReturnUrl: String? = null,
     @SerialName("statement_descriptor") val statementDescriptor: String? = null,
     @SerialName("card_details") val cardDetails: CardDetails
-) : ChannelProperties
+) : ChannelPropertiesDto
 
 
 @Serializable
@@ -50,4 +50,4 @@ data class CardDetails(
 @SerialName("GOPAY")
 data class GopayChannelProperties(
     @SerialName("account_mobile_number") val accountMobileNumber: String
-) : ChannelProperties
+) : ChannelPropertiesDto

@@ -2,10 +2,11 @@ package com.prayatna.lookiesapp.data.repository
 
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseTransactionService
-import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateXenditPaymentRequest
-import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateXenditPaymentResponse
+import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
+import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
+import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
@@ -41,11 +42,11 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun  createPaymentRequest(request: CreateXenditPaymentRequest): DataResult<CreateXenditPaymentResponse> {
+    override suspend fun createPaymentRequest(request: CreateXenditPaymentRequestInput): DataResult<CreateXenditPaymentRequestResult> {
         return try {
-            val response = transactionService.createPaymentRequest(request = request)
+            val response = transactionService.createPaymentRequest(request = request.toDto())
             if (response.status != "error") {
-                DataResult.Success(response)
+                DataResult.Success(response.toDomain())
             } else {
                 DataResult.Error(response.message)
             }

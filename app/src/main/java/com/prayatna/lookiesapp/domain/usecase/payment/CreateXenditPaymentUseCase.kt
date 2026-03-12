@@ -1,12 +1,24 @@
 package com.prayatna.lookiesapp.domain.usecase.payment
 
-import com.prayatna.lookiesapp.data.remote.dto.request.payment.*
-import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateXenditPaymentResponse
+import com.prayatna.lookiesapp.domain.model.transaction.CardChannelProperties
+import com.prayatna.lookiesapp.domain.model.transaction.CardDetails
 import com.prayatna.lookiesapp.domain.model.transaction.CreatePaymentParams
-import com.prayatna.lookiesapp.presentation.transaction.payment.state.PaymentMethod
+import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
+import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
+import com.prayatna.lookiesapp.domain.model.transaction.GopayChannelProperties
+import com.prayatna.lookiesapp.domain.model.transaction.PaymentRequestMethod
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
+import java.util.UUID
 import javax.inject.Inject
+
+private fun String.normalizePhone(): String {
+    return when {
+        startsWith("0") -> "+62${substring(1)}"
+        startsWith("+62") -> this
+        else -> "+62$this"
+    }
+}
 
 class CreateXenditPaymentUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository
@@ -17,30 +29,30 @@ class CreateXenditPaymentUseCase @Inject constructor(
         orderId: String,
         merchantId: String,
         amount: Double
-    ): DataResult<CreateXenditPaymentResponse> {
+    ): DataResult<CreateXenditPaymentRequestResult> {
 
-        val referenceId = "TRX-${System.currentTimeMillis()}"
+        val referenceId = "TRX-${UUID.randomUUID()}"
 
         val request = when (state.selectedMethod) {
 
-            PaymentMethod.GOPAY -> {
+            PaymentRequestMethod.GOPAY -> {
                 if (state.phoneNumber.isBlank()) {
                     return DataResult.Error("Nomor GoPay wajib diisi")
                 }
 
-                CreateXenditPaymentRequest(
+                CreateXenditPaymentRequestInput(
                     merchantId = merchantId,
                     orderId = orderId,
                     referenceId = referenceId,
                     requestAmount = amount,
-                    channelCode = PaymentMethod.GOPAY.code,
+                    channelCode = "GOPAY_RECURRING",
                     channelProperties = GopayChannelProperties(
-                        accountMobileNumber = "+62" + state.phoneNumber
+                        accountMobileNumber = state.phoneNumber.normalizePhone()
                     )
                 )
             }
 
-            PaymentMethod.CREDIT_CARD -> {
+            PaymentRequestMethod.CREDIT_CARD -> {
                 if (
                     state.cardNumber.isBlank() ||
                     state.cardExpiry.isBlank() ||
@@ -57,12 +69,12 @@ class CreateXenditPaymentUseCase @Inject constructor(
                 val month = parts[0]
                 val year = "20${parts[1]}"
 
-                CreateXenditPaymentRequest(
+                CreateXenditPaymentRequestInput(
                     merchantId = merchantId,
                     orderId = orderId,
                     referenceId = referenceId,
                     requestAmount = amount,
-                    channelCode = PaymentMethod.CREDIT_CARD.code,
+                    channelCode = "CARDS",
                     channelProperties = CardChannelProperties(
                         skipThreeDs = false,
                         cardDetails = CardDetails(

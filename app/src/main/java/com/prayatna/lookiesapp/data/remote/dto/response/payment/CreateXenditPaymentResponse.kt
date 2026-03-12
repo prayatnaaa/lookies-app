@@ -43,7 +43,7 @@ data class XenditPaymentTokenDto(
     val requestAmount: Int,
 
     @SerialName("channel_properties")
-    val channelProperties: ChannelPropertiesDto,
+    val channelProperties: TChannelPropertiesDto,
 
     val type: String,
 
@@ -51,7 +51,7 @@ data class XenditPaymentTokenDto(
 )
 
 @Serializable
-data class ChannelPropertiesDto(
+data class TChannelPropertiesDto(
 
     @SerialName("success_return_url")
     val successReturnUrl: String,
