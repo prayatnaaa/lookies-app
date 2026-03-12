@@ -51,8 +51,7 @@ class SupabaseTransactionService @Inject constructor(
         val user = auth.currentUserOrNull() ?: throw IllegalStateException("User not logged in")
 
         val result = postgrest
-//            .from("user_orders_view")
-            .from("transaction_view")
+            .from("transactions_view")
             .select {
                 filter {
                     eq("buyer_id", user.id)

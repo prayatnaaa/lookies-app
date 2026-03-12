@@ -9,9 +9,9 @@ data class PaymentInfoDto(
     val paymentId: String? = null,
 
     @SerialName("invoice_id")
-    val invoiceId: String,
+    val invoiceId: String? = null,
 
-    val status: String,
+    val status: String? = null,
 
-    val provider: String
+    val provider: String? = null
 )

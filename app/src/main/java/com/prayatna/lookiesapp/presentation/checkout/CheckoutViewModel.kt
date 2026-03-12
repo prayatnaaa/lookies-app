@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.checkout
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
@@ -96,7 +97,7 @@ class CheckoutViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val currentItem = _uiState.value.itemToBuy
-
+            Log.d("CheckoutViewModel", "createCheckout: $currentItem")
             if (currentItem == null) {
                 _uiState.update { it.copy(errorMessage = "Data item belum siap.") }
                 return@launch

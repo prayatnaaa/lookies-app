@@ -14,7 +14,7 @@ data class Transaction(
 
 data class PaymentInfo(
     val paymentId: String? = null,
-    val invoiceId: String,
-    val status: String,
-    val provider: String
+    val invoiceId: String? = null,
+    val status: String? = null,
+    val provider: String? = null
 )
