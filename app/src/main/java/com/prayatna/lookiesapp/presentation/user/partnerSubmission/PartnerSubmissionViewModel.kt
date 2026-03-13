@@ -11,7 +11,7 @@ import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
 import com.prayatna.lookiesapp.domain.model.user.IndividualDetail
 import com.prayatna.lookiesapp.domain.model.user.KycDocument
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
-import com.prayatna.lookiesapp.domain.repository.UserRepository
+import com.prayatna.lookiesapp.domain.usecase.user.RegisterBusinessUseCase
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionFormState
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionUiState
@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PartnerSubmissionViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val registerBusinessUseCase: RegisterBusinessUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -138,8 +138,8 @@ class PartnerSubmissionViewModel @Inject constructor(
                 bankAccounts = bankAccount
             )
 
-            val result = userRepository.registerBusiness(
-                request = requestInput,
+            val result = registerBusinessUseCase(
+                input = requestInput,
                 kycFile = form.kycFileBytes,
                 fileName = form.kycFileName
             )
