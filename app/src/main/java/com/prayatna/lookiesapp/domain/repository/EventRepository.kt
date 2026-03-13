@@ -12,9 +12,13 @@ import kotlinx.coroutines.flow.Flow
 
 interface EventRepository {
     suspend fun getEvents(
-        title: String?,
-        organizerId: String?,
-        status: String?
+        title: String? = null,
+        organizerId: String? = null,
+        status: String? = null,
+        location: String? = null,
+        startDate: String? = null,
+        endDate: String? = null,
+        isTicketPriceAscending: Boolean = true
     ): DataResult<List<Event>>
     suspend fun getEvent(eventId: String, forceRefresh: Boolean = false): DataResult<Event>
     suspend fun getEventStatistics(eventId: String): Flow<DataResult<EventStatisticDto>>

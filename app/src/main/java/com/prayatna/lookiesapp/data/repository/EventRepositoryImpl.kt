@@ -29,13 +29,21 @@ class EventRepositoryImpl @Inject constructor(
     override suspend fun getEvents(
         title: String?,
         organizerId: String?,
-        status: String?
+        status: String?,
+        location: String?,
+        startDate: String?,
+        endDate: String? ,
+        isTicketPriceAscending: Boolean
     ): DataResult<List<Event>> {
         return try {
             val response = supabaseEventService.getEvents(
                 title = title,
                 organizerId = organizerId,
-                status = status
+                status = status,
+                location = location,
+                startDate = startDate,
+                endDate = endDate,
+                isTicketPriceAscending = isTicketPriceAscending
             )
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {

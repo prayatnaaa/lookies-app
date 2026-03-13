@@ -12,6 +12,7 @@ import com.prayatna.lookiesapp.data.remote.dto.response.event.CreateEventRespons
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.storage.Storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -112,7 +113,11 @@ class SupabaseEventService @Inject constructor(
     suspend fun getEvents(
         title: String? = null,
         organizerId: String? = null,
-        status: String? = null
+        status: String? = null,
+        location: String? = null,
+        startDate: String? = null,
+        endDate: String? = null,
+        isTicketPriceAscending: Boolean = true
     ): List<EventDto> {
 
         val query = postgrest
@@ -128,7 +133,17 @@ class SupabaseEventService @Inject constructor(
                     if (status != null) {
                         eq("status", status)
                     }
+                    if (location != null) {
+                        ilike("location", "%$location%")
+                    }
+                    if (startDate != null) {
+                        gte("start_date", startDate)
+                    }
+                    if (endDate != null) {
+                        lte("end_date", endDate)
+                    }
                 }
+                order("ticket_price", if (isTicketPriceAscending) Order.ASCENDING else Order.DESCENDING)
             }
 
         return query.decodeList()

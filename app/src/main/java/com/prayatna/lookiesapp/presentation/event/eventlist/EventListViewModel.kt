@@ -6,6 +6,7 @@ import com.prayatna.lookiesapp.domain.usecase.event.GetEventsUseCase
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,27 +18,38 @@ class EventListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EventListUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<EventListUiState> = _uiState.asStateFlow()
 
-    fun getEvents(forceRefresh: Boolean = false) {
-        if (!forceRefresh && _uiState.value.events.isNotEmpty()) return
+    init {
+        loadEvents()
+    }
 
+    private fun loadEvents() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            when (val result = getEventsUseCase()) {
+            val currentQuery = _uiState.value.searchQuery.ifBlank { null }
+            val currentStatus = _uiState.value.selectedStatus
+            val ascending = _uiState.value.isTicketPriceAscending
+
+            when (val result = getEventsUseCase(
+                title = currentQuery,
+                status = currentStatus,
+                isTicketPriceAscending = ascending
+            )) {
                 is DataResult.Success -> {
                     _uiState.update { state ->
                         state.copy(
                             isLoading = false,
                             events = result.data,
-                            filteredEvents = result.data,
                             errorMessage = null
                         )
                     }
                 }
                 is DataResult.Error -> {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+                    _uiState.update {
+                        it.copy(isLoading = false, errorMessage = result.error)
+                    }
                 }
                 else -> _uiState.update { it.copy(isLoading = false) }
             }
@@ -46,25 +58,24 @@ class EventListViewModel @Inject constructor(
 
     fun onSearchQueryChange(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
-        filterEvents(query)
     }
 
-    private fun filterEvents(query: String) {
-        val currentEvents = _uiState.value.events
-
-        if (query.isBlank()) {
-            _uiState.update { it.copy(filteredEvents = currentEvents) }
-            return
-        }
-
-        val filtered = currentEvents.filter { event ->
-            event.title.contains(query, ignoreCase = true) ||
-                    event.location.contains(query, ignoreCase = true) ||
-                    event.organizer.legalName.contains(query, ignoreCase = true)
-        }
-
-        _uiState.update { it.copy(filteredEvents = filtered) }
+    fun onSearchTriggered() {
+        loadEvents()
     }
 
-    fun retry() = getEvents(forceRefresh = true)
+    fun onFilterSelected(status: String?) {
+        val newStatus = if (_uiState.value.selectedStatus == status) null else status
+        _uiState.update { it.copy(selectedStatus = newStatus) }
+        loadEvents()
+    }
+
+    fun onSortToggled() {
+        _uiState.update { it.copy(isTicketPriceAscending = !it.isTicketPriceAscending) }
+        loadEvents()
+    }
+
+    fun retry() {
+        loadEvents()
+    }
 }

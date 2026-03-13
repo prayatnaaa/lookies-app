@@ -11,12 +11,21 @@ class GetEventsUseCase @Inject constructor(
     suspend operator fun invoke(
         title: String? = null,
         organizerId: String? = null,
-        status: String? = null
+        status: String? = null,
+        location: String? = null,
+        startDate: String? = null,
+        endDate: String? = null,
+        isTicketPriceAscending: Boolean = true
     ): DataResult<List<Event>> {
-        return repository.getEvents(
+        val result =  repository.getEvents(
             title = title,
             organizerId = organizerId,
-            status = status
+            status = status,
+            location = location,
+            startDate = startDate,
+            endDate = endDate,
+            isTicketPriceAscending = isTicketPriceAscending
         )
+        return result
     }
 }
