@@ -9,14 +9,16 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
-import com.prayatna.lookiesapp.presentation.components.CustomDialog
+import com.prayatna.lookiesapp.presentation.checkout.state.PaymentMethodUiState
+import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.checkout.CheckoutContent
+import com.prayatna.lookiesapp.presentation.components.checkout.CheckoutPaymentMethodContent
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun CheckoutScreen(
     type: String,
-    quantity: Int = 1,
+    quantity: Int,
     itemId: String,
     viewModel: CheckoutViewModel = hiltViewModel(),
     navController: NavController
@@ -40,7 +42,7 @@ fun CheckoutScreen(
     }
 
     if (showSuccessDialog.value) {
-        CustomDialog(
+        CustomBottomSheet(
             title = "Order Created!",
             message = "Continue to payment?",
             confirmText = "Pay now",
@@ -55,24 +57,22 @@ fun CheckoutScreen(
 
                 viewModel.onCheckoutResultConsumed()
 
-                navController.navigate(
-                    "${NavigationRoutes.PAYMENT}/$orderId/$merchantId/$totalAmount"
-                ) {
-                    popUpTo("checkout_route") { inclusive = true }
+                if (uiState.selectedMethod == PaymentMethodUiState.QRIS) {
+                    navController.navigate(
+                        "${NavigationRoutes.PAYMENT}/$orderId/$merchantId/$totalAmount"
+                    ) {
+                        popUpTo("checkout_route") { inclusive = true }
+                    }
                 }
             },
-            onDismiss = {
-                showSuccessDialog.value = false
-                viewModel.onCheckoutResultConsumed()
-                navController.popBackStack()
-            }
+            onDismiss = {}
         )
     }
 
     if (showErrorDialog.value) {
-        CustomDialog(
+        CustomBottomSheet(
             title = "Checkout Failed",
-            message = uiState.errorMessage ?: "Terjadi kesalahan.",
+            message = uiState.errorMessage!!,
             confirmText = "OK",
             onConfirm = {
                 showErrorDialog.value = false
@@ -86,6 +86,14 @@ fun CheckoutScreen(
     }
 
     CheckoutContent(
+        children = {
+            CheckoutPaymentMethodContent(
+                selectedMethod = uiState.selectedMethod,
+                onPaymentMethodSelected = {
+                    viewModel.onPaymentMethodSelected(it)
+                }
+            )
+        },
         uiState = uiState,
         onBackClick = {
             navController.popBackStack()

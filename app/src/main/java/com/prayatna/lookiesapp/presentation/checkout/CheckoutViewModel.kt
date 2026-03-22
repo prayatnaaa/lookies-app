@@ -9,6 +9,7 @@ import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutItemDisplay
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutUiState
+import com.prayatna.lookiesapp.presentation.checkout.state.PaymentMethodUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +42,7 @@ class CheckoutViewModel @Inject constructor(
                 }
                 else -> {
                     _uiState.update {
-                        it.copy(isLoading = false, errorMessage = "Tipe item tidak valid")
+                        it.copy(isLoading = false, errorMessage = "Invalid item type!")
                     }
                 }
             }
@@ -92,6 +93,12 @@ class CheckoutViewModel @Inject constructor(
         }
     }
 
+    fun onPaymentMethodSelected(method: PaymentMethodUiState) {
+        _uiState.update {
+            it.copy(selectedMethod = method)
+        }
+    }
+
     fun createCheckout(
         items: List<OrderItemInput>
     ) {
@@ -99,7 +106,7 @@ class CheckoutViewModel @Inject constructor(
             val currentItem = _uiState.value.itemToBuy
             Log.d("CheckoutViewModel", "createCheckout: $currentItem")
             if (currentItem == null) {
-                _uiState.update { it.copy(errorMessage = "Data item belum siap.") }
+                _uiState.update { it.copy(errorMessage = "No item yet!") }
                 return@launch
             }
 

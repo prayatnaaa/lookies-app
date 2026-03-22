@@ -42,7 +42,8 @@ fun CheckoutContent(
     quantity: Int,
     onPayClick: () -> Unit,
     onRefresh: () -> Unit,
-    snackbarHost: @Composable () -> Unit = {}
+    snackbarHost: @Composable () -> Unit = {},
+    children: @Composable () -> Unit = {}
 ) {
 
     Scaffold(
@@ -139,7 +140,9 @@ fun CheckoutContent(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(100.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    children()
                 }
             }
         }
