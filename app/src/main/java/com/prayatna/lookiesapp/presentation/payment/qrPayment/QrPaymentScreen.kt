@@ -11,12 +11,14 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.QrCodeGenerator
 import com.prayatna.lookiesapp.utils.formatRupiah
 
@@ -50,7 +52,7 @@ fun QrPaymentScreen(
         ?.channelProperties?.qrString
 
     val bitmap = remember(qrString) {
-        qrString?.let { QrCodeGenerator.generate(it) }
+        qrString?.let { QrCodeGenerator.generate(it, size = 1024) }
     }
 
     Scaffold { padding ->
@@ -76,7 +78,7 @@ fun QrPaymentScreen(
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = "Use e-wallet or mobile banking application",
@@ -87,12 +89,16 @@ fun QrPaymentScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Card(
-                    shape = RoundedCornerShape(20.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    )
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(260.dp)
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
                             .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
