@@ -5,7 +5,9 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.request.order.OrderItemRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateQrisPaymentRequestRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateXenditPaymentRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateQrisPaymentRequestResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateXenditPaymentResponse
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -75,6 +77,19 @@ class SupabaseTransactionService @Inject constructor(
             setBody(request)
         }
         Log.d("CreatePayment", response.body())
+        return response.body()
+    }
+
+    suspend fun createQrisPaymentRequest(request: CreateQrisPaymentRequestRequest): CreateQrisPaymentRequestResponse {
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
+        val response =  httpClient.post(
+            "${BuildConfig.SUPABASE_EDGE_BASE_URL}/qris-payment-close-amount"
+        ) {
+            contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer ${session.accessToken}")
+            setBody(request)
+        }
         return response.body()
     }
 }

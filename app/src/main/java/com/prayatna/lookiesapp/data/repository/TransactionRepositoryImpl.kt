@@ -5,11 +5,14 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseTransactionServi
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
+import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestInput
+import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.ktor.client.network.sockets.ConnectTimeoutException
@@ -30,6 +33,16 @@ class TransactionRepositoryImpl @Inject constructor(
             DataResult.Error(e.error)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
+
+    override suspend fun createQrisPaymentRequest(data: CreateQrisPaymentRequestInput): DataResult<CreateQrisPaymentRequestResult> {
+        return try {
+            val response = transactionService.createQrisPaymentRequest(request = data.toDto())
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
         }
     }
 
