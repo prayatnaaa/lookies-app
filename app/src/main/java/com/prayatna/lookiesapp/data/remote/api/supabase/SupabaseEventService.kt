@@ -121,7 +121,7 @@ class SupabaseEventService @Inject constructor(
     ): List<EventDto> {
 
         val query = postgrest
-            .from("events_view")
+            .from("v2_event_view")
             .select {
                 filter {
                     if (title != null) {
@@ -131,7 +131,8 @@ class SupabaseEventService @Inject constructor(
                         eq("organizer_id", organizerId)
                     }
                     if (status != null) {
-                        eq("status", status)
+                        val statuses = status.split(",").map { it.trim() }
+                        isIn("status", statuses)
                     }
                     if (location != null) {
                         ilike("location", "%$location%")
