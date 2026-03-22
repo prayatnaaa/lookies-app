@@ -123,4 +123,7 @@ dependencies {
 
     //Desugar
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    //ZXING (Barcode generator)
+    implementation(libs.core)
 }

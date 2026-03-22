@@ -41,6 +41,7 @@ import com.prayatna.lookiesapp.presentation.partner.manageEvent.PartnerManageEve
 import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
+import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
 import com.prayatna.lookiesapp.presentation.transaction.payment.PaymentScreen
@@ -94,6 +95,26 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         navController = navController,
         startDestination = NavigationRoutes.MAIN_LOADING
     ) {
+        composable(
+            route = "${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType },
+                navArgument("merchantId") { type = NavType.StringType },
+                navArgument("amount") { type = NavType.FloatType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            val merchantId = backStackEntry.arguments?.getString("merchantId") ?: ""
+            val amount = backStackEntry.arguments?.getFloat("amount")?.toDouble() ?: 0.0
+
+            QrPaymentScreen(
+                orderId = orderId,
+                merchantId = merchantId,
+                amount = amount.toInt(),
+                navController = navController
+            )
+        }
+
         composable(
             route = "${NavigationRoutes.PAYMENT}/{orderId}/{merchantId}/{amount}",
             arguments = listOf(
