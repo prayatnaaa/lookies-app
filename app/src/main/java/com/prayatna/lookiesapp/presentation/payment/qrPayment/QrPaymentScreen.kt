@@ -21,6 +21,7 @@ import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.QrCodeGenerator
 import com.prayatna.lookiesapp.utils.formatRupiah
+import kotlinx.coroutines.delay
 
 @Composable
 fun QrPaymentScreen(
@@ -33,6 +34,7 @@ fun QrPaymentScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showErrorDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(orderId, merchantId, amount) {
         viewModel.createQrisPaymentRequest(
@@ -53,6 +55,21 @@ fun QrPaymentScreen(
 
     val bitmap = remember(qrString) {
         qrString?.let { QrCodeGenerator.generate(it, size = 1024) }
+    }
+
+    LaunchedEffect(uiState.qrPaymentData) {
+        if (uiState.qrPaymentData != null) {
+            viewModel.getPaymentAttempt(orderId)
+        }
+    }
+
+    LaunchedEffect(uiState.isPaid) {
+        if (uiState.isPaid) {
+            showSuccessDialog = true
+
+            delay(1500)
+            navController.popBackStack()
+        }
     }
 
     Scaffold { padding ->
@@ -169,6 +186,20 @@ fun QrPaymentScreen(
             },
             onDismiss = {
                 showErrorDialog = false
+            }
+        )
+    }
+
+    if (showSuccessDialog) {
+        CustomBottomSheet(
+            title = "Yeay!",
+            message = "You paid!",
+            confirmText = "OK",
+            onConfirm = {
+                showSuccessDialog = false
+            },
+            onDismiss = {
+                showSuccessDialog = false
             }
         )
     }

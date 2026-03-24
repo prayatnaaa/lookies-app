@@ -8,7 +8,7 @@ data class PaymentAttempt(
     val channel: String,
     val externalId: String,
     val createdAt: String,
-    val amount: String,
+    val amount: Int,
     val currency: String,
     val failureReason: String? = null,
     val updatedAt: String? = null

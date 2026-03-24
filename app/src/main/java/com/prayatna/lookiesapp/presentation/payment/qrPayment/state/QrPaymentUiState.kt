@@ -5,5 +5,6 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequest
 data class QrPaymentUiState (
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val qrPaymentData: CreateQrisPaymentRequestResult? = null
+    val qrPaymentData: CreateQrisPaymentRequestResult? = null,
+    val isPaid: Boolean = false
 )

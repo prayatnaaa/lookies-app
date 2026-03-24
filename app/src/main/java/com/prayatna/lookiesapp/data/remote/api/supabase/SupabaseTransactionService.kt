@@ -100,7 +100,7 @@ class SupabaseTransactionService @Inject constructor(
     @OptIn(SupabaseExperimental::class)
     fun getPaymentAttempt(orderId: String): Flow<PaymentAttemptDto> {
         val result = postgrest.from("payment_attempts")
-            .selectSingleValueAsFlow(PaymentAttemptDto::orderId) {
+            .selectSingleValueAsFlow(PaymentAttemptDto::id) {
                 PaymentAttemptDto::orderId eq orderId
             }
         return result

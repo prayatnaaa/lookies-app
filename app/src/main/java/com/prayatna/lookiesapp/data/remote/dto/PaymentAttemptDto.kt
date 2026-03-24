@@ -15,7 +15,7 @@ data class PaymentAttemptDto(
     val externalId: String,
     @SerialName("created_at")
     val createdAt: String,
-    val amount: String,
+    val amount: Int,
     val currency: String,
     @SerialName("failure_reason")
     val failureReason: String? = null,
