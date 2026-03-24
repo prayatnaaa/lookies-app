@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
+import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
 import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.request.order.OrderItemRequest
@@ -9,10 +10,12 @@ import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateQrisPayment
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateXenditPaymentRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateQrisPaymentRequestResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateXenditPaymentResponse
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.rpc
+import io.github.jan.supabase.realtime.selectSingleValueAsFlow
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.header
@@ -20,6 +23,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class SupabaseTransactionService @Inject constructor(
@@ -91,5 +95,14 @@ class SupabaseTransactionService @Inject constructor(
             setBody(request)
         }
         return response.body()
+    }
+
+    @OptIn(SupabaseExperimental::class)
+    fun getPaymentAttempt(orderId: String): Flow<PaymentAttemptDto> {
+        val result = postgrest.from("payment_attempts")
+            .selectSingleValueAsFlow(PaymentAttemptDto::orderId) {
+                PaymentAttemptDto::orderId eq orderId
+            }
+        return result
     }
 }

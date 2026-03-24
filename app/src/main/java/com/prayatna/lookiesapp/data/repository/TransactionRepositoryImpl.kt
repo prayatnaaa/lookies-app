@@ -2,9 +2,11 @@ package com.prayatna.lookiesapp.data.repository
 
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseTransactionService
+import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
+import com.prayatna.lookiesapp.domain.model.payment.PaymentAttempt
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
@@ -16,6 +18,10 @@ import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.ktor.client.network.sockets.ConnectTimeoutException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class TransactionRepositoryImpl @Inject constructor(
@@ -70,5 +76,18 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: ConnectTimeoutException) {
             DataResult.Error("Connection timeout")
         }
+    }
+
+    override fun getPaymentAttempt(orderId: String): Flow<DataResult<PaymentAttempt>> {
+        return transactionService.getPaymentAttempt(orderId)
+            .map<PaymentAttemptDto, DataResult<PaymentAttempt>> { dto ->
+                DataResult.Success(dto.toDomain())
+            }
+            .onStart {
+                emit(DataResult.Loading)
+            }
+            .catch { e ->
+                emit(DataResult.Error(e.toString()))
+            }
     }
 }
