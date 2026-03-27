@@ -4,5 +4,5 @@ enum class MerchantBusinessType(
     val type: String
 ) {
     PARTNER("partner"),
-    MERCHANT("merchant")
+    ARTIST("artist")
 }

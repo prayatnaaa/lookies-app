@@ -102,9 +102,9 @@ fun PartnerListScreen(
                         )
 
                         FilterItem(
-                            title = "Merchant",
-                            selected = filterState.selectedStatus == MerchantBusinessType.MERCHANT,
-                            onClick = { viewModel.onFilterSelected(MerchantBusinessType.MERCHANT) }
+                            title = "Artist",
+                            selected = filterState.selectedStatus == MerchantBusinessType.ARTIST,
+                            onClick = { viewModel.onFilterSelected(MerchantBusinessType.ARTIST) }
                         )
                     }
 
