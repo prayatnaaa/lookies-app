@@ -1,6 +1,8 @@
 package com.prayatna.lookiesapp.presentation.admin.event
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +14,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventCardList
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.components.partner.FilterItem
 
 @Composable
 fun AdminEventScreen(
@@ -28,50 +31,107 @@ fun AdminEventScreen(
     Scaffold(
         topBar = { BackTopBar(navController = navController) }
     ) { innerPadding ->
-        Box(
+        Column(
             modifier = modifier
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            when {
-                uiState.isLoading -> {
-                    CircularLoading()
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 8.dp)
+            ) {
+
+                item {
+                    FilterItem(
+                        title = "all",
+                        selected = uiState.status == null,
+                        onClick = { viewModel.onStatusSelected(null) }
+                    )
                 }
 
-                uiState.errorMessage != null -> {
-                    Column(
-                        modifier = modifier
-                            .align(Alignment.Center)
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = uiState.errorMessage ?: "Unknown error occurred.",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { viewModel.retry() }) {
-                            Text("Retry")
+                items(EventStatus.entries) { status ->
+                    FilterItem(
+                        title = status.name.lowercase(),
+                        selected = uiState.status == status,
+                        onClick = { viewModel.onStatusSelected(status) }
+                    )
+
+//                    FilterItem(
+//                        title = "Published",
+//                        selected = uiState.status == EventStatus.PUBLISHED,
+//                        onClick = { viewModel.onStatusSelected(EventStatus.PUBLISHED) }
+//                    )
+//
+//                    FilterItem(
+//                        title = "On going",
+//                        selected = uiState.status == EventStatus.ONGOING,
+//                        onClick = { viewModel.onStatusSelected(EventStatus.ONGOING) }
+//                    )
+//
+//                    FilterItem(
+//                        title = "Cancelled",
+//                        selected = uiState.status == EventStatus.CANCELLED,
+//                        onClick = { viewModel.onStatusSelected(EventStatus.CANCELLED) }
+//                    )
+//
+//                    FilterItem(
+//                        title = "Rejected",
+//                        selected = uiState.status == EventStatus.REJECTED,
+//                        onClick = { viewModel.onStatusSelected(EventStatus.REJECTED) }
+//                    )
+//
+//                    FilterItem(
+//                        title = "Completed",
+//                        selected = uiState.status == EventStatus.COMPLETED,
+//                        onClick = { viewModel.onStatusSelected(EventStatus.COMPLETED) }
+//                    )
+                }
+            }
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+            ) {
+                when {
+                    uiState.isLoading -> {
+                        CircularLoading()
+                    }
+
+                    uiState.errorMessage != null -> {
+                        Column(
+                            modifier = modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = uiState.errorMessage ?: "Unknown error occurred.",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(onClick = { viewModel.retry() }) {
+                                Text("Retry")
+                            }
                         }
                     }
-                }
 
-                uiState.events.isNotEmpty() -> {
-                    EventCardList(
-                        events = uiState.events,
-                        modifier = Modifier.fillMaxSize(),
-                        onClick = { event ->
-                            navController.navigate("detail_event/${event.id}")
-                        }
-                    )
-                }
-
-                else -> {
-                    Text(
-                        text = "No events found.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    uiState.events.isNotEmpty() -> {
+                        EventCardList(
+                            showStatus = true,
+                            showTicketPrice = true,
+                            events = uiState.events,
+                            onClick = { event ->
+                                navController.navigate("detail_event/${event.id}")
+                            }
+                        )
+                    } else -> {
+                        Text(
+                            text = "No events found.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
                 }
             }
         }

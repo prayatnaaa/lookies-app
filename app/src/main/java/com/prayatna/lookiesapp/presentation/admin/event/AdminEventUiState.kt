@@ -6,4 +6,15 @@ data class AdminEventUiState(
     val isLoading: Boolean = false,
     val events: List<Event> = emptyList(),
     val errorMessage: String? = null,
+    val title: String? = null,
+    val status: EventStatus? = null,
 )
+
+enum class EventStatus(val type: String) {
+    PENDING("pending_validation"),
+    PUBLISHED("published"),
+    ONGOING("ongoing"),
+    COMPLETED("completed"),
+    CANCELLED("cancelled"),
+    REJECTED("rejected");
+}
