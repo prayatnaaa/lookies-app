@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DecidePartnerApplicationResponseDto(
-    val id: Int,
+    val id: String,
     @SerialName("business_id")
     val businessId: String,
     @SerialName("kyc_status")

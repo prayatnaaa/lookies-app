@@ -77,7 +77,7 @@ fun DetailPartnerScreen(
     LaunchedEffect(adminState.success) {
         adminState.success?.let {
             pendingAction = null
-            resultMessage = it
+            resultMessage = "Merchant has been ${it.status}"
             isResultSuccess = true
         }
     }

@@ -19,7 +19,7 @@ class SupabaseAdminService @Inject constructor(
             filter {
                 eq("business_id", id)
             }
-        }.decodeAs<DecidePartnerApplicationResponseDto>()
+        }.decodeSingle<DecidePartnerApplicationResponseDto>()
         return result
     }
 
@@ -33,7 +33,7 @@ class SupabaseAdminService @Inject constructor(
             filter {
                 eq("id", id)
             }
-        }.decodeAs<DecideEventResponseDto>()
+        }.decodeSingle<DecideEventResponseDto>()
 
         return result
     }

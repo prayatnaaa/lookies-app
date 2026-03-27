@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.partner.detailpartner
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.domain.usecase.admin.ApprovePartnerUseCase
 import com.prayatna.lookiesapp.domain.usecase.admin.RejectPartnerUseCase
 import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
@@ -43,7 +44,7 @@ class DetailPartnerViewModel @Inject constructor(
 
     private fun decidePartner(
         partnerId: String,
-        action: suspend (String) -> DataResult<String>
+        action: suspend (String) -> DataResult<DecidePartnerApplicationResult>
     ) {
         viewModelScope.launch {
             _adminState.update { it.copy(isLoading = true, error = null) }

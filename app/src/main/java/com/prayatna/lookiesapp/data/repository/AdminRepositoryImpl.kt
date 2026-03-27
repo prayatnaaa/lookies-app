@@ -7,7 +7,6 @@ import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.domain.repository.AdminRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
-import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import javax.inject.Inject
 
@@ -25,10 +24,6 @@ class AdminRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
-        } catch (e: HttpRequestException) {
-            DataResult.Error(e.message ?: "Network error")
-        } catch (e: Exception) {
-            DataResult.Error("Something went wrong! Please check your connection")
         }
     }
 
@@ -49,7 +44,7 @@ class AdminRepositoryImpl @Inject constructor(
         decidePartner("approved", partnerId)
 
     override suspend fun rejectPartner(partnerId: String): DataResult<DecidePartnerApplicationResult> =
-        decidePartner("disapproved", partnerId)
+        decidePartner("rejected", partnerId)
 
     override suspend fun approveEvent(eventId: String): DataResult<DecideEventResult> =
         decideEvent("published", eventId)
