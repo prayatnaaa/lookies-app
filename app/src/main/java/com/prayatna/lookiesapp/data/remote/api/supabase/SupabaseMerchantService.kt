@@ -9,12 +9,13 @@ class SupabaseMerchantService @Inject constructor(
     private val postgrest: Postgrest
 ) {
 
-    suspend fun getMerchantProfile(id: String): MerchantProfileDto {
+    suspend fun getMerchantProfile(id: String, merchantType: String? = null): MerchantProfileDto {
         val response = postgrest
             .from("merchant_account_profiles")
             .select {
                 filter {
                     eq("business_id", id)
+                    if (merchantType != null) eq("merchant_type", merchantType)
                 }
             }.decodeSingle<MerchantProfileDto>()
 

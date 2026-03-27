@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.partner.partnerlist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,8 +19,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.components.partner.FilterItem
 import com.prayatna.lookiesapp.presentation.components.partner.PartnerListCard
 import com.prayatna.lookiesapp.presentation.error.ErrorScreen
+import com.prayatna.lookiesapp.presentation.partner.partnerlist.state.MerchantBusinessType
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -32,6 +35,7 @@ fun PartnerListScreen(
     val uiState by viewModel.partnerState.collectAsStateWithLifecycle()
     val roleState by viewModel.roleState.collectAsStateWithLifecycle()
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val filterState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val shouldRefresh = savedStateHandle
         ?.getStateFlow("shouldRefresh", false)
@@ -78,6 +82,31 @@ fun PartnerListScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 20.dp, vertical = 16.dp)
                     )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 8.dp)
+                    ) {
+
+                        FilterItem(
+                            title = "All",
+                            selected = filterState.selectedStatus == null,
+                            onClick = { viewModel.onFilterSelected(null) }
+                        )
+
+                        FilterItem(
+                            title = "Partner",
+                            selected = filterState.selectedStatus == MerchantBusinessType.PARTNER,
+                            onClick = { viewModel.onFilterSelected(MerchantBusinessType.PARTNER) }
+                        )
+
+                        FilterItem(
+                            title = "Merchant",
+                            selected = filterState.selectedStatus == MerchantBusinessType.MERCHANT,
+                            onClick = { viewModel.onFilterSelected(MerchantBusinessType.MERCHANT) }
+                        )
+                    }
 
                     // Partner list
                     PartnerListCard(

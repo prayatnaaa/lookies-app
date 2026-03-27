@@ -12,6 +12,7 @@ fun MerchantProfileDto.toDomain(): MerchantProfile {
         legalName = legalName,
         tradingName = tradingName,
         pictureUrl = pictureUrl,
-        description = description
+        description = description,
+        merchantType = merchantType
     )
 }

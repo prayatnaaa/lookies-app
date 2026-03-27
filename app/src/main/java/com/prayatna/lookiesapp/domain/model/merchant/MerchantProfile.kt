@@ -8,5 +8,6 @@ data class MerchantProfile(
     val legalName: String,
     val tradingName: String? = null,
     val pictureUrl: String? = null,
-    val description: String? = null
+    val description: String? = null,
+    val merchantType: String
 )

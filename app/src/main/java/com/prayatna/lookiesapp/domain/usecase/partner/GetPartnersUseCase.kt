@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.domain.usecase.partner
 
-import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
@@ -15,15 +14,26 @@ class GetPartnersUseCase @Inject constructor(
     private val userPref: UserPreference
 ) {
 
-    operator fun invoke(): Flow<DataResult<List<MerchantBusiness>>> {
+    operator fun invoke(
+        merchantType: String? = null,
+        status: String?,
+        name: String?,
+        kycStatus: String?,
+        ): Flow<DataResult<List<MerchantBusiness>>> {
         return combine(
             userPref.getRole(),
-            partnerRepository.getPartners()
+            partnerRepository.getPartners(
+                merchantType = merchantType,
+                status = status,
+                name = name,
+                kycStatus = kycStatus
+            )
         ) { role, result ->
-            Log.d("ROLE", result.toString())
             result.map { partners ->
                 if (role == "admin") partners
-                else partners.filter { it.status == "approve" }
+                else partners
+                    .filter { it.status == "approve" }
+                    .filter { it.merchantType == merchantType }
             }
         }
     }

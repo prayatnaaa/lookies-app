@@ -28,5 +28,8 @@ data class MerchantProfileDto(
     val pictureUrl: String? = null,
 
     @SerialName("description")
-    val description: String? = null
+    val description: String? = null,
+
+    @SerialName("merchant_type")
+    val merchantType: String,
 )

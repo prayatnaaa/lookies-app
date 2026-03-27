@@ -52,7 +52,7 @@ class SupabasePartnerService @Inject constructor(
         status: String? = null,
         name: String? = null,
         kycStatus: String? = null,
-        merchantType: String = "partner"
+        merchantType: String? = null
     ): List<MerchantBusinessDto> {
         val result = postgrest
             .from("merchant_businesses_views")
@@ -70,6 +70,7 @@ class SupabasePartnerService @Inject constructor(
                         eq("kyc_status", kycStatus)
                     }
 
+                    if (merchantType != null)
                     eq("merchant_type", merchantType)
                 }
             }

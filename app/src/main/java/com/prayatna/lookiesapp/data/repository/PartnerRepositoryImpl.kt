@@ -31,7 +31,12 @@ class PartnerRepositoryImpl @Inject constructor(
     ): Flow<DataResult<List<MerchantBusiness>>> = flow {
         emit(DataResult.Loading)
         try {
-            val response = supabasePartnerService.getPartners()
+            val response = supabasePartnerService.getPartners(
+                status = status,
+                name = name,
+                kycStatus = kycStatus,
+                merchantType = merchantType
+            )
             emit(DataResult.Success(response.map { it.toDomain() }))
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
