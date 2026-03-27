@@ -3,7 +3,7 @@ package com.prayatna.lookiesapp.domain.model.transaction
 data class CreateQrisPaymentRequestResult(
     val status: String,
     val message: String,
-    val data: QrisPaymentData
+    val data: QrisPaymentData? = null
 )
 
 data class QrisPaymentData(

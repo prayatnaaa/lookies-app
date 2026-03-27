@@ -100,17 +100,17 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             arguments = listOf(
                 navArgument("orderId") { type = NavType.StringType },
                 navArgument("merchantId") { type = NavType.StringType },
-                navArgument("amount") { type = NavType.FloatType }
+                navArgument("amount") { type = NavType.LongType }
             )
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
             val merchantId = backStackEntry.arguments?.getString("merchantId") ?: ""
-            val amount = backStackEntry.arguments?.getFloat("amount")?.toDouble() ?: 0.0
+            val amount = backStackEntry.arguments?.getLong("amount") ?: 0L
 
             QrPaymentScreen(
                 orderId = orderId,
                 merchantId = merchantId,
-                amount = amount.toInt(),
+                amount = amount,
                 navController = navController
             )
         }
@@ -231,22 +231,29 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             }
         }
         composable(
-            route = "${NavigationRoutes.REGISTER_EVENT}/{eventId}?maxPaintingPerArtist={maxPaintingPerArtist}",
+            route = "${NavigationRoutes.REGISTER_EVENT}/{eventId}/{maxPaintingPerArtist}/{fee}/{merchantId}",
             arguments = listOf(
                 navArgument("eventId") { type = NavType.IntType },
-                navArgument("maxPaintingPerArtist") { type = NavType.IntType }
+                navArgument("maxPaintingPerArtist") { type = NavType.IntType },
+                navArgument("fee") { type = NavType.StringType },
+                navArgument("merchantId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
 
             val eventId = backStackEntry.arguments?.getInt("eventId")
             val maxPaintingPerArtist =
                 backStackEntry.arguments?.getInt("maxPaintingPerArtist")
+            val fee = backStackEntry.arguments?.getString("fee")?.toDoubleOrNull()
+            val merchantId = backStackEntry.arguments?.getString("merchantId")
+
 
             if (eventId != null && maxPaintingPerArtist != null) {
                 RegisterEventScreen(
                     navController = navController,
                     eventId = eventId,
-                    maxPaintingPerArtist = maxPaintingPerArtist
+                    maxPaintingPerArtist = maxPaintingPerArtist,
+                    fee = fee!!,
+                    merchantId = merchantId!!
                 )
             }
         }

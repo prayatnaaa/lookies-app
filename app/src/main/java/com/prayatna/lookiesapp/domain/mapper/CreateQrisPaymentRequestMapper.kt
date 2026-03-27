@@ -23,7 +23,7 @@ fun CreateQrisPaymentRequestInput.toDto() = CreateQrisPaymentRequestRequest(
 fun CreateQrisPaymentRequestResponse.toDomain() = CreateQrisPaymentRequestResult(
     status = status,
     message = message,
-    data = data.toDomain()
+    data = data?.toDomain()
 )
 
 fun PaymentDataDto.toDomain() = QrisPaymentData(

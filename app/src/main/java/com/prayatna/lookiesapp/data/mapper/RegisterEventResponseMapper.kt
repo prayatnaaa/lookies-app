@@ -8,6 +8,9 @@ fun RegisterEventResponse.toDomain(): RegisterEventOutput {
         status = status,
         message = message,
         eventId = eventId,
-        totalPaintings = totalPaintings
+        totalPaintings = totalPaintings,
+        totalAmount = totalAmount,
+        participantId = participantId,
+        orderId = orderId
     )
 }

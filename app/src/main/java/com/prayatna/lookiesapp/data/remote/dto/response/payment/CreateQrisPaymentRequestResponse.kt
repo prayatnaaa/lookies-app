@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class CreateQrisPaymentRequestResponse(
     val status: String,
     val message: String,
-    val data: PaymentDataDto
+    val data: PaymentDataDto? = null
 )
 
 @Serializable

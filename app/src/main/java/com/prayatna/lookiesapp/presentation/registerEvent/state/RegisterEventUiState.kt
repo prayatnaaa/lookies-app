@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.registerEvent.state
 
+import com.prayatna.lookiesapp.domain.model.artist.RegisterEventOutput
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 
 data class RegisterEventUiState(
@@ -11,5 +12,6 @@ data class RegisterEventUiState(
     val selectedIds: Set<Int> = emptySet(),
     val errorMessage: String? = null,
     val isSuccess: Boolean = false,
-    val successMessage: String? = null
+    val successMessage: String? = null,
+    val data: RegisterEventOutput? = null
 )

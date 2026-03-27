@@ -26,7 +26,7 @@ fun BottomActionBar(state: RegisterEventUiState, onEvent: (RegisterEventEvent) -
                 onClick = { onEvent(RegisterEventEvent.PrevStep) },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Kembali")
+                Text("Previous")
             }
         }
 
@@ -35,7 +35,7 @@ fun BottomActionBar(state: RegisterEventUiState, onEvent: (RegisterEventEvent) -
                 onClick = onCancel,
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Batal")
+                Text("Cancel")
             }
         }
 
@@ -47,7 +47,7 @@ fun BottomActionBar(state: RegisterEventUiState, onEvent: (RegisterEventEvent) -
             modifier = Modifier.weight(1f),
             enabled = state.selectedIds.isNotEmpty() || !state.isLoading
         ) {
-            Text(if (state.currentStep == 1) "Lanjut Review" else "Kirim Pendaftaran")
+            Text(if (state.currentStep == 1) "Continue" else "Send registration")
         }
     }
 }

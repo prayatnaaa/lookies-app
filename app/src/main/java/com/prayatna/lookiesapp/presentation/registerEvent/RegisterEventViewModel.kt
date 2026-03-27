@@ -108,7 +108,7 @@ class RegisterEventViewModel @Inject constructor(
             _state.update {
                 when (result) {
                     is DataResult.Success -> {
-                        it.copy(isLoading = false, isSuccess = true, successMessage = result.data.message)
+                        it.copy(isLoading = false, data = result.data, isSuccess = true, successMessage = result.data.message)
                     }
                     is DataResult.Error -> {
                         it.copy(isLoading = false, errorMessage = result.error)

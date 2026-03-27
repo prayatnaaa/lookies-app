@@ -61,9 +61,11 @@ fun DetailEventScreen(
                     onRegisterButtonClick = {
                             navController
                                 .navigate(
-                                    "${
-                                        NavigationRoutes.REGISTER_EVENT
-                                    }/${eventId}?maxPaintingPerArtist=${detailEventState.info?.maxPaintingPerArtist}"
+                                    NavigationRoutes.REGISTER_EVENT +
+                                            "/${eventId}" +
+                                            "/${detailEventState.info?.maxPaintingPerArtist}" +
+                                            "/${detailEventState.info?.artistRegistrationFee}" +
+                                            "/${detailEventState.info?.organizer?.id}"
                                 )
                     },
                     onBuyButtonClick = {

@@ -10,5 +10,11 @@ data class RegisterEventResponse(
     @SerialName("event_id")
     val eventId: String? = "",
     @SerialName("total_paintings")
-    val totalPaintings: String? = ""
+    val totalPaintings: String? = "",
+    @SerialName("total_amount")
+    val totalAmount: Int? = null,
+    @SerialName("participant_id")
+    val participantId: String? = "",
+    @SerialName("order_id")
+    val orderId: String? = ""
 )

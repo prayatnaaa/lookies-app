@@ -59,7 +59,7 @@ fun CheckoutScreen(
 
                 if (uiState.selectedMethod == PaymentMethodUiState.QRIS) {
                     navController.navigate(
-                        "${NavigationRoutes.QRIS_PAYMENT}/$orderId/$merchantId/$totalAmount"
+                        "${NavigationRoutes.QRIS_PAYMENT}/$orderId/$merchantId/${totalAmount?.toLong()}"
                     ) {
                         popUpTo("checkout_route") { inclusive = true }
                     }

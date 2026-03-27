@@ -94,6 +94,8 @@ class SupabaseTransactionService @Inject constructor(
             header("Authorization", "Bearer ${session.accessToken}")
             setBody(request)
         }
+        Log.d("CreatePayment", response.body())
+        Log.d("CreatePayment", request.toString())
         return response.body()
     }
 

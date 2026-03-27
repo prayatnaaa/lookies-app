@@ -28,7 +28,7 @@ fun QrPaymentScreen(
     viewModel: QrPaymentViewModel = hiltViewModel(),
     merchantId: String,
     orderId: String,
-    amount: Int,
+    amount: Long,
     description: String? = null,
     navController: NavController
 ) {
@@ -40,7 +40,7 @@ fun QrPaymentScreen(
         viewModel.createQrisPaymentRequest(
             merchantId = merchantId,
             orderId = orderId,
-            amount = amount,
+            amount = amount.toInt(),
             description = description
         )
     }

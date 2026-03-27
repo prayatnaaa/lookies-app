@@ -20,18 +20,23 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.CustomDialog
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.registerEvent.BottomActionBar
 import com.prayatna.lookiesapp.presentation.components.registerEvent.ConfirmPaintingsContent
 import com.prayatna.lookiesapp.presentation.components.registerEvent.SelectPaintingContent
 import com.prayatna.lookiesapp.presentation.registerEvent.state.RegisterEventEvent
+import com.prayatna.lookiesapp.utils.NavigationRoutes
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
 fun RegisterEventScreen(
     viewModel: RegisterEventViewModel = hiltViewModel(),
     navController: NavController,
     eventId: Int,
+    fee: Double,
+    merchantId: String,
     maxPaintingPerArtist: Int
 ) {
 
@@ -44,11 +49,11 @@ fun RegisterEventScreen(
 
     if (state.isSuccess) {
         state.successMessage?.let { message ->
-            CustomDialog(
+            CustomBottomSheet (
                 title = "Success!",
-                message = message,
+                message = " $message, now you need to pay the registration fee ${formatRupiah(fee)}",
                 onConfirm = {
-                    navController.popBackStack()
+                    navController.navigate("${NavigationRoutes.QRIS_PAYMENT}/${state.data?.orderId}/${merchantId}/${fee}")
                 },
                 onDismiss = {
                     navController.popBackStack()
@@ -74,12 +79,12 @@ fun RegisterEventScreen(
         topBar = {
             Column(Modifier.padding(16.dp).statusBarsPadding()) {
                 Text(
-                    text = if (state.currentStep == 1) "Langkah 1: Pilih Karya" else "Langkah 2: Review & Submit",
+                    text = if (state.currentStep == 1) "Step 1: Select painting" else "Step 2: Review & Submit",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Kuota Event: ${state.selectedIds.size} / $maxPaintingPerArtist",
+                    text = "Event Quota: ${state.selectedIds.size} / $maxPaintingPerArtist",
                     color = if (state.selectedIds.size > maxPaintingPerArtist) Color.Red else Color.Gray
                 )
                 LinearProgressIndicator(
