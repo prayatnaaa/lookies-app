@@ -1,10 +1,12 @@
 package com.prayatna.lookiesapp.domain.repository
 
-import com.prayatna.lookiesapp.domain.model.partner.Partner
+import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
+import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.utils.DataResult
 
 interface AdminRepository {
-    suspend fun getPendingPartners(): DataResult<List<Partner>>
-    suspend fun approvePartner(partnerId: String): DataResult<String>
-    suspend fun rejectPartner(partnerId: String): DataResult<String>
+    suspend fun approvePartner(partnerId: String): DataResult<DecidePartnerApplicationResult>
+    suspend fun rejectPartner(partnerId: String): DataResult<DecidePartnerApplicationResult>
+    suspend fun approveEvent(eventId: String): DataResult<DecideEventResult>
+    suspend fun rejectEvent(eventId: String): DataResult<DecideEventResult>
 }
