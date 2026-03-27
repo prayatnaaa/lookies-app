@@ -19,8 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.ui.theme.DarkGreen
+import com.prayatna.lookiesapp.ui.theme.Maroon
 import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
@@ -31,7 +34,10 @@ fun DetailEventFooter(
     onRegisterButtonClick: () -> Unit = {},
     onSeePaintingsClick: () -> Unit = {},
     showBuyButton: Boolean = false,
-    isRegisterButtonEnabled: Boolean = true
+    isRegisterButtonEnabled: Boolean = true,
+    showDecideButton: Boolean = false,
+    onApproveButtonClick: () -> Unit = {},
+    onRejectButtonClick: () -> Unit = {},
 ) {
     ElevatedCard(
         modifier = modifier
@@ -78,6 +84,29 @@ fun DetailEventFooter(
                     BuyButton(
                         modifier = modifier.weight(0.5f),
                         onClick = onBuyButtonClick
+                    )
+                }
+            }
+
+            if (showDecideButton) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    DecideButton(
+                        text = "Approve",
+                        color = DarkGreen,
+                        modifier = Modifier.weight(1f),
+                        onClick = onApproveButtonClick
+                    )
+
+                    DecideButton(
+                        text = "Reject",
+                        color = Maroon,
+                        modifier = Modifier.weight(1f),
+                        onClick = onRejectButtonClick
                     )
                 }
             }
@@ -138,4 +167,26 @@ fun DetailEventFooterPreview() {
     DetailEventFooter(
         onBuyButtonClick = {},
     )
+}
+
+@Composable
+fun DecideButton(
+    text: String,
+    color: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    ElevatedButton(
+        onClick = onClick,
+        modifier = modifier,
+        colors = ButtonDefaults.elevatedButtonColors(
+            containerColor = color
+        ),
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
+    ) {
+        Text(
+            text = text,
+            color = Color.White
+        )
+    }
 }

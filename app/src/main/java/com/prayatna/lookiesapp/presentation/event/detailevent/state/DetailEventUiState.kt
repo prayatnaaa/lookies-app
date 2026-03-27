@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.event.detailevent
+package com.prayatna.lookiesapp.presentation.event.detailevent.state
 
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting

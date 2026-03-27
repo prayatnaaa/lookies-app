@@ -23,7 +23,7 @@ class SupabaseAdminService @Inject constructor(
         return result
     }
 
-    suspend fun decideEvent(status: String, id: String): DecideEventResponseDto {
+    suspend fun decideEvent(status: String, id: Int): DecideEventResponseDto {
         val result = postgrest.from("events").update(
             {
                 set("status", status)

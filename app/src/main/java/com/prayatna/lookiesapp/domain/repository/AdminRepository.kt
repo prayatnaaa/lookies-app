@@ -7,6 +7,6 @@ import com.prayatna.lookiesapp.utils.DataResult
 interface AdminRepository {
     suspend fun approvePartner(partnerId: String): DataResult<DecidePartnerApplicationResult>
     suspend fun rejectPartner(partnerId: String): DataResult<DecidePartnerApplicationResult>
-    suspend fun approveEvent(eventId: String): DataResult<DecideEventResult>
-    suspend fun rejectEvent(eventId: String): DataResult<DecideEventResult>
+    suspend fun approveEvent(eventId: Int): DataResult<DecideEventResult>
+    suspend fun rejectEvent(eventId: Int): DataResult<DecideEventResult>
 }
