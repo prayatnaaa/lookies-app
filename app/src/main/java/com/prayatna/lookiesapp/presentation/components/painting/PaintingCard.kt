@@ -22,10 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,6 +45,7 @@ fun PaintingCard(
     price: Double? = null,
     isSold: Boolean = false,
     isSelected: Boolean = false,
+    isOwnPainting: Boolean = false,
     onClick: () -> Unit,
 ) {
     val highlightColor = MaterialTheme.colorScheme.primary
@@ -60,13 +64,28 @@ fun PaintingCard(
         onClick = onClick
     ) {
         Box {
-            AsyncImage(
-                model = paintingUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
-                contentDescription = name,
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentScale = ContentScale.FillWidth
-            )
+            Box(modifier = Modifier
+                .fillMaxSize()) {
+                AsyncImage(
+                    model = paintingUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
+                    contentDescription = name,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.FillWidth
+                )
+
+                Text(
+                    text = "LOOKIES",
+                    color = Color.White.copy(alpha = 0.15f),
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 4.sp,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .rotate(-35f)
+                        .semantics { hideFromAccessibility() }
+                )
+            }
 
             if (isSold) {
                 Box(

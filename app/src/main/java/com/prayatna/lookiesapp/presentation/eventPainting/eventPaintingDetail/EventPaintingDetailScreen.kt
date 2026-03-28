@@ -58,6 +58,7 @@ import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventPainting.EventOriginCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.components.painting.WaterMark
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 import com.prayatna.lookiesapp.utils.formatRupiah
 
@@ -114,7 +115,7 @@ fun EventPaintingDetailScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     AsyncImage(
@@ -136,6 +137,10 @@ fun EventPaintingDetailScreen(
                             .background(Color.Black.copy(alpha = 0.5f), CircleShape)
                             .padding(8.dp)
                     )
+
+                    WaterMark(modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center))
                 }
 
                 Column(modifier = Modifier.padding(20.dp)) {

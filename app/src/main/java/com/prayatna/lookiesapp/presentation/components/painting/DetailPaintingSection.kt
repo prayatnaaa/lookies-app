@@ -60,7 +60,10 @@ fun DetailPaintingSection(
             ) {
 
                 AsyncImage(
-                    model = painting.paintingUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
+                    model = painting.paintingUrl.replace(
+                        "http://172.21.179.110",
+                        "http://10.0.2.2"
+                    ),
                     contentDescription = painting.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -93,6 +96,7 @@ fun DetailPaintingSection(
                             )
                         )
                 )
+
 
                 Text(
                     text = painting.title,

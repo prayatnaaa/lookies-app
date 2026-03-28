@@ -2,9 +2,11 @@ package com.prayatna.lookiesapp.presentation.components.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
+import com.prayatna.lookiesapp.presentation.components.painting.WaterMark
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
@@ -42,14 +45,18 @@ fun HomePaintingCard(
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column {
-            AsyncImage(
-                model = data.painting.paintingUrl
-                    .replace("http://172.21.179.110", "http://10.0.2.2"),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                AsyncImage(
+                    model = data.painting.paintingUrl
+                        .replace("http://172.21.179.110", "http://10.0.2.2"),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
+                WaterMark(modifier = Modifier.align(Alignment.Center))
+            }
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(
                     text = data.painting.title,
