@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.domain.repository
 
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
 import com.prayatna.lookiesapp.domain.model.payment.PaymentAttempt
+import com.prayatna.lookiesapp.domain.model.ticket.Ticket
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
@@ -21,4 +22,6 @@ interface TransactionRepository {
             DataResult<CreateXenditPaymentRequestResult>
     fun getPaymentAttempt(orderId: String):
             Flow<DataResult<PaymentAttempt>>
+    suspend fun getTicketsByOrderId(orderId: String):
+            DataResult<List<Ticket>>
 }

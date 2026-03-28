@@ -7,6 +7,7 @@ import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
 import com.prayatna.lookiesapp.domain.model.payment.PaymentAttempt
+import com.prayatna.lookiesapp.domain.model.ticket.Ticket
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
@@ -89,5 +90,15 @@ class TransactionRepositoryImpl @Inject constructor(
             .catch { e ->
                 emit(DataResult.Error(e.toString()))
             }
+    }
+
+    override suspend fun getTicketsByOrderId(orderId: String): DataResult<List<Ticket>> {
+        return try {
+            val result = transactionService.getTicketsByOrderId(orderId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
     }
 }

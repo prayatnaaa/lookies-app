@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
+import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.request.order.OrderItemRequest
@@ -34,7 +35,6 @@ class SupabaseTransactionService @Inject constructor(
     suspend fun createOrder(
         items: List<OrderItemRequest>
     ): String {
-
         val userId = auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not authenticated")
 
@@ -105,6 +105,16 @@ class SupabaseTransactionService @Inject constructor(
             .selectSingleValueAsFlow(PaymentAttemptDto::id) {
                 PaymentAttemptDto::orderId eq orderId
             }
+        return result
+    }
+
+    suspend fun getTicketsByOrderId(orderId: String): List<TicketDto> {
+        val result = postgrest.from("tickets")
+            .select {
+                filter {
+                    eq("order_id", orderId)
+                }
+            }.decodeList<TicketDto>()
         return result
     }
 }
