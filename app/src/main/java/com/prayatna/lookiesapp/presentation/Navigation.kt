@@ -44,6 +44,7 @@ import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListS
 import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
+import com.prayatna.lookiesapp.presentation.transaction.detailTransaction.DetailTransactionScreen
 import com.prayatna.lookiesapp.presentation.transaction.payment.PaymentScreen
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.PartnerSubmissionScreen
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -387,6 +388,14 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("merchantId")?.let { artistId ->
                 PersonalPaintingListScreen(artistId = artistId, navController = navController)
+            }
+        }
+        composable(
+            route = "${NavigationRoutes.DETAIL_TRANSACTION}/{orderId}",
+            arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("orderId")?.let { orderId ->
+                DetailTransactionScreen(navController = navController, orderId = orderId)
             }
         }
     }

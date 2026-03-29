@@ -77,7 +77,7 @@ class SupabaseTransactionService @Inject constructor(
             .select {
                 filter {
                     eq("buyer_id", user.id)
-                    eq("id", orderId)
+                    eq("order_id", orderId)
                 }
                 order("created_at", order = Order.DESCENDING)
             }
@@ -126,7 +126,7 @@ class SupabaseTransactionService @Inject constructor(
     }
 
     suspend fun getTicketsByOrderId(orderId: String): List<TicketDto> {
-        val result = postgrest.from("tickets")
+        val result = postgrest.from("purchased_tickets")
             .select {
                 filter {
                     eq("order_id", orderId)

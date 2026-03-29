@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.utils.Constants
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 import com.prayatna.lookiesapp.utils.QrCodeGenerator
 import com.prayatna.lookiesapp.utils.formatRupiah
 import kotlinx.coroutines.delay
@@ -67,8 +68,8 @@ fun QrPaymentScreen(
         if (uiState.isPaid) {
             showSuccessDialog = true
 
-            delay(1500)
-            navController.popBackStack()
+            delay(1000)
+            navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId")
         }
     }
 
@@ -125,7 +126,7 @@ fun QrPaymentScreen(
                                 contentDescription = "QR Code"
                             )
                         } else {
-                            Text("QR is not available")
+                            CircularLoading()
                         }
                     }
                 }
@@ -192,8 +193,8 @@ fun QrPaymentScreen(
 
     if (showSuccessDialog) {
         CustomBottomSheet(
-            title = "Yeay!",
-            message = "You paid!",
+            title = "Congrats!",
+            message = "Your payment has been success!",
             confirmText = "OK",
             onConfirm = {
                 showSuccessDialog = false

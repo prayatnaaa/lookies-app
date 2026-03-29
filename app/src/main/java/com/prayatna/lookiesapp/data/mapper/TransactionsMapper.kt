@@ -11,7 +11,7 @@ import com.prayatna.lookiesapp.domain.model.transaction.TransactionItem
 
 fun TransactionDto.toDomain(): Transaction {
     return Transaction(
-        id = id,
+        id = orderId,
         buyerId = buyerId,
         totalAmount = totalAmount,
         currency = currency,
