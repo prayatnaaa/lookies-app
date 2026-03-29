@@ -101,4 +101,14 @@ class TransactionRepositoryImpl @Inject constructor(
             DataResult.Error(eMessage)
         }
     }
+
+    override suspend fun getTransactionByOrderId(orderId: String): DataResult<Transaction> {
+        return try {
+            val result = transactionService.getUserTransactionByOrderId(orderId)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
 }

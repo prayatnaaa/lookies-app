@@ -69,6 +69,23 @@ class SupabaseTransactionService @Inject constructor(
         return result
     }
 
+    suspend fun getUserTransactionByOrderId(orderId: String): TransactionDto {
+        val user = auth.currentUserOrNull() ?: throw IllegalStateException("User not logged in")
+
+        val result = postgrest
+            .from("transactions_view")
+            .select {
+                filter {
+                    eq("buyer_id", user.id)
+                    eq("id", orderId)
+                }
+                order("created_at", order = Order.DESCENDING)
+            }
+            .decodeSingle<TransactionDto>()
+        return result
+
+    }
+
     suspend fun createPaymentRequest(request: CreateXenditPaymentRequest): CreateXenditPaymentResponse {
         val session = auth.currentSessionOrNull()
             ?: throw IllegalStateException("No active session")

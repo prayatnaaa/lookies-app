@@ -24,4 +24,6 @@ interface TransactionRepository {
             Flow<DataResult<PaymentAttempt>>
     suspend fun getTicketsByOrderId(orderId: String):
             DataResult<List<Ticket>>
+    suspend fun getTransactionByOrderId(orderId: String):
+            DataResult<Transaction>
 }
