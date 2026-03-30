@@ -178,7 +178,7 @@ fun UploadPaintingForm(
 
             OutlinedTextField(
                 value = if (params.price == 0.0) "" else params.price.toString() ,
-                onValueChange = { onEvent(UploadPaintingEvent.OnSubjectChange(it)) },
+                onValueChange = { onEvent(UploadPaintingEvent.OnPriceChange(it)) },
                 label = { Text("Price") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
