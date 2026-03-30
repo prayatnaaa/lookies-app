@@ -53,7 +53,7 @@ fun RegisterEventScreen(
                 title = "Success!",
                 message = " $message, now you need to pay the registration fee ${formatRupiah(fee)}",
                 onConfirm = {
-                    navController.navigate("${NavigationRoutes.QRIS_PAYMENT}/${state.data?.orderId}/${merchantId}/${fee}")
+                    navController.navigate("${NavigationRoutes.QRIS_PAYMENT}/${state.data?.orderId}/${merchantId}/${fee.toLong()}")
                 },
                 onDismiss = {
                     navController.popBackStack()
