@@ -124,7 +124,7 @@ class SupabasePartnerService @Inject constructor(
             .select {
                 if (eventId != null) {
                     filter {
-                        eq("event->>event_id", eventId)
+                        eq("event->>id", eventId)
                     }
                 }
             }
