@@ -82,7 +82,7 @@ class CheckoutViewModel @Inject constructor(
                     price = data.finalPrice,
                     imageUrl = data.painting.paintingUrl,
                     type = "painting",
-                    merchantId = data.participant.id
+                    merchantId = data.participant.event.organizer.id
                 )
                 _uiState.update { it.copy(isLoading = false, itemToBuy = itemDisplay) }
             }
