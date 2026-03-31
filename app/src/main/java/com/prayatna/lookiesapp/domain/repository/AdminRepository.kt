@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.domain.repository
 
 import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
 import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
+import com.prayatna.lookiesapp.domain.model.admin.GetKycDocument
 import com.prayatna.lookiesapp.utils.DataResult
 
 interface AdminRepository {
@@ -9,4 +10,5 @@ interface AdminRepository {
     suspend fun rejectPartner(partnerId: String): DataResult<DecidePartnerApplicationResult>
     suspend fun approveEvent(eventId: Int): DataResult<DecideEventResult>
     suspend fun rejectEvent(eventId: Int): DataResult<DecideEventResult>
+    suspend fun getKycDocuments(businessId: String): DataResult<List<GetKycDocument>>
 }

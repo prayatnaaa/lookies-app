@@ -1,13 +1,19 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import com.prayatna.lookiesapp.data.remote.dto.GetKycDocumentDto
+import com.prayatna.lookiesapp.data.remote.dto.request.user.KycDocumentDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecideEventResponseDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecidePartnerApplicationResponseDto
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.BucketListFilter
+import io.github.jan.supabase.storage.Storage
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 class SupabaseAdminService @Inject constructor(
-    private val postgrest: Postgrest
+    private val postgrest: Postgrest,
+    private val storage: Storage
 ) {
     suspend fun decidePartnerApplication(status: String, id: String): DecidePartnerApplicationResponseDto {
          val result = postgrest.from("merchant_accounts").update(
@@ -36,5 +42,13 @@ class SupabaseAdminService @Inject constructor(
         }.decodeSingle<DecideEventResponseDto>()
 
         return result
+    }
+
+    suspend fun getKycDocuments(businessId: String): List<GetKycDocumentDto> {
+        return postgrest.from("kyc_documents").select {
+            filter {
+                eq("business_id", businessId)
+            }
+        }.decodeList<GetKycDocumentDto>()
     }
 }

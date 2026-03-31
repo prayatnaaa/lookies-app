@@ -4,6 +4,7 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAdminService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
 import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
+import com.prayatna.lookiesapp.domain.model.admin.GetKycDocument
 import com.prayatna.lookiesapp.domain.repository.AdminRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
@@ -52,4 +53,14 @@ class AdminRepositoryImpl @Inject constructor(
 
     override suspend fun rejectEvent(eventId: Int): DataResult<DecideEventResult> =
         decideEvent("rejected", eventId)
+
+    override suspend fun getKycDocuments(businessId: String): DataResult<List<GetKycDocument>> {
+        return try {
+            val result = supabaseAdminService.getKycDocuments(businessId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
 }
