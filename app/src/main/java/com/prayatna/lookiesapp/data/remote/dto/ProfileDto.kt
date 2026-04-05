@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
 data class ProfileDto(
     @SerialName("user_id")
     val id: String? = null,
+    @SerialName("business_id")
+    val businessId: String? = null,
     @SerialName("bio")
     val bio: String? = null,
     @SerialName("address")
