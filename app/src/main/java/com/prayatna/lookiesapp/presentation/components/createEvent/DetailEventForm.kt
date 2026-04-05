@@ -1,21 +1,20 @@
 package com.prayatna.lookiesapp.presentation.components.createEvent
 
 import android.net.Uri
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.domain.model.event.EventFormat
 import com.prayatna.lookiesapp.domain.model.event.TEventType
 import com.prayatna.lookiesapp.presentation.components.CustomDropdownField
 import com.prayatna.lookiesapp.presentation.components.CustomTextField
+import com.prayatna.lookiesapp.presentation.components.registerBusiness.FormSectionCard
 
 @Composable
 fun DetailEventForm(
@@ -35,26 +34,24 @@ fun DetailEventForm(
     selectedEventFormatId: String,
     onEventFormatChange: (String) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
+    FormSectionCard(
+        title = "Event Details",
+        icon = Icons.Default.Event
     ) {
         Text(
-            text = "Event Detail",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(4.dp),
-        )
-        Text(
-            text = "Please fill in the following information to create an event",
-            fontSize = 12.sp,
+            text = "Fill in the core information for your event",
+            style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
         EventBannerCard(
             onClick = onImageClick,
             imageUri = imageUri,
             imageUrl = imageUriString
         )
+
         CustomTextField(
             value = eventName,
             onValueChange = onEventNameChange,
@@ -90,12 +87,6 @@ fun DetailEventForm(
             endDate = endDate,
             onStartDateChange = onStartDateChange,
             onEndDateChange = onEndDateChange
-        )
-
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outline,
-            modifier = Modifier.padding(vertical = 16.dp)
         )
     }
 }

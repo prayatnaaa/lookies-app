@@ -78,6 +78,25 @@ class CreateEventViewModel @Inject constructor(
             is CreateEventFormEvent.EventTypeChanged -> {
                 update { copy(eventType = event.value) }
             }
+
+            is CreateEventFormEvent.PaintingArtistPercentChanged -> {
+                update { copy(paintingArtistPercent = event.value) }
+            }
+            is CreateEventFormEvent.PaintingEventPercentChanged -> {
+                update { copy(paintingEventPercent = event.value) }
+            }
+            is CreateEventFormEvent.PaintingPlatformPercentChanged -> {
+                update { copy(paintingPlatformPercent = event.value) }
+            }
+            is CreateEventFormEvent.TicketArtistPercentChanged -> {
+                update { copy(ticketArtistPercent = event.value) }
+            }
+            is CreateEventFormEvent.TicketEventPercentChanged -> {
+                update { copy(ticketEventPercent = event.value) }
+            }
+            is CreateEventFormEvent.TicketPlatformPercentChanged -> {
+                update { copy(ticketPlatformPercent = event.value) }
+            }
         }
     }
 
@@ -138,7 +157,14 @@ class CreateEventViewModel @Inject constructor(
                 registrationFee = state.artistRegistrationFee?.toDouble(),
                 eventType = state.eventType.toInt(),
                 eventFormat = state.eventFormat.toInt(),
-                organizerId = businessId
+                organizerId = businessId,
+                paintingArtistPercent = state.paintingArtistPercent,
+                paintingEventPercent = state.paintingEventPercent,
+                paintingPlatformPercent = state.paintingPlatformPercent,
+                ticketArtistPercent = state.ticketArtistPercent,
+                ticketEventPercent = state.ticketEventPercent,
+                ticketPlatformPercent = state.ticketPlatformPercent,
+
             )
 
 

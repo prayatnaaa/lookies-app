@@ -21,6 +21,12 @@ data class CreateEventFormState(
     val eventFormat: String = "",
     val eventTypes: List<TEventType> = emptyList(),
     val eventFormats: List<EventFormat> = emptyList(),
+    val paintingArtistPercent: Int = 0,
+    val paintingEventPercent: Int = 0,
+    val paintingPlatformPercent: Int? = null,
+    val ticketArtistPercent: Int? = null,
+    val ticketEventPercent: Int? = null,
+    val ticketPlatformPercent: Int? = null,
     val isLoadingMeta: Boolean = false,
     val errorMessage: String? = null,
 ) {

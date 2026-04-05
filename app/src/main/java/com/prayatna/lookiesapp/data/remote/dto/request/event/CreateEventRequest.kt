@@ -31,6 +31,18 @@ data class CreateEventRequest(
     @SerialName("event_type_id")
     val eventType: Int,
     @SerialName("event_format_id")
-    val eventFormat: Int
+    val eventFormat: Int,
+    @SerialName("painting_artist_percent")
+    val paintingArtistPercent: Int,
+    @SerialName("painting_event_percent")
+    val paintingEventPercent: Int,
+    @SerialName("painting_platform_percent")
+    val paintingPlatformPercent: Int? = null,
+    @SerialName("ticket_artist_percent")
+    val ticketArtistPercent: Int? = null,
+    @SerialName("ticket_event_percent")
+    val ticketEventPercent: Int? = null,
+    @SerialName("ticket_platform_percent")
+    val ticketPlatformPercent: Int? = null,
 )
 

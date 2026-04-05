@@ -17,6 +17,12 @@ sealed interface CreateEventFormEvent {
     data class ArtistRegistrationFeeChanged(val value: String?) : CreateEventFormEvent
     data class EventTypeChanged(val value: String) : CreateEventFormEvent
     data class EventFormatChanged(val value: String) : CreateEventFormEvent
+    data class PaintingArtistPercentChanged(val value: Int) : CreateEventFormEvent
+    data class PaintingEventPercentChanged(val value: Int) : CreateEventFormEvent
+    data class PaintingPlatformPercentChanged(val value: Int) : CreateEventFormEvent
+    data class TicketArtistPercentChanged(val value: Int) : CreateEventFormEvent
+    data class TicketEventPercentChanged(val value: Int) : CreateEventFormEvent
+    data class TicketPlatformPercentChanged(val value: Int) : CreateEventFormEvent
     data object LoadEventMeta : CreateEventFormEvent
     data object Submit : CreateEventFormEvent
 }

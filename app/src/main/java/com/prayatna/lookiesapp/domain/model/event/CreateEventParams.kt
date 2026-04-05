@@ -15,5 +15,11 @@ data class CreateEventParams(
     val ticketPrice: Double? = null,
     val registrationFee: Double? = null,
     val eventType: Int,
-    val eventFormat: Int
+    val eventFormat: Int,
+    val paintingArtistPercent: Int,
+    val paintingEventPercent: Int,
+    val paintingPlatformPercent: Int? = null,
+    val ticketArtistPercent: Int? = null,
+    val ticketEventPercent: Int? = null,
+    val ticketPlatformPercent: Int? = null,
 )
