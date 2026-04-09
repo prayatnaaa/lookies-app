@@ -25,7 +25,12 @@ fun DetailPaintingScreen(
 
     Scaffold(
         topBar = {
-            BackTopBar(navController = navController)
+            BackTopBar(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                title = "Detail Painting"
+            )
         }
     ) { innerPadding ->
         innerPadding.calculateTopPadding()

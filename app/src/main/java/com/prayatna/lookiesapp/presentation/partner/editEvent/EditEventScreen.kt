@@ -87,7 +87,9 @@ fun EditEventScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             BackTopBar(
-                navController = navController,
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 title = "Edit Event"
             )
         }

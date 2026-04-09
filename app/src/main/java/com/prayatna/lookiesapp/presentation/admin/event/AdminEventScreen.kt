@@ -29,7 +29,9 @@ fun AdminEventScreen(
     }
 
     Scaffold(
-        topBar = { BackTopBar(navController = navController) }
+        topBar = { BackTopBar(onBackClick = {
+            navController.popBackStack()
+        }) }
     ) { innerPadding ->
         Column(
             modifier = modifier

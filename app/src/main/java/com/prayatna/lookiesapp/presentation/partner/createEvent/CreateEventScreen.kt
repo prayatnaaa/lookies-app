@@ -149,7 +149,9 @@ fun CreateEventScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BackTopBar(
-                navController = navController,
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 title = "Create Event"
             )
         },

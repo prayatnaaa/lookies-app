@@ -49,7 +49,9 @@ fun PartnerManageEventScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BackTopBar(
-                navController = navController,
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 title = "Manage Event",
             )
         }

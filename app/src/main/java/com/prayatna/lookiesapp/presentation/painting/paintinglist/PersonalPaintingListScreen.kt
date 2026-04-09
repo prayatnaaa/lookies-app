@@ -38,7 +38,9 @@ fun PersonalPaintingListScreen(
         topBar = {
             BackTopBar(
                 title = "My arts",
-                navController = navController
+                onBackClick = {
+                    navController.popBackStack()
+                }
             )
         },
         modifier = Modifier.fillMaxSize(),

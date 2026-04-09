@@ -60,7 +60,10 @@ fun SelfEventListScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
-        topBar = { BackTopBar(navController = navController, title = "My Events") }
+        topBar = { BackTopBar(
+            onBackClick = {
+                navController.popBackStack()
+            }, title = "My Events") }
     ) { innerPadding ->
         Column(
             modifier = modifier

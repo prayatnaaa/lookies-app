@@ -253,7 +253,9 @@ fun DetailPartnerScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                     topBar = {
                         BackTopBar(
-                            navController = navController,
+                           onBackClick = {
+                               navController.popBackStack()
+                           },
                             title = "Partner Details"
                         )
                     },

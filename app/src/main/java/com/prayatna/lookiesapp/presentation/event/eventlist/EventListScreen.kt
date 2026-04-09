@@ -70,7 +70,7 @@ fun EventListScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
-        topBar = { BackTopBar(navController = navController, title = "Events") }
+        topBar = { BackTopBar(onBackClick = { navController.popBackStack() }, title = "Events") }
     ) { innerPadding ->
         Column(
             modifier = modifier

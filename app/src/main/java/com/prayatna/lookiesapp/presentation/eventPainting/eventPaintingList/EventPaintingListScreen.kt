@@ -54,7 +54,9 @@ fun EventPaintingListScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = { BackTopBar(navController = navController, title = "Gallery") }
+        topBar = { BackTopBar(onBackClick = {
+            navController.popBackStack()
+        }, title = "Gallery") }
     ) { innerPadding ->
         Column(
             modifier = modifier

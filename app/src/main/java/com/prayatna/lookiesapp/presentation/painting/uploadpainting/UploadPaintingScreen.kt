@@ -41,7 +41,9 @@ fun UploadPaintingScreen(
 
     UploadPaintingForm(
         topBar = {
-            BackTopBar(navController = navController, title = "Upload Painting")
+            BackTopBar(onBackClick = {
+                navController.popBackStack()
+            }, title = "Upload Painting")
         },
         params = params,
         selectedImage = image,

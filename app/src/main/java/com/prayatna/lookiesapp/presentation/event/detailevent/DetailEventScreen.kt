@@ -73,7 +73,11 @@ fun DetailEventScreen(
         containerColor = MaterialTheme.colorScheme.background,
 
         topBar = {
-            BackTopBar(navController = navController)
+            BackTopBar(
+                onBackClick = {
+                navController.popBackStack()
+            },
+                title = "Detail event")
         },
 
         bottomBar = {

@@ -47,7 +47,9 @@ fun ParticipantPaintingListScreen(
     Scaffold(
         topBar = {
             BackTopBar(
-                navController = navController,
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 title = "Participant paintings"
             )
         },
