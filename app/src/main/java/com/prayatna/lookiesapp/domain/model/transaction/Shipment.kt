@@ -9,4 +9,8 @@ data class Shipment(
     val shippingCost: Double,
     val createdAt: String,
     val shippedAt: String? = null,
+    val reciepentName: String,
+    val phoneNumber: String,
+    val addressLine: String,
+    val province: String,
 )

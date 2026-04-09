@@ -17,6 +17,16 @@ data class ShipmentDto(
     val status: String,
     @SerialName("shipping_cost")
     val shippingCost: Double,
+    @SerialName("reciepent_name")
+    val reciepentName: String,
+    @SerialName("phone_number")
+    val phoneNumber: String,
+    @SerialName("address_line")
+    val addressLine: String,
+    @SerialName("province")
+    val province: String,
+    @SerialName("postal_code")
+    val postalCode: String,
     @SerialName("created_at")
     val createdAt: String,
     @SerialName("shipped_at")
