@@ -16,7 +16,7 @@ import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
 import com.prayatna.lookiesapp.presentation.artistDashboard.ArtistDashboardScreen
 import com.prayatna.lookiesapp.presentation.chat.ChatScreen
-import com.prayatna.lookiesapp.presentation.checkout.CheckoutScreen
+import com.prayatna.lookiesapp.presentation.checkout.state.checkoutNavigation
 import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
@@ -177,23 +177,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             MerchantMemberListScreen(navController = navController)
         }
 
-        composable("${NavigationRoutes.CHECKOUT}/{type}/{id}/{quantity}",
-            arguments = listOf(
-                navArgument("type") { type = NavType.StringType },
-                navArgument("id") { type = NavType.StringType },
-                navArgument("quantity") { type = NavType.IntType }
-        )) { backStackEntry ->
-            val type = backStackEntry.arguments?.getString("type") ?: ""
-            val id = backStackEntry.arguments?.getString("id") ?: ""
-            val quantity = backStackEntry.arguments?.getInt("quantity") ?: 1
-            CheckoutScreen(
-                quantity = quantity,
-                type = type,
-                itemId = id,
-                navController = navController
-            )
+        checkoutNavigation(navController = navController)
 
-        }
         composable(NavigationRoutes.SEARCH) {
             SearchScreen(navController = navController)
         }
