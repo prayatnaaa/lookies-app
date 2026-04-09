@@ -45,6 +45,7 @@ object NavigationRoutes {
     const val PERSONAL_PAINTING = "personal_painting"
     const val EDIT_EVENT = "edit_event"
     const val DETAIL_TRANSACTION = "detail_transaction"
+    const val CREATE_USER_ADDRESS = "create_user_address"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

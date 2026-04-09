@@ -25,6 +25,20 @@ fun CheckoutRoute(
         viewModel.getDetailItem(type, itemId)
     }
 
+    val addressAdded = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow("address_added", false)
+        ?.collectAsStateWithLifecycle()
+
+    LaunchedEffect(addressAdded?.value) {
+        if (addressAdded?.value == true) {
+            viewModel.refreshUserAddresses()
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.set("address_added", false)
+        }
+    }
+
     CheckoutScreen(
         type = type,
         uiState = uiState,
@@ -50,6 +64,10 @@ fun CheckoutRoute(
 
                 is CheckoutEvent.OnAddressSelected -> {
                     viewModel.onAddressSelected(event.address)
+                }
+
+                CheckoutEvent.OnAddAddressClick -> {
+                    navController.navigate(NavigationRoutes.CREATE_USER_ADDRESS)
                 }
 
                 CheckoutEvent.OnPayClick -> {

@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -60,6 +62,7 @@ fun CheckoutContent(
     onRefresh: () -> Unit,
     onShipmentFeeSelected: (ShipmentFee) -> Unit = {},
     onAddressSelected: (UserAddress) -> Unit = {},
+    onAddAddressClick: () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
     children: @Composable () -> Unit = {}
 ) {
@@ -184,6 +187,14 @@ fun CheckoutContent(
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.error
                                 )
+                                OutlinedButton(
+                                    onClick = onAddAddressClick,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = MaterialTheme.shapes.medium,
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                                ) {
+                                    Text("+ Add New Address")
+                                }
                             } else {
                                 uiState.userAddresses.forEach { address ->
                                     val isSelected = uiState.selectedAddress?.id == address.id
@@ -207,7 +218,7 @@ fun CheckoutContent(
                                     ) {
                                         RadioButton(
                                             selected = isSelected,
-                                            onClick = { onAddressSelected(address) },
+                                            onClick = null,
                                             colors = RadioButtonDefaults.colors(
                                                 selectedColor = MaterialTheme.colorScheme.primary
                                             )
@@ -234,6 +245,15 @@ fun CheckoutContent(
                                         }
                                     }
                                 }
+                            }
+
+                            OutlinedButton(
+                                onClick = onAddAddressClick,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = MaterialTheme.shapes.medium,
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                            ) {
+                                Text("+ Add New Address")
                             }
 
                             HorizontalDivider()

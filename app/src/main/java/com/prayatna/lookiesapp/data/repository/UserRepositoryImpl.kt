@@ -11,6 +11,7 @@ import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.domain.repository.UserRepository
@@ -161,4 +162,13 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun createUserAddress(address: CreateUserAddressInput): DataResult<UserAddress> {
+        return try {
+            val result = supabaseUserService.createUserAddress(address = address.toDto())
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
 }

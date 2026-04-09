@@ -146,6 +146,12 @@ class CheckoutViewModel @Inject constructor(
         }
     }
 
+    fun refreshUserAddresses() {
+        viewModelScope.launch {
+            fetchUserAddresses()
+        }
+    }
+
     fun onShipmentFeeSelected(fee: ShipmentFee) {
         _uiState.update {
             it.copy(selectedShipmentFee = fee)

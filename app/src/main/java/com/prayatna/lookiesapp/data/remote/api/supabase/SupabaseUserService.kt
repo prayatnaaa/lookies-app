@@ -2,6 +2,8 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
+import com.prayatna.lookiesapp.data.remote.dto.UserAddressDto
+import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateUserAddressRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.RoleApplicationRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.utils.Helper
@@ -159,5 +161,31 @@ class SupabaseUserService @Inject constructor(
             }
             throw e
         }
+    }
+
+    suspend fun getUserAddresses(): List<UserAddressDto> {
+        val userId = auth.currentUserOrNull()?.id
+            ?: throw Exception("User not authenticated")
+
+        return postgrest.from("user_addresses").select {
+            filter {
+                eq("user_id", userId)
+            }
+        }.decodeList<UserAddressDto>()
+    }
+
+    suspend fun createUserAddress(address: CreateUserAddressRequest): UserAddressDto {
+        val userId = auth.currentUserOrNull()?.id
+            ?: throw Exception("User not authenticated")
+
+        val finalRequest = address.copy(userId = userId)
+
+        val result =  postgrest.from("user_addresses")
+            .insert(finalRequest) {
+                select()
+            }
+            .decodeSingle<UserAddressDto>()
+
+        return result
     }
 }
