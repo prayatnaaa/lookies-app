@@ -12,6 +12,8 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequest
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
+import com.prayatna.lookiesapp.domain.model.transaction.Shipment
+import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
@@ -29,11 +31,13 @@ class TransactionRepositoryImpl @Inject constructor(
     private val transactionService: SupabaseTransactionService
 ) : TransactionRepository {
     override suspend fun createOrder(
-        items: List<OrderItemInput>
+        items: List<OrderItemInput>,
+        shippingCost: Double
     ): DataResult<String> {
         return try {
             val response = transactionService.createOrder(
                 items = items.map { it.toDto() },
+                shippingCost = shippingCost
             )
             DataResult.Success(response)
         } catch (e: RestException) {
@@ -107,6 +111,26 @@ class TransactionRepositoryImpl @Inject constructor(
             val result = transactionService.getUserTransactionByOrderId(orderId)
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getShipmentByOrderId(orderId: String): DataResult<Shipment> {
+        return try {
+            val result = transactionService.getShipmentByOrderId(orderId)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getShipmentFees(): DataResult<List<ShipmentFee>> {
+        return try {
+            val result = transactionService.getShipmentFees()
+            DataResult.Success(result.map { it.toDomain() })
+        }catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
         }

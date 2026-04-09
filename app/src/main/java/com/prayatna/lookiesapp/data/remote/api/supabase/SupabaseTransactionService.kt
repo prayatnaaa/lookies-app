@@ -3,6 +3,8 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
+import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
+import com.prayatna.lookiesapp.data.remote.dto.ShipmentFeeDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
@@ -33,18 +35,20 @@ class SupabaseTransactionService @Inject constructor(
     private val httpClient: HttpClient
 ) {
     suspend fun createOrder(
-        items: List<OrderItemRequest>
+        items: List<OrderItemRequest>,
+        shippingCost: Double
     ): String {
         val userId = auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not authenticated")
 
         val params = CreateOrderRpcParams(
             buyerId = userId,
-            items = items
+            items = items,
+            shippingCost = shippingCost.toInt()
         )
 
         val orderId = postgrest.rpc(
-            function = "create_order_with_items",
+            function = "v2_create_order_with_items",
             parameters = params
         ).decodeAs<String>()
 
@@ -133,5 +137,17 @@ class SupabaseTransactionService @Inject constructor(
                 }
             }.decodeList<TicketDto>()
         return result
+    }
+
+    suspend fun getShipmentByOrderId(orderId: String): ShipmentDto {
+        return postgrest.from("shipments").select {
+            filter {
+                eq("order_id", orderId)
+            }
+        }.decodeSingle<ShipmentDto>()
+    }
+
+    suspend fun getShipmentFees(): List<ShipmentFeeDto> {
+        return postgrest.from("shipment_fees").select().decodeList<ShipmentFeeDto>()
     }
 }

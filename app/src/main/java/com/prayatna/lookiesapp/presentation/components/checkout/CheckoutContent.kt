@@ -1,6 +1,13 @@
 package com.prayatna.lookiesapp.presentation.components.checkout
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +18,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,29 +32,42 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutUiState
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckoutContent(
+    type: String,
     uiState: CheckoutUiState,
     onBackClick: () -> Unit,
     quantity: Int,
     onPayClick: () -> Unit,
     onRefresh: () -> Unit,
+    onShipmentFeeSelected: (ShipmentFee) -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
     children: @Composable () -> Unit = {}
 ) {
+    val shippingCost = if (type == "painting") {
+        uiState.selectedShipmentFee?.fee?.toDouble() ?: 0.0
+    } else {
+        0.0
+    }
+    val subtotal = (uiState.itemToBuy?.price ?: 0.0) * quantity
+    val totalPrice = subtotal + shippingCost
 
     Scaffold(
         snackbarHost = snackbarHost,
@@ -61,7 +84,7 @@ fun CheckoutContent(
         bottomBar = {
             if (uiState.itemToBuy != null) {
                 CheckoutBottomBar(
-                    totalPrice = uiState.itemToBuy.price!!.times(quantity),
+                    totalPrice = totalPrice,
                     isLoading = uiState.isLoading,
                     onPayClick = { onPayClick() }
                 )
@@ -112,6 +135,100 @@ fun CheckoutContent(
 
                     HorizontalDivider()
 
+                    // Shipping section for paintings
+                    AnimatedVisibility(
+                        visible = type == "painting",
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LocalShipping,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text(
+                                    text = "Shipping",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            if (uiState.isShipmentLoading) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Loading shipping options...",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            } else {
+                                uiState.shipmentFees.forEach { fee ->
+                                    val isSelected = uiState.selectedShipmentFee?.id == fee.id
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .border(
+                                                width = if (isSelected) 2.dp else 1.dp,
+                                                color = if (isSelected) MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.outlineVariant,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .background(
+                                                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+                                                else Color.Transparent
+                                            )
+                                            .clickable { onShipmentFeeSelected(fee) }
+                                            .padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(
+                                            selected = isSelected,
+                                            onClick = { onShipmentFeeSelected(fee) },
+                                            colors = RadioButtonDefaults.colors(
+                                                selectedColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        )
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = fee.region,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
+
+                                        Text(
+                                            text = formatRupiah(fee.fee.toDouble()),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+
+                            HorizontalDivider()
+                        }
+                    }
+
                     Text(
                         text = "Payments Summary",
                         style = MaterialTheme.typography.titleMedium,
@@ -119,7 +236,21 @@ fun CheckoutContent(
                     )
 
                     PaymentSummaryRow(label = "Unit price", amount = uiState.itemToBuy.price ?: 0.0)
-//                    PaymentSummaryRow(label = "Service fee", amount = 0.0)
+
+                    if (quantity > 1) {
+                        PaymentSummaryRow(
+                            label = "Quantity",
+                            amount = subtotal,
+                            detail = "x$quantity"
+                        )
+                    }
+
+                    if (type == "painting" && uiState.selectedShipmentFee != null) {
+                        PaymentSummaryRow(
+                            label = "Shipping (${uiState.selectedShipmentFee.region})",
+                            amount = uiState.selectedShipmentFee.fee.toDouble()
+                        )
+                    }
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -133,7 +264,7 @@ fun CheckoutContent(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = formatRupiah((uiState.itemToBuy.price?.times(quantity)) ?: 0.0),
+                            text = formatRupiah(totalPrice),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -150,14 +281,28 @@ fun CheckoutContent(
 }
 
 @Composable
-fun PaymentSummaryRow(label: String, amount: Double) {
+fun PaymentSummaryRow(
+    label: String,
+    amount: Double,
+    detail: String? = null
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+        Row {
+            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+            if (detail != null) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = detail,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray.copy(alpha = 0.7f)
+                )
+            }
+        }
         Text(text = formatRupiah(amount), style = MaterialTheme.typography.bodyMedium)
     }
 }

@@ -44,6 +44,10 @@ fun CheckoutRoute(
                     viewModel.onPaymentMethodSelected(event.method)
                 }
 
+                is CheckoutEvent.OnShipmentFeeSelected -> {
+                    viewModel.onShipmentFeeSelected(event.fee)
+                }
+
                 CheckoutEvent.OnPayClick -> {
                     val currentItem = uiState.itemToBuy
                     if (currentItem != null) {
@@ -59,8 +63,13 @@ fun CheckoutRoute(
                 CheckoutEvent.OnSuccessConfirmed -> {
                     val orderId = uiState.checkoutSuccessData
                     val merchantId = uiState.itemToBuy?.merchantId
+                    val shippingCost = if (type == "painting") {
+                        uiState.selectedShipmentFee?.fee?.toDouble() ?: 0.0
+                    } else {
+                        0.0
+                    }
                     val totalAmount =
-                        uiState.itemToBuy?.price?.times(quantity)?.toLong()
+                        (uiState.itemToBuy?.price?.times(quantity)?.plus(shippingCost))?.toLong()
 
                     viewModel.onCheckoutResultConsumed()
 
