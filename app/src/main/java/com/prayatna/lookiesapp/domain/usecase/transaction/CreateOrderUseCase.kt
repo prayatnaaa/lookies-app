@@ -9,6 +9,19 @@ class CreateOrderUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         items: List<OrderItemInput>,
-        shippingCost: Double
-    ) = transactionRepository.createOrder(items, shippingCost)
+        shippingCost: Double,
+        recipientName: String,
+        phoneNumber: String,
+        addressLine: String,
+        province: String,
+        postalCode: String
+    ) = transactionRepository.createOrder(
+        items,
+        shippingCost,
+        recipientName,
+        phoneNumber,
+        addressLine,
+        province,
+        postalCode
+    )
 }

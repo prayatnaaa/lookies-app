@@ -9,8 +9,10 @@ import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
+import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
+import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
@@ -146,6 +148,16 @@ class UserRepositoryImpl @Inject constructor(
             DataResult.Error(msg)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
+
+    override suspend fun getUserAddresses(): DataResult<List<UserAddress>> {
+        return try {
+            val result = supabaseUserService.getUserAddresses()
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
         }
     }
 

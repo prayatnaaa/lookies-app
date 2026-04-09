@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
+import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutUiState
 import com.prayatna.lookiesapp.utils.formatRupiah
 
@@ -58,6 +59,7 @@ fun CheckoutContent(
     onPayClick: () -> Unit,
     onRefresh: () -> Unit,
     onShipmentFeeSelected: (ShipmentFee) -> Unit = {},
+    onAddressSelected: (UserAddress) -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
     children: @Composable () -> Unit = {}
 ) {
@@ -135,7 +137,109 @@ fun CheckoutContent(
 
                     HorizontalDivider()
 
-                    // Shipping section for paintings
+                    // Address section for paintings
+                    AnimatedVisibility(
+                        visible = type == "painting",
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LocalShipping,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text(
+                                    text = "Shipping Address",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            if (uiState.isAddressLoading) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Loading addresses...",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            } else if (uiState.userAddresses.isEmpty()) {
+                                Text(
+                                    text = "No saved addresses found. Please add an address first.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            } else {
+                                uiState.userAddresses.forEach { address ->
+                                    val isSelected = uiState.selectedAddress?.id == address.id
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .border(
+                                                width = if (isSelected) 2.dp else 1.dp,
+                                                color = if (isSelected) MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.outlineVariant,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .background(
+                                                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+                                                else Color.Transparent
+                                            )
+                                            .clickable { onAddressSelected(address) }
+                                            .padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(
+                                            selected = isSelected,
+                                            onClick = { onAddressSelected(address) },
+                                            colors = RadioButtonDefaults.colors(
+                                                selectedColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        )
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = address.name,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Text(
+                                                text = address.phoneNumber,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Text(
+                                                text = "${address.addressLine}, ${address.city}, ${address.province} ${address.postalCode}",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            HorizontalDivider()
+                        }
+                    }
+
                     AnimatedVisibility(
                         visible = type == "painting",
                         enter = fadeIn() + expandVertically(),

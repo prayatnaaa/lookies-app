@@ -12,4 +12,8 @@ fun ShipmentDto.toDomain() = Shipment(
     shippingCost = shippingCost,
     createdAt = createdAt,
     shippedAt = shippedAt,
+    reciepentName = reciepentName,
+    phoneNumber = phoneNumber,
+    addressLine = addressLine,
+    province = province,
 )

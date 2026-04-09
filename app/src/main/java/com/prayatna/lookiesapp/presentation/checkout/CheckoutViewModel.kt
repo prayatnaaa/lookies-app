@@ -5,10 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
 import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
+import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.domain.usecase.event.GetEventByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.CreateOrderUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetShipmentFeeUseCase
+import com.prayatna.lookiesapp.domain.usecase.user.GetUserAddressesUseCase
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutItemDisplay
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutUiState
 import com.prayatna.lookiesapp.presentation.checkout.state.PaymentMethodUiState
@@ -26,7 +28,8 @@ class CheckoutViewModel @Inject constructor(
    private val createOrderUseCase: CreateOrderUseCase,
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
-    private val getShipmentFeeUseCase: GetShipmentFeeUseCase
+    private val getShipmentFeeUseCase: GetShipmentFeeUseCase,
+    private val getUserAddressesUseCase: GetUserAddressesUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CheckoutUiState())
@@ -43,6 +46,7 @@ class CheckoutViewModel @Inject constructor(
                 "painting" -> {
                     handlePaintingFetch(id)
                     fetchShipmentFees()
+                    fetchUserAddresses()
                 }
                 else -> {
                     _uiState.update {
@@ -119,9 +123,38 @@ class CheckoutViewModel @Inject constructor(
         }
     }
 
+    private suspend fun fetchUserAddresses() {
+        _uiState.update { it.copy(isAddressLoading = true) }
+        when (val result = getUserAddressesUseCase()) {
+            is DataResult.Success -> {
+                val addresses = result.data
+                _uiState.update {
+                    it.copy(
+                        isAddressLoading = false,
+                        userAddresses = addresses,
+                        selectedAddress = addresses.firstOrNull { addr -> addr.isDefault }
+                            ?: addresses.firstOrNull()
+                    )
+                }
+            }
+            is DataResult.Error -> {
+                _uiState.update {
+                    it.copy(isAddressLoading = false, errorMessage = result.error)
+                }
+            }
+            else -> Unit
+        }
+    }
+
     fun onShipmentFeeSelected(fee: ShipmentFee) {
         _uiState.update {
             it.copy(selectedShipmentFee = fee)
+        }
+    }
+
+    fun onAddressSelected(address: UserAddress) {
+        _uiState.update {
+            it.copy(selectedAddress = address)
         }
     }
 
@@ -148,11 +181,22 @@ class CheckoutViewModel @Inject constructor(
                 0.0
             }
 
+            val selectedAddress = _uiState.value.selectedAddress
+            if (currentItem.type == "painting" && selectedAddress == null) {
+                _uiState.update { it.copy(errorMessage = "Please select a shipping address") }
+                return@launch
+            }
+
             _uiState.update { it.copy(isLoading = true, errorMessage = null, checkoutSuccessData = null) }
 
             val result = createOrderUseCase(
                 items = items,
-                shippingCost = shippingCost
+                shippingCost = shippingCost,
+                recipientName = selectedAddress?.name ?: "",
+                phoneNumber = selectedAddress?.phoneNumber ?: "",
+                addressLine = selectedAddress?.addressLine ?: "",
+                province = selectedAddress?.province ?: "",
+                postalCode = selectedAddress?.postalCode ?: "",
             )
 
             _uiState.update { currentState ->

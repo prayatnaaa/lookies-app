@@ -48,6 +48,10 @@ fun CheckoutRoute(
                     viewModel.onShipmentFeeSelected(event.fee)
                 }
 
+                is CheckoutEvent.OnAddressSelected -> {
+                    viewModel.onAddressSelected(event.address)
+                }
+
                 CheckoutEvent.OnPayClick -> {
                     val currentItem = uiState.itemToBuy
                     if (currentItem != null) {

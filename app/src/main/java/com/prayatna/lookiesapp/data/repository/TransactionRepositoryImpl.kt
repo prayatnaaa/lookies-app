@@ -32,12 +32,22 @@ class TransactionRepositoryImpl @Inject constructor(
 ) : TransactionRepository {
     override suspend fun createOrder(
         items: List<OrderItemInput>,
-        shippingCost: Double
+        shippingCost: Double,
+        recipientName: String,
+        phoneNumber: String,
+        addressLine: String,
+        province: String,
+        postalCode: String
     ): DataResult<String> {
         return try {
             val response = transactionService.createOrder(
                 items = items.map { it.toDto() },
-                shippingCost = shippingCost
+                shippingCost = shippingCost,
+                recipientName = recipientName,
+                phoneNumber = phoneNumber,
+                addressLine = addressLine,
+                province = province,
+                postalCode
             )
             DataResult.Success(response)
         } catch (e: RestException) {

@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.checkout.state
 
 import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
+import com.prayatna.lookiesapp.domain.model.user.UserAddress
 
 data class CheckoutUiState(
     val isLoading: Boolean = false,
@@ -10,7 +11,10 @@ data class CheckoutUiState(
     val selectedMethod: PaymentMethodUiState = PaymentMethodUiState.QRIS,
     val shipmentFees: List<ShipmentFee> = emptyList(),
     val selectedShipmentFee: ShipmentFee? = null,
-    val isShipmentLoading: Boolean = false
+    val isShipmentLoading: Boolean = false,
+    val userAddresses: List<UserAddress> = emptyList(),
+    val selectedAddress: UserAddress? = null,
+    val isAddressLoading: Boolean = false
 )
 
 data class CheckoutItemDisplay(

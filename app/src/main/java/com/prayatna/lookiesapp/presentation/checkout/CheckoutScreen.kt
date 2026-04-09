@@ -64,6 +64,10 @@ fun CheckoutScreen(
             onEvent(CheckoutEvent.OnShipmentFeeSelected(fee))
         },
 
+        onAddressSelected = { address ->
+            onEvent(CheckoutEvent.OnAddressSelected(address))
+        },
+
         children = {
             CheckoutPaymentMethodContent(
                 selectedMethod = uiState.selectedMethod,

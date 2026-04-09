@@ -36,7 +36,12 @@ class SupabaseTransactionService @Inject constructor(
 ) {
     suspend fun createOrder(
         items: List<OrderItemRequest>,
-        shippingCost: Double
+        shippingCost: Double,
+        recipientName: String,
+        phoneNumber: String,
+        addressLine: String,
+        province: String,
+        postalCode: String
     ): String {
         val userId = auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not authenticated")
@@ -44,7 +49,12 @@ class SupabaseTransactionService @Inject constructor(
         val params = CreateOrderRpcParams(
             buyerId = userId,
             items = items,
-            shippingCost = shippingCost.toInt()
+            shippingCost = shippingCost.toInt(),
+            recipientName = recipientName,
+            phoneNumber = phoneNumber,
+            addressLine = addressLine,
+            province = province,
+            postalCode = postalCode
         )
 
         val orderId = postgrest.rpc(

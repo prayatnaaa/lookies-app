@@ -16,7 +16,12 @@ import kotlinx.coroutines.flow.Flow
 interface TransactionRepository {
     suspend fun createOrder(
         items: List<OrderItemInput>,
-        shippingCost: Double
+        shippingCost: Double,
+        recipientName: String,
+        phoneNumber: String,
+        addressLine: String,
+        province: String,
+        postalCode: String
     ):
             DataResult<String>
     suspend fun createQrisPaymentRequest(data: CreateQrisPaymentRequestInput):

@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
+import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
@@ -22,4 +23,6 @@ interface UserRepository {
         kycFile: Uri,
         fileName: String
     ): DataResult<RoleApplicationResponse>
+    suspend fun getUserAddresses():
+            DataResult<List<UserAddress>>
 }
