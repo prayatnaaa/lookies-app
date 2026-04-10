@@ -6,7 +6,6 @@ import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecidePartnerAppli
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
-import io.github.jan.supabase.storage.Storage
 import javax.inject.Inject
 
 class SupabaseAdminService @Inject constructor(
@@ -27,33 +26,16 @@ class SupabaseAdminService @Inject constructor(
         return result
     }
 
-    suspend fun decideEvent(status: String, id: Int): DecideEventResponseDto {
-        val result = postgrest.from("events").update(
-            {
-                set("status", status)
-            }
-        ) {
-            select(Columns.list("id", "organizer_id", "title", "status"))
-            filter {
-                eq("id", id)
-            }
-        }.decodeSingle<DecideEventResponseDto>()
-
-        return result
-    }
-
     suspend fun rejectEvent(id: Int, rejectReason: String): DecideEventResponseDto {
         val userId = auth.currentSessionOrNull() ?: throw Exception("User not authenticated")
         val result = postgrest.from("events").update(
-            {
-                mapOf(
-                    "status" to "rejected",
-                    "updated_at" to "now()",
-                    "approved_by" to userId,
-                    "approved_at" to "now()",
-                    "reject_reason" to rejectReason
-                )
-            }
+            mapOf(
+                "status" to "rejected",
+                "updated_at" to "now()",
+                "approved_by" to userId,
+                "approved_at" to "now()",
+                "reject_reason" to rejectReason
+            )
         ) {
             select(Columns.list("id", "organizer_id", "title", "status"))
             filter {
@@ -65,17 +47,14 @@ class SupabaseAdminService @Inject constructor(
     }
 
     suspend fun approveEvent(id: Int): DecideEventResponseDto {
-        val userId = auth.currentSessionOrNull() ?: throw Exception("User not authenticated")
+        val userId = auth.currentSessionOrNull()?.user?.id ?: throw Exception("User not authenticated")
 
         val result = postgrest.from("events").update(
-            {
-                mapOf(
-                    "status" to "accepted",
-                    "updated_at" to "now()",
-                    "approved_by" to userId,
-                    "approved_at" to "now()"
-                )
-            }
+            mapOf(
+                "status" to "published",
+                "approved_by" to userId,
+                "approved_at" to "now()"
+            )
         ) {
             select(Columns.list("id", "organizer_id", "title", "status"))
             filter {
