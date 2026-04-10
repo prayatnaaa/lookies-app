@@ -8,7 +8,9 @@ import com.prayatna.lookiesapp.domain.model.transaction.Shipment
 import com.prayatna.lookiesapp.domain.repository.MerchantRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
+import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import javax.inject.Inject
 
 class MerchantRepositoryImpl @Inject constructor(
@@ -51,6 +53,26 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getShipmentsByMerchantId(merchantId: String): DataResult<List<Shipment>> {
+        return try {
+            val result = supabaseMerchantService.getShipmentsByMerchantId(merchantId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+             when(e) {
+                is NotFoundRestException -> {
+                    DataResult.Error("Shipment not found")
+                }
+                is UnauthorizedRestException -> {
+                    DataResult.Error("Unauthorized")
+                }
+                else -> {
+                    val eMessage = extractSupabaseError(e.error)
+                    DataResult.Error(eMessage)
+                }
+            }
         }
     }
 }

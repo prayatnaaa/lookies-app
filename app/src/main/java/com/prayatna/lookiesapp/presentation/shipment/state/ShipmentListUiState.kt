@@ -1,0 +1,9 @@
+package com.prayatna.lookiesapp.presentation.shipment.state
+
+import com.prayatna.lookiesapp.domain.model.transaction.Shipment
+
+data class ShipmentListUiState(
+    val errorMessage: String? = null,
+    val isLoading: Boolean = false,
+    val data: List<Shipment> = emptyList()
+)

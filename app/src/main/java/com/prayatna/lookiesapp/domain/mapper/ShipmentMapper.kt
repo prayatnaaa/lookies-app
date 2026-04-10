@@ -16,4 +16,5 @@ fun ShipmentDto.toDomain() = Shipment(
     phoneNumber = phoneNumber,
     addressLine = addressLine,
     province = province,
+    postalCode = postalCode
 )

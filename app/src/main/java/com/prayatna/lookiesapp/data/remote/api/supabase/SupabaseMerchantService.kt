@@ -59,4 +59,13 @@ class SupabaseMerchantService @Inject constructor(
                 }
             }.decodeSingle<ShipmentDto>()
     }
+
+    suspend fun getShipmentsByMerchantId(merchantId: String): List<ShipmentDto> {
+        return postgrest.from("shipments")
+            .select {
+                filter {
+                    ShipmentDto::merchantId eq merchantId
+                }
+            }.decodeList<ShipmentDto>()
+    }
 }

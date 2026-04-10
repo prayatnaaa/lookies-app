@@ -12,7 +12,7 @@ data class ShipmentDto(
     @SerialName("order_id")
     val orderId: String,
     @SerialName("tracking_number")
-    val trackingNumber: String,
+    val trackingNumber: String? = null,
     @SerialName("status")
     val status: String,
     @SerialName("shipping_cost")

@@ -43,6 +43,7 @@ import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListS
 import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
+import com.prayatna.lookiesapp.presentation.shipment.shipmentListNavigation
 import com.prayatna.lookiesapp.presentation.transaction.detailTransaction.DetailTransactionScreen
 import com.prayatna.lookiesapp.presentation.transaction.payment.PaymentScreen
 import com.prayatna.lookiesapp.presentation.user.createUserAddress.createUserAddressNavigation
@@ -97,6 +98,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         navController = navController,
         startDestination = NavigationRoutes.MAIN_LOADING
     ) {
+
+        shipmentListNavigation(navController = navController)
         composable(
             route = "${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}",
             arguments = listOf(

@@ -283,6 +283,14 @@ fun PartnerHomeScreen(
                                         navController.navigate("${NavigationRoutes.MERCHANT_MEMBER_LIST}/$businessId")
                                     }
                                 )
+                                DashboardActionItem(
+                                    title = "Shipments",
+                                    subtitle = "Manage shipments of customers",
+                                    icon = Icons.Filled.Group,
+                                    onClick = {
+                                        navController.navigate("${NavigationRoutes.SHIPMENT_LIST}/$businessId")
+                                    }
+                                )
                             }
                         }
 

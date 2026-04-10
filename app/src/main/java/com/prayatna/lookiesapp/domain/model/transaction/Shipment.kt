@@ -4,7 +4,7 @@ data class Shipment(
     val id: String,
     val merchantId: String,
     val orderId: String,
-    val trackingNumber: String,
+    val trackingNumber: String? = null,
     val status: String,
     val shippingCost: Double,
     val createdAt: String,
@@ -13,4 +13,5 @@ data class Shipment(
     val phoneNumber: String,
     val addressLine: String,
     val province: String,
+    val postalCode: String
 )
