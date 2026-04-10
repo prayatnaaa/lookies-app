@@ -161,11 +161,11 @@ class DetailEventViewModel @Inject constructor(
         }
     }
 
-    fun rejectEvent(eventId: String) {
+    fun rejectEvent(eventId: String, rejectReason: String) {
         viewModelScope.launch {
             _adminState.update { it.copy(isLoading = true, error = null, success = null) }
 
-            when (val result = rejectEventUseCase(eventId.toInt())) {
+            when (val result = rejectEventUseCase(eventId.toInt(), rejectReason = rejectReason)) {
                 is DataResult.Success -> {
                     _adminState.update {
                         it.copy(

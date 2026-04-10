@@ -6,7 +6,7 @@ import com.prayatna.lookiesapp.utils.DataResult
 import javax.inject.Inject
 
 class RejectEventUseCase @Inject constructor( private val adminRepository: AdminRepository) {
-    suspend operator fun invoke(eventId: Int): DataResult<DecideEventResult> {
-        return adminRepository.rejectEvent(eventId)
+    suspend operator fun invoke(eventId: Int, rejectReason: String): DataResult<DecideEventResult> {
+        return adminRepository.rejectEvent(eventId, rejectReason)
     }
 }

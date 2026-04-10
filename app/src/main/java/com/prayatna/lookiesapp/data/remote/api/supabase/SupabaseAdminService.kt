@@ -1,19 +1,17 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import com.prayatna.lookiesapp.data.remote.dto.GetKycDocumentDto
-import com.prayatna.lookiesapp.data.remote.dto.request.user.KycDocumentDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecideEventResponseDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecidePartnerApplicationResponseDto
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
-import io.github.jan.supabase.storage.BucketListFilter
 import io.github.jan.supabase.storage.Storage
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
 
 class SupabaseAdminService @Inject constructor(
     private val postgrest: Postgrest,
-    private val storage: Storage
+    private val auth: Auth
 ) {
     suspend fun decidePartnerApplication(status: String, id: String): DecidePartnerApplicationResponseDto {
          val result = postgrest.from("merchant_accounts").update(
@@ -38,6 +36,51 @@ class SupabaseAdminService @Inject constructor(
             select(Columns.list("id", "organizer_id", "title", "status"))
             filter {
                 eq("id", id)
+            }
+        }.decodeSingle<DecideEventResponseDto>()
+
+        return result
+    }
+
+    suspend fun rejectEvent(id: Int, rejectReason: String): DecideEventResponseDto {
+        val userId = auth.currentSessionOrNull() ?: throw Exception("User not authenticated")
+        val result = postgrest.from("events").update(
+            {
+                mapOf(
+                    "status" to "rejected",
+                    "updated_at" to "now()",
+                    "approved_by" to userId,
+                    "approved_at" to "now()",
+                    "reject_reason" to rejectReason
+                )
+            }
+        ) {
+            select(Columns.list("id", "organizer_id", "title", "status"))
+            filter {
+                eq("id", id)
+            }
+        }.decodeSingle<DecideEventResponseDto>()
+
+        return result
+    }
+
+    suspend fun approveEvent(id: Int): DecideEventResponseDto {
+        val userId = auth.currentSessionOrNull() ?: throw Exception("User not authenticated")
+
+        val result = postgrest.from("events").update(
+            {
+                mapOf(
+                    "status" to "accepted",
+                    "updated_at" to "now()",
+                    "approved_by" to userId,
+                    "approved_at" to "now()"
+                )
+            }
+        ) {
+            select(Columns.list("id", "organizer_id", "title", "status"))
+            filter {
+                eq("id", id)
+
             }
         }.decodeSingle<DecideEventResponseDto>()
 

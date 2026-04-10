@@ -35,6 +35,9 @@ fun DetailEventScreen(
     var showResultModal by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
 
+    var isRejectSheetOpen by rememberSaveable { mutableStateOf(false) }
+    var rejectReason by rememberSaveable { mutableStateOf("") }
+
     LaunchedEffect(eventId) {
         viewModel.getEvent(eventId)
         viewModel.getEventPaintings(eventId)
@@ -86,7 +89,7 @@ fun DetailEventScreen(
                     role = role,
                     event = event,
                     onApprove = { viewModel.approveEvent(eventId) },
-                    onReject = { viewModel.rejectEvent(eventId) },
+                    onReject = { isRejectSheetOpen = true },
                     onRegister = {
                         navController.navigate(
                             NavigationRoutes.REGISTER_EVENT +
@@ -159,6 +162,79 @@ fun DetailEventScreen(
                     )
                 }
             )
+        }
+
+        if (isRejectSheetOpen) {
+            RejectEventBottomSheet(
+                reason = rejectReason,
+                onReasonChange = { rejectReason = it },
+                onDismiss = { isRejectSheetOpen = false },
+                onConfirm = {
+                    isRejectSheetOpen = false
+                    viewModel.rejectEvent(eventId, rejectReason)
+                    rejectReason = ""
+                }
+            )
+        }
+    }
+}
+
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+fun RejectEventBottomSheet(
+    reason: String,
+    onReasonChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    androidx.compose.material3.ModalBottomSheet(
+        onDismissRequest = onDismiss
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "Reject Event",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+            )
+
+            androidx.compose.material3.OutlinedTextField(
+                value = reason,
+                onValueChange = onReasonChange,
+                label = { Text("Rejection Reason") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 3
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                androidx.compose.material3.OutlinedButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Cancel")
+                }
+                
+                androidx.compose.material3.Button(
+                    onClick = onConfirm,
+                    modifier = Modifier.weight(1f),
+                    enabled = reason.isNotBlank(),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = com.prayatna.lookiesapp.ui.theme.Maroon,
+                        contentColor = androidx.compose.ui.graphics.Color.White
+                    )
+                ) {
+                    Text("Reject")
+                }
+            }
         }
     }
 }

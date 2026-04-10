@@ -28,12 +28,15 @@ class AdminRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun decideEvent(
-        status: String,
-        id: Int
-    ): DataResult<DecideEventResult> {
+    override suspend fun approvePartner(partnerId: String): DataResult<DecidePartnerApplicationResult> =
+        decidePartner("approved", partnerId)
+
+    override suspend fun rejectPartner(partnerId: String): DataResult<DecidePartnerApplicationResult> =
+        decidePartner("rejected", partnerId)
+
+    override suspend fun approveEvent(eventId: Int): DataResult<DecideEventResult> {
         return try {
-            val result = supabaseAdminService.decideEvent(status, id)
+            val result = supabaseAdminService.approveEvent(eventId)
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
@@ -41,18 +44,16 @@ class AdminRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun approvePartner(partnerId: String): DataResult<DecidePartnerApplicationResult> =
-        decidePartner("approved", partnerId)
 
-    override suspend fun rejectPartner(partnerId: String): DataResult<DecidePartnerApplicationResult> =
-        decidePartner("rejected", partnerId)
-
-    override suspend fun approveEvent(eventId: Int): DataResult<DecideEventResult> =
-        decideEvent("published", eventId)
-
-
-    override suspend fun rejectEvent(eventId: Int): DataResult<DecideEventResult> =
-        decideEvent("rejected", eventId)
+    override suspend fun rejectEvent(eventId: Int, rejectReason: String): DataResult<DecideEventResult> {
+        return try {
+            val result = supabaseAdminService.rejectEvent(id = eventId, rejectReason = rejectReason)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
 
     override suspend fun getKycDocuments(businessId: String): DataResult<List<GetKycDocument>> {
         return try {
