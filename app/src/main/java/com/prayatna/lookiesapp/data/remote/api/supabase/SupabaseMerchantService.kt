@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
+import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
 import io.github.jan.supabase.postgrest.Postgrest
 import javax.inject.Inject
 
@@ -31,5 +32,31 @@ class SupabaseMerchantService @Inject constructor(
                 }
             }.decodeList<MerchantMemberDto>()
         return response
+    }
+
+    suspend fun updateShipmentStatus(shipmentId: String, status: String): ShipmentDto {
+        return postgrest
+            .from("shipments")
+            .update({
+                set("status", status)
+            }) {
+                select()
+                filter {
+                    ShipmentDto::id eq shipmentId
+                }
+            }.decodeSingle<ShipmentDto>()
+    }
+
+    suspend fun createTrackingNumberShipment(shipmentId: String, trackingNumber: String): ShipmentDto {
+        return postgrest
+            .from("shipments")
+            .update({
+                set("tracking_number", trackingNumber)
+            }) {
+                select()
+                filter {
+                    ShipmentDto::id eq shipmentId
+                }
+            }.decodeSingle<ShipmentDto>()
     }
 }

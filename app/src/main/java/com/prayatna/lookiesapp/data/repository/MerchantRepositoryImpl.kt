@@ -4,6 +4,7 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseMerchantService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
+import com.prayatna.lookiesapp.domain.model.transaction.Shipment
 import com.prayatna.lookiesapp.domain.repository.MerchantRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
@@ -27,6 +28,26 @@ class MerchantRepositoryImpl @Inject constructor(
         return try {
             val response = supabaseMerchantService.getMerchantMembers(userId)
             DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun updateShipmentStatus(shipmentId: String, status: String): DataResult<Shipment> {
+        return try {
+            val response = supabaseMerchantService.updateShipmentStatus(shipmentId, status)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun createTrackingNumberShipment(shipmentId: String, trackingNumber: String): DataResult<Shipment> {
+        return try {
+            val response = supabaseMerchantService.createTrackingNumberShipment(shipmentId, trackingNumber)
+            DataResult.Success(response.toDomain())
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
