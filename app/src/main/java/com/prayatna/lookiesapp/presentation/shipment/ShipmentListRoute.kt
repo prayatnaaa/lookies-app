@@ -23,8 +23,8 @@ fun ShipmentListRoute(
     ShipmentListScreen(
         uiState = uiState,
         onBackPress = { navController.popBackStack() },
-        onShipmentCardClick = { shipmentId ->
-            //Todo: Navigate to shipment detail screen
+        onShipmentCardClick = { orderId ->
+            navController.navigate("${com.prayatna.lookiesapp.utils.NavigationRoutes.SHIPMENT_DETAIL}/$orderId")
         }
     )
 

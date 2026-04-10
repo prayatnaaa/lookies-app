@@ -1,6 +1,8 @@
 package com.prayatna.lookiesapp.presentation.components.shipment
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -9,7 +11,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.transaction.Shipment
-import com.prayatna.lookiesapp.presentation.components.partner.StatusPill
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
@@ -36,12 +37,12 @@ fun ShipmentCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Order #${shipment.orderId.uppercase()}",
+                    text = "Order #${shipment.orderId.take(8).uppercase()}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
-                StatusPill(text = shipment.status)
+                StatusBadge(status = shipment.status)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -96,5 +97,24 @@ fun ShipmentCard(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun StatusBadge(status: String) {
+    val backgroundColor = MaterialTheme.colorScheme.secondaryContainer
+    val textColor = MaterialTheme.colorScheme.onSecondaryContainer
+
+    Box(
+        modifier = Modifier
+            .background(color = backgroundColor, shape = RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = status.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
+            color = textColor,
+            fontWeight = FontWeight.Bold
+        )
     }
 }

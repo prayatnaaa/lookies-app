@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
+import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.UserAddressDto
 import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateUserAddressRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.RoleApplicationRequest
@@ -187,5 +188,14 @@ class SupabaseUserService @Inject constructor(
             .decodeSingle<UserAddressDto>()
 
         return result
+    }
+
+    suspend fun getShipmentsByOrderId(orderId: String): List<ShipmentDto> {
+        return postgrest.from("shipments")
+            .select {
+                filter {
+                    ShipmentDto::orderId eq orderId
+                }
+            }.decodeList<ShipmentDto>()
     }
 }

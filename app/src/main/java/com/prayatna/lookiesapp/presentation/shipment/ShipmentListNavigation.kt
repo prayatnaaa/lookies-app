@@ -25,4 +25,20 @@ fun NavGraphBuilder.shipmentListNavigation(
             )
         }
     }
+
+    composable(
+        route = "${NavigationRoutes.SHIPMENT_DETAIL}/{orderId}",
+        arguments = listOf(
+            navArgument("orderId") { type = NavType.StringType }
+        )
+    ) { backStackEntry ->
+        val orderId = backStackEntry.arguments?.getString("orderId")
+
+        orderId?.let { id ->
+            com.prayatna.lookiesapp.presentation.shipment.detail.ShipmentDetailRoute(
+                navController = navController,
+                orderId = id
+            )
+        }
+    }
 }

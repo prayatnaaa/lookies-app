@@ -199,7 +199,7 @@ class CheckoutViewModel @Inject constructor(
                 items = items,
                 shippingCost = shippingCost,
                 recipientName = selectedAddress?.name ?: "",
-                phoneNumber = selectedAddress?.phoneNumber ?: "",
+                phoneNumber = selectedAddress?.phoneNumber?: "",
                 addressLine = selectedAddress?.addressLine ?: "",
                 province = selectedAddress?.province ?: "",
                 postalCode = selectedAddress?.postalCode ?: "",

@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseTransactionService
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
@@ -47,7 +48,7 @@ class TransactionRepositoryImpl @Inject constructor(
                 phoneNumber = phoneNumber,
                 addressLine = addressLine,
                 province = province,
-                postalCode
+                postalCode = postalCode,
             )
             DataResult.Success(response)
         } catch (e: RestException) {

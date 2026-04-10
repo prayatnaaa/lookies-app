@@ -49,16 +49,16 @@ class SupabaseTransactionService @Inject constructor(
         val params = CreateOrderRpcParams(
             buyerId = userId,
             items = items,
-            shippingCost = shippingCost.toInt(),
+            shippingCost = shippingCost.toLong(),
             recipientName = recipientName,
             phoneNumber = phoneNumber,
             addressLine = addressLine,
             province = province,
-            postalCode = postalCode
+            postalCode = postalCode.toInt()
         )
 
         val orderId = postgrest.rpc(
-            function = "v2_create_order_with_items",
+            function = "v3_create_order_with_items",
             parameters = params
         ).decodeAs<String>()
 
