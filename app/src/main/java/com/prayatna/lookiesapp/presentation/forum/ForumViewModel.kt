@@ -86,7 +86,6 @@ class ForumViewModel @Inject constructor(
             _uiState.update { currentState ->
                 when (result) {
                     is DataResult.Success -> {
-                        // Clear input field on success, message list will naturally update via realtime listener
                         currentState.copy(isSending = false, currentInputString = "")
                     }
                     is DataResult.Error -> {

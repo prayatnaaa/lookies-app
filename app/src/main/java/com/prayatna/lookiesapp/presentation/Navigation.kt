@@ -43,6 +43,7 @@ import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
 import com.prayatna.lookiesapp.presentation.shipment.shipmentListNavigation
+import com.prayatna.lookiesapp.presentation.shipmentDetail.shipmentDetailNavigation
 import com.prayatna.lookiesapp.presentation.transaction.detailTransaction.DetailTransactionScreen
 import com.prayatna.lookiesapp.presentation.transaction.payment.PaymentScreen
 import com.prayatna.lookiesapp.presentation.user.createUserAddress.createUserAddressNavigation
@@ -370,5 +371,38 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             }
         }
         createUserAddressNavigation(navController = navController)
+        
+        composable(NavigationRoutes.FORUM_LIST) {
+            com.prayatna.lookiesapp.presentation.forum.forumlist.ForumListRoute(navController)
+        }
+
+        shipmentDetailNavigation(navController)
+        
+        composable(
+            route = "${NavigationRoutes.FORUM_CHANNEL_LIST}/{forumId}",
+            arguments = listOf(navArgument("forumId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("forumId")?.let { forumId ->
+                com.prayatna.lookiesapp.presentation.forum.forumchannellist.ForumChannelListRoute(
+                    forumId = forumId,
+                    onNavigateToChat = { channelId ->
+                        navController.navigate("${NavigationRoutes.FORUM_MESSAGES}/$channelId")
+                    },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+        }
+        
+        composable(
+            route = "${NavigationRoutes.FORUM_MESSAGES}/{channelId}",
+            arguments = listOf(navArgument("channelId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("channelId")?.let { channelId ->
+                com.prayatna.lookiesapp.presentation.forum.ForumRoute(
+                    channelId = channelId,
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+        }
     }
 }

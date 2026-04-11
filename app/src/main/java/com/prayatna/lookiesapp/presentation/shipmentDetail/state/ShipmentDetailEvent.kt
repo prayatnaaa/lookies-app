@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.shipment.detail.state
+package com.prayatna.lookiesapp.presentation.shipmentDetail.state
 
 sealed class ShipmentDetailEvent {
     data class OnStatusSelected(val status: String) : ShipmentDetailEvent()

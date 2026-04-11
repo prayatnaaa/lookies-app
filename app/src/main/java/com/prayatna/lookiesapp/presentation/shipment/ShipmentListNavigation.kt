@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.prayatna.lookiesapp.presentation.shipmentDetail.ShipmentDetailRoute
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 fun NavGraphBuilder.shipmentListNavigation(
@@ -22,22 +23,6 @@ fun NavGraphBuilder.shipmentListNavigation(
             ShipmentListRoute(
                 navController = navController,
                 merchantId = id
-            )
-        }
-    }
-
-    composable(
-        route = "${NavigationRoutes.SHIPMENT_DETAIL}/{orderId}",
-        arguments = listOf(
-            navArgument("orderId") { type = NavType.StringType }
-        )
-    ) { backStackEntry ->
-        val orderId = backStackEntry.arguments?.getString("orderId")
-
-        orderId?.let { id ->
-            com.prayatna.lookiesapp.presentation.shipment.detail.ShipmentDetailRoute(
-                navController = navController,
-                orderId = id
             )
         }
     }

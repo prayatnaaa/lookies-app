@@ -1,12 +1,12 @@
-package com.prayatna.lookiesapp.presentation.shipment.detail
+package com.prayatna.lookiesapp.presentation.shipmentDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.domain.usecase.merchant.CreateTrackingNumberShipmentUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.UpdateShipmentStatusUseCase
-import com.prayatna.lookiesapp.presentation.shipment.detail.state.ShipmentDetailEvent
-import com.prayatna.lookiesapp.presentation.shipment.detail.state.ShipmentDetailUiState
+import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailEvent
+import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

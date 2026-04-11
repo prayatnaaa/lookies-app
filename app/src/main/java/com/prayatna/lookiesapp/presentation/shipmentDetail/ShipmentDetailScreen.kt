@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.shipment.detail
+package com.prayatna.lookiesapp.presentation.shipmentDetail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +15,8 @@ import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.shipment.ShipmentDetailContent
-import com.prayatna.lookiesapp.presentation.shipment.detail.state.ShipmentDetailEvent
-import com.prayatna.lookiesapp.presentation.shipment.detail.state.ShipmentDetailUiState
+import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailEvent
+import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailUiState
 
 @Composable
 fun ShipmentDetailScreen(

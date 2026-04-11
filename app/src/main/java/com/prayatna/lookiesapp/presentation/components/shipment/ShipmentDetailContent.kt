@@ -24,8 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.presentation.shipment.detail.state.ShipmentDetailEvent
-import com.prayatna.lookiesapp.presentation.shipment.detail.state.ShipmentDetailUiState
+import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailEvent
+import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -40,4 +40,26 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Error(e.message ?: "Error sending forum message")
         }
     }
+
+    override suspend fun getForums(): DataResult<List<com.prayatna.lookiesapp.domain.model.message.ForumsView>> {
+        return try {
+            val result = supabaseChatService.getForums()
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error fetching forums")
+        }
+    }
+
+    override suspend fun getForumChannels(forumId: String): DataResult<List<com.prayatna.lookiesapp.domain.model.message.ForumChannelView>> {
+        return try {
+            val result = supabaseChatService.getForumChannels(forumId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error fetching forum channels")
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.shipment.detail
+package com.prayatna.lookiesapp.presentation.shipmentDetail
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.prayatna.lookiesapp.presentation.shipment.detail.state.ShipmentDetailEvent
+import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailEvent
 
 @Composable
 fun ShipmentDetailRoute(

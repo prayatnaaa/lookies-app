@@ -1,7 +1,9 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelMessagesViewDto
+import com.prayatna.lookiesapp.data.remote.dto.ForumChannelViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumMessageDto
+import com.prayatna.lookiesapp.data.remote.dto.ForumsViewDto
 import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumMessageRequest
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -11,7 +13,6 @@ import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
@@ -54,7 +55,7 @@ class SupabaseChatService @Inject constructor(
             getForumChannelMessages(channelId)
         }.onStart {
             channel.subscribe()
-            emit(getForumChannelMessages(channelId)) // initial load
+            emit(getForumChannelMessages(channelId))
         }
     }
 
@@ -67,4 +68,24 @@ class SupabaseChatService @Inject constructor(
             }.decodeList<ForumChannelMessagesViewDto>()
     }
 
+    suspend fun getForums(): List<ForumsViewDto> {
+        val userId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
+        return postgrest.from("user_forums_view")
+            .select {
+                filter {
+                    eq("user_id", userId)
+                }
+            }.decodeList<ForumsViewDto>()
+    }
+
+    suspend fun getForumChannels(forumId: String): List<ForumChannelViewDto> {
+        val userId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
+        return postgrest.from("user_forum_channels_view")
+            .select {
+                filter {
+                    eq("user_id", userId)
+                    eq("forum_id", forumId)
+                }
+            }.decodeList<ForumChannelViewDto>()
+    }
 }

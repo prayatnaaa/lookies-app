@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.shipment.detail.state
+package com.prayatna.lookiesapp.presentation.shipmentDetail.state
 
 import com.prayatna.lookiesapp.domain.model.transaction.Shipment
 
