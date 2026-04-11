@@ -9,7 +9,7 @@ import javax.inject.Inject
 class ListenToForumMessagesUseCase @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
-    operator fun invoke(channelId: String): DataResult<Flow<List<ForumChannelMessagesView>>> {
+    operator fun invoke(channelId: String): Flow<List<ForumChannelMessagesView>> {
         return chatRepository.listenToForumMessages(channelId)
     }
 }

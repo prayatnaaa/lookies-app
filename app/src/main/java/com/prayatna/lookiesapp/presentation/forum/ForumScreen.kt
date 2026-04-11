@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -54,7 +55,6 @@ fun ForumScreen(
 ) {
     val listState = rememberLazyListState()
 
-    // Scroll to bottom when new messages arrive
     LaunchedEffect(state.messages.size) {
         if (state.messages.isNotEmpty()) {
             listState.animateScrollToItem(state.messages.size - 1)
@@ -73,6 +73,7 @@ fun ForumScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .imePadding()
         ) {
             Box(
                 modifier = Modifier
@@ -115,7 +116,7 @@ fun DiscordStyleMessageItem(message: ForumChannelMessagesView) {
     Row(
         modifier = Modifier.fillMaxWidth(),) {
         CustomAsyncImage(
-            model = message.profilePictureUrl,
+            model = message.profilePictureUrl ?: "",
             contentDescription = "",
             modifier = Modifier
                 .size(40.dp)

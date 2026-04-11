@@ -1,7 +1,9 @@
 package com.prayatna.lookiesapp.data.remote.dto
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ForumChannelViewDto(
    @SerialName("channel_id")
     val id: String,

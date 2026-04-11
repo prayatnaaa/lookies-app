@@ -17,5 +17,5 @@ data class ForumChannelMessagesViewDto(
     @SerialName("full_name")
     val fullName: String,
     @SerialName("profile_picture_url")
-    val profilePictureUrl: String
+    val profilePictureUrl: String? = null
 )

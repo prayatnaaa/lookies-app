@@ -1,6 +1,8 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseChatService
+import com.prayatna.lookiesapp.data.remote.dto.ForumChannelMessagesViewDto
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
@@ -17,22 +19,21 @@ class ChatRepositoryImpl @Inject constructor(
     private val supabaseChatService: SupabaseChatService
 ): ChatRepository {
 
-    override fun listenToForumMessages(channelId: String): DataResult<Flow<List<ForumChannelMessagesView>>> {
-        return try {
-            val flow = supabaseChatService.listenToForumMessages(channelId)
-                .map { list ->
-                    list.map { it.toDomain() }
-                }
-            DataResult.Success(flow)
-        } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error connecting to forum messages")
-        }
+    override fun listenToForumMessages(
+        channelId: String
+    ): Flow<List<ForumChannelMessagesView>> {
+
+        return supabaseChatService.listenToForumMessages(channelId)
+            .map { dtoList ->
+                dtoList.map { it.toDomain() }
+            }
     }
 
     override suspend fun insertForumsMessage(data: CreateForumMessageInput): DataResult<ForumMessage> {
         return try {
             val requestDto = data.toDto()
             val result = supabaseChatService.insertForumsMessage(requestDto)
+            Log.d("INSERT_MESSAGE", result.toString())
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)

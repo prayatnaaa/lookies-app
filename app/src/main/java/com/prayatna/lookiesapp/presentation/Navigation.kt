@@ -20,6 +20,8 @@ import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
 import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListScreen
+import com.prayatna.lookiesapp.presentation.forum.ForumRoute
+import com.prayatna.lookiesapp.presentation.forum.forumchannellist.ForumChannelListRoute
 import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
@@ -383,7 +385,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             arguments = listOf(navArgument("forumId") { type = NavType.StringType })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("forumId")?.let { forumId ->
-                com.prayatna.lookiesapp.presentation.forum.forumchannellist.ForumChannelListRoute(
+                ForumChannelListRoute(
                     forumId = forumId,
                     onNavigateToChat = { channelId ->
                         navController.navigate("${NavigationRoutes.FORUM_MESSAGES}/$channelId")
@@ -398,7 +400,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             arguments = listOf(navArgument("channelId") { type = NavType.StringType })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("channelId")?.let { channelId ->
-                com.prayatna.lookiesapp.presentation.forum.ForumRoute(
+                ForumRoute(
                     channelId = channelId,
                     onBackClick = { navController.popBackStack() }
                 )

@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.forum
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
@@ -31,34 +32,41 @@ class ForumViewModel @Inject constructor(
 
     fun initChannel(channelId: String) {
         if (_uiState.value.channelId == channelId && _uiState.value.messages.isNotEmpty()) return
-        
-        _uiState.update { it.copy(channelId = channelId, isLoading = true, errorMessage = null) }
+
+        _uiState.update {
+            it.copy(
+                channelId = channelId,
+                isLoading = true,
+                errorMessage = null
+            )
+        }
+
         startListeningToMessages(channelId)
     }
 
     private fun startListeningToMessages(channelId: String) {
         listenJob?.cancel()
+
         listenJob = viewModelScope.launch {
-            when (val result = listenToForumMessagesUseCase(channelId)) {
-                is DataResult.Success -> {
-                    result.data
-                        .catch { e ->
-                            _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
-                        }
-                        .collect { messages ->
-                            _uiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    messages = messages.sortedBy { msg -> msg.createdAt }
-                                )
-                            }
-                        }
+            listenToForumMessagesUseCase(channelId)
+                .catch { e ->
+                    Log.e("CHAT", e.message.toString())
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = e.message
+                        )
+                    }
                 }
-                is DataResult.Error -> {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+                .collect { messages ->
+                    Log.d("CHAT", messages.toString())
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            messages = messages.sortedBy { msg -> msg.createdAt }
+                        )
+                    }
                 }
-                else -> Unit
-            }
         }
     }
 

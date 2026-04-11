@@ -8,7 +8,7 @@ import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-    fun listenToForumMessages(channelId: String): DataResult<Flow<List<com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView>>>
+    fun listenToForumMessages(channelId: String): Flow<List<com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView>>
     suspend fun insertForumsMessage(data: com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput): DataResult<com.prayatna.lookiesapp.domain.model.message.ForumMessage>
     suspend fun getForums(): DataResult<List<com.prayatna.lookiesapp.domain.model.message.ForumsView>>
     suspend fun getForumChannels(forumId: String): DataResult<List<com.prayatna.lookiesapp.domain.model.message.ForumChannelView>>

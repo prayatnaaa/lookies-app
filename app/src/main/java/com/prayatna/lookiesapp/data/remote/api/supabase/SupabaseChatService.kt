@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelMessagesViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumMessageDto
@@ -12,6 +13,7 @@ import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
@@ -44,28 +46,35 @@ class SupabaseChatService @Inject constructor(
 //        }
 //    }
 
-    @Suppress("DEPRECATION")
-    fun listenToForumMessages(channelId: String): Flow<List<ForumChannelMessagesViewDto>> {
+//    @Suppress("DEPRECATION")
+    fun listenToForumMessages(channelId: String): Flow<List<ForumChannelMessagesViewDto>> = flow {
+
         val channel = realtime.channel("forum_messages_channel")
 
-        return channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+        val flow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
             table = "forum_messages"
-            filter = "channel_id=eq.$channelId"
-        }.map {
-            getForumChannelMessages(channelId)
-        }.onStart {
-            channel.subscribe()
+            // filter = "channel_id=eq.$channelId"
+        }
+        channel.subscribe()
+
+        emit(getForumChannelMessages(channelId))
+
+        flow.collect {
+            Log.d("CHAT", "EVENT MASUK: $it")
             emit(getForumChannelMessages(channelId))
         }
     }
 
     private suspend fun getForumChannelMessages(channelId: String): List<ForumChannelMessagesViewDto> {
-        return postgrest.from("forum_channel_messages_view")
+        val result = postgrest.from("forum_channel_messages_view")
             .select {
                 filter {
                     eq("channel_id", channelId)
                 }
             }.decodeList<ForumChannelMessagesViewDto>()
+        Log.d("CHAT", result.toString())
+        Log.d("CHAT", channelId)
+        return result
     }
 
     suspend fun getForums(): List<ForumsViewDto> {

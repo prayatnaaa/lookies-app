@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class ForumsViewDto(
     @SerialName("forum_id")
     val id: String,
-    @SerialName("eventId")
+    @SerialName("event_id")
     val eventId: String,
     val title: String,
     @SerialName("banner_image_url")
