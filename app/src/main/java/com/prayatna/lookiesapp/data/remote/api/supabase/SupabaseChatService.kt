@@ -1,65 +1,70 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
-import android.util.Log
-import com.prayatna.lookiesapp.data.remote.dto.ChatRoomDto
-import com.prayatna.lookiesapp.data.remote.dto.MessageDto
-import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
-import com.prayatna.lookiesapp.data.remote.dto.response.chat.CreateMessageResponse
-import io.github.jan.supabase.annotations.SupabaseExperimental
+import com.prayatna.lookiesapp.data.remote.dto.ForumChannelMessagesViewDto
+import com.prayatna.lookiesapp.data.remote.dto.ForumMessageDto
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumMessageRequest
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.query.Order
-import io.github.jan.supabase.postgrest.query.filter.FilterOperation
-import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.Realtime
-import io.github.jan.supabase.realtime.selectAsFlow
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class SupabaseChatService @Inject constructor(
     private val auth: Auth,
     private val postgrest: Postgrest,
+    private val realtime: Realtime
 ) {
 
+    suspend fun insertForumsMessage(request: CreateForumMessageRequest): ForumMessageDto {
+        val userId = auth.currentSessionOrNull()?.user?.id ?:
+        throw IllegalStateException("User not logged in")
 
-    private fun generateConversationId(myId: String, otherId: String): String {
-        val ids = listOf(myId, otherId).sorted()
-        return "${ids[0]}_${ids[1]}"
-    }
-
-     @OptIn(SupabaseExperimental::class)
-     fun getMessages(targetId: String): Flow<List<MessageDto>> {
-         val senderId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
-         val conversationId = generateConversationId(senderId, targetId)
-        val response = postgrest.from("messages_view")
-            .selectAsFlow(
-                MessageDto::id,
-                filter = FilterOperation("conversation_id", FilterOperator.EQ, conversationId),
-            )
-        return response
-    }
-
-    suspend fun createMessage(data: CreateMessageRequest): CreateMessageResponse {
-        val senderId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
-        val finalData = data.copy(senderId = senderId)
-        val response = postgrest.from("messages").insert(finalData) {
+        val finalRequest = request.copy(senderId = userId)
+        return postgrest.from("forum_messages").insert(finalRequest) {
             select()
-        }.decodeSingle<CreateMessageResponse>()
-
-        Log.d("CHAT", "createMessage: $response")
-        return response
+        }.decodeSingle<ForumMessageDto>()
     }
 
-    suspend fun getChatInbox(): List<ChatRoomDto> {
-        return postgrest.from("chat_inbox_view")
+//    fun listenToForumMessages(): Flow<List<ForumMessageDto>> {
+//        val channel = realtime.channel("forum_messages_channel")
+//
+//        return channel.postgresListDataFlow(
+//            schema = "public",
+//            table = "forum_messages",
+//            primaryKey = ForumMessageDto::id
+//        ).onStart {
+//            channel.subscribe()
+//        }
+//    }
+
+    @Suppress("DEPRECATION")
+    fun listenToForumMessages(channelId: String): Flow<List<ForumChannelMessagesViewDto>> {
+        val channel = realtime.channel("forum_messages_channel")
+
+        return channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "forum_messages"
+            filter = "channel_id=eq.$channelId"
+        }.map {
+            getForumChannelMessages(channelId)
+        }.onStart {
+            channel.subscribe()
+            emit(getForumChannelMessages(channelId)) // initial load
+        }
+    }
+
+    private suspend fun getForumChannelMessages(channelId: String): List<ForumChannelMessagesViewDto> {
+        return postgrest.from("forum_channel_messages_view")
             .select {
-//                filter {
-//                    eq("user_id", myUserId)
-//                }
-                order("sent_at", Order.DESCENDING)
-            }
-            .decodeList<ChatRoomDto>()
+                filter {
+                    eq("channel_id", channelId)
+                }
+            }.decodeList<ForumChannelMessagesViewDto>()
     }
+
 }
