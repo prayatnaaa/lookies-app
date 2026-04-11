@@ -15,7 +15,6 @@ import androidx.navigation.navArgument
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
 import com.prayatna.lookiesapp.presentation.artistDashboard.ArtistDashboardScreen
-import com.prayatna.lookiesapp.presentation.chat.ChatScreen
 import com.prayatna.lookiesapp.presentation.checkout.state.checkoutNavigation
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
 import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
@@ -332,24 +331,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             }
 
         }
-        composable(
-            route = "${NavigationRoutes.MESSAGES}/{userId}/{username}",
-            arguments = listOf(
-                navArgument("userId") { type = NavType.StringType },
-                navArgument("username") { type = NavType.StringType }
-            )
-        ) {
-            backStackEntry ->
-            backStackEntry.arguments?.getString("userId")?.let { userId ->
-                backStackEntry.arguments?.getString("username")?.let { username ->
-                    ChatScreen(
-                        navController = navController,
-                        targetId = userId,
-                        targetName = username
-                    )
-                }
-            }
-        }
+
         composable(
             route = "${NavigationRoutes.DETAIL_PAINTING}/{paintingId}",
             arguments = listOf(navArgument("paintingId") {

@@ -41,7 +41,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView
-import com.prayatna.lookiesapp.presentation.chat.formatTime
 import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.forum.state.ForumUiState
@@ -136,7 +135,7 @@ fun DiscordStyleMessageItem(message: ForumChannelMessagesView) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = formatTime(message.createdAt),
+                    text = message.createdAt,
                     fontSize = 11.sp,
                     color = Color.Gray
                 )

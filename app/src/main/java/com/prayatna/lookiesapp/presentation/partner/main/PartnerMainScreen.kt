@@ -23,7 +23,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.prayatna.lookiesapp.presentation.SharedViewModel
-import com.prayatna.lookiesapp.presentation.chatRoom.ChatRoomScreen
 import com.prayatna.lookiesapp.presentation.partner.main.home.PartnerHomeScreen
 import com.prayatna.lookiesapp.presentation.partner.main.settings.PartnerSettingsScreen
 import com.prayatna.lookiesapp.utils.PartnerBottomNavItem
@@ -86,9 +85,9 @@ fun PartnerContent(
             PartnerHomeScreen(navController = navHostController, businessId = businessId)
         }
 
-        composable(PartnerBottomNavItem.Chat.route) {
-            ChatRoomScreen(navController = navHostController)
-        }
+//        composable(PartnerBottomNavItem.Chat.route) {
+//            ChatRoomScreen(navController = navHostController)
+//        }
         composable(PartnerBottomNavItem.Transaction.route) {
 //            StarredScreen()
         }
