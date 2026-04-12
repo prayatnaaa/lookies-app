@@ -9,6 +9,7 @@ import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.domain.usecase.event.GetEventByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.CreateOrderUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetShipmentFeeUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.GetUserAddressesUseCase
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutItemDisplay
@@ -28,6 +29,7 @@ class CheckoutViewModel @Inject constructor(
    private val createOrderUseCase: CreateOrderUseCase,
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
+    private val getDetailTransactionUseCase: GetDetailTransactionUseCase,
     private val getShipmentFeeUseCase: GetShipmentFeeUseCase,
     private val getUserAddressesUseCase: GetUserAddressesUseCase
 ) : ViewModel() {
@@ -47,6 +49,9 @@ class CheckoutViewModel @Inject constructor(
                     handlePaintingFetch(id)
                     fetchShipmentFees()
                     fetchUserAddresses()
+                }
+                "event_registration" -> {
+                    handleEventRegistrationFetch(id)
                 }
                 else -> {
                     _uiState.update {
@@ -93,6 +98,35 @@ class CheckoutViewModel @Inject constructor(
                     merchantId = data.participant.event.organizer.id
                 )
                 _uiState.update { it.copy(isLoading = false, itemToBuy = itemDisplay) }
+            }
+            is DataResult.Error -> {
+                _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+            }
+            else -> Unit
+        }
+    }
+
+    private suspend fun handleEventRegistrationFetch(orderId: String) {
+        when (val result = getDetailTransactionUseCase(orderId)) {
+            is DataResult.Success -> {
+                val transaction = result.data.transaction
+                val firstItem = transaction.items.firstOrNull()
+                val itemDisplay = CheckoutItemDisplay(
+                    id = transaction.id,
+                    title = firstItem?.details?.title ?: "Event Registration",
+                    subtitle = "Registration Fee",
+                    price = transaction.totalAmount,
+                    imageUrl = firstItem?.details?.imageUrl ?: "",
+                    type = "event_registration",
+                    merchantId = transaction.merchantId
+                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        itemToBuy = itemDisplay,
+                        existingOrderId = orderId
+                    )
+                }
             }
             is DataResult.Error -> {
                 _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }

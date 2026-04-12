@@ -8,6 +8,7 @@ data class CheckoutUiState(
     val errorMessage: String? = null,
     val itemToBuy: CheckoutItemDisplay? = null,
     val checkoutSuccessData: String? = null,
+    val existingOrderId: String? = null,
     val selectedMethod: PaymentMethodUiState = PaymentMethodUiState.QRIS,
     val shipmentFees: List<ShipmentFee> = emptyList(),
     val selectedShipmentFee: ShipmentFee? = null,

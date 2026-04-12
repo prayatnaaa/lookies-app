@@ -124,7 +124,11 @@ fun CheckoutContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Purchased Item",
+                        text = when (type) {
+                            "event_registration" -> "Registration Details"
+                            "event_ticket" -> "Event Ticket"
+                            else -> "Purchased Item"
+                        },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -359,7 +363,14 @@ fun CheckoutContent(
                         fontWeight = FontWeight.Bold
                     )
 
-                    PaymentSummaryRow(label = "Unit price", amount = uiState.itemToBuy.price ?: 0.0)
+                    PaymentSummaryRow(
+                        label = when (type) {
+                            "event_registration" -> "Registration Fee"
+                            "event_ticket" -> "Ticket Price"
+                            else -> "Unit price"
+                        },
+                        amount = uiState.itemToBuy.price ?: 0.0
+                    )
 
                     if (quantity > 1) {
                         PaymentSummaryRow(

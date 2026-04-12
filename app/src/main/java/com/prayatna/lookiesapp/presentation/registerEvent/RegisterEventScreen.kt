@@ -28,7 +28,6 @@ import com.prayatna.lookiesapp.presentation.components.registerEvent.ConfirmPain
 import com.prayatna.lookiesapp.presentation.components.registerEvent.SelectPaintingContent
 import com.prayatna.lookiesapp.presentation.registerEvent.state.RegisterEventEvent
 import com.prayatna.lookiesapp.utils.NavigationRoutes
-import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
 fun RegisterEventScreen(
@@ -45,15 +44,19 @@ fun RegisterEventScreen(
 
     LaunchedEffect(eventId) {
         viewModel.onEvent(RegisterEventEvent.SetEventId(eventId))
+        viewModel.onEvent(RegisterEventEvent.SetFee(fee))
+        viewModel.onEvent(RegisterEventEvent.SetMerchantId(merchantId))
     }
 
     if (state.isSuccess) {
         state.successMessage?.let { message ->
             CustomBottomSheet (
                 title = "Success!",
-                message = " $message, now you need to pay the registration fee ${formatRupiah(fee)}",
+                message = "$message. Proceed to checkout to complete payment.",
                 onConfirm = {
-                    navController.navigate("${NavigationRoutes.QRIS_PAYMENT}/${state.data?.orderId}/${merchantId}/${fee.toLong()}")
+                    navController.navigate(
+                        "${NavigationRoutes.CHECKOUT}/event_registration/${state.data?.orderId}/1"
+                    )
                 },
                 onDismiss = {
                     navController.popBackStack()
@@ -109,7 +112,7 @@ fun RegisterEventScreen(
             if (state.currentStep == 1) {
                 SelectPaintingContent(state, onEvent)
             } else {
-                ConfirmPaintingsContent(state, onEvent)
+                ConfirmPaintingsContent(state, onEvent, fee)
             }
         }
     }

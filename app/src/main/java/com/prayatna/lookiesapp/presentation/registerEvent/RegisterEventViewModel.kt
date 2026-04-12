@@ -33,6 +33,12 @@ class RegisterEventViewModel @Inject constructor(
             is RegisterEventEvent.SetEventId -> {
                 _state.update { it.copy(eventId = event.id) }
             }
+            is RegisterEventEvent.SetFee -> {
+                _state.update { it.copy(fee = event.fee) }
+            }
+            is RegisterEventEvent.SetMerchantId -> {
+                _state.update { it.copy(merchantId = event.merchantId) }
+            }
             is RegisterEventEvent.TogglePainting -> {
                 _state.update { currentState ->
                     val newSelection = currentState.selectedIds.toMutableSet()

@@ -8,6 +8,8 @@ data class RegisterEventUiState(
     val currentStep: Int = 1,
     val eventId: Int = 0,
     val maxLimit: Int = 3,
+    val fee: Double = 0.0,
+    val merchantId: String = "",
     val allPaintings: List<Painting> = emptyList(),
     val selectedIds: Set<Int> = emptySet(),
     val errorMessage: String? = null,
