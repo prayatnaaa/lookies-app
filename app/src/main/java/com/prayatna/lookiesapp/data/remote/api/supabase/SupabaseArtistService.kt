@@ -33,7 +33,7 @@ class SupabaseArtistService @Inject constructor(
     private val realtime: Realtime,
     private val httpClient: HttpClient,
 ) {
-    
+
     suspend fun registerEvent(
         artistId: String,
         eventId:Int,

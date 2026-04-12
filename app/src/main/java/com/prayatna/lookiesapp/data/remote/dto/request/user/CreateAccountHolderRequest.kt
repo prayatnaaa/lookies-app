@@ -18,7 +18,7 @@ data class RoleApplicationRequest(
     @SerialName("business_payload")
     val businessPayload: CreateAccountHolderRequest,
 
-    @SerialName("bank_accounts")
+    @SerialName("merchant_bank_accounts")
     val bankAccounts: BankAccountDto
 )
 
