@@ -4,6 +4,7 @@ import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.UserAddressDto
+import com.prayatna.lookiesapp.data.remote.dto.request.user.ArtistApplicationRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateUserAddressRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.RoleApplicationRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
@@ -143,6 +144,70 @@ class SupabaseUserService @Inject constructor(
 
             val response = httpClient
                 .post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/role-application") {
+                    contentType(ContentType.Application.Json)
+                    header("Authorization", "Bearer ${session.accessToken}")
+                    setBody(finalRequest)
+                }
+            return response.body()
+
+        } catch (e: Exception) {
+            Log.e("Supabase", "Error logic, rolling back file...", e)
+
+            uploadedPath?.let { pathToDelete ->
+                try {
+                    storage.from("private_documents").delete(pathToDelete)
+                    Log.d("Supabase", "Rollback: File deleted $pathToDelete")
+                } catch (deleteErr: Exception) {
+                    Log.e("Supabase", "Failed to rollback file", deleteErr)
+                }
+            }
+            throw e
+        }
+    }
+
+    suspend fun becomeArtist(
+        request: ArtistApplicationRequest,
+        kycFile: ByteArray,
+        fileName: String
+    ): RoleApplicationResponse {
+
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
+
+        val userId = auth.currentUserOrNull()?.id
+            ?: throw IllegalStateException("User not logged in")
+
+        var uploadedPath: String? = null
+
+        try {
+            val safeFileName = fileName.replace(" ", "_")
+            val path = "$userId/$safeFileName"
+
+            storage.from("private_documents").upload(
+                path = path,
+                data = kycFile,
+                upsert = true
+            )
+
+            uploadedPath = path
+            Log.d("Supabase", "File uploaded successfully at: $path")
+
+            val updatedKycList = request.kycDocuments?.toMutableList()
+
+            if (updatedKycList != null) {
+                updatedKycList[0] = updatedKycList[0].copy(
+                    fileId = path
+                )
+            } else {
+                throw IllegalStateException("List kycDocuments cannot be empty")
+            }
+
+            val finalRequest = request.copy(
+                kycDocuments = updatedKycList,
+                )
+
+            val response = httpClient
+                .post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/become-artist") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer ${session.accessToken}")
                     setBody(finalRequest)

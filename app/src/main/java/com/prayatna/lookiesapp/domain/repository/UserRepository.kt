@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.domain.repository
 import android.net.Uri
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
+import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
@@ -30,4 +31,9 @@ interface UserRepository {
             DataResult<List<UserAddress>>
     suspend fun createUserAddress(address: CreateUserAddressInput):
             DataResult<UserAddress>
+    suspend fun becomeArtist(
+        request: ArtistApplicationInput,
+        kycFile: Uri,
+        fileName: String
+    ): DataResult<RoleApplicationResponse>
 }

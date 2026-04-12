@@ -11,6 +11,7 @@ import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
@@ -135,6 +136,32 @@ class UserRepositoryImpl @Inject constructor(
             ?: return DataResult.Error("Image is not selected")
         return try {
             val result = supabaseUserService.registerBusiness(
+                request = request.toDto(),
+                kycFile = compressedImage,
+                fileName = fileName
+            )
+            if (result.status == "success") {
+                DataResult.Success(result)
+            } else {
+                DataResult.Error(result.message)
+            }
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
+
+    override suspend fun becomeArtist(
+        request: ArtistApplicationInput,
+        kycFile: Uri,
+        fileName: String
+    ): DataResult<RoleApplicationResponse> {
+        val compressedImage = kycFile.compressImage(context, 500_000L)
+            ?: return DataResult.Error("Image is not selected")
+        return try {
+            val result = supabaseUserService.becomeArtist(
                 request = request.toDto(),
                 kycFile = compressedImage,
                 fileName = fileName
