@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.ArtistDashboardSummaryDto
 import com.prayatna.lookiesapp.data.remote.dto.EventPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.request.artist.RegisterEventRequest
@@ -11,6 +12,13 @@ import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.broadcastFlow
 import io.github.jan.supabase.realtime.channel
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -22,9 +30,10 @@ import javax.inject.Inject
 class SupabaseArtistService @Inject constructor(
     private val auth: Auth,
     private val postgrest: Postgrest,
-    private val realtime: Realtime
+    private val realtime: Realtime,
+    private val httpClient: HttpClient,
 ) {
-
+    
     suspend fun registerEvent(
         artistId: String,
         eventId:Int,
@@ -36,11 +45,18 @@ class SupabaseArtistService @Inject constructor(
             paintingIds = paintingIds
         )
 
-        Log.d("RegisterEvent", parameters.toString())
-        val response = postgrest.rpc(function = "v2_register_event",
-            parameters = parameters).decodeAs<RegisterEventResponse>()
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
 
-        return response
+        val response =  httpClient.post("${BuildConfig.SUPABASE_EDGE_BASE_URL}/register-paintings-to-event") {
+            contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer ${session.accessToken}")
+            setBody(parameters)
+        }
+
+        Log.d("Create-Event", response.body())
+
+        return response.body()
     }
 
     suspend fun getArtistEventPaintings(artistId: String): List<EventPaintingDto> {
