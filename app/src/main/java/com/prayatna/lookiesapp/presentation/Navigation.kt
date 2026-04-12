@@ -48,6 +48,7 @@ import com.prayatna.lookiesapp.presentation.shipment.shipmentListNavigation
 import com.prayatna.lookiesapp.presentation.shipmentDetail.shipmentDetailNavigation
 import com.prayatna.lookiesapp.presentation.transaction.detailTransaction.DetailTransactionScreen
 import com.prayatna.lookiesapp.presentation.transaction.payment.PaymentScreen
+import com.prayatna.lookiesapp.presentation.user.artistSubmission.artistSubmissionNavigation
 import com.prayatna.lookiesapp.presentation.user.createUserAddress.createUserAddressNavigation
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.PartnerSubmissionScreen
@@ -356,6 +357,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         ) {
             PartnerSubmissionScreen(navController = navController)
         }
+        artistSubmissionNavigation(navController)
         composable(
             route = "${NavigationRoutes.PERSONAL_PAINTING}/{merchantId}",
             arguments = listOf(navArgument("merchantId") { type = NavType.StringType })

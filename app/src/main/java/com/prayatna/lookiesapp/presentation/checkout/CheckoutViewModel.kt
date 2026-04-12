@@ -166,7 +166,7 @@ class CheckoutViewModel @Inject constructor(
                     it.copy(
                         isAddressLoading = false,
                         userAddresses = addresses,
-                        selectedAddress = addresses.firstOrNull { addr -> addr.isDefault }
+                        selectedAddress = addresses.firstOrNull { address -> address.isDefault }
                             ?: addresses.firstOrNull()
                     )
                 }

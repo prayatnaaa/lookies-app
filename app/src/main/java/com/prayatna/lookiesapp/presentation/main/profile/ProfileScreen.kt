@@ -145,7 +145,7 @@ fun ProfileScreen(
                             if (profile.role != "user") {
                                 navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
                             } else {
-                                navController.navigate("${NavigationRoutes.PARTNER_APPLICATION}/artist")
+                                navController.navigate(NavigationRoutes.ARTIST_APPLICATION)
                             }
                         }
                     )

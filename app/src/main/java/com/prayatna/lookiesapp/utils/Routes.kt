@@ -39,6 +39,7 @@ object NavigationRoutes {
     const val SELF_EVENT_LIST = "self_event_list"
     const val UPLOAD_PAINTING = "upload_painting"
     const val PARTNER_APPLICATION = "partner_application"
+    const val ARTIST_APPLICATION = "artist_application"
     const val ADD_LOCATION = "add_location"
     const val PARTNER_LIST = "partner_list"
     const val DETAIL_PARTNER = "partner_detail"

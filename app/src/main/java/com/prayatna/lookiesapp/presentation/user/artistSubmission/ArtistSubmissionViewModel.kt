@@ -1,0 +1,146 @@
+package com.prayatna.lookiesapp.presentation.user.artistSubmission
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.domain.model.user.Address
+import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
+import com.prayatna.lookiesapp.domain.model.user.BankAccount
+import com.prayatna.lookiesapp.domain.model.user.KYCDocument
+import com.prayatna.lookiesapp.domain.usecase.user.BecomeArtistUseCase
+import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionEvent
+import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionFormState
+import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionUiState
+import com.prayatna.lookiesapp.utils.DataResult
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class ArtistSubmissionViewModel @Inject constructor(
+    private val becomeArtistUseCase: BecomeArtistUseCase
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<ArtistSubmissionUiState>(ArtistSubmissionUiState.Idle)
+    val uiState: StateFlow<ArtistSubmissionUiState> = _uiState.asStateFlow()
+
+    private val _formState = MutableStateFlow(ArtistSubmissionFormState())
+    val formState: StateFlow<ArtistSubmissionFormState> = _formState.asStateFlow()
+
+    fun onEvent(event: ArtistSubmissionEvent) {
+        when (event) {
+            is ArtistSubmissionEvent.FullNameChanged -> _formState.update { it.copy(fullName = event.value) }
+            is ArtistSubmissionEvent.DisplayNameChanged -> _formState.update { it.copy(displayName = event.value) }
+            is ArtistSubmissionEvent.BioChanged -> _formState.update { it.copy(bio = event.value) }
+            is ArtistSubmissionEvent.PhoneNumberChanged -> _formState.update { it.copy(phoneNumber = event.value) }
+            is ArtistSubmissionEvent.NationalityChanged -> _formState.update { it.copy(nationality = event.value) }
+            is ArtistSubmissionEvent.PlaceOfBirthChanged -> _formState.update { it.copy(placeOfBirth = event.value) }
+            is ArtistSubmissionEvent.DateOfBirthChanged -> _formState.update { it.copy(dateOfBirth = event.value) }
+            is ArtistSubmissionEvent.GenderChanged -> _formState.update { it.copy(gender = event.value) }
+            is ArtistSubmissionEvent.WebsiteChanged -> _formState.update { it.copy(website = event.value) }
+            is ArtistSubmissionEvent.CountryChanged -> _formState.update { it.copy(country = event.value) }
+            
+            is ArtistSubmissionEvent.AddressChanged -> _formState.update { it.copy(streetLine1 = event.value) }
+            is ArtistSubmissionEvent.AddressLine2Changed -> _formState.update { it.copy(streetLine2 = event.value) }
+            is ArtistSubmissionEvent.CityChanged -> _formState.update { it.copy(city = event.value) }
+            is ArtistSubmissionEvent.ProvinceChanged -> _formState.update { it.copy(province = event.value) }
+            is ArtistSubmissionEvent.DistrictChanged -> _formState.update { it.copy(district = event.value) }
+            is ArtistSubmissionEvent.SubDistrictChanged -> _formState.update { it.copy(subDistrict = event.value) }
+            is ArtistSubmissionEvent.PostalCodeChanged -> _formState.update { it.copy(postalCode = event.value) }
+            
+            is ArtistSubmissionEvent.BankCodeChanged -> _formState.update { it.copy(bankCode = event.value) }
+            is ArtistSubmissionEvent.BankNameChanged -> _formState.update { it.copy(bankName = event.value) }
+            is ArtistSubmissionEvent.AccountNumberChanged -> _formState.update { it.copy(accountNumber = event.value) }
+            is ArtistSubmissionEvent.AccountHolderNameChanged -> _formState.update { it.copy(accountHolderName = event.value) }
+            
+            is ArtistSubmissionEvent.KycFileSelected -> _formState.update { it.copy(kycFileBytes = event.uri) }
+            is ArtistSubmissionEvent.Submit -> submitRegistration()
+            is ArtistSubmissionEvent.DismissError -> _uiState.value = ArtistSubmissionUiState.Idle
+            ArtistSubmissionEvent.OnBack -> Unit
+        }
+    }
+
+    private fun submitRegistration() {
+        val form = _formState.value
+
+        if (form.kycFileBytes == null) {
+            _uiState.value = ArtistSubmissionUiState.Error("Input KYC file!")
+            return
+        }
+
+        if (form.fullName.isBlank() || form.phoneNumber.isBlank()) {
+            _uiState.value = ArtistSubmissionUiState.Error("Please fill in required personal details (Full Name, Phone)!")
+            return
+        }
+
+        if (form.bankCode.isBlank() || form.bankName.isBlank() ||
+            form.accountNumber.isBlank() || form.accountHolderName.isBlank()
+        ) {
+            _uiState.value = ArtistSubmissionUiState.Error("Please fill in all bank account details!")
+            return
+        }
+
+        _uiState.value = ArtistSubmissionUiState.Loading
+
+        viewModelScope.launch {
+            val address = Address(
+                country = form.country.ifBlank { "ID" },
+                city = form.city,
+                streetLine1 = form.streetLine1,
+                streetLine2 = form.streetLine2.takeIf { it.isNotBlank() },
+                district = form.district,
+                subDistrict = form.subDistrict,
+                provinceState = form.province,
+                postalCode = form.postalCode
+            )
+
+            val bankAccount = BankAccount(
+                bankCode = form.bankCode,
+                bankName = form.bankName,
+                accountNumber = form.accountNumber,
+                accountHolderName = form.accountHolderName
+            )
+
+            val requestInput = ArtistApplicationInput(
+                fullName = form.fullName,
+                displayName = form.displayName.takeIf { it.isNotBlank() },
+                bio = form.bio.takeIf { it.isNotBlank() },
+                phoneNumber = form.phoneNumber,
+                nationality = form.nationality.takeIf { it.isNotBlank() },
+                placeOfBirth = form.placeOfBirth.takeIf { it.isNotBlank() },
+                dateOfBirth = form.dateOfBirth.takeIf { it.isNotBlank() },
+                gender = form.gender,
+                website = form.website.takeIf { it.isNotBlank() },
+                country = form.country.takeIf { it.isNotBlank() },
+                address = address,
+                bankAccount = bankAccount,
+                kycDocuments = listOf(
+                    KYCDocument(
+                        type = form.kycFileType,
+                        country = form.country.ifBlank { "ID" },
+                        fileId = "" // Filled in data layer
+                    )
+                )
+            )
+
+            val result = becomeArtistUseCase(
+                input = requestInput,
+                kycFile = form.kycFileBytes,
+                fileName = form.kycFileName
+            )
+
+            when (result) {
+                is DataResult.Success -> {
+                    _uiState.value = ArtistSubmissionUiState.Success(result.data)
+                }
+                is DataResult.Error -> {
+                    _uiState.value = ArtistSubmissionUiState.Error(result.error)
+                }
+                else -> Unit
+            }
+        }
+    }
+}
