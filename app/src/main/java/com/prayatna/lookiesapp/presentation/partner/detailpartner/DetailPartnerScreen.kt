@@ -139,6 +139,7 @@ fun DetailPartnerScreen(
                                     viewModel.approvePartner(data.id)
                                 } else {
                                     viewModel.rejectPartner(data.id)
+                                    viewModel.rejectPartner(data.id)
                                 }
                             }
                         },

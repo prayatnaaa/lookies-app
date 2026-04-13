@@ -33,7 +33,7 @@ fun ArtistSubmissionRoute(
                 }
 
                 ArtistSubmissionEffect.NavigateToSuccess -> {
-                    navController.navigate("success_screen")
+                    navController.popBackStack()
                 }
             }
         }

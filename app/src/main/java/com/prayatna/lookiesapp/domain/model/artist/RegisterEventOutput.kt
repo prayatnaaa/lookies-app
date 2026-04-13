@@ -5,7 +5,11 @@ data class RegisterEventOutput(
     val message: String,
     val eventId: String? = "",
     val totalPaintings: String? = "",
-    val totalAmount: Int? = null,
-    val participantId: String? = "",
-    val orderId: String? = ""
+    val data: SuccessRegisterEventOutput? = null
+)
+
+data class SuccessRegisterEventOutput(
+    val participantId: String,
+    val totalAmount: Int,
+    val orderId: String
 )

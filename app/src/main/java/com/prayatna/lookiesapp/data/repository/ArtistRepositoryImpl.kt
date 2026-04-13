@@ -34,6 +34,8 @@ class ArtistRepositoryImpl @Inject constructor(
                 paintingIds = paintingIds
             )
 
+            Log.e("RegisterEvent", "registerEvent: $response")
+
             if (response.status == "error") {
                 return DataResult.Error(response.message)
             }

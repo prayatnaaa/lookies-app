@@ -55,7 +55,7 @@ fun RegisterEventScreen(
                 message = "$message. Proceed to checkout to complete payment.",
                 onConfirm = {
                     navController.navigate(
-                        "${NavigationRoutes.CHECKOUT}/event_registration/${state.data?.orderId}/1"
+                        "${NavigationRoutes.CHECKOUT}/event_registration/${state.data?.data?.orderId}/1"
                     )
                 },
                 onDismiss = {

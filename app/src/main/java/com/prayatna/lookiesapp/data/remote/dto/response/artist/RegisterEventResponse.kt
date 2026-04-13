@@ -11,10 +11,15 @@ data class RegisterEventResponse(
     val eventId: String? = "",
     @SerialName("total_paintings")
     val totalPaintings: String? = "",
-    @SerialName("total_amount")
-    val totalAmount: Int? = null,
+    val data: SuccessRegisterEventResponse? = null
+)
+
+@Serializable
+data class SuccessRegisterEventResponse(
     @SerialName("participant_id")
-    val participantId: String? = "",
+    val participantId: String,
+    @SerialName("total_amount")
+    val totalAmount: Int,
     @SerialName("order_id")
-    val orderId: String? = ""
+    val orderId: String
 )

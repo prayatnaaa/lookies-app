@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.checkout
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
@@ -297,6 +298,7 @@ class CheckoutViewModel @Inject constructor(
             }
 
             is DataResult.Error -> {
+                Log.e("CheckoutViewModel", "handleEventRegistrationFetch: ${result.error}")
                 _uiState.update { it.copy(isLoading = false) }
                 emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
             }
