@@ -13,7 +13,7 @@ data class ArtistApplicationInput(
     val country: String?,
     val address: Address?,
     val bankAccount: BankAccount,
-    val kycDocuments: List<KYCDocument>?
+    val kycDocuments: List<KycDocument>?
 )
 
 data class Address(
@@ -25,12 +25,6 @@ data class Address(
     val subDistrict: String,
     val provinceState: String,
     val postalCode: String
-)
-
-data class KYCDocument(
-    val type: String,
-    val country: String,
-    val fileId: String
 )
 
 enum class Gender {

@@ -22,5 +22,5 @@ data class CreateOrderRpcParams(
     @SerialName("p_province")
     val province: String,
     @SerialName("p_postal_code")
-    val postalCode: Int,
+    val postalCode: String,
 )

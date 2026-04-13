@@ -1,24 +1,25 @@
 package com.prayatna.lookiesapp.presentation.checkout
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
-import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
-import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.domain.usecase.event.GetEventByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.CreateOrderUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetShipmentFeeUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.GetUserAddressesUseCase
+import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutEffect
+import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutEvent
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutItemDisplay
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutUiState
-import com.prayatna.lookiesapp.presentation.checkout.state.PaymentMethodUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,7 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
-   private val createOrderUseCase: CreateOrderUseCase,
+    private val createOrderUseCase: CreateOrderUseCase,
     private val getEventByIdUseCase: GetEventByIdUseCase,
     private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
     private val getDetailTransactionUseCase: GetDetailTransactionUseCase,
@@ -37,49 +38,208 @@ class CheckoutViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CheckoutUiState())
     val uiState: StateFlow<CheckoutUiState> = _uiState.asStateFlow()
 
-    fun getDetailItem(type: String, id: String) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+    private val _effect = MutableSharedFlow<CheckoutEffect>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
+    val effect = _effect.asSharedFlow()
 
-            when (type) {
-                "event_ticket" -> {
-                    handleEventFetch(id)
+    // ========================
+    // SINGLE ENTRY POINT
+    // ========================
+    fun onEvent(event: CheckoutEvent) {
+        when (event) {
+
+            is CheckoutEvent.OnLoad -> {
+                _uiState.update {
+                    it.copy(
+                        type = event.type,
+                        itemId = event.itemId,
+                        quantity = event.quantity
+                    )
                 }
-                "painting" -> {
-                    handlePaintingFetch(id)
-                    fetchShipmentFees()
-                    fetchUserAddresses()
-                }
-                "event_registration" -> {
-                    handleEventRegistrationFetch(id)
-                }
-                else -> {
-                    _uiState.update {
-                        it.copy(isLoading = false, errorMessage = "Invalid item type!")
-                    }
-                }
+                loadData()
+            }
+
+            CheckoutEvent.OnRefresh -> loadData()
+
+            CheckoutEvent.OnBackClick -> {
+                emitEffect(CheckoutEffect.NavigateBack)
+            }
+
+            CheckoutEvent.OnAddAddressClick -> {
+                emitEffect(CheckoutEffect.NavigateToAddAddress)
+            }
+
+            CheckoutEvent.OnPayClick -> handlePayClick()
+
+            is CheckoutEvent.OnPaymentMethodSelected -> {
+                _uiState.update { it.copy(selectedMethod = event.method) }
+            }
+
+            is CheckoutEvent.OnShipmentFeeSelected -> {
+                _uiState.update { it.copy(selectedShipmentFee = event.fee) }
+            }
+
+            is CheckoutEvent.OnAddressSelected -> {
+                _uiState.update { it.copy(selectedAddress = event.address) }
             }
         }
     }
 
+    // ========================
+    // LOAD DATA
+    // ========================
+    private fun loadData() {
+        val state = _uiState.value
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
+            when (state.type) {
+                "event_ticket" -> handleEventFetch(state.itemId)
+
+                "painting" -> {
+                    handlePaintingFetch(state.itemId)
+                    fetchShipmentFees()
+                    fetchUserAddresses()
+                }
+
+                "event_registration" -> {
+                    handleEventRegistrationFetch(state.itemId)
+                }
+
+                else -> emitEffect(CheckoutEffect.ShowErrorDialog("Invalid type"))
+            }
+        }
+    }
+
+    // ========================
+    // PAY LOGIC
+    // ========================
+    private fun handlePayClick() {
+        val state = _uiState.value
+        val item = state.itemToBuy ?: run {
+            emitEffect(CheckoutEffect.ShowErrorDialog("Item not found"))
+            return
+        }
+
+        if (state.type == "event_registration") {
+            val orderId = state.existingOrderId ?: return
+            navigateToPayment(orderId)
+            return
+        }
+
+        val orderItem = OrderItemInput(
+            itemType = item.type,
+            itemRefId = item.id,
+            quantity = state.quantity
+        )
+
+        createCheckout( items = listOf(orderItem))
+    }
+
+    // ========================
+    // CREATE ORDER
+    // ========================
+    private fun createCheckout(items: List<OrderItemInput>) {
+        viewModelScope.launch {
+            val state = _uiState.value
+            val item = state.itemToBuy ?: return@launch
+
+            val shippingCost =
+                if (item.type == "painting")
+                    state.selectedShipmentFee?.fee?.toDouble() ?: 0.0
+                else 0.0
+
+            if (item.type == "painting" && state.selectedAddress == null) {
+                emitEffect(CheckoutEffect.ShowSnackbar("Select address"))
+                return@launch
+            }
+
+            _uiState.update { it.copy(isLoading = true) }
+
+            when (val result = createOrderUseCase(
+                items = items,
+                shippingCost = shippingCost,
+                recipientName = state.selectedAddress?.name ?: "",
+                phoneNumber = state.selectedAddress?.phoneNumber ?: "",
+                addressLine = state.selectedAddress?.addressLine ?: "",
+                province = state.selectedAddress?.province ?: "",
+                postalCode = state.selectedAddress?.postalCode ?: "",
+            )) {
+
+                is DataResult.Success -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    handleCheckoutSuccess(
+                        orderId = result.data,
+                        type = item.type,
+                        quantity = state.quantity
+                    )
+                }
+
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
+                }
+
+                else -> _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    // ========================
+    // NAVIGATION
+    // ========================
+    private fun navigateToPayment(orderId: String) {
+        val state = _uiState.value
+        val item = state.itemToBuy ?: return
+
+        val shippingCost =
+            if (state.type == "painting")
+                state.selectedShipmentFee?.fee?.toDouble() ?: 0.0
+            else 0.0
+
+        val total =
+            (item.price?.times(state.quantity)?.plus(shippingCost))?.toLong() ?: 0L
+
+        emitEffect(
+            CheckoutEffect.NavigateToQrisPayment(
+                orderId = orderId,
+                merchantId = item.merchantId,
+                amount = total
+            )
+        )
+    }
+
+    // ========================
+    // NETWORK HANDLERS
+    // ========================
     private suspend fun handleEventFetch(id: String) {
         when (val result = getEventByIdUseCase(id)) {
             is DataResult.Success -> {
                 val event = result.data
-                val itemDisplay = CheckoutItemDisplay(
-                    id = event.id,
-                    title = event.title,
-                    subtitle = "by ${event.organizer.legalName}",
-                    price = event.ticketPrice,
-                    imageUrl = event.bannerImageUrl,
-                    type = "event_ticket",
-                    merchantId = event.organizer.id
-                )
-                _uiState.update { it.copy(isLoading = false, itemToBuy = itemDisplay) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        itemToBuy = CheckoutItemDisplay(
+                            id = event.id,
+                            title = event.title,
+                            subtitle = "by ${event.organizer.legalName}",
+                            price = event.ticketPrice,
+                            imageUrl = event.bannerImageUrl,
+                            type = "event_ticket",
+                            merchantId = event.organizer.id
+                        )
+                    )
+                }
             }
+
             is DataResult.Error -> {
-                _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+                _uiState.update { it.copy(isLoading = false) }
+                emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
             }
+
             else -> Unit
         }
     }
@@ -88,20 +248,27 @@ class CheckoutViewModel @Inject constructor(
         when (val result = getEventPaintingByIdUseCase(id)) {
             is DataResult.Success -> {
                 val data = result.data
-                val itemDisplay = CheckoutItemDisplay(
-                    id = data.id,
-                    title = data.painting.title,
-                    subtitle = "by ${data.participant.artist.fullName}",
-                    price = data.finalPrice,
-                    imageUrl = data.painting.paintingUrl,
-                    type = "painting",
-                    merchantId = data.participant.event.organizer.id
-                )
-                _uiState.update { it.copy(isLoading = false, itemToBuy = itemDisplay) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        itemToBuy = CheckoutItemDisplay(
+                            id = data.id,
+                            title = data.painting.title,
+                            subtitle = "by ${data.participant.artist.fullName}",
+                            price = data.finalPrice,
+                            imageUrl = data.painting.paintingUrl,
+                            type = "painting",
+                            merchantId = data.participant.event.organizer.id
+                        )
+                    )
+                }
             }
+
             is DataResult.Error -> {
-                _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+                _uiState.update { it.copy(isLoading = false) }
+                emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
             }
+
             else -> Unit
         }
     }
@@ -111,32 +278,36 @@ class CheckoutViewModel @Inject constructor(
             is DataResult.Success -> {
                 val transaction = result.data.transaction
                 val firstItem = transaction.items.firstOrNull()
-                val itemDisplay = CheckoutItemDisplay(
-                    id = transaction.id,
-                    title = firstItem?.details?.title ?: "Event Registration",
-                    subtitle = "Registration Fee",
-                    price = transaction.totalAmount,
-                    imageUrl = firstItem?.details?.imageUrl ?: "",
-                    type = "event_registration",
-                    merchantId = transaction.merchantId
-                )
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        itemToBuy = itemDisplay,
-                        existingOrderId = orderId
+                        existingOrderId = orderId,
+                        itemToBuy = CheckoutItemDisplay(
+                            id = transaction.id,
+                            title = firstItem?.details?.title ?: "Event Registration",
+                            subtitle = "Registration Fee",
+                            price = transaction.totalAmount,
+                            imageUrl = firstItem?.details?.imageUrl ?: "",
+                            type = "event_registration",
+                            merchantId = transaction.merchantId
+                        )
                     )
                 }
             }
+
             is DataResult.Error -> {
-                _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+                _uiState.update { it.copy(isLoading = false) }
+                emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
             }
+
             else -> Unit
         }
     }
 
     private suspend fun fetchShipmentFees() {
         _uiState.update { it.copy(isShipmentLoading = true) }
+
         when (val result = getShipmentFeeUseCase()) {
             is DataResult.Success -> {
                 val fees = result.data
@@ -148,123 +319,70 @@ class CheckoutViewModel @Inject constructor(
                     )
                 }
             }
+
             is DataResult.Error -> {
-                _uiState.update {
-                    it.copy(isShipmentLoading = false, errorMessage = result.error)
-                }
+                _uiState.update { it.copy(isShipmentLoading = false) }
+                emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
             }
+
             else -> Unit
         }
     }
 
     private suspend fun fetchUserAddresses() {
         _uiState.update { it.copy(isAddressLoading = true) }
+
         when (val result = getUserAddressesUseCase()) {
             is DataResult.Success -> {
                 val addresses = result.data
-                _uiState.update {
-                    it.copy(
+                _uiState.update { checkoutUiState ->
+                    checkoutUiState.copy(
                         isAddressLoading = false,
                         userAddresses = addresses,
-                        selectedAddress = addresses.firstOrNull { address -> address.isDefault }
+                        selectedAddress = addresses.firstOrNull { it.isDefault }
                             ?: addresses.firstOrNull()
                     )
                 }
             }
+
             is DataResult.Error -> {
-                _uiState.update {
-                    it.copy(isAddressLoading = false, errorMessage = result.error)
-                }
+                _uiState.update { it.copy(isAddressLoading = false) }
+                emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
             }
+
             else -> Unit
         }
     }
 
-    fun refreshUserAddresses() {
+    private fun handleCheckoutSuccess(orderId: String, type: String, quantity: Int) {
         viewModelScope.launch {
-            fetchUserAddresses()
+            val state = _uiState.value
+            val item = state.itemToBuy ?: return@launch
+
+            val shippingCost = if (type == "painting") {
+                state.selectedShipmentFee?.fee?.toDouble() ?: 0.0
+            } else 0.0
+
+            val totalAmount =
+                (item.price?.times(quantity)?.plus(shippingCost))?.toLong() ?: 0L
+
+            emitEffect(CheckoutEffect.ShowSuccessDialog)
+
+            delay(1000)
+
+            emitEffect(
+                CheckoutEffect.NavigateToQrisPayment(
+                    orderId = orderId,
+                    merchantId = item.merchantId,
+                    amount = totalAmount
+                )
+            )
         }
     }
 
-    fun onShipmentFeeSelected(fee: ShipmentFee) {
-        _uiState.update {
-            it.copy(selectedShipmentFee = fee)
-        }
-    }
-
-    fun onAddressSelected(address: UserAddress) {
-        _uiState.update {
-            it.copy(selectedAddress = address)
-        }
-    }
-
-    fun onPaymentMethodSelected(method: PaymentMethodUiState) {
-        _uiState.update {
-            it.copy(selectedMethod = method)
-        }
-    }
-
-    fun createCheckout(
-        items: List<OrderItemInput>
-    ) {
+    private fun emitEffect(effect: CheckoutEffect) {
         viewModelScope.launch {
-            val currentItem = _uiState.value.itemToBuy
-            Log.d("CheckoutViewModel", "createCheckout: $currentItem")
-            if (currentItem == null) {
-                _uiState.update { it.copy(errorMessage = "No item yet!") }
-                return@launch
-            }
-
-            val shippingCost = if (currentItem.type == "painting") {
-                _uiState.value.selectedShipmentFee?.fee?.toDouble() ?: 0.0
-            } else {
-                0.0
-            }
-
-            val selectedAddress = _uiState.value.selectedAddress
-            if (currentItem.type == "painting" && selectedAddress == null) {
-                _uiState.update { it.copy(errorMessage = "Please select a shipping address") }
-                return@launch
-            }
-
-            _uiState.update { it.copy(isLoading = true, errorMessage = null, checkoutSuccessData = null) }
-
-            val result = createOrderUseCase(
-                items = items,
-                shippingCost = shippingCost,
-                recipientName = selectedAddress?.name ?: "",
-                phoneNumber = selectedAddress?.phoneNumber?: "",
-                addressLine = selectedAddress?.addressLine ?: "",
-                province = selectedAddress?.province ?: "",
-                postalCode = selectedAddress?.postalCode ?: "",
-            )
-
-            _uiState.update { currentState ->
-                when (result) {
-                    is DataResult.Success -> {
-                        currentState.copy(
-                            isLoading = false,
-                            checkoutSuccessData = result.data
-                        )
-                    }
-                    is DataResult.Error -> {
-                        currentState.copy(
-                            isLoading = false,
-                            errorMessage = result.error
-                        )
-                    }
-                    else -> currentState.copy(isLoading = false)
-                }
-            }
-        }
-    }
-
-    fun onCheckoutResultConsumed() {
-        _uiState.update {
-            it.copy(
-                errorMessage = null,
-                checkoutSuccessData = null
-            )
+            _effect.emit(effect)
         }
     }
 }

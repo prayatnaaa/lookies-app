@@ -5,15 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.user.Address
 import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.BankAccount
-import com.prayatna.lookiesapp.domain.model.user.KYCDocument
+import com.prayatna.lookiesapp.domain.model.user.KycDocument
 import com.prayatna.lookiesapp.domain.usecase.user.BecomeArtistUseCase
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionFormState
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,36 +32,20 @@ class ArtistSubmissionViewModel @Inject constructor(
     private val _formState = MutableStateFlow(ArtistSubmissionFormState())
     val formState: StateFlow<ArtistSubmissionFormState> = _formState.asStateFlow()
 
+    private val _effect = MutableSharedFlow<ArtistSubmissionEffect>()
+    val effect = _effect.asSharedFlow()
+
     fun onEvent(event: ArtistSubmissionEvent) {
         when (event) {
-            is ArtistSubmissionEvent.FullNameChanged -> _formState.update { it.copy(fullName = event.value) }
-            is ArtistSubmissionEvent.DisplayNameChanged -> _formState.update { it.copy(displayName = event.value) }
-            is ArtistSubmissionEvent.BioChanged -> _formState.update { it.copy(bio = event.value) }
-            is ArtistSubmissionEvent.PhoneNumberChanged -> _formState.update { it.copy(phoneNumber = event.value) }
-            is ArtistSubmissionEvent.NationalityChanged -> _formState.update { it.copy(nationality = event.value) }
-            is ArtistSubmissionEvent.PlaceOfBirthChanged -> _formState.update { it.copy(placeOfBirth = event.value) }
-            is ArtistSubmissionEvent.DateOfBirthChanged -> _formState.update { it.copy(dateOfBirth = event.value) }
-            is ArtistSubmissionEvent.GenderChanged -> _formState.update { it.copy(gender = event.value) }
-            is ArtistSubmissionEvent.WebsiteChanged -> _formState.update { it.copy(website = event.value) }
-            is ArtistSubmissionEvent.CountryChanged -> _formState.update { it.copy(country = event.value) }
-            
-            is ArtistSubmissionEvent.AddressChanged -> _formState.update { it.copy(streetLine1 = event.value) }
-            is ArtistSubmissionEvent.AddressLine2Changed -> _formState.update { it.copy(streetLine2 = event.value) }
-            is ArtistSubmissionEvent.CityChanged -> _formState.update { it.copy(city = event.value) }
-            is ArtistSubmissionEvent.ProvinceChanged -> _formState.update { it.copy(province = event.value) }
-            is ArtistSubmissionEvent.DistrictChanged -> _formState.update { it.copy(district = event.value) }
-            is ArtistSubmissionEvent.SubDistrictChanged -> _formState.update { it.copy(subDistrict = event.value) }
-            is ArtistSubmissionEvent.PostalCodeChanged -> _formState.update { it.copy(postalCode = event.value) }
-            
-            is ArtistSubmissionEvent.BankCodeChanged -> _formState.update { it.copy(bankCode = event.value) }
-            is ArtistSubmissionEvent.BankNameChanged -> _formState.update { it.copy(bankName = event.value) }
-            is ArtistSubmissionEvent.AccountNumberChanged -> _formState.update { it.copy(accountNumber = event.value) }
-            is ArtistSubmissionEvent.AccountHolderNameChanged -> _formState.update { it.copy(accountHolderName = event.value) }
-            
-            is ArtistSubmissionEvent.KycFileSelected -> _formState.update { it.copy(kycFileBytes = event.uri) }
+            is ArtistSubmissionEvent.OnBack -> {
+                viewModelScope.launch {
+                    _effect.emit(ArtistSubmissionEffect.NavigateBack)
+                }
+            }
+
             is ArtistSubmissionEvent.Submit -> submitRegistration()
-            is ArtistSubmissionEvent.DismissError -> _uiState.value = ArtistSubmissionUiState.Idle
-            ArtistSubmissionEvent.OnBack -> Unit
+
+            else -> updateForm(event)
         }
     }
 
@@ -118,7 +104,7 @@ class ArtistSubmissionViewModel @Inject constructor(
                 address = address,
                 bankAccount = bankAccount,
                 kycDocuments = listOf(
-                    KYCDocument(
+                    KycDocument(
                         type = form.kycFileType,
                         country = form.country.ifBlank { "ID" },
                         fileId = "" // Filled in data layer
@@ -135,11 +121,53 @@ class ArtistSubmissionViewModel @Inject constructor(
             when (result) {
                 is DataResult.Success -> {
                     _uiState.value = ArtistSubmissionUiState.Success(result.data)
+                    emitEffect(ArtistSubmissionEffect.NavigateToSuccess)
                 }
                 is DataResult.Error -> {
                     _uiState.value = ArtistSubmissionUiState.Error(result.error)
+                    emitEffect(ArtistSubmissionEffect.ShowSnackbar(result.error))
                 }
                 else -> Unit
+            }
+        }
+    }
+
+    private fun emitEffect(effect: ArtistSubmissionEffect) {
+        viewModelScope.launch {
+            _effect.emit(effect)
+        }
+    }
+
+    private fun updateForm(event: ArtistSubmissionEvent) {
+        _formState.update {
+            when (event) {
+                is ArtistSubmissionEvent.FullNameChanged -> it.copy(fullName = event.value)
+                is ArtistSubmissionEvent.DisplayNameChanged -> it.copy(displayName = event.value)
+                is ArtistSubmissionEvent.BioChanged -> it.copy(bio = event.value)
+                is ArtistSubmissionEvent.PhoneNumberChanged -> it.copy(phoneNumber = event.value)
+                is ArtistSubmissionEvent.NationalityChanged -> it.copy(nationality = event.value)
+                is ArtistSubmissionEvent.PlaceOfBirthChanged -> it.copy(placeOfBirth = event.value)
+                is ArtistSubmissionEvent.DateOfBirthChanged -> it.copy(dateOfBirth = event.value)
+                is ArtistSubmissionEvent.GenderChanged -> it.copy(gender = event.value)
+                is ArtistSubmissionEvent.WebsiteChanged -> it.copy(website = event.value)
+                is ArtistSubmissionEvent.CountryChanged -> it.copy(country = event.value)
+
+                is ArtistSubmissionEvent.AddressChanged -> it.copy(streetLine1 = event.value)
+                is ArtistSubmissionEvent.AddressLine2Changed -> it.copy(streetLine2 = event.value)
+                is ArtistSubmissionEvent.CityChanged -> it.copy(city = event.value)
+                is ArtistSubmissionEvent.ProvinceChanged -> it.copy(province = event.value)
+                is ArtistSubmissionEvent.DistrictChanged -> it.copy(district = event.value)
+                is ArtistSubmissionEvent.SubDistrictChanged -> it.copy(subDistrict = event.value)
+                is ArtistSubmissionEvent.PostalCodeChanged -> it.copy(postalCode = event.value)
+
+                is ArtistSubmissionEvent.BankCodeChanged -> it.copy(bankCode = event.value)
+                is ArtistSubmissionEvent.BankNameChanged -> it.copy(bankName = event.value)
+                is ArtistSubmissionEvent.AccountNumberChanged -> it.copy(accountNumber = event.value)
+                is ArtistSubmissionEvent.AccountHolderNameChanged -> it.copy(accountHolderName = event.value)
+
+                is ArtistSubmissionEvent.KycFileSelected -> it.copy(kycFileBytes = event.uri)
+
+                else -> it
             }
         }
     }

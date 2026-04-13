@@ -1,11 +1,6 @@
 package com.prayatna.lookiesapp.presentation.components.checkout
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,16 +27,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,359 +48,219 @@ import com.prayatna.lookiesapp.utils.formatRupiah
 fun CheckoutContent(
     type: String,
     uiState: CheckoutUiState,
-    onBackClick: () -> Unit,
     quantity: Int,
+    onBackClick: () -> Unit,
     onPayClick: () -> Unit,
     onRefresh: () -> Unit,
-    onShipmentFeeSelected: (ShipmentFee) -> Unit = {},
-    onAddressSelected: (UserAddress) -> Unit = {},
-    onAddAddressClick: () -> Unit = {},
-    snackbarHost: @Composable () -> Unit = {},
-    children: @Composable () -> Unit = {}
+    onShipmentFeeSelected: (ShipmentFee) -> Unit,
+    onAddressSelected: (UserAddress) -> Unit,
+    onAddAddressClick: () -> Unit,
+    children: @Composable () -> Unit
 ) {
+
     val shippingCost = if (type == "painting") {
         uiState.selectedShipmentFee?.fee?.toDouble() ?: 0.0
-    } else {
-        0.0
-    }
+    } else 0.0
+
     val subtotal = (uiState.itemToBuy?.price ?: 0.0) * quantity
     val totalPrice = subtotal + shippingCost
 
     Scaffold(
-        snackbarHost = snackbarHost,
         topBar = {
             TopAppBar(
                 title = { Text("Checkout") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = null)
                     }
                 }
             )
         },
         bottomBar = {
-            if (uiState.itemToBuy != null) {
+            uiState.itemToBuy?.let {
                 CheckoutBottomBar(
                     totalPrice = totalPrice,
                     isLoading = uiState.isLoading,
-                    onPayClick = { onPayClick() }
+                    onPayClick = onPayClick
                 )
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.surface)
+                .padding(padding)
         ) {
+
+            // LOADING
             if (uiState.isLoading && uiState.itemToBuy == null) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+                return@Box
             }
-            else if (uiState.errorMessage != null && uiState.itemToBuy == null) {
+
+            // EMPTY / FAILED LOAD
+            if (uiState.itemToBuy == null) {
                 Column(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text("Failed to load item")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = onRefresh) { Text("Try again") }
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = onRefresh) {
+                        Text("Try again")
+                    }
+                }
+                return@Box
+            }
+
+            // CONTENT
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+
+                CheckoutItemCard(
+                    title = uiState.itemToBuy.title,
+                    imageUrl = uiState.itemToBuy.imageUrl,
+                    price = uiState.itemToBuy.price ?: 0.0,
+                    subtitle = uiState.itemToBuy.subtitle,
+                    quantity = quantity,
+                    onQuantityChange = null
+                )
+
+                HorizontalDivider()
+
+                // ADDRESS
+                AnimatedVisibility(visible = type == "painting") {
+                    AddressSection(
+                        uiState = uiState,
+                        onAddressSelected = onAddressSelected,
+                        onAddAddressClick = onAddAddressClick
+                    )
+                }
+
+                // SHIPPING
+                AnimatedVisibility(visible = type == "painting") {
+                    ShippingSection(
+                        uiState = uiState,
+                        onShipmentFeeSelected = onShipmentFeeSelected
+                    )
+                }
+
+                // SUMMARY
+                PaymentSummaryRow("Subtotal", subtotal)
+
+                if (type == "painting" && uiState.selectedShipmentFee != null) {
+                    PaymentSummaryRow(
+                        "Shipping",
+                        uiState.selectedShipmentFee.fee.toDouble()
+                    )
+                }
+
+                HorizontalDivider()
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Total")
+                    Text(formatRupiah(totalPrice))
+                }
+
+                children()
+            }
+        }
+    }
+}
+
+@Composable
+fun AddressSection(
+    uiState: CheckoutUiState,
+    onAddressSelected: (UserAddress) -> Unit,
+    onAddAddressClick: () -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        Text("Shipping Address", style = MaterialTheme.typography.titleMedium)
+
+        if (uiState.isAddressLoading) {
+            CircularProgressIndicator()
+        } else if (uiState.userAddresses.isEmpty()) {
+
+            Text("No address found")
+
+            OutlinedButton(onClick = onAddAddressClick) {
+                Text("+ Add Address")
+            }
+
+        } else {
+
+            uiState.userAddresses.forEach { address ->
+                val selected = uiState.selectedAddress?.id == address.id
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onAddressSelected(address) }
+                        .padding(12.dp)
+                        .border(
+                            width = if (selected) 2.dp else 1.dp,
+                            color = if (selected) MaterialTheme.colorScheme.primary else Color.Gray,
+                            shape = RoundedCornerShape(12.dp)
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(selected = selected, onClick = null)
+
+                    Spacer(Modifier.width(8.dp))
+
+                    Column {
+                        Text(address.name)
+                        Text(address.phoneNumber)
+                        Text(address.addressLine)
+                    }
                 }
             }
-            else if (uiState.itemToBuy != null) {
-                Column(
+        }
+    }
+}
+
+@Composable
+fun ShippingSection(
+    uiState: CheckoutUiState,
+    onShipmentFeeSelected: (ShipmentFee) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        Text("Shipping", style = MaterialTheme.typography.titleMedium)
+
+        if (uiState.isShipmentLoading) {
+            CircularProgressIndicator()
+        } else {
+            uiState.shipmentFees.forEach { fee ->
+                val selected = uiState.selectedShipmentFee?.id == fee.id
+
+                Row(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .fillMaxWidth()
+                        .clickable { onShipmentFeeSelected(fee) }
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = when (type) {
-                            "event_registration" -> "Registration Details"
-                            "event_ticket" -> "Event Ticket"
-                            else -> "Purchased Item"
-                        },
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                    RadioButton(
+                        selected = selected,
+                        onClick = { onShipmentFeeSelected(fee) }
                     )
 
-                    CheckoutItemCard(
-                        title = uiState.itemToBuy.title,
-                        imageUrl = uiState.itemToBuy.imageUrl,
-                        price = uiState.itemToBuy.price ?: 0.0,
-                        subtitle = uiState.itemToBuy.subtitle,
-                        quantity = quantity,
-                        onQuantityChange = null
-                    )
+                    Spacer(Modifier.width(8.dp))
 
-                    HorizontalDivider()
+                    Text(fee.region, modifier = Modifier.weight(1f))
 
-                    // Address section for paintings
-                    AnimatedVisibility(
-                        visible = type == "painting",
-                        enter = fadeIn() + expandVertically(),
-                        exit = fadeOut() + shrinkVertically()
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.LocalShipping,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Text(
-                                    text = "Shipping Address",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-
-                            if (uiState.isAddressLoading) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Loading addresses...",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            } else if (uiState.userAddresses.isEmpty()) {
-                                Text(
-                                    text = "No saved addresses found. Please add an address first.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                                OutlinedButton(
-                                    onClick = onAddAddressClick,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = MaterialTheme.shapes.medium,
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                                ) {
-                                    Text("+ Add New Address")
-                                }
-                            } else {
-                                uiState.userAddresses.forEach { address ->
-                                    val isSelected = uiState.selectedAddress?.id == address.id
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .border(
-                                                width = if (isSelected) 2.dp else 1.dp,
-                                                color = if (isSelected) MaterialTheme.colorScheme.primary
-                                                else MaterialTheme.colorScheme.outlineVariant,
-                                                shape = RoundedCornerShape(12.dp)
-                                            )
-                                            .background(
-                                                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
-                                                else Color.Transparent
-                                            )
-                                            .clickable { onAddressSelected(address) }
-                                            .padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        RadioButton(
-                                            selected = isSelected,
-                                            onClick = null,
-                                            colors = RadioButtonDefaults.colors(
-                                                selectedColor = MaterialTheme.colorScheme.primary
-                                            )
-                                        )
-
-                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = address.name,
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                            Text(
-                                                text = address.phoneNumber,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                            Text(
-                                                text = "${address.addressLine}, ${address.city}, ${address.province} ${address.postalCode}",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            OutlinedButton(
-                                onClick = onAddAddressClick,
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = MaterialTheme.shapes.medium,
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                            ) {
-                                Text("+ Add New Address")
-                            }
-
-                            HorizontalDivider()
-                        }
-                    }
-
-                    AnimatedVisibility(
-                        visible = type == "painting",
-                        enter = fadeIn() + expandVertically(),
-                        exit = fadeOut() + shrinkVertically()
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.LocalShipping,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Text(
-                                    text = "Shipping",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-
-                            if (uiState.isShipmentLoading) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Loading shipping options...",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            } else {
-                                uiState.shipmentFees.forEach { fee ->
-                                    val isSelected = uiState.selectedShipmentFee?.id == fee.id
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .border(
-                                                width = if (isSelected) 2.dp else 1.dp,
-                                                color = if (isSelected) MaterialTheme.colorScheme.primary
-                                                else MaterialTheme.colorScheme.outlineVariant,
-                                                shape = RoundedCornerShape(12.dp)
-                                            )
-                                            .background(
-                                                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
-                                                else Color.Transparent
-                                            )
-                                            .clickable { onShipmentFeeSelected(fee) }
-                                            .padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        RadioButton(
-                                            selected = isSelected,
-                                            onClick = { onShipmentFeeSelected(fee) },
-                                            colors = RadioButtonDefaults.colors(
-                                                selectedColor = MaterialTheme.colorScheme.primary
-                                            )
-                                        )
-
-                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = fee.region,
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                        }
-
-                                        Text(
-                                            text = formatRupiah(fee.fee.toDouble()),
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-                                }
-                            }
-
-                            HorizontalDivider()
-                        }
-                    }
-
-                    Text(
-                        text = "Payments Summary",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    PaymentSummaryRow(
-                        label = when (type) {
-                            "event_registration" -> "Registration Fee"
-                            "event_ticket" -> "Ticket Price"
-                            else -> "Unit price"
-                        },
-                        amount = uiState.itemToBuy.price ?: 0.0
-                    )
-
-                    if (quantity > 1) {
-                        PaymentSummaryRow(
-                            label = "Quantity",
-                            amount = subtotal,
-                            detail = "x$quantity"
-                        )
-                    }
-
-                    if (type == "painting" && uiState.selectedShipmentFee != null) {
-                        PaymentSummaryRow(
-                            label = "Shipping (${uiState.selectedShipmentFee.region})",
-                            amount = uiState.selectedShipmentFee.fee.toDouble()
-                        )
-                    }
-
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Total",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = formatRupiah(totalPrice),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    children()
+                    Text(formatRupiah(fee.fee.toDouble()))
                 }
             }
         }
@@ -418,27 +270,14 @@ fun CheckoutContent(
 @Composable
 fun PaymentSummaryRow(
     label: String,
-    amount: Double,
-    detail: String? = null
+    amount: Double
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row {
-            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-            if (detail != null) {
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = detail,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray.copy(alpha = 0.7f)
-                )
-            }
-        }
-        Text(text = formatRupiah(amount), style = MaterialTheme.typography.bodyMedium)
+        Text(label)
+        Text(formatRupiah(amount))
     }
 }
 

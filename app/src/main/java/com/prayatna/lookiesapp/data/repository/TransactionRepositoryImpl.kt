@@ -52,6 +52,7 @@ class TransactionRepositoryImpl @Inject constructor(
             )
             DataResult.Success(response)
         } catch (e: RestException) {
+            Log.e("OrderService", e.error)
             DataResult.Error(e.error)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")

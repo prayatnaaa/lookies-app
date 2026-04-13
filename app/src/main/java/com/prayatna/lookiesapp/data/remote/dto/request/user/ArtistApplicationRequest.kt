@@ -42,7 +42,7 @@ data class ArtistApplicationRequest(
     val bankAccount: BankAccountDto,
 
     @SerialName("kyc_documents")
-    val kycDocuments: List<KYCDocumentDto>? = null
+    val kycDocuments: List<KycDocumentDto>? = null
 )
 
 @Serializable
@@ -55,13 +55,6 @@ data class AddressDto(
     @SerialName("sub_district") val subDistrict: String,
     @SerialName("province_state") val provinceState: String,
     @SerialName("postal_code") val postalCode: String
-)
-
-@Serializable
-data class KYCDocumentDto(
-    @SerialName("type") val type: String,
-    @SerialName("country") val country: String,
-    @SerialName("file_id") val fileId: String
 )
 
 @Serializable

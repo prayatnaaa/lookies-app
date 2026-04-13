@@ -9,7 +9,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionEvent
-import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionUiState
 
 @Composable
 fun ArtistSubmissionRoute(
@@ -22,11 +21,21 @@ fun ArtistSubmissionRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val formState by viewModel.formState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(uiState) {
-        if (uiState is ArtistSubmissionUiState.Error) {
-            val errorMessage = (uiState as ArtistSubmissionUiState.Error).message
-            snackbarHostState.showSnackbar(message = errorMessage)
-            viewModel.onEvent(ArtistSubmissionEvent.DismissError)
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is ArtistSubmissionEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
+
+                ArtistSubmissionEffect.NavigateBack -> {
+                    navController.popBackStack()
+                }
+
+                ArtistSubmissionEffect.NavigateToSuccess -> {
+                    navController.navigate("success_screen")
+                }
+            }
         }
     }
 
