@@ -19,6 +19,9 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentReque
 import com.prayatna.lookiesapp.domain.model.transaction.Shipment
 import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
+import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
+import com.prayatna.lookiesapp.domain.model.transaction.Refund
+import com.prayatna.lookiesapp.domain.model.transaction.SetRefundAsCompleteResult
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
@@ -154,6 +157,51 @@ class TransactionRepositoryImpl @Inject constructor(
     override suspend fun setOrderToComplete(request: SetOrderToCompleteInput): DataResult<SetOrderToCompleteResult> {
         return try {
             val result = transactionService.setOrderToComplete(request.toDto())
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun createRefundRequest(
+        request: CreateRefundRequestInput, 
+        proofImage: ByteArray?
+    ): DataResult<Refund> {
+        return try {
+            val result = transactionService.createRefundRequest(request.toDto(), proofImage)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getRefunds(): DataResult<List<Refund>> {
+        return try {
+            val result = transactionService.getRefunds()
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getRefundsByOrderId(orderId: String): DataResult<List<Refund>> {
+        return try {
+            val result = transactionService.getRefundsByOrderId(orderId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun setRefundAsComplete(refundRequestId: String): DataResult<SetRefundAsCompleteResult> {
+        return try {
+            val result = transactionService.setRefundAsComplete(refundRequestId)
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)

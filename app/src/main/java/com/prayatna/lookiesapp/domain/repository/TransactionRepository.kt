@@ -12,6 +12,9 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentReque
 import com.prayatna.lookiesapp.domain.model.transaction.Shipment
 import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
+import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
+import com.prayatna.lookiesapp.domain.model.transaction.Refund
+import com.prayatna.lookiesapp.domain.model.transaction.SetRefundAsCompleteResult
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
@@ -44,4 +47,15 @@ interface TransactionRepository {
             DataResult<List<ShipmentFee>>
     suspend fun setOrderToComplete(request: SetOrderToCompleteInput):
             DataResult<SetOrderToCompleteResult>
+            
+    suspend fun createRefundRequest(
+        request: CreateRefundRequestInput, 
+        proofImage: ByteArray?
+    ): DataResult<Refund>
+    
+    suspend fun getRefunds(): DataResult<List<Refund>>
+    
+    suspend fun getRefundsByOrderId(orderId: String): DataResult<List<Refund>>
+    
+    suspend fun setRefundAsComplete(refundRequestId: String): DataResult<SetRefundAsCompleteResult>
 }
