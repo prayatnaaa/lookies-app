@@ -26,6 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,14 +37,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
+import com.prayatna.lookiesapp.domain.model.transaction.Shipment
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionStatusChip
 import com.prayatna.lookiesapp.utils.DateHelper
 import com.prayatna.lookiesapp.utils.formatRupiah
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 
 @Composable
-fun DetailTransactionContent(data: DetailTransaction) {
+fun DetailTransactionContent(
+    data: DetailTransaction, 
+    shipment: Shipment? = null,
+    isCompleting: Boolean = false,
+    onCompleteOrder: (() -> Unit)? = null
+) {
     val transaction = data.transaction
     val clipboardManager = LocalClipboardManager.current
+    var isShipmentExpanded by remember { mutableStateOf(false) }
 
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
@@ -126,6 +148,61 @@ fun DetailTransactionContent(data: DetailTransaction) {
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                }
+            }
+        }
+
+        if (shipment != null) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth().clickable { isShipmentExpanded = !isShipmentExpanded },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.LocalShipping, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Shipment Status", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            }
+                            Icon(
+                                imageVector = if (isShipmentExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                contentDescription = null
+                            )
+                        }
+                        
+                        if (isShipmentExpanded) {
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.surfaceVariant)
+                            
+                            if (shipment.trackingNumber != null) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text("Tracking Number", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(shipment.trackingNumber, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                                    }
+                                    IconButton(
+                                        onClick = { clipboardManager.setText(AnnotatedString(shipment.trackingNumber)) },
+                                        modifier = Modifier.size(32.dp)
+                                    ) {
+                                        Icon(Icons.Default.ContentCopy, contentDescription = "Copy Tracking Number", modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                            }
+                            
+                            ShipmentTimeline(shipment)
+                        }
                     }
                 }
             }
@@ -266,6 +343,90 @@ fun DetailTransactionContent(data: DetailTransaction) {
             }
         }
 
+        item {
+            Button(
+                onClick = { onCompleteOrder?.invoke() },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(8.dp),
+                enabled = !isCompleting
+            ) {
+                if (isCompleting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Complete Order", fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+
         item { Spacer(modifier = Modifier.height(16.dp)) }
+    }
+}
+
+@Composable
+fun ShipmentTimeline(shipment: Shipment) {
+    val statuses = listOf("pending", "processing", "shipped", "delivered")
+    val isCancelled = shipment.status.lowercase() == "cancelled"
+    val isRefunded = shipment.status.lowercase() == "refunded"
+    
+    val displayStatuses = if (isCancelled) listOf("pending", "processing", "cancelled")
+        else if (isRefunded) listOf("pending", "processing", "refunded")
+        else statuses
+
+    val actIndex = displayStatuses.indexOf(shipment.status.lowercase())
+    val currentIndex = if (actIndex == -1) displayStatuses.size else actIndex
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 8.dp)) {
+        displayStatuses.forEachIndexed { index, status ->
+            val isCompleted = index < currentIndex
+            val isCurrent = index == currentIndex
+            
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(24.dp)) {
+                    if (isCompleted) {
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                    } else if (isCurrent) {
+                        if (status == "cancelled" || status == "refunded") {
+                             Icon(Icons.Default.Cancel, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
+                        } else {
+                             Icon(Icons.Default.RadioButtonUnchecked, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                        }
+                    } else {
+                        Icon(Icons.Default.RadioButtonUnchecked, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), modifier = Modifier.size(20.dp))
+                    }
+                    
+                    if (index < displayStatuses.size - 1) {
+                        Box(modifier = Modifier
+                            .width(2.dp)
+                            .height(32.dp)
+                            .background(
+                                if (index < currentIndex) MaterialTheme.colorScheme.primary 
+                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                            ))
+                    }
+                }
+                
+                Spacer(modifier = Modifier.width(12.dp))
+                
+                Column(modifier = Modifier.padding(bottom = if (index < displayStatuses.size - 1) 0.dp else 0.dp)) {
+                    Text(
+                        text = status.replaceFirstChar { it.uppercase() },
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isCurrent || isCompleted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                    if (status == "pending" && shipment.createdAt.isNotEmpty()) {
+                        Text(text = DateHelper.formatDate(shipment.createdAt), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else if (status == "shipped" && shipment.shippedAt != null) {
+                        Text(text = DateHelper.formatDate(shipment.shippedAt), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        }
     }
 }

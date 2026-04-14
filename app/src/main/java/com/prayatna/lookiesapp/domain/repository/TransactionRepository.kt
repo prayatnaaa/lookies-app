@@ -1,7 +1,9 @@
 package com.prayatna.lookiesapp.domain.repository
 
+import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteInput
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
 import com.prayatna.lookiesapp.domain.model.payment.PaymentAttempt
+import com.prayatna.lookiesapp.domain.model.payment.SetOrderToCompleteResult
 import com.prayatna.lookiesapp.domain.model.ticket.Ticket
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
@@ -40,4 +42,6 @@ interface TransactionRepository {
             DataResult<Shipment>
     suspend fun getShipmentFees():
             DataResult<List<ShipmentFee>>
+    suspend fun setOrderToComplete(request: SetOrderToCompleteInput):
+            DataResult<SetOrderToCompleteResult>
 }

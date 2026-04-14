@@ -2,7 +2,10 @@ package com.prayatna.lookiesapp.presentation.transaction.detailTransaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteInput
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailPaintingOrder
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.SetOrderToCompleteUseCase
 import com.prayatna.lookiesapp.presentation.transaction.detailTransaction.state.DetailTransactionUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +18,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailTransactionViewModel @Inject constructor(
-    private val getDetailTransactionUseCase: GetDetailTransactionUseCase
+    private val getDetailTransactionUseCase: GetDetailTransactionUseCase,
+    private val getDetailPaintingOrder: GetDetailPaintingOrder,
+    private val setOrderToCompleteUseCase: SetOrderToCompleteUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(DetailTransactionUiState())
@@ -35,17 +40,62 @@ class DetailTransactionViewModel @Inject constructor(
                     }
                 }
                 is DataResult.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            errorMessage = null,
-                            isLoading = false,
-                            data = result.data
-                        )
+                    val detailTx = result.data
+                    val isPainting = detailTx.transaction.items.any { it.itemType == "painting" }
+                    
+                    if (isPainting) {
+                        when (val paintingResult = getDetailPaintingOrder(orderId)) {
+                            is DataResult.Success -> {
+                                _uiState.update {
+                                    it.copy(
+                                        errorMessage = null,
+                                        isLoading = false,
+                                        data = detailTx,
+                                        shipment = paintingResult.data.shipment
+                                    )
+                                }
+                            }
+                            is DataResult.Error -> {
+                                _uiState.update {
+                                    it.copy(
+                                        errorMessage = paintingResult.error,
+                                        isLoading = false
+                                    )
+                                }
+                            }
+                            else -> Unit
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                errorMessage = null,
+                                isLoading = false,
+                                data = detailTx,
+                                shipment = null
+                            )
+                        }
                     }
                 }
                 else -> Unit
             }
 
+        }
+    }
+
+    fun setOrderToComplete(orderId: String) {
+        val input = SetOrderToCompleteInput(orderId)
+        viewModelScope.launch {
+            _uiState.update { it.copy(isCompleting = true) }
+            when (val result = setOrderToCompleteUseCase(input)) {
+                is DataResult.Success -> {
+                    _uiState.update { it.copy(isCompleting = false) }
+                    getDetailTransaction(orderId)
+                }
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(isCompleting = false, errorMessage = result.error) }
+                }
+                else -> Unit
+            }
         }
     }
 

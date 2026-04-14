@@ -2,12 +2,15 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
+import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseTransactionService
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
+import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteInput
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
 import com.prayatna.lookiesapp.domain.model.payment.PaymentAttempt
+import com.prayatna.lookiesapp.domain.model.payment.SetOrderToCompleteResult
 import com.prayatna.lookiesapp.domain.model.ticket.Ticket
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
@@ -143,6 +146,16 @@ class TransactionRepositoryImpl @Inject constructor(
             val result = transactionService.getShipmentFees()
             DataResult.Success(result.map { it.toDomain() })
         }catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun setOrderToComplete(request: SetOrderToCompleteInput): DataResult<SetOrderToCompleteResult> {
+        return try {
+            val result = transactionService.setOrderToComplete(request.toDto())
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
         }

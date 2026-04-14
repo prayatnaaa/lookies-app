@@ -105,7 +105,12 @@ fun DetailTransactionScreen(
                 }
 
                 state.data != null -> {
-                    DetailTransactionContent(data = state.data!!)
+                    DetailTransactionContent(
+                        data = state.data!!,
+                        shipment = state.shipment,
+                        isCompleting = state.isCompleting,
+                        onCompleteOrder = { viewModel.setOrderToComplete(orderId) }
+                    )
                 }
             }
         }

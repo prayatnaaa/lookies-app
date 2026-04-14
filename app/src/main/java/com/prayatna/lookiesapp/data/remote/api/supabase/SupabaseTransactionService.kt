@@ -11,8 +11,10 @@ import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParam
 import com.prayatna.lookiesapp.data.remote.dto.request.order.OrderItemRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateQrisPaymentRequestRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateXenditPaymentRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.payment.SetOrderToCompleteRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateQrisPaymentRequestResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateXenditPaymentResponse
+import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteResponse
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -161,5 +163,20 @@ class SupabaseTransactionService @Inject constructor(
 
     suspend fun getShipmentFees(): List<ShipmentFeeDto> {
         return postgrest.from("shipment_fees").select().decodeList<ShipmentFeeDto>()
+    }
+
+    suspend fun setOrderToComplete(request: SetOrderToCompleteRequest): SetOrderToCompleteResponse {
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
+
+        val response =  httpClient.post(
+            "${BuildConfig.SUPABASE_EDGE_BASE_URL}/qris-payment-close-amount"
+        ) {
+            contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer ${session.accessToken}")
+            setBody(request)
+        }
+        Log.d("CreatePayment", response.body())
+        return response.body()
     }
 }
