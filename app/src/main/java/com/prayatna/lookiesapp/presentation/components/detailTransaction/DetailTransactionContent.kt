@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.components.detailTransaction
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -60,7 +62,9 @@ fun DetailTransactionContent(
     data: DetailTransaction, 
     shipment: Shipment? = null,
     isCompleting: Boolean = false,
-    onCompleteOrder: (() -> Unit)? = null
+    onCompleteOrder: (() -> Unit)? = null,
+    onRequestRefund: (() -> Unit)? = null,
+    onViewRefunds: (() -> Unit)? = null
 ) {
     val transaction = data.transaction
     val clipboardManager = LocalClipboardManager.current
@@ -343,21 +347,44 @@ fun DetailTransactionContent(
             }
         }
 
-        item {
-            Button(
-                onClick = { onCompleteOrder?.invoke() },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                shape = RoundedCornerShape(8.dp),
-                enabled = !isCompleting
-            ) {
-                if (isCompleting) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text("Complete Order", fontWeight = FontWeight.Bold)
+        if (shipment?.status?.lowercase() in listOf("delivered", "completed")) {
+            item {
+                Button(
+                    onClick = { onCompleteOrder?.invoke() },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    enabled = !isCompleting
+                ) {
+                    if (isCompleting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Complete Order", fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+
+        if (shipment?.status?.lowercase() in listOf("delivered", "completed")) {
+            item {
+                OutlinedButton(
+                    onClick = { onRequestRefund?.invoke() },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Request Refund", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
+                }
+            }
+            item {
+                OutlinedButton(
+                    onClick = { onViewRefunds?.invoke() },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("View Refund Requests", fontWeight = FontWeight.Bold)
                 }
             }
         }

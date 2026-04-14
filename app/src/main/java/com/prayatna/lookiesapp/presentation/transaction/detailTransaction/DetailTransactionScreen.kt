@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.detailTransaction.DetailTransactionContent
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,7 +110,13 @@ fun DetailTransactionScreen(
                         data = state.data!!,
                         shipment = state.shipment,
                         isCompleting = state.isCompleting,
-                        onCompleteOrder = { viewModel.setOrderToComplete(orderId) }
+                        onCompleteOrder = { viewModel.setOrderToComplete(orderId) },
+                        onRequestRefund = {
+                            navController.navigate("${NavigationRoutes.CREATE_REFUND}/$orderId")
+                        },
+                        onViewRefunds = {
+                            navController.navigate("${NavigationRoutes.ORDER_REFUNDS}/$orderId")
+                        }
                     )
                 }
             }

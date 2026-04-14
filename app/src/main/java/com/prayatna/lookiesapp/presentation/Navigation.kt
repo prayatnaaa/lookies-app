@@ -52,6 +52,7 @@ import com.prayatna.lookiesapp.presentation.user.artistSubmission.artistSubmissi
 import com.prayatna.lookiesapp.presentation.user.createUserAddress.createUserAddressNavigation
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.PartnerSubmissionScreen
+import com.prayatna.lookiesapp.presentation.refund.refundNavigation
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -408,5 +409,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 )
             }
         }
+
+        refundNavigation(navController)
     }
 }
