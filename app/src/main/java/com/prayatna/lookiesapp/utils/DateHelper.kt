@@ -4,9 +4,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
+import java.time.ZoneId
 
-object DateHelper {
-    fun formatDate(dateString: String): String {
+
+
+fun formatDate(dateString: String): String {
         return try {
             // Asumsi format backend: "2023-10-25" atau "2023-10-25T10:00:00Z"
             // Kita gunakan SimpleDateFormat (Legacy)
@@ -27,5 +31,16 @@ object DateHelper {
             e.printStackTrace()
             dateString // Jika gagal parsing, kembalikan string aslinya
         }
+    }
+
+fun formatChatTime(raw: String): String {
+    return try {
+        val parsed = OffsetDateTime.parse(raw)
+            .atZoneSameInstant(ZoneId.systemDefault())
+
+        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        parsed.format(formatter)
+    } catch (e: Exception) {
+        raw
     }
 }

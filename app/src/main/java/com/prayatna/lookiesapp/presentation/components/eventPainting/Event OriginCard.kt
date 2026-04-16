@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.utils.DateHelper
+import com.prayatna.lookiesapp.utils.formatDate
 
 @Composable
 fun EventOriginCard(
@@ -106,7 +106,7 @@ fun EventOriginCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = DateHelper.formatDate(endDate),
+                            text = formatDate(endDate),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.error

@@ -32,8 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.ticket.Ticket
 import com.prayatna.lookiesapp.utils.Constants
-import com.prayatna.lookiesapp.utils.DateHelper
 import com.prayatna.lookiesapp.utils.QrCodeGenerator
+import com.prayatna.lookiesapp.utils.formatDate
 
 @Composable
 fun TicketCard(ticket: Ticket) {
@@ -76,7 +76,7 @@ fun TicketCard(ticket: Ticket) {
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Created ${DateHelper.formatDate(ticket.createdAt)}",
+                        text = "Created ${formatDate(ticket.createdAt)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation.components.transactionList
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,8 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
-import com.prayatna.lookiesapp.utils.DateHelper
-import com.prayatna.lookiesapp.utils.Helper
+import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
@@ -68,7 +66,7 @@ fun TransactionItemCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = DateHelper.formatDate(transaction.createdAt),
+                        text = formatDate(transaction.createdAt),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

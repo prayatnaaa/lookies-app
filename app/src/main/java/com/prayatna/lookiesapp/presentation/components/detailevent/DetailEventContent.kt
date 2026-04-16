@@ -35,7 +35,7 @@ import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.presentation.components.painting.PaintingCard
 import com.prayatna.lookiesapp.utils.Constants
-import com.prayatna.lookiesapp.utils.DateHelper
+import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
@@ -162,7 +162,7 @@ fun DetailEventContent(
                     EventDetailItem(
                         icon = Icons.Default.DateRange,
                         label = "Date",
-                        value = "${DateHelper.formatDate(event.startDate)} - ${DateHelper.formatDate(event.endDate)}",
+                        value = "${formatDate(event.startDate)} - ${formatDate(event.endDate)}",
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(16.dp))

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
 import com.prayatna.lookiesapp.domain.usecase.chat.InsertForumsMessageUseCase
 import com.prayatna.lookiesapp.domain.usecase.chat.ListenToForumMessagesUseCase
+import com.prayatna.lookiesapp.domain.usecase.user.GetProfileUseCase
 import com.prayatna.lookiesapp.presentation.forum.state.ForumUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class ForumViewModel @Inject constructor(
     private val listenToForumMessagesUseCase: ListenToForumMessagesUseCase,
     private val insertForumsMessageUseCase: InsertForumsMessageUseCase,
+    private val getProfileUseCase: GetProfileUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ForumUiState())
@@ -30,6 +32,17 @@ class ForumViewModel @Inject constructor(
 
     private var listenJob: Job? = null
 
+    init {
+        viewModelScope.launch {
+            getProfileUseCase().collect { result ->
+                if (result is DataResult.Success) {
+                    _uiState.update {
+                        it.copy(currentUserId = result.data.id.orEmpty())
+                    }
+                }
+            }
+        }
+    }
 
     fun initChannel(channelId: String) {
         if (_uiState.value.channelId == channelId && _uiState.value.messages.isNotEmpty()) return
@@ -51,7 +64,6 @@ class ForumViewModel @Inject constructor(
         listenJob = viewModelScope.launch {
             listenToForumMessagesUseCase(channelId).distinctUntilChanged()
                 .catch { e ->
-                    Log.e("CHAT", e.message.toString())
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -60,7 +72,6 @@ class ForumViewModel @Inject constructor(
                     }
                 }
                 .collect { messages ->
-                    Log.d("CHAT", messages.toString())
                     _uiState.update {
                         it.copy(
                             isLoading = false,

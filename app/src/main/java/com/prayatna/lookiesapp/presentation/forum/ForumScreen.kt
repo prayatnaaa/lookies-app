@@ -45,6 +45,7 @@ import com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView
 import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.forum.state.ForumUiState
+import com.prayatna.lookiesapp.utils.formatChatTime
 
 @Composable
 fun ForumScreen(
@@ -95,7 +96,10 @@ fun ForumScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(state.messages) { message ->
-                            DiscordStyleMessageItem(message = message)
+                            DiscordStyleMessageItem(
+                                message = message,
+                                isMine = message.senderId == state.currentUserId
+                            )
                         }
                     }
                 }
@@ -112,42 +116,70 @@ fun ForumScreen(
 }
 
 @Composable
-fun DiscordStyleMessageItem(message: ForumChannelMessagesView) {
+fun DiscordStyleMessageItem(
+    message: ForumChannelMessagesView,
+    isMine: Boolean
+) {
     Row(
-        modifier = Modifier.fillMaxWidth(),) {
-        CustomAsyncImage(
-            model = message.profilePictureUrl ?: "",
-            contentDescription = "",
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start
+    ) {
+        if (!isMine) {
+            CustomAsyncImage(
+                model = message.profilePictureUrl?.replace("http://172.21.179.110", "http://10.0.2.2") ?: "",
+                contentDescription = "",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+        }
+
+        Column(
+            horizontalAlignment = if (isMine) Alignment.End else Alignment.Start,
             modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(Color.LightGray)
-        )
-        
-        Spacer(modifier = Modifier.width(12.dp))
-        
-        Column {
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(
-                    text = message.fullName.ifEmpty { "Unknown User" },
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                .fillMaxWidth(0.75f)
+                .background(
+                    if (isMine) MaterialTheme.colorScheme.background
+                    else MaterialTheme.colorScheme.surfaceVariant,
+                    RoundedCornerShape(12.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = message.createdAt,
-                    fontSize = 11.sp,
-                    color = Color.Gray
-                )
+                .padding(12.dp)
+        ) {
+
+            if (!isMine) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = message.fullName.ifEmpty { "Unknown User" },
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = formatChatTime(message.createdAt),
+                        fontSize = 10.sp,
+                        color = Color.Gray
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
             }
-            Spacer(modifier = Modifier.height(2.dp))
+
             Text(
                 text = message.content,
-                fontSize = 15.sp,
-                lineHeight = 22.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                color = if (isMine) Color.White else MaterialTheme.colorScheme.onSurface
             )
+
+            if (isMine) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = formatChatTime(message.createdAt),
+                    fontSize = 10.sp,
+                    color = Color.White.copy(alpha = 0.7f)
+                )
+            }
         }
     }
 }

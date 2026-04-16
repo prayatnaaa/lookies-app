@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.transaction.TransactionItem
-import com.prayatna.lookiesapp.utils.DateHelper
+import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
@@ -74,7 +74,7 @@ fun OrderItemCard(item: TransactionItem) {
 
                 item.details?.eventDate?.let { date ->
                     Text(
-                        text = DateHelper.formatDate(date),
+                        text = formatDate(date),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -119,7 +118,7 @@ fun ForumItem(
             .padding(vertical = 8.dp)
     ) {
         AsyncImage(
-            model = forum.bannerImageUrl,
+            model = forum.bannerImageUrl .replace("http://172.21.179.110", "http://10.0.2.2"),
             contentDescription = "Forum Banner",
             modifier = Modifier
                 .fillMaxWidth()

@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.event.Event
-import com.prayatna.lookiesapp.utils.DateHelper
+import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
@@ -70,8 +70,8 @@ fun EventCard(
 
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = DateHelper.formatDate(event.startDate) + " - " +
-                            DateHelper.formatDate(event.endDate)
+                        text = formatDate(event.startDate) + " - " +
+                            formatDate(event.endDate)
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))

@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
 import com.prayatna.lookiesapp.domain.model.transaction.Shipment
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionStatusChip
-import com.prayatna.lookiesapp.utils.DateHelper
 import com.prayatna.lookiesapp.utils.formatRupiah
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +55,7 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import com.prayatna.lookiesapp.utils.formatDate
 
 @Composable
 fun DetailTransactionContent(
@@ -148,7 +148,7 @@ fun DetailTransactionContent(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = DateHelper.formatDate(transaction.createdAt),
+                            text = formatDate(transaction.createdAt),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -448,9 +448,9 @@ fun ShipmentTimeline(shipment: Shipment) {
                         color = if (isCurrent || isCompleted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                     if (status == "pending" && shipment.createdAt.isNotEmpty()) {
-                        Text(text = DateHelper.formatDate(shipment.createdAt), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = formatDate(shipment.createdAt), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     } else if (status == "shipped" && shipment.shippedAt != null) {
-                        Text(text = DateHelper.formatDate(shipment.shippedAt), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = formatDate(shipment.shippedAt), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }

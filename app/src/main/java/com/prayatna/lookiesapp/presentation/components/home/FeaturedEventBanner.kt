@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.utils.Constants
-import com.prayatna.lookiesapp.utils.DateHelper
+import com.prayatna.lookiesapp.utils.formatDate
 
 @Composable
 fun FeaturedEventBanner(
@@ -67,7 +67,7 @@ fun FeaturedEventBanner(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = DateHelper.formatDate(event.startDate) + " - " + DateHelper.formatDate(event.endDate),
+                    text = formatDate(event.startDate) + " - " + formatDate(event.endDate),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White.copy(alpha = 0.9f)
                 )
