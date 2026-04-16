@@ -56,7 +56,7 @@ class PaintingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPaintingsByArtist(id: String?): DataResult<List<Painting>> {
+    override suspend fun getPaintingsByArtist(id: String): DataResult<List<Painting>> {
         return try {
             val response = paintingService.getPaintingByArtistId(id)
             DataResult.Success(response.map { it.toDomain() })

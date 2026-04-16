@@ -26,11 +26,11 @@ class ParticipantPaintingListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ParticipantPaintingListUiState())
     val uiState: StateFlow<ParticipantPaintingListUiState> = _uiState.asStateFlow()
 
-    fun loadPaintings(participantId: String) {
+    fun loadPaintings(eventId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            when (val result = getEventPaintingsUseCase(participantId)) {
+            when (val result = getEventPaintingsUseCase(eventId)) {
                 is DataResult.Error -> {
                     _uiState.update {
                         it.copy(

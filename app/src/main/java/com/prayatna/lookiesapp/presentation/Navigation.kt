@@ -253,11 +253,11 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
 
         composable(
-            route = "${NavigationRoutes.EVENT_PAINTING_LIST}/{participantId}",
-            arguments = listOf(navArgument("participantId") { type = NavType.StringType })
+            route = "${NavigationRoutes.EVENT_PAINTING_LIST}/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry.arguments?.getString("participantId")?.let { participantId ->
-                ParticipantPaintingListScreen(participantId = participantId, navController = navController)
+            backStackEntry.arguments?.getString("eventId")?.let { participantId ->
+                ParticipantPaintingListScreen(eventId = participantId, navController = navController)
             }
         }
         composable(

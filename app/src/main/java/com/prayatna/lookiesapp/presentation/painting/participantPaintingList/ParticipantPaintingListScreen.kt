@@ -20,7 +20,7 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun ParticipantPaintingListScreen(
-    participantId: String,
+    eventId: String,
     navController: NavController,
     viewModel: ParticipantPaintingListViewModel = hiltViewModel()
 ) {
@@ -28,8 +28,8 @@ fun ParticipantPaintingListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(participantId) {
-        viewModel.loadPaintings(participantId)
+    LaunchedEffect(eventId) {
+        viewModel.loadPaintings(eventId)
     }
 
     LaunchedEffect(uiState.errorMessage) {

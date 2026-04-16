@@ -162,12 +162,12 @@ class SupabaseEventService @Inject constructor(
         return event
     }
 
-    suspend fun getEventPaintings(participantId: String, status: String? = null): List<EventPaintingDto> {
+    suspend fun getEventPaintings(eventId: String, status: String? = null): List<EventPaintingDto> {
         val response = postgrest
             .from("event_paintings_view")
             .select {
                 filter {
-                    eq("event_participants->>id", participantId)
+                    eq("event_id", eventId)
                     if (status != null) {
                         eq("status", status)
                     }

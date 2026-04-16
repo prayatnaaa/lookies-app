@@ -107,7 +107,7 @@ fun PartnerManageEventScreen(
                                 icon = Icons.Default.Group,
                                 alertCount = uiState.statistics?.pendingParticipants?.toInt() ?: 0,
                                 onClick = {
-                                    navController.navigate("${NavigationRoutes.PARTICIPANT_LIST}/${event.id}")
+                                    navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/${event.id}")
                                 }
                             )
                         }
@@ -119,11 +119,7 @@ fun PartnerManageEventScreen(
                             description = "Lihat semua lukisan yang masuk, kurasi lukisan, dan atur display.",
                             icon = Icons.Default.Palette,
                             onClick = {
-                                if (isSelfExhibition) {
-                                    navController.navigate("${NavigationRoutes.MANAGE_PAINTINGS}/${event.id}")
-                                } else {
-                                    navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/${event.id}")
-                                }
+                                navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/${event.id}")
                             }
                         )
                     }

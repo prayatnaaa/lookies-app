@@ -284,6 +284,14 @@ fun PartnerHomeScreen(
                                     }
                                 )
                                 DashboardActionItem(
+                                    title = "Paintings",
+                                    subtitle = "Manage paintings collection",
+                                    icon = Icons.Filled.Group,
+                                    onClick = {
+                                        navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/$businessId")
+                                    }
+                                )
+                                DashboardActionItem(
                                     title = "Shipments",
                                     subtitle = "Manage shipments of customers",
                                     icon = Icons.Filled.Group,

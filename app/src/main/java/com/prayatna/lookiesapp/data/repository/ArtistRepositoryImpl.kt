@@ -4,7 +4,9 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseArtistService
 import com.prayatna.lookiesapp.data.remote.dto.ArtistDashboardSummaryDto
+import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.artist.ArtistDashboardSummary
+import com.prayatna.lookiesapp.domain.model.artist.GetArtistBusinessIdOutput
 import com.prayatna.lookiesapp.domain.model.artist.RegisterEventOutput
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
@@ -64,6 +66,17 @@ class ArtistRepositoryImpl @Inject constructor(
         return try {
             val response = supabaseArtistService.getArtistEventPaintings(artistId = artistId)
             DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
+
+    override suspend fun getArtistBusinessId(): DataResult<GetArtistBusinessIdOutput> {
+        return try {
+            val response = supabaseArtistService.getArtistBusinessId()
+            DataResult.Success(response.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
         } catch (e: Exception) {

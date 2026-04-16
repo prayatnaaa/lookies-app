@@ -118,10 +118,10 @@ class EventRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getEventPaintings(participantId: String,
+    override suspend fun getEventPaintings(eventId: String,
                                            status: String?): DataResult<List<EventPainting>> {
         return try {
-            val response = supabaseEventService.getEventPaintings(participantId = participantId,
+            val response = supabaseEventService.getEventPaintings(eventId = eventId,
                 status = status)
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {

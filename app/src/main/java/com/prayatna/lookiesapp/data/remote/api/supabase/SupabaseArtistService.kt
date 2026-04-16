@@ -5,9 +5,11 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.ArtistDashboardSummaryDto
 import com.prayatna.lookiesapp.data.remote.dto.EventPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.request.artist.RegisterEventRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.GetArtistBusinessIdResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.artist.RegisterEventResponse
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.broadcastFlow
@@ -33,6 +35,18 @@ class SupabaseArtistService @Inject constructor(
     private val realtime: Realtime,
     private val httpClient: HttpClient,
 ) {
+
+    suspend fun getArtistBusinessId(): GetArtistBusinessIdResponse {
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
+        return postgrest.from("merchant_accounts").select(
+            Columns.list("business_id")
+        ) {
+            filter {
+                eq("owner_user_id", session.user!!.id)
+            }
+        }.decodeSingle<GetArtistBusinessIdResponse>()
+    }
 
     suspend fun registerEvent(
         artistId: String,
