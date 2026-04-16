@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,7 +49,7 @@ class ForumViewModel @Inject constructor(
         listenJob?.cancel()
 
         listenJob = viewModelScope.launch {
-            listenToForumMessagesUseCase(channelId)
+            listenToForumMessagesUseCase(channelId).distinctUntilChanged()
                 .catch { e ->
                     Log.e("CHAT", e.message.toString())
                     _uiState.update {

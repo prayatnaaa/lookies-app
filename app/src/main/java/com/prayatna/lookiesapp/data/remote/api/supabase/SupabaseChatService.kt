@@ -12,10 +12,10 @@ import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SupabaseChatService @Inject constructor(
@@ -34,34 +34,34 @@ class SupabaseChatService @Inject constructor(
         }.decodeSingle<ForumMessageDto>()
     }
 
-//    fun listenToForumMessages(): Flow<List<ForumMessageDto>> {
-//        val channel = realtime.channel("forum_messages_channel")
-//
-//        return channel.postgresListDataFlow(
-//            schema = "public",
-//            table = "forum_messages",
-//            primaryKey = ForumMessageDto::id
-//        ).onStart {
-//            channel.subscribe()
-//        }
-//    }
+    @Suppress("DEPRECATION")
+    fun listenToForumMessages(channelId: String): Flow<List<ForumChannelMessagesViewDto>> = callbackFlow {
 
-//    @Suppress("DEPRECATION")
-    fun listenToForumMessages(channelId: String): Flow<List<ForumChannelMessagesViewDto>> = flow {
-
-        val channel = realtime.channel("forum_messages_channel")
+        val channel = realtime.channel("forum_messages_channel$channelId")
 
         val flow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
             table = "forum_messages"
-            // filter = "channel_id=eq.$channelId"
+            filter = "channel_id=eq.$channelId"
         }
+
         channel.subscribe()
 
-        emit(getForumChannelMessages(channelId))
+        trySend(getForumChannelMessages(channelId))
 
-        flow.collect {
-            Log.d("CHAT", "EVENT MASUK: $it")
-            emit(getForumChannelMessages(channelId))
+        val job = launch {
+            flow.collect {
+                Log.d("CHAT", "EVENT IN: $it")
+                trySend(getForumChannelMessages(channelId))
+            }
+        }
+
+        awaitClose {
+            Log.d("CHAT", "UNSUBSCRIBE CHANNEL")
+            job.cancel()
+            launch {
+                realtime.removeChannel(channel)
+                channel.unsubscribe()
+            }
         }
     }
 
