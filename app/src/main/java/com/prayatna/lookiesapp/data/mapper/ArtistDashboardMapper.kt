@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.domain.model.artist.ArtistDashboardSummary
 
 fun ArtistDashboardSummaryDto.toDomain(): ArtistDashboardSummary {
     return ArtistDashboardSummary(
+        businessId = businessId,
         userId = userId,
         totalPaintings = totalPaintings,
         totalCatalogValue = totalCatalogValue,

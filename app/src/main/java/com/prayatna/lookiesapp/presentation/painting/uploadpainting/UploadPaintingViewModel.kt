@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
@@ -20,15 +21,19 @@ import javax.inject.Inject
 @HiltViewModel
 class UploadPaintingViewModel @Inject constructor(
     private val uploadPaintingUseCase: UploadPaintingUseCase,
-    private val paintingRepository: PaintingRepository
+    private val paintingRepository: PaintingRepository,
+    savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
     var dropdownState by mutableStateOf(PaintingDropdownState())
         private set
+    private val businessId: String = checkNotNull(savedStateHandle["businessId"]) {
+        "businessId argument is required to upload a painting"
+    }
 
     var params by mutableStateOf(
         AddPaintingParams(
-            artistId = "",
+            artistId = businessId,
             title = "",
             paintingUrl = "",
             description = "",

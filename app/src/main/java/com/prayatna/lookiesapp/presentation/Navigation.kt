@@ -348,9 +348,15 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             }
         }
         composable(
-            route = NavigationRoutes.UPLOAD_PAINTING
+            route = "${NavigationRoutes.UPLOAD_PAINTING}/{businessId}",
+            arguments = listOf(
+                navArgument("businessId") {
+                    type = NavType.StringType
+                    nullable = false
+                }
+            )
         ) {
-            UploadPaintingScreen(navController = navController)
+            UploadPaintingScreen(navController)
         }
         composable(
             route = "${NavigationRoutes.PARTNER_APPLICATION}/{merchantType}",

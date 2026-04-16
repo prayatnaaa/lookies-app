@@ -83,6 +83,8 @@ class SupabaseArtistService @Inject constructor(
                 }
                 .decodeSingle<ArtistDashboardSummaryDto>()
 
+            Log.d("Dashboard", "initial: $initial")
+
             trySend(initial)
 
             val channel = realtime.channel("dashboard:$userId")

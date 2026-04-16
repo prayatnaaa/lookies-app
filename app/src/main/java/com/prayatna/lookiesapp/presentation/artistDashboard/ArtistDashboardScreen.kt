@@ -86,7 +86,11 @@ fun ArtistDashboardScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                     navController.navigate(NavigationRoutes.UPLOAD_PAINTING)
+                    if (state is ArtistDashboardUiState.Success) {
+                        val data = (state as ArtistDashboardUiState.Success).data
+                        navController.navigate("${NavigationRoutes.UPLOAD_PAINTING}/${data.businessId}")
+
+                    }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -242,7 +246,7 @@ fun ArtistDashboardScreen(
                                     subtitle = "Manage portfolio, pricing & stock",
                                     icon = Icons.Filled.Brush,
                                     onClick = {
-                                        navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${currentState.data.userId}")
+                                        navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${currentState.data.businessId}")
                                     }
                                 )
                                 DashboardActionItem(

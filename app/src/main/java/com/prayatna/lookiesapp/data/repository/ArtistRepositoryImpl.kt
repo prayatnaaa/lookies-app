@@ -56,6 +56,7 @@ class ArtistRepositoryImpl @Inject constructor(
             .onStart { emit(DataResult.Loading) }
             .catch { e ->
                 val extractMessage = extractSupabaseError(e.message ?: "Something went wrong")
+                Log.e("Dashboard", e.toString())
                 emit(DataResult.Error(extractMessage))
             }
 

@@ -141,8 +141,7 @@ fun ProfileScreen(
                         subtitle = "Create or see listing",
                         icon = Icons.Default.SavedSearch,
                         onClick = {
-                            Log.d("ProfileScreen", "Role: $profile")
-                            if (profile.role != "user") {
+                            if (profile.role == "artist") {
                                 navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
                             } else {
                                 navController.navigate(NavigationRoutes.ARTIST_APPLICATION)

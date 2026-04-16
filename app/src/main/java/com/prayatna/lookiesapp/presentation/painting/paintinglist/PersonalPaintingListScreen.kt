@@ -50,7 +50,7 @@ fun PersonalPaintingListScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                 ),
                 onClick = {
-                    navController.navigate(NavigationRoutes.UPLOAD_PAINTING)
+                    navController.navigate("${NavigationRoutes.UPLOAD_PAINTING}/${artistId}")
                 },
                 shape = RoundedCornerShape(4.dp)
             ) {

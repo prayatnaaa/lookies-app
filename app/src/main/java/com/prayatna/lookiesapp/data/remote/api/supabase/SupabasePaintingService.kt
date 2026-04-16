@@ -102,14 +102,14 @@ class SupabasePaintingService @Inject constructor(
     }
 
     suspend fun uploadPainting(painting: UploadPaintingRequest, image: ByteArray?): UploadPaintingResponse {
-        val artistId = auth.currentUserOrNull()?.id
+        auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not logged in")
 
         var uploadedPath: String? = null
         if (image == null) throw IllegalArgumentException("Image cannot be null")
 
         try {
-            val path = "${artistId}/${UUID.randomUUID()}.png"
+            val path = "${painting.artistId}/${UUID.randomUUID()}.png"
             storage.from("paintings").upload(
                 path = path,
                 data = image,
@@ -120,7 +120,6 @@ class SupabasePaintingService @Inject constructor(
             val imageUrl = Helper.buildImageUrl(imageName = path, bucketName = "paintings")
 
             val finalPainting = painting.copy(
-                artistId = artistId,
                 paintingUrl = imageUrl
             )
 
