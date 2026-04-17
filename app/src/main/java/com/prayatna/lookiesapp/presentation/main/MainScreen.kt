@@ -40,7 +40,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.prayatna.lookiesapp.R
 import com.prayatna.lookiesapp.presentation.SharedViewModel
-import com.prayatna.lookiesapp.presentation.forum.forumlist.ForumListRoute
+import com.prayatna.lookiesapp.presentation.forumlist.ForumListRoute
 import com.prayatna.lookiesapp.presentation.main.home.HomeScreen
 import com.prayatna.lookiesapp.presentation.main.profile.ProfileScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen

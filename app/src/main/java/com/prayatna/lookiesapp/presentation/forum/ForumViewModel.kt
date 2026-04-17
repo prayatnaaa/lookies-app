@@ -1,12 +1,12 @@
 package com.prayatna.lookiesapp.presentation.forum
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
 import com.prayatna.lookiesapp.domain.usecase.chat.InsertForumsMessageUseCase
 import com.prayatna.lookiesapp.domain.usecase.chat.ListenToForumMessagesUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.GetProfileUseCase
+import com.prayatna.lookiesapp.presentation.forum.state.ForumEvent
 import com.prayatna.lookiesapp.presentation.forum.state.ForumUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,6 +33,19 @@ class ForumViewModel @Inject constructor(
     private var listenJob: Job? = null
 
     init {
+        observeCurrentUser()
+    }
+
+    fun onEvent(event: ForumEvent) {
+        when (event) {
+            is ForumEvent.InitChannel -> handleInitChannel(event.channelId)
+            is ForumEvent.InputChanged -> updateInput(event.text)
+            ForumEvent.SendMessage -> handleSendMessage()
+            ForumEvent.ClearError -> clearError()
+        }
+    }
+
+    private fun observeCurrentUser() {
         viewModelScope.launch {
             getProfileUseCase().collect { result ->
                 if (result is DataResult.Success) {
@@ -44,8 +57,10 @@ class ForumViewModel @Inject constructor(
         }
     }
 
-    fun initChannel(channelId: String) {
-        if (_uiState.value.channelId == channelId && _uiState.value.messages.isNotEmpty()) return
+    private fun handleInitChannel(channelId: String) {
+        val current = _uiState.value
+
+        if (current.channelId == channelId && current.messages.isNotEmpty()) return
 
         _uiState.update {
             it.copy(
@@ -55,19 +70,20 @@ class ForumViewModel @Inject constructor(
             )
         }
 
-        startListeningToMessages(channelId)
+        listenMessages(channelId)
     }
 
-    private fun startListeningToMessages(channelId: String) {
+    private fun listenMessages(channelId: String) {
         listenJob?.cancel()
 
         listenJob = viewModelScope.launch {
-            listenToForumMessagesUseCase(channelId).distinctUntilChanged()
+            listenToForumMessagesUseCase(channelId)
+                .distinctUntilChanged()
                 .catch { e ->
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = e.message
+                            errorMessage = e.message ?: "Unknown error"
                         )
                     }
                 }
@@ -82,42 +98,62 @@ class ForumViewModel @Inject constructor(
         }
     }
 
-    fun onInputTextChanged(text: String) {
-        _uiState.update { it.copy(currentInputString = text) }
+    private fun updateInput(text: String) {
+        _uiState.update {
+            it.copy(currentInputString = text)
+        }
     }
 
-    fun sendMessage() {
-        val channelId = _uiState.value.channelId
-        val content = _uiState.value.currentInputString.trim()
-        
-        if (channelId.isEmpty() || content.isEmpty()) return
+    private fun handleSendMessage() {
+        val current = _uiState.value
 
-        _uiState.update { it.copy(isSending = true, errorMessage = null) }
+        val channelId = current.channelId
+        val content = current.currentInputString.trim()
+        val senderId = current.currentUserId
+
+        if (channelId.isEmpty() || content.isEmpty() || senderId.isEmpty()) return
+
+        _uiState.update {
+            it.copy(isSending = true, errorMessage = null)
+        }
 
         viewModelScope.launch {
-            val input = CreateForumMessageInput(
-                channelId = channelId,
-                content = content,
-                senderId = "1"
+            val result = insertForumsMessageUseCase(
+                CreateForumMessageInput(
+                    channelId = channelId,
+                    content = content,
+                    senderId = senderId
+                )
             )
-            
-            val result = insertForumsMessageUseCase(input)
-            
-            _uiState.update { currentState ->
+
+            _uiState.update { state ->
                 when (result) {
                     is DataResult.Success -> {
-                        currentState.copy(isSending = false, currentInputString = "")
+                        state.copy(
+                            isSending = false,
+                            currentInputString = ""
+                        )
                     }
+
                     is DataResult.Error -> {
-                        currentState.copy(isSending = false, errorMessage = result.error)
+                        state.copy(
+                            isSending = false,
+                            errorMessage = result.error
+                        )
                     }
-                    else -> currentState.copy(isSending = false)
+
+                    else -> state.copy(isSending = false)
                 }
             }
         }
     }
 
-    fun clearError() {
+    private fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    override fun onCleared() {
+        listenJob?.cancel()
+        super.onCleared()
     }
 }

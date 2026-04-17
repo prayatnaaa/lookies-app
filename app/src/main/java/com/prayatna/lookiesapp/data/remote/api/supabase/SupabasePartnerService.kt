@@ -11,7 +11,15 @@ import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.realtime.PostgresAction
+import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.storage.Storage
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
@@ -19,6 +27,7 @@ class SupabasePartnerService @Inject constructor(
     private val auth: Auth,
     private val postgrest: Postgrest,
     private val storage: Storage,
+    private val realtime: Realtime
 ) {
     private suspend fun uploadPartnerLogo(image: ByteArray): String {
         if (image.isEmpty()) throw Exception("Image is empty")
@@ -173,9 +182,37 @@ class SupabasePartnerService @Inject constructor(
         return "Painting rejected"
     }
 
-    suspend fun getDashboardSummary(): PartnerDashboardDto {
+    fun getDashboardSummary(): Flow<PartnerDashboardDto> = callbackFlow {
         val userId = auth.currentUserOrNull()?.id
             ?: throw Exception("user not logged in")
+
+        val channel = realtime.channel("partner_dashboard_$userId")
+
+        val flow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "purchased_tickets"
+        }
+
+        channel.subscribe()
+
+        // Initial fetch
+        trySend(fetchDashboardSummary(userId))
+
+        val job = launch {
+            flow.collect {
+                trySend(fetchDashboardSummary(userId))
+            }
+        }
+
+        awaitClose {
+            job.cancel()
+            launch {
+                channel.unsubscribe()
+                realtime.removeChannel(channel)
+            }
+        }
+    }
+
+    private suspend fun fetchDashboardSummary(userId: String): PartnerDashboardDto {
         return postgrest.from("partner_dashboard_summary_view")
             .select {
                 filter {

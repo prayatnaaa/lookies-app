@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.forum.forumchannellist
+package com.prayatna.lookiesapp.presentation.forumchannellist
 
 sealed interface ForumChannelListEvent {
     data class OnChannelClick(val channelId: String) : ForumChannelListEvent

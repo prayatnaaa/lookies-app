@@ -21,7 +21,8 @@ import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListScreen
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
-import com.prayatna.lookiesapp.presentation.forum.forumchannellist.ForumChannelListRoute
+import com.prayatna.lookiesapp.presentation.forumchannellist.ForumChannelListRoute
+import com.prayatna.lookiesapp.presentation.forumlist.ForumListRoute
 import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
@@ -384,7 +385,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         createUserAddressNavigation(navController = navController)
         
         composable(NavigationRoutes.FORUM_LIST) {
-            com.prayatna.lookiesapp.presentation.forum.forumlist.ForumListRoute(navController)
+            ForumListRoute(navController)
         }
 
         shipmentDetailNavigation(navController)

@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.prayatna.lookiesapp.presentation.forum.state.ForumEvent
 
 @Composable
 fun ForumRoute(
@@ -15,13 +16,17 @@ fun ForumRoute(
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(channelId) {
-        viewModel.initChannel(channelId)
+        viewModel.onEvent(ForumEvent.InitChannel(channelId))
     }
 
     ForumScreen(
         state = state,
-        onInputChanged = viewModel::onInputTextChanged,
-        onSendMessage = viewModel::sendMessage,
+        onInputChanged = {
+            viewModel.onEvent(ForumEvent.InputChanged(it))
+        },
+        onSendMessage = {
+            viewModel.onEvent(ForumEvent.SendMessage)
+        },
         onBackClick = onBackClick
     )
 }

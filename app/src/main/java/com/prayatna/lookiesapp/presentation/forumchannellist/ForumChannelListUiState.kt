@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.forum.forumchannellist
+package com.prayatna.lookiesapp.presentation.forumchannellist
 
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelView
 

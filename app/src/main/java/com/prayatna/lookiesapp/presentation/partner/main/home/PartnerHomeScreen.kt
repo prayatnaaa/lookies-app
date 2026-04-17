@@ -81,8 +81,8 @@ fun PartnerHomeScreen(
                     Column {
                         Text(
                             text = when (val s = state) {
-                                is PartnerHomeUiState.Success -> s.data.tradingName
-                                    ?: s.data.legalName
+                                is PartnerHomeUiState.Success -> s.profile.tradingName
+                                    ?: s.profile.legalName
                                 else -> "Partner Dashboard"
                             },
                             style = MaterialTheme.typography.titleLarge,
@@ -188,7 +188,8 @@ fun PartnerHomeScreen(
                 }
 
                 is PartnerHomeUiState.Success -> {
-                    val profile = currentState.data
+                    val profile = currentState.profile
+                    val dashboard = currentState.dashboard
 
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
@@ -239,20 +240,20 @@ fun PartnerHomeScreen(
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(bottom = 12.dp)
                             )
-                            Row(
+                                Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 StatCard(
                                     modifier = Modifier.weight(1f),
-                                    title = "My Events",
-                                    value = "View All",
+                                    title = "Active Events",
+                                    value = dashboard?.activeEvents?.toString() ?: "0",
                                     icon = Icons.Outlined.EventAvailable
                                 )
                                 StatCard(
                                     modifier = Modifier.weight(1f),
-                                    title = "Tickets",
-                                    value = "Overview",
+                                    title = "Tickets Sold",
+                                    value = dashboard?.totalTicketsSold?.toString() ?: "0",
                                     icon = Icons.Outlined.ConfirmationNumber
                                 )
                             }

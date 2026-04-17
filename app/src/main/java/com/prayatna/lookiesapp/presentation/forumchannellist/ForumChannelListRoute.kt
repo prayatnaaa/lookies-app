@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.forum.forumchannellist
+package com.prayatna.lookiesapp.presentation.forumchannellist
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

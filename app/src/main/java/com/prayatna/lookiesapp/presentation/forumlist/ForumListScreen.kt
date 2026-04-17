@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.forum.forumlist
+package com.prayatna.lookiesapp.presentation.forumlist
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

@@ -14,7 +14,7 @@ interface ArtistRepository {
     ):
             DataResult<RegisterEventOutput>
     fun getDashboardData():
-            Flow<DataResult<ArtistDashboardSummary>>
+            Flow<ArtistDashboardSummary>
     suspend fun getArtistEventPaintings(artistId: String):
             DataResult<List<EventPainting>>
     suspend fun getArtistBusinessId():

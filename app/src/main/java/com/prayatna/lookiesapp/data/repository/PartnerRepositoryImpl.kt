@@ -17,7 +17,10 @@ import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class PartnerRepositoryImpl @Inject constructor(
@@ -120,12 +123,7 @@ class PartnerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDashboardSummary(): DataResult<PartnerDashboard> {
-        return try {
-            val result = supabasePartnerService.getDashboardSummary()
-            DataResult.Success(result.toDomain())
-        } catch (e: RestException) {
-            DataResult.Error(e.error)
-        }
-    }
+    override fun getDashboardSummary(): Flow<PartnerDashboard> =
+        supabasePartnerService.getDashboardSummary()
+            .map { it.toDomain() }
 }

@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.forum.forumchannellist
+package com.prayatna.lookiesapp.presentation.forumchannellist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

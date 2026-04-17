@@ -49,18 +49,10 @@ class ArtistRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getDashboardData(): Flow<DataResult<ArtistDashboardSummary>> =
+    override fun getDashboardData(): Flow<ArtistDashboardSummary> =
         supabaseArtistService
             .getDashboardSummary()
-            .map<ArtistDashboardSummaryDto, DataResult<ArtistDashboardSummary>> { dto ->
-                DataResult.Success(dto.toDomain())
-            }
-            .onStart { emit(DataResult.Loading) }
-            .catch { e ->
-                val extractMessage = extractSupabaseError(e.message ?: "Something went wrong")
-                Log.e("Dashboard", e.toString())
-                emit(DataResult.Error(extractMessage))
-            }
+            .map { it.toDomain() }
 
     override suspend fun getArtistEventPaintings(artistId: String): DataResult<List<EventPainting>> {
         return try {

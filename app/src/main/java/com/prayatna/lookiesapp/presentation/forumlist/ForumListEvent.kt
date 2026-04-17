@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.forum.forumlist
+package com.prayatna.lookiesapp.presentation.forumlist
 
 sealed interface ForumListEvent {
     data class OnForumClick(val forumId: String) : ForumListEvent

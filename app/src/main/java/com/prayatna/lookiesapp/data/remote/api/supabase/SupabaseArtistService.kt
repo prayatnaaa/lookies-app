@@ -10,10 +10,10 @@ import com.prayatna.lookiesapp.data.remote.dto.response.artist.RegisterEventResp
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
-import io.github.jan.supabase.postgrest.rpc
+import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.Realtime
-import io.github.jan.supabase.realtime.broadcastFlow
 import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.header
@@ -24,8 +24,6 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -84,35 +82,41 @@ class SupabaseArtistService @Inject constructor(
     }
 
     fun getDashboardSummary(): Flow<ArtistDashboardSummaryDto> = callbackFlow {
-
         val userId = auth.currentSessionOrNull()?.user?.id
             ?: throw IllegalStateException("User not logged in")
 
+        val channel = realtime.channel("artist_dashboard_$userId")
+
+        val flow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "order_items"
+        }
+
+        channel.subscribe()
+
+        // Initial fetch
+        trySend(fetchArtistDashboardSummary(userId))
+
         val job = launch {
-
-            val initial = postgrest
-                .from("artist_dashboard")
-                .select {
-                    filter { eq("user_id", userId) }
-                }
-                .decodeSingle<ArtistDashboardSummaryDto>()
-
-            Log.d("Dashboard", "initial: $initial")
-
-            trySend(initial)
-
-            val channel = realtime.channel("dashboard:$userId")
-
-            channel
-                .broadcastFlow<ArtistDashboardSummaryDto>(event = "dashboard_update")
-                .onEach { trySend(it) }
-                .launchIn(this)
-
-            channel.subscribe(blockUntilSubscribed = true)
+            flow.collect {
+                trySend(fetchArtistDashboardSummary(userId))
+            }
         }
 
         awaitClose {
             job.cancel()
+            launch {
+                channel.unsubscribe()
+                realtime.removeChannel(channel)
+            }
         }
+    }
+
+    private suspend fun fetchArtistDashboardSummary(userId: String): ArtistDashboardSummaryDto {
+        return postgrest
+            .from("artist_dashboard")
+            .select {
+                filter { eq("user_id", userId) }
+            }
+            .decodeSingle<ArtistDashboardSummaryDto>()
     }
 }

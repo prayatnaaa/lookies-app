@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.forum.forumlist
+package com.prayatna.lookiesapp.presentation.forumlist
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
