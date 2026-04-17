@@ -10,7 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,27 +25,31 @@ class PartnerHomeViewModel @Inject constructor(
     fun getDashboardData(businessId: String) {
         viewModelScope.launch {
             _state.value = PartnerHomeUiState.Loading
+
             when (val result = getMerchantProfileUseCase(businessId)) {
                 is DataResult.Success -> {
-                    getPartnerDashboardSummaryUseCase()
-                        .onStart { 
-                            _state.value = PartnerHomeUiState.Success(profile = result.data)
-                        }
+
+                    _state.value = PartnerHomeUiState.PartialSuccess(result.data)
+
+                    getPartnerDashboardSummaryUseCase(businessId)
                         .catch { e ->
-                            _state.value = PartnerHomeUiState.Error(e.message ?: "Unknown error")
+                            _state.value =
+                                PartnerHomeUiState.Error(e.message ?: "Unknown error")
                         }
-                        .collect { dashboard ->
+                        .collectLatest { dashboard ->
                             _state.value = PartnerHomeUiState.Success(
                                 profile = result.data,
                                 dashboard = dashboard
                             )
                         }
                 }
+
                 is DataResult.Error -> {
                     _state.value = PartnerHomeUiState.Error(result.error)
                 }
+
                 else -> Unit
             }
         }
     }
-}
+}

@@ -252,11 +252,12 @@ class SupabaseTransactionService @Inject constructor(
     }
 
     suspend fun getRefunds(): List<RefundDto> {
-        return postgrest.from("refunds").select().decodeList<RefundDto>()
+        return postgrest.from("refund_requests").select().decodeList<RefundDto>()
     }
 
     suspend fun getRefundsByOrderId(orderId: String): List<RefundDto> {
-        return postgrest.from("refunds").select {
+        Log.d("Refund", orderId)
+        return postgrest.from("refund_requests").select {
             filter {
                 eq("order_id", orderId)
             }

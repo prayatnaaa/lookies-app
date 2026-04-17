@@ -219,7 +219,7 @@ fun PartnerHomeScreen(
                             ) {
                                 StatCard(
                                     modifier = Modifier.weight(1f),
-                                    title = "KYC Status",
+                                    title = "Status",
                                     value = profile.kycStatus.replaceFirstChar { it.uppercase() },
                                     icon = Icons.Outlined.Shield
                                 )
@@ -247,13 +247,13 @@ fun PartnerHomeScreen(
                                 StatCard(
                                     modifier = Modifier.weight(1f),
                                     title = "Active Events",
-                                    value = dashboard?.activeEvents?.toString() ?: "0",
+                                    value = dashboard.activeEvents.toString(),
                                     icon = Icons.Outlined.EventAvailable
                                 )
                                 StatCard(
                                     modifier = Modifier.weight(1f),
                                     title = "Tickets Sold",
-                                    value = dashboard?.totalTicketsSold?.toString() ?: "0",
+                                    value = dashboard.totalTicketsSold.toString(),
                                     icon = Icons.Outlined.ConfirmationNumber
                                 )
                             }
@@ -307,6 +307,108 @@ fun PartnerHomeScreen(
                         item { Spacer(modifier = Modifier.height(80.dp)) }
                     }
                 }
+
+                is PartnerHomeUiState.PartialSuccess -> {
+                    val profile = currentState.profile
+
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(24.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+
+                        // Header (already available)
+                        item {
+                            WelcomeHeader(
+                                name = profile.tradingName ?: profile.legalName,
+                                pictureUrl = profile.pictureUrl,
+                                description = profile.description
+                            )
+                        }
+
+                        // Business Status (can show immediately)
+                        item {
+                            Text(
+                                "Business Status",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                StatCard(
+                                    modifier = Modifier.weight(1f),
+                                    title = "Status",
+                                    value = profile.kycStatus.replaceFirstChar { it.uppercase() },
+                                    icon = Icons.Outlined.Shield
+                                )
+                                StatCard(
+                                    modifier = Modifier.weight(1f),
+                                    title = "Payout",
+                                    value = if (profile.payoutEnabled) "Enabled" else "Disabled",
+                                    icon = if (profile.payoutEnabled)
+                                        Icons.Default.CheckCircle
+                                    else
+                                        Icons.Default.WarningAmber
+                                )
+                            }
+                        }
+
+                        // Dashboard loading state
+                        item {
+                            Text(
+                                "Event Overview",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                CircularProgressIndicator()
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    "Loading stats...",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+
+                        // You can still allow navigation actions
+                        item {
+                            Text(
+                                "Management",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                DashboardActionItem(
+                                    title = "My Events",
+                                    subtitle = "View and manage your events",
+                                    icon = Icons.Filled.Event,
+                                    onClick = {
+                                        navController.navigate("${NavigationRoutes.SELF_EVENT_LIST}/$businessId")
+                                    }
+                                )
+                                DashboardActionItem(
+                                    title = "Team Members",
+                                    subtitle = "Manage your team and roles",
+                                    icon = Icons.Filled.Group,
+                                    onClick = {
+                                        navController.navigate("${NavigationRoutes.MERCHANT_MEMBER_LIST}/$businessId")
+                                    }
+                                )
+                            }
+                        }
+
+                        item { Spacer(modifier = Modifier.height(80.dp)) }
+                    }
+                }
             }
         }
     }
@@ -325,7 +427,7 @@ private fun WelcomeHeader(
             .background(
                 Brush.horizontalGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.background,
                         MaterialTheme.colorScheme.secondary
                     )
                 )

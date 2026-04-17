@@ -123,7 +123,7 @@ class PartnerRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getDashboardSummary(): Flow<PartnerDashboard> =
-        supabasePartnerService.getDashboardSummary()
+    override fun getDashboardSummary(merchantId: String): Flow<PartnerDashboard> =
+        supabasePartnerService.getDashboardSummary(merchantId)
             .map { it.toDomain() }
 }

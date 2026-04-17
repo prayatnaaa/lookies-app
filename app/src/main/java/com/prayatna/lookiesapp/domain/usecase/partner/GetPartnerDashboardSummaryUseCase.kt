@@ -9,7 +9,7 @@ import javax.inject.Inject
 class GetPartnerDashboardSummaryUseCase @Inject constructor(
     private val repository: PartnerRepository
 ) {
-    operator fun invoke(): Flow<PartnerDashboard> {
-        return repository.getDashboardSummary()
+    operator fun invoke(merchantId: String): Flow<PartnerDashboard> {
+        return repository.getDashboardSummary(merchantId)
     }
 }

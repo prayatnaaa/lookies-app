@@ -26,5 +26,5 @@ interface PartnerRepository {
     suspend fun getParticipantList(eventId: String?): DataResult<List<EventParticipant>>
     suspend fun approvePainting(id: String): DataResult<String>
     suspend fun rejectPainting(id: String): DataResult<String>
-    fun getDashboardSummary(): Flow<PartnerDashboard>
+    fun getDashboardSummary(merchantId: String): Flow<PartnerDashboard>
 }

@@ -5,9 +5,12 @@ import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 
 sealed class PartnerHomeUiState {
     data object Loading : PartnerHomeUiState()
+    data class PartialSuccess(
+        val profile: MerchantProfile,
+    ) : PartnerHomeUiState()
     data class Success(
         val profile: MerchantProfile,
-        val dashboard: PartnerDashboard? = null
+        val dashboard: PartnerDashboard
     ) : PartnerHomeUiState()
     data class Error(val message: String) : PartnerHomeUiState()
 }

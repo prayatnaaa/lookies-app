@@ -182,11 +182,11 @@ class SupabasePartnerService @Inject constructor(
         return "Painting rejected"
     }
 
-    fun getDashboardSummary(): Flow<PartnerDashboardDto> = callbackFlow {
-        val userId = auth.currentUserOrNull()?.id
-            ?: throw Exception("user not logged in")
+    fun getDashboardSummary(merchantId: String): Flow<PartnerDashboardDto> = callbackFlow {
+//        val userId = auth.currentUserOrNull()?.id
+//            ?: throw Exception("user not logged in")
 
-        val channel = realtime.channel("partner_dashboard_$userId")
+        val channel = realtime.channel("partner_dashboard_$merchantId")
 
         val flow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
             table = "purchased_tickets"
@@ -195,11 +195,11 @@ class SupabasePartnerService @Inject constructor(
         channel.subscribe()
 
         // Initial fetch
-        trySend(fetchDashboardSummary(userId))
+        trySend(fetchDashboardSummary(merchantId))
 
         val job = launch {
             flow.collect {
-                trySend(fetchDashboardSummary(userId))
+                trySend(fetchDashboardSummary(merchantId))
             }
         }
 
@@ -213,21 +213,12 @@ class SupabasePartnerService @Inject constructor(
     }
 
     private suspend fun fetchDashboardSummary(userId: String): PartnerDashboardDto {
-        return postgrest.from("partner_dashboard_summary_view")
+        return postgrest.from("partner_dashboard_view")
             .select {
                 filter {
                     eq("partner_id", userId)
                 }
             }
-            .decodeSingleOrNull<PartnerDashboardDto>()
-            ?: PartnerDashboardDto(
-                partnerId = userId,
-                partnerName = null,
-                totalEventsCreated = 0,
-                activeEvents = 0,
-                totalTicketsSold = 0,
-                totalRevenue = 0.0,
-                pendingPayout = 0.0
-            )
+            .decodeSingle<PartnerDashboardDto>()
     }
 }
