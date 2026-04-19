@@ -20,14 +20,26 @@ fun CheckoutRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // ✅ Initial load
     LaunchedEffect(Unit) {
         viewModel.onEvent(
             CheckoutEvent.OnLoad(type, itemId, quantity)
         )
     }
 
-    // ✅ ONLY navigation handled here
+    val addressAdded = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow("address_added", false)
+        ?.collectAsStateWithLifecycle()
+
+    LaunchedEffect(addressAdded?.value) {
+        if (addressAdded?.value == true) {
+            viewModel.refreshUserAddresses()
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.set("address_added", false)
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
@@ -46,7 +58,7 @@ fun CheckoutRoute(
                     )
                 }
 
-                else -> Unit // ❗ jangan handle dialog/snackbar di sini
+                else -> Unit //
             }
         }
     }

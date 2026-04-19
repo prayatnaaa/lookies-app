@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.components.checkout
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -193,36 +194,51 @@ fun AddressSection(
 
             Text("No address found")
 
-            OutlinedButton(onClick = onAddAddressClick) {
-                Text("+ Add Address")
+            OutlinedButton(
+                onClick = onAddAddressClick,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+            ) {
+                Text("+ Add New Address")
             }
 
         } else {
 
+            Column {
             uiState.userAddresses.forEach { address ->
                 val selected = uiState.selectedAddress?.id == address.id
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onAddressSelected(address) }
+                            .padding(12.dp)
+                            .border(
+                                width = if (selected) 2.dp else 1.dp,
+                                color = if (selected) MaterialTheme.colorScheme.primary else Color.Gray,
+                                shape = RoundedCornerShape(12.dp)
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = selected, onClick = null)
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onAddressSelected(address) }
-                        .padding(12.dp)
-                        .border(
-                            width = if (selected) 2.dp else 1.dp,
-                            color = if (selected) MaterialTheme.colorScheme.primary else Color.Gray,
-                            shape = RoundedCornerShape(12.dp)
-                        ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(selected = selected, onClick = null)
+                        Spacer(Modifier.width(8.dp))
 
-                    Spacer(Modifier.width(8.dp))
-
-                    Column {
-                        Text(address.name)
-                        Text(address.phoneNumber)
-                        Text(address.addressLine)
+                        Column {
+                            Text(address.name)
+                            Text(address.phoneNumber)
+                            Text(address.addressLine)
+                        }
                     }
+                }
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                OutlinedButton(
+                    onClick = onAddAddressClick,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("+ Add New Address")
                 }
             }
         }

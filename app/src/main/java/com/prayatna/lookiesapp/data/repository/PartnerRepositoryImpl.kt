@@ -9,18 +9,17 @@ import com.prayatna.lookiesapp.domain.model.EventParticipant
 import com.prayatna.lookiesapp.domain.model.event.DefaultEvent
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
-import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.painting.Painting
+import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class PartnerRepositoryImpl @Inject constructor(
@@ -126,4 +125,19 @@ class PartnerRepositoryImpl @Inject constructor(
     override fun getDashboardSummary(merchantId: String): Flow<PartnerDashboard> =
         supabasePartnerService.getDashboardSummary(merchantId)
             .map { it.toDomain() }
+
+    override suspend fun insertSelfEventPaintings(
+        eventId: Int,
+        selectedPaintings: List<Painting>
+    ): DataResult<String> {
+        return try {
+            val result = supabasePartnerService.insertSelfEventPaintings(
+                eventId = eventId.toString(),
+                selectedPaintings = selectedPaintings.map { it.toDto() }
+            )
+            DataResult.Success(result)
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
+    }
 }

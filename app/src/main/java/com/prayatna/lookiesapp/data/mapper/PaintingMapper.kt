@@ -24,6 +24,25 @@ fun GetPaintingDto.toDomain(): Painting {
     )
 }
 
+fun Painting.toDto(): GetPaintingDto {
+    return GetPaintingDto(
+        id = this.id,
+        artistId = this.artistId,
+        title = this.title,
+        paintingUrl = this.paintingUrl,
+        description = this.description,
+        dimensionHeight = this.dimensionHeight,
+        dimensionWidth = this.dimensionWidth,
+        medium = this.medium,
+        artStyle = this.artStyle,
+        subject = this.subject,
+        yearCreated =this.yearCreated,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt,
+        price = this.price
+    )
+}
+
 fun UploadPaintingRequest.toDomain(): AddPaintingParams {
     return AddPaintingParams(
         artistId = this.artistId,

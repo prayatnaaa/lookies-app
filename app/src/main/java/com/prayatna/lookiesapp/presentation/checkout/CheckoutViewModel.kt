@@ -45,6 +45,11 @@ class CheckoutViewModel @Inject constructor(
     )
     val effect = _effect.asSharedFlow()
 
+    fun refreshUserAddresses() {
+        viewModelScope.launch {
+            fetchUserAddresses()
+        }
+    }
     // ========================
     // SINGLE ENTRY POINT
     // ========================

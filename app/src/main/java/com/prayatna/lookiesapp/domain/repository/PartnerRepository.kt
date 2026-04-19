@@ -6,6 +6,7 @@ import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
@@ -27,4 +28,6 @@ interface PartnerRepository {
     suspend fun approvePainting(id: String): DataResult<String>
     suspend fun rejectPainting(id: String): DataResult<String>
     fun getDashboardSummary(merchantId: String): Flow<PartnerDashboard>
+    suspend fun insertSelfEventPaintings(eventId: Int, selectedPaintings: List<Painting>):
+            DataResult<String>
 }
