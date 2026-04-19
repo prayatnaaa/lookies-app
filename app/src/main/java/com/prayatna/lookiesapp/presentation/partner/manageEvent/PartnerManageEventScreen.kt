@@ -119,7 +119,7 @@ fun PartnerManageEventScreen(
                             description = "Lihat semua lukisan yang masuk, kurasi lukisan, dan atur display.",
                             icon = Icons.Default.Palette,
                             onClick = {
-                                navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/${event.id}")
+                                navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/${event.id}?eventType=${event.eventType.slug}&businessId=${event.organizer.id}")
                             }
                         )
                     }

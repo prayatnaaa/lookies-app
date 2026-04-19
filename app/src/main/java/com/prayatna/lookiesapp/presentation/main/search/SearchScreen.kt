@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,6 +59,8 @@ data class SearchCategory(
 fun SearchScreen(navController: NavController) {
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+    var hasSearched by rememberSaveable { mutableStateOf(false) }
+    var lastSearchedQuery by rememberSaveable { mutableStateOf("") }
 
     val searchHistory = remember { mutableStateListOf("Abstract Art", "Bali Event") }
 
@@ -74,6 +77,8 @@ fun SearchScreen(navController: NavController) {
                 searchHistory.add(0, searchQuery)
             }
             active = false
+            hasSearched = true
+            lastSearchedQuery = searchQuery
             // 3. TODO: navigation ke result screen / filter viewmodel
         }
     }
@@ -165,7 +170,19 @@ fun SearchScreen(navController: NavController) {
                 }
             }
 
-            if (!active) {
+            if (!active && hasSearched) {
+                com.prayatna.lookiesapp.presentation.components.EmptyState(
+                    title = "No results found",
+                    description = "We couldn't find anything for \"${lastSearchedQuery}\". Try checking for typos or using different keywords.",
+                    icon = Icons.Default.SearchOff,
+                    actionText = "Clear Search",
+                    onActionClick = { 
+                        hasSearched = false 
+                        query = ""
+                        lastSearchedQuery = ""
+                    }
+                )
+            } else if (!active) {
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Text(
                         text = "Browse by Category",

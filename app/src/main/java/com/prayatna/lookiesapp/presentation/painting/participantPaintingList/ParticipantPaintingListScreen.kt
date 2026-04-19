@@ -20,7 +20,9 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun ParticipantPaintingListScreen(
+    eventType: String? = null,
     eventId: String,
+    businessId: String? = null,
     navController: NavController,
     viewModel: ParticipantPaintingListViewModel = hiltViewModel()
 ) {
@@ -45,6 +47,15 @@ fun ParticipantPaintingListScreen(
     }
 
     Scaffold(
+        bottomBar = {
+            if (eventType == "self_exhibition") {
+                Button(onClick = {
+                    navController.navigate("${NavigationRoutes.SELF_EVENT_LIST}/${businessId}")
+                }) {
+                    Text("Upload Painting")
+                }
+            }
+        },
         topBar = {
             BackTopBar(
                 onBackClick = {

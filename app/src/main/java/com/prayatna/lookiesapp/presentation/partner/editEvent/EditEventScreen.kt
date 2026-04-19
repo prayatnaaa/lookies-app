@@ -236,13 +236,22 @@ fun EditEventScreen(
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary
                             ),
-                            enabled = !uiState.isLoading && event?.status != "pending_validation",
+                            enabled = !uiState.isLoading && event?.eventType?.slug == "self_exhibition",
                                     onClick = {
-                                navController.navigate("${NavigationRoutes.PARTICIPANT_LIST}/$eventId")
+                                navController.navigate(
+                                    "${
+                                        NavigationRoutes.EVENT_PAINTING_LIST
+                                    }/${
+                                        uiState.data?.organizer?.id
+                                    }?eventType=${
+                                        event?.eventType?.slug
+                                    }&businessId=${
+                                        event?.organizer?.id
+                                    }")
                             }
                         ) {
                             Text(
-                                text = "Participants",
+                                text = "Add Paintings",
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }

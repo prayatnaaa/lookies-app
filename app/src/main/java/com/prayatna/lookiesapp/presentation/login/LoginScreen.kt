@@ -9,11 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,10 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
-import com.prayatna.lookiesapp.ui.theme.BlackText
 import com.prayatna.lookiesapp.ui.theme.GreyTextLight
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.Constants
@@ -119,25 +116,19 @@ fun LoginScreen(modifier: Modifier = Modifier,
                 )
             }
             if (showDialog) {
-                AlertDialog(
-                    containerColor = BlackText,
-                    shape = MaterialTheme.shapes.medium,
-                    textContentColor = PureWhite,
-                    onDismissRequest = {},
-                    title = {
-                        Text(if (isErrorDialog) "Error" else "Success",
-                            color = PureWhite)
+                CustomBottomSheet(
+
+                    title = if (isErrorDialog) "Error" else "Success",
+                    onDismiss = {
+                        showDialog = false
                     },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showDialog = false
-                        }) {
-                            Text("OK", color = PureWhite)
+                    message = dialogMessage,
+                    onConfirm = {
+                        showDialog = false
+                        if (isErrorDialog) {
+                            viewModel.resetLoginState()
                         }
-                    },
-                    text = {
-                        Text(dialogMessage, color = PureWhite)
-                    },
+                    }
                 )
             }
 

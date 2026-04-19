@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation.refund.orderRefunds
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,7 +35,7 @@ class OrderRefundsViewModel @Inject constructor(
         loadRefunds()
     }
 
-    fun loadRefunds() {
+    private fun loadRefunds() {
         if (orderId.isBlank()) return
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }

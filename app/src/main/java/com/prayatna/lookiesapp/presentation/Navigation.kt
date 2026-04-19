@@ -172,17 +172,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
 
         composable(
-//            route = "${NavigationRoutes.MERCHANT_MEMBER_LIST}/{userId}",
-//            arguments = listOf(navArgument("userId") { type = NavType.StringType })
             route = NavigationRoutes.MERCHANT_MEMBER_LIST
         ) {
-//            backStackEntry ->
-//            backStackEntry.arguments?.getString("userId")?.let { id ->
-//                MerchantMemberListScreen(
-//                    navController = navController,
-//                    userId = id
-//                )
-//            }
             MerchantMemberListScreen(navController = navController)
         }
 
@@ -254,11 +245,31 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
 
         composable(
-            route = "${NavigationRoutes.EVENT_PAINTING_LIST}/{eventId}",
-            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+            route = "${NavigationRoutes.EVENT_PAINTING_LIST}/{eventId}?eventType={eventType}&businessId={businessId}",
+            arguments = listOf(
+                navArgument("eventId") { type = NavType.StringType },
+                navArgument("eventType") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument("businessId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("eventId")?.let { participantId ->
-                ParticipantPaintingListScreen(eventId = participantId, navController = navController)
+                val eventType = backStackEntry.arguments?.getString("eventType")
+                val businessId = backStackEntry.arguments?.getString("businessId")
+
+                ParticipantPaintingListScreen(
+                    eventId = participantId,
+                    navController = navController,
+                    eventType = eventType,
+                    businessId = businessId
+                )
             }
         }
         composable(
