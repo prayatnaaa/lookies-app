@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "675420699225",
+    "project_id": "fir-ml-prayatna",
+    "storage_bucket": "fir-ml-prayatna.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675420699225:android:537252e0fb20a6faa0cf48",
+        "android_client_info": {
+          "package_name": "com.prayatna.lookiesapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA3SM2UJexj1xFtvG8YvsM0qK1EQiP27k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
