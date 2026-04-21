@@ -10,6 +10,7 @@ import com.prayatna.lookiesapp.domain.model.event.DefaultEvent
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.painting.InsertSelfEventPaintingsResult
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
@@ -129,14 +130,16 @@ class PartnerRepositoryImpl @Inject constructor(
     override suspend fun insertSelfEventPaintings(
         eventId: Int,
         selectedPaintings: List<Painting>
-    ): DataResult<String> {
+    ): DataResult<InsertSelfEventPaintingsResult> {
         return try {
             val result = supabasePartnerService.insertSelfEventPaintings(
                 eventId = eventId.toString(),
                 selectedPaintings = selectedPaintings.map { it.toDto() }
             )
-            DataResult.Success(result)
+            Log.d("InsertSelfEventPaintings", result.toString())
+            DataResult.Success(result.toDomain())
         } catch (e: RestException) {
+            Log.e("InsertSelfEventPaintings", e.toString())
             DataResult.Error(e.error)
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.prayatna.lookiesapp.R
 
 object NavigationRoutes {
+    const val INSERT_EVENT_PAINTINGS_ROUTE = "insert_event_paintings_route"
     const val SHIPMENT_LIST = "shipment_list"
     const val QRIS_PAYMENT = "qris_payment"
     const val MERCHANT_MEMBER_LIST = "merchant_member_list"

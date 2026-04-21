@@ -23,6 +23,7 @@ import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.Even
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
 import com.prayatna.lookiesapp.presentation.forumchannellist.ForumChannelListRoute
 import com.prayatna.lookiesapp.presentation.forumlist.ForumListRoute
+import com.prayatna.lookiesapp.presentation.insertEventPaintings.insertEventPaintingsNavigation
 import com.prayatna.lookiesapp.presentation.loading.MainLoadingScreen
 import com.prayatna.lookiesapp.presentation.login.LoginScreen
 import com.prayatna.lookiesapp.presentation.login.LoginViewModel
@@ -243,6 +244,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 )
             }
         }
+
+        insertEventPaintingsNavigation(navController)
 
         composable(
             route = "${NavigationRoutes.EVENT_PAINTING_LIST}/{eventId}?eventType={eventType}&businessId={businessId}",

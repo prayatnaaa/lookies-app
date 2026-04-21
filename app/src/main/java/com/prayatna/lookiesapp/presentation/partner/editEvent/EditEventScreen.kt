@@ -240,14 +240,8 @@ fun EditEventScreen(
                                     onClick = {
                                 navController.navigate(
                                     "${
-                                        NavigationRoutes.EVENT_PAINTING_LIST
-                                    }/${
-                                        uiState.data?.organizer?.id
-                                    }?eventType=${
-                                        event?.eventType?.slug
-                                    }&businessId=${
-                                        event?.organizer?.id
-                                    }")
+                                        NavigationRoutes.INSERT_EVENT_PAINTINGS_ROUTE
+                                    }/${eventId}/${event?.organizer?.id}")
                             }
                         ) {
                             Text(

@@ -10,6 +10,7 @@ import com.prayatna.lookiesapp.data.remote.dto.PartnerDashboardDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.SelfEventPaintingInsertRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetPaintingDto
+import com.prayatna.lookiesapp.data.remote.dto.response.painting.InsertSelfEventPaintingsResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -228,16 +229,18 @@ class SupabasePartnerService @Inject constructor(
     suspend fun insertSelfEventPaintings(
         eventId: String,
         selectedPaintings: List<GetPaintingDto>
-    ): String {
+    ): InsertSelfEventPaintingsResponse {
         val insertPayload = selectedPaintings.map { painting ->
             SelfEventPaintingInsertRequest(
                 paintingId = painting.id,
                 eventId = eventId,
-                finalPrice = painting.price
+                finalPrice = painting.price,
+                status = "accepted"
             )
         }
-        return postgrest.from("event_paintings").insert(listOf(insertPayload)) {
+        Log.d("InsertSelfEventPaintings", insertPayload.toString())
+        return postgrest.from("event_paintings").insert(insertPayload) {
             select(Columns.list("id"))
-        }.decodeSingle<String>()
+        }.decodeSingle<InsertSelfEventPaintingsResponse>()
     }
 }
