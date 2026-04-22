@@ -11,6 +11,8 @@ import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
+    suspend fun updateFcmToken(token: String):
+            DataResult<Unit>
     fun getProfile():
             Flow<DataResult<ProfileDto>>
     suspend fun editProfile(
@@ -36,4 +38,6 @@ interface UserRepository {
         kycFile: Uri,
         fileName: String
     ): DataResult<RoleApplicationResponse>
+    suspend fun getFcmToken():
+            String?
 }

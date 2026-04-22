@@ -2,7 +2,6 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
-import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.UserAddressDto
 import com.prayatna.lookiesapp.data.remote.dto.request.user.ArtistApplicationRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateUserAddressRequest
@@ -255,12 +254,19 @@ class SupabaseUserService @Inject constructor(
         return result
     }
 
-    suspend fun getShipmentsByOrderId(orderId: String): List<ShipmentDto> {
-        return postgrest.from("shipments")
-            .select {
+    suspend fun updateFcmToken(token: String) {
+        val userId = auth.currentUserOrNull()?.id
+            ?: throw Exception("User not authenticated")
+
+        postgrest.from("user_profiles")
+            .update({
+                set("fcm_token", token)
+            }) {
                 filter {
-                    ShipmentDto::orderId eq orderId
+                    eq("user_id", userId)
                 }
-            }.decodeList<ShipmentDto>()
+            }
+
+        Log.d("FCM-UPDATE", "Token updated")
     }
 }

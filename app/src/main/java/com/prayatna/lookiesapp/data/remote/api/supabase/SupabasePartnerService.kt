@@ -5,7 +5,6 @@ import com.prayatna.lookiesapp.data.remote.dto.DefaultEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventParticipantDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
-import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDashboardDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.SelfEventPaintingInsertRequest
@@ -230,7 +229,16 @@ class SupabasePartnerService @Inject constructor(
         eventId: String,
         selectedPaintings: List<GetPaintingDto>
     ): InsertSelfEventPaintingsResponse {
-        val insertPayload = selectedPaintings.map { painting ->
+
+        val availablePaintings = selectedPaintings.filter { painting ->
+            painting.status == "available"
+        }
+
+        if (availablePaintings.isEmpty()) {
+            throw IllegalStateException("Selected paintings is not available.")
+        }
+
+        val insertPayload = availablePaintings.map { painting ->
             SelfEventPaintingInsertRequest(
                 paintingId = painting.id,
                 eventId = eventId,
@@ -238,7 +246,9 @@ class SupabasePartnerService @Inject constructor(
                 status = "accepted"
             )
         }
+
         Log.d("InsertSelfEventPaintings", insertPayload.toString())
+
         return postgrest.from("event_paintings").insert(insertPayload) {
             select(Columns.list("id"))
         }.decodeSingle<InsertSelfEventPaintingsResponse>()

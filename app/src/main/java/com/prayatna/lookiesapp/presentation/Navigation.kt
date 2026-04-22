@@ -62,10 +62,6 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val authState by viewModel.authState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.observeSession()
-    }
-
     LaunchedEffect(authState) {
 
         val destination = when (val state = authState) {

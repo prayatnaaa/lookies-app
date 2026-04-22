@@ -8,21 +8,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
+import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
 import com.prayatna.lookiesapp.domain.usecase.auth.ListenUserSessionUseCase
+import com.prayatna.lookiesapp.domain.usecase.auth.LoginUseCase
+import com.prayatna.lookiesapp.domain.usecase.user.GetFcmTokenUseCase
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.worker.FcmTokenScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.gotrue.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val listenUserSessionUseCase: ListenUserSessionUseCase
+    private val loginUseCase: LoginUseCase,
+    private val listenUserSessionUseCase: ListenUserSessionUseCase,
+    private val getFcmTokenUseCase: GetFcmTokenUseCase,
+    private val getRoleUseCase: GetRoleUseCase,
+    private val fcmTokenScheduler: FcmTokenScheduler,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     var emailValue by mutableStateOf("")
@@ -37,6 +46,10 @@ class LoginViewModel @Inject constructor(
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
+
+    init {
+        observeSession()
+    }
 
     fun onEmailChange(emailValue: String) {
         this.emailValue = emailValue
@@ -61,7 +74,7 @@ class LoginViewModel @Inject constructor(
         _authState.value = AuthState.Loading
 
         viewModelScope.launch {
-            when (val result = authRepository.signIn(emailValue, passwordValue)) {
+            when (val result = loginUseCase(emailValue, passwordValue)) {
 
                 is DataResult.Success -> {
                     resetForm()
@@ -76,14 +89,12 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun observeSession() {
+    private fun observeSession() {
         viewModelScope.launch {
             when (val result = listenUserSessionUseCase()) {
                 is DataResult.Error -> {
                     _authState.value = AuthState.Error(result.error)
                 }
-                DataResult.Idle -> TODO()
-                DataResult.Loading -> TODO()
                 is DataResult.Success -> {
                     val session = result.data
 
@@ -97,11 +108,11 @@ class LoginViewModel @Inject constructor(
                                 Log.d("SignIn", "Not authenticated")
                                 _authState.value = AuthState.Unauthenticated
                             }
-                            else -> {}
+                            else -> Unit
                         }
-
                     }
                 }
+                else -> Unit
             }
         }
     }
@@ -109,11 +120,18 @@ class LoginViewModel @Inject constructor(
     private fun loadAuthenticatedUser() {
         viewModelScope.launch {
             val role = authRepository.getRole()
+            val token = getFcmTokenUseCase()
+
+            if (token != null) {
+                fcmTokenScheduler.enqueue(token)
+            }
+
             Log.d("SignIn", "Role in lAU: $role")
-            if (role.isBlank()) {
-                _authState.value = AuthState.Unauthenticated
+
+            _authState.value = if (role.isBlank()) {
+                AuthState.Unauthenticated
             } else {
-                _authState.value = AuthState.Authenticated(role)
+                AuthState.Authenticated(role)
             }
         }
     }

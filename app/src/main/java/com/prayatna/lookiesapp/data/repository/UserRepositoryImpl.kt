@@ -3,11 +3,13 @@ package com.prayatna.lookiesapp.data.repository
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.google.firebase.FirebaseException
+import com.google.firebase.messaging.FirebaseMessaging
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
-import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.mapper.toDto
+import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
+import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
@@ -29,6 +31,7 @@ import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.tasks.await
 import java.util.UUID
 import javax.inject.Inject
 
@@ -38,8 +41,18 @@ class UserRepositoryImpl @Inject constructor(
     private val storage: Storage,
     private val userPreference: UserPreference,
     private val supabaseUserService: SupabaseUserService,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ): UserRepository {
+    override suspend fun updateFcmToken(token: String): DataResult<Unit> {
+        return try {
+            val result = supabaseUserService.updateFcmToken(token)
+            DataResult.Success(result)
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            Log.e("UserRepositoryImpl", "updateFcmToken: $msg")
+            DataResult.Error(msg)
+        }
+    }
 
     override fun getProfile(): Flow<DataResult<ProfileDto>> =
         userPreference.getProfile()
@@ -60,8 +73,6 @@ class UserRepositoryImpl @Inject constructor(
                             filter { eq("user_id", userId) }
                         }
                         .decodeSingle<ProfileDto>()
-
-                    Log.d("ProfileScreen", "Remote Profile: $remoteProfile")
 
                     userPreference.setProfile(remoteProfile.asDomainModel())
 
@@ -176,6 +187,14 @@ class UserRepositoryImpl @Inject constructor(
             DataResult.Error(msg)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
+
+    override suspend fun getFcmToken(): String? {
+        return try {
+            FirebaseMessaging.getInstance().token.await()
+        } catch (e: FirebaseException) {
+            e.message ?: "Something went wrong! Please check your connection"
         }
     }
 
