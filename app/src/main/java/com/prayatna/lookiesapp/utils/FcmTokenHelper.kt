@@ -23,7 +23,7 @@ fun enqueueFcmWorker(context: Context, token: String) {
 
     WorkManager.getInstance(context).enqueueUniqueWork(
         "fcm_token_sync",
-        ExistingWorkPolicy.KEEP,
+        ExistingWorkPolicy.REPLACE,
         request
     )
 }

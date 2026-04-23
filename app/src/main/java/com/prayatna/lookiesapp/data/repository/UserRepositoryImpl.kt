@@ -192,6 +192,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getFcmToken(): String? {
         return try {
+            Log.d("UserRepositoryImpl", "getFcmToken: ${FirebaseMessaging.getInstance().token.await()}")
             FirebaseMessaging.getInstance().token.await()
         } catch (e: FirebaseException) {
             e.message ?: "Something went wrong! Please check your connection"

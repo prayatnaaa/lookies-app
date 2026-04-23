@@ -123,6 +123,7 @@ class LoginViewModel @Inject constructor(
             val token = getFcmTokenUseCase()
 
             if (token != null) {
+                Log.d("UserRepositoryImpl", "Token in lAU: $token")
                 fcmTokenScheduler.enqueue(token)
             }
 
