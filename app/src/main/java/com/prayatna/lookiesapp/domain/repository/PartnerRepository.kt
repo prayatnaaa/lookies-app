@@ -6,6 +6,7 @@ import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantDetail
 import com.prayatna.lookiesapp.domain.model.painting.InsertSelfEventPaintingsResult
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.utils.DataResult
@@ -18,7 +19,7 @@ interface PartnerRepository {
         kycStatus: String? = null,
         merchantType: String? = null
     ): Flow<DataResult<List<MerchantBusiness>>>
-    suspend fun getDetailPartner(id: String): DataResult<MerchantBusiness>
+    suspend fun getDetailPartner(id: String): DataResult<MerchantDetail>
     suspend fun getSelfEvents(
         businessId: String,
         status: String? = null,

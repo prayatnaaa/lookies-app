@@ -10,6 +10,7 @@ import com.prayatna.lookiesapp.domain.model.event.DefaultEvent
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantDetail
 import com.prayatna.lookiesapp.domain.model.painting.InsertSelfEventPaintingsResult
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
@@ -52,7 +53,7 @@ class PartnerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDetailPartner(id: String): DataResult<MerchantBusiness> {
+    override suspend fun getDetailPartner(id: String): DataResult<MerchantDetail> {
         return try {
             val response = supabasePartnerService.getDetailPartner(id)
             DataResult.Success(response.toDomain())

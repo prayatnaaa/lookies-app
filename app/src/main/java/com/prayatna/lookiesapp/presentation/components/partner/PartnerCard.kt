@@ -95,7 +95,7 @@ fun PartnerCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    StatusPill(text = data.status!!)
+                    StatusPill(text = data.status ?: "unknown")
                 }
             }
 

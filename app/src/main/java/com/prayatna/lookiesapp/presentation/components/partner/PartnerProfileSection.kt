@@ -17,17 +17,23 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.Public
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,13 +43,18 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
-import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
+import com.prayatna.lookiesapp.domain.model.merchant.Member
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantAddress
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantDetail
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantIndividual
 
 @Composable
 fun PartnerProfileSection(
-    data: MerchantBusiness,
+    data: MerchantDetail,
     onPortofolioClick: () -> Unit,
     isAdmin: Boolean = false
 ) {
@@ -51,107 +62,29 @@ fun PartnerProfileSection(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
-        // ── Profile Header (banner + overlapping avatar) ──
+        // ── HEADER ──
         item {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                // Banner image with default fallback
-                val bannerUrl = data.pictureUrl?.replace("http://172.21.179.110", "http://10.0.2.2")
-                if (bannerUrl.isNullOrBlank()) {
-                    // Default banner gradient
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .background(
-                                Brush.horizontalGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.primaryContainer,
-                                        MaterialTheme.colorScheme.secondaryContainer
-                                    )
-                                )
-                            )
-                    )
-                } else {
-                    SubcomposeAsyncImage(
-                        model = bannerUrl,
-                        contentDescription = data.tradingName,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        contentScale = ContentScale.Crop,
-                        error = {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            colors = listOf(
-                                                MaterialTheme.colorScheme.primaryContainer,
-                                                MaterialTheme.colorScheme.secondaryContainer
-                                            )
-                                        )
-                                    )
-                            )
-                        }
-                    )
-                }
-                // Gradient scrim at bottom of banner
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .align(Alignment.BottomCenter)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    MaterialTheme.colorScheme.background.copy(alpha = 0.8f)
-                                )
-                            )
-                        )
-                )
-                // Overlapping avatar with default fallback
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .offset(x = 20.dp, y = 40.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(3.dp)
-                ) {
-                    PartnerAvatar(
-                        pictureUrl = data.pictureUrl,
-                        name = data.legalName,
-                        size = 84
-                    )
-                }
-            }
+            ProfileHeader(data)
         }
 
-        // ── Name, Status & Type ──
+        // ── NAME & TYPE ──
         item {
-            Column(
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp, top = 52.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
+            Column(Modifier.padding(horizontal = 20.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = data.legalName,
                         style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Bold
                     )
-                    if (isAdmin && data.status!!.isNotBlank()) {
-                        StatusPill(text = data.status)
+                    if (isAdmin && !data.kycStatus.isNullOrBlank()) {
+                        Spacer(Modifier.width(8.dp))
+                        StatusPill(text = data.kycStatus)
                     }
                 }
-                Spacer(Modifier.height(2.dp))
+
                 Text(
                     text = data.type,
                     style = MaterialTheme.typography.bodyMedium,
@@ -160,112 +93,294 @@ fun PartnerProfileSection(
             }
         }
 
-        // ── Description ──
+        // ── ABOUT ──
         if (!data.description.isNullOrBlank()) {
             item {
-                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
-                    Text(
-                        text = "About",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    Spacer(Modifier.height(6.dp))
+                SectionCard("About") {
                     Text(
                         text = data.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
         }
 
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 20.dp),
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
-        }
-
-        // ── Contact Information ──
-        item {
-            SectionHeader(title = "Contact Information")
-        }
-        item {
-            Column(
-                modifier = Modifier.padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                if (!data.email.isNullOrBlank()) {
-                    InfoRow(icon = Icons.Outlined.Email, label = "Email", value = data.email)
-                }
-                if (!data.phoneNumber.isNullOrBlank()) {
-                    InfoRow(icon = Icons.Outlined.Phone, label = "Phone", value = data.phoneNumber)
-                }
-                if (!data.websiteUrl.isNullOrBlank()) {
-                    InfoRowClickable(
-                        icon = Icons.Outlined.Link,
-                        text = "View Portfolio",
-                        onClick = onPortofolioClick
-                    )
+        // ── OWNER ──
+        if (data.ownerName != null) {
+            item {
+                SectionCard("Owner") {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        PartnerAvatar(
+                            pictureUrl = data.ownerPicture,
+                            name = data.ownerName,
+                            size = 48
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Column {
+                            Text(data.ownerName, fontWeight = FontWeight.SemiBold)
+                            data.ownerEmail?.let {
+                                Text(it, style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
                 }
             }
         }
 
+        // ── CONTACT ──
         item {
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
+            SectionCard("Contact Information") {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    data.email?.let {
+                        InfoRow(Icons.Outlined.Email, "Email", it)
+                    }
+                    data.phoneNumber?.let {
+                        InfoRow(Icons.Outlined.Phone, "Phone", it)
+                    }
+                    data.websiteUrl?.let {
+                        InfoRowClickable(
+                            Icons.Outlined.Link,
+                            onPortofolioClick
+                        )
+                    }
+                }
+            }
         }
 
-        // ── Business Details ──
+        // ── BUSINESS ──
         item {
-            SectionHeader(title = "Business Details")
-        }
-        item {
-            Column(
-                modifier = Modifier.padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                InfoRow(
-                    icon = Icons.Outlined.Business,
-                    label = "Industry",
-                    value = data.industryCategory
-                )
-                InfoRow(
-                    icon = Icons.Outlined.Public,
-                    label = "Country",
-                    value = data.countryOfOperation
-                )
-                if (!data.dateOfRegistration.isNullOrBlank()) {
+            SectionCard("Business Details") {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    InfoRow(Icons.Outlined.Business, "Industry", data.industryCategory)
+                    InfoRow(Icons.Outlined.Public, "Country", data.countryOfOperation)
+                    data.dateOfRegistration?.let {
+                        InfoRow(Icons.Outlined.CalendarToday, "Registered", it)
+                    }
                     InfoRow(
-                        icon = Icons.Outlined.CalendarToday,
-                        label = "Registered",
-                        value = data.dateOfRegistration
+                        Icons.Outlined.Business,
+                        "Type",
+                        data.merchantType.replaceFirstChar { it.titlecase() }
                     )
                 }
-                InfoRow(
-                    icon = Icons.Outlined.Business,
-                    label = "Merchant Type",
-                    value = data.merchantType.replaceFirstChar { it.titlecase() }
-                )
             }
         }
 
-        item { Spacer(Modifier.height(16.dp)) }
+        // ── ADDRESSES ──
+        if (data.addresses.isNotEmpty()) {
+            item {
+                SectionCard("Addresses") {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        data.addresses.forEach {
+                            AddressItem(it)
+                        }
+                    }
+                }
+            }
+        }
+
+        // ── BANK ──
+        if (data.bankAccounts.isNotEmpty()) {
+            item {
+                SectionCard("Bank Accounts") {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        data.bankAccounts.forEach {
+                            BankItem(it)
+                        }
+                    }
+                }
+            }
+        }
+
+        // ── MEMBERS ──
+        if (data.members.isNotEmpty()) {
+            item {
+                SectionCard("Team Members") {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        data.members.forEach {
+                            MemberItem(it)
+                        }
+                    }
+                }
+            }
+        }
+
+        // ── INDIVIDUALS ──
+        if (data.individuals.isNotEmpty()) {
+            item {
+                SectionCard("Legal / Individuals") {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        data.individuals.forEach {
+                            IndividualItem(it)
+                        }
+                    }
+                }
+            }
+        }
+
+        item { Spacer(Modifier.height(20.dp)) }
     }
 }
 
 @Composable
-private fun SectionHeader(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleSmall,
-        fontWeight = FontWeight.SemiBold,
-        color = MaterialTheme.colorScheme.onBackground,
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 4.dp)
-    )
+fun SectionCard(title: String, content: @Composable () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .background(
+                MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.medium
+            )
+            .padding(16.dp)
+    ) {
+        Text(
+            title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(Modifier.height(12.dp))
+        content()
+    }
+}
+
+@Composable
+fun AddressItem(data: MerchantAddress) {
+    Column {
+        Text(
+            listOfNotNull(
+                data.streetLine1,
+                data.streetLine2
+            ).joinToString(", ")
+        )
+        Text(
+            listOfNotNull(
+                data.subDistrict,
+                data.district,
+                data.city,
+                data.province
+            ).joinToString(", "),
+            style = MaterialTheme.typography.bodySmall
+        )
+        Text(data.country, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Composable
+fun BankItem(data: MerchantBankAccount) {
+    var isVisible by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                data.bankName ?: data.bankCode,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            if (data.isPrimary) {
+                Text(
+                    "PRIMARY",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            Text(
+                text = if (isVisible) data.accountNumber
+                else "****${data.accountNumber.takeLast(4)}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f)
+            )
+
+            IconButton(onClick = { isVisible = !isVisible }) {
+                Icon(
+                    imageVector = if (isVisible)
+                        Icons.Default.VisibilityOff
+                    else
+                        Icons.Default.Visibility,
+                    contentDescription = "Toggle visibility"
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            data.accountHolderName,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+    }
+}
+
+@Composable
+fun MemberItem(data: Member) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = data.name,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = data.email,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = data.role,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Text(
+                text = data.status,
+                style = MaterialTheme.typography.bodySmall,
+                color = when (data.status.lowercase()) {
+                    "active" -> Color.Green
+                    "inactive" -> Color.Gray
+                    else -> Color.Red
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun IndividualItem(data: MerchantIndividual) {
+    Column {
+        Text("${data.givenNames} ${data.surname}", fontWeight = FontWeight.SemiBold)
+        data.role?.let { Text(it) }
+        data.email?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+    }
 }
 
 @Composable
@@ -297,7 +412,7 @@ private fun InfoRow(icon: ImageVector, label: String, value: String) {
 }
 
 @Composable
-private fun InfoRowClickable(icon: ImageVector, text: String, onClick: () -> Unit) {
+private fun InfoRowClickable(icon: ImageVector, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .clickable(onClick = onClick)
@@ -307,10 +422,77 @@ private fun InfoRowClickable(icon: ImageVector, text: String, onClick: () -> Uni
     ) {
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         Text(
-            text = text,
+            text = "Visit website",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
             textDecoration = TextDecoration.Underline
         )
+    }
+}
+
+@Composable
+fun ProfileHeader(data: MerchantDetail) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+
+        // ── Banner ──
+        val bannerUrl = data.pictureUrl
+            ?.replace("http://172.21.179.110", "http://10.0.2.2")
+
+        if (bannerUrl.isNullOrBlank()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.secondaryContainer
+                            )
+                        )
+                    )
+            )
+        } else {
+            SubcomposeAsyncImage(
+                model = bannerUrl,
+                contentDescription = data.legalName,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+        // ── Gradient overlay ──
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Color.Transparent,
+                            MaterialTheme.colorScheme.background
+                        )
+                    )
+                )
+        )
+
+        // ── Avatar ──
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .offset(x = 20.dp, y = 40.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(3.dp)
+        ) {
+            PartnerAvatar(
+                pictureUrl = data.pictureUrl,
+                name = data.legalName,
+                size = 84
+            )
+        }
     }
 }

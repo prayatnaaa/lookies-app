@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.data.remote.dto.DefaultEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventParticipantDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
+import com.prayatna.lookiesapp.data.remote.dto.MerchantDetailDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDashboardDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.SelfEventPaintingInsertRequest
@@ -87,18 +88,20 @@ class SupabasePartnerService @Inject constructor(
                 }
             }
             .decodeList<MerchantBusinessDto>()
+        Log.d("GetPartners", result.toString())
 
         return result
     }
 
-    suspend fun getDetailPartner(id: String): MerchantBusinessDto {
+    suspend fun getDetailPartner(id: String): MerchantDetailDto {
         val result = postgrest
-            .from("merchant_businesses_views")
+            .from("merchant_detail_view")
             .select {
                 filter {
                     eq("id", id)
                 }
-            }.decodeSingle<MerchantBusinessDto>()
+            }.decodeSingle<MerchantDetailDto>()
+        Log.d("GetPartners", result.toString())
         return result
     }
 
