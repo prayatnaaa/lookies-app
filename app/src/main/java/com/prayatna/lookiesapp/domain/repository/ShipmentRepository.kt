@@ -9,4 +9,8 @@ interface ShipmentRepository  {
             DataResult<Shipment>
     suspend fun getShipmentFees():
             DataResult<List<ShipmentFee>>
+
+    suspend fun createExhibitionShipment(input: com.prayatna.lookiesapp.domain.shipment.CreateExhibitionShipmentInput): DataResult<com.prayatna.lookiesapp.domain.shipment.ExhibitionShipment>
+
+    suspend fun updateExhibitionShipmentStatus(shipmentId: String, notes: String?, status: String): DataResult<com.prayatna.lookiesapp.domain.shipment.ExhibitionShipment>
 }

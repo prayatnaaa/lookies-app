@@ -1,7 +1,10 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import com.prayatna.lookiesapp.data.remote.dto.ExhibitionShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentFeeDto
+import com.prayatna.lookiesapp.data.remote.dto.request.shipment.CreateExhibitionShipmentRequest
+import com.prayatna.lookiesapp.domain.mapper.toInsertDto
 import io.github.jan.supabase.postgrest.Postgrest
 import javax.inject.Inject
 
@@ -19,6 +22,28 @@ class SupabaseShipmentService @Inject constructor(
 
     suspend fun getShipmentFees(): List<ShipmentFeeDto> {
         return postgrest.from("shipment_fees").select().decodeList<ShipmentFeeDto>()
+    }
+
+    suspend fun createExhibitionShipment(data: CreateExhibitionShipmentRequest): ExhibitionShipmentDto {
+        return postgrest.from("exhibition_shipments")
+            .insert(data)
+            .decodeSingle<ExhibitionShipmentDto>()
+    }
+
+    suspend fun updateExhibitionShipmentStatus(shipmentId: String, notes: String?, status: String): ExhibitionShipmentDto {
+        return postgrest.from("exhibition_shipments")
+            .update({
+                if (notes != null) {
+                    set("notes", notes)
+                }
+                set("status", status)
+            }) {
+                select()
+                filter {
+                    eq("id", shipmentId)
+
+                }
+            }.decodeSingle<ExhibitionShipmentDto>()
     }
 
 }

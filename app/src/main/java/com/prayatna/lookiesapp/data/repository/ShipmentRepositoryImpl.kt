@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.repository
 
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseShipmentService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
 import com.prayatna.lookiesapp.domain.model.shipment.ShipmentFee
 import com.prayatna.lookiesapp.domain.repository.ShipmentRepository
@@ -28,6 +29,30 @@ class ShipmentRepositoryImpl @Inject constructor(
             val result = supabaseShipmentService.getShipmentFees()
             DataResult.Success(result.map { it.toDomain() })
         }catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun createExhibitionShipment(input: com.prayatna.lookiesapp.domain.shipment.CreateExhibitionShipmentInput): DataResult<com.prayatna.lookiesapp.domain.shipment.ExhibitionShipment> {
+        return try {
+            val result = supabaseShipmentService.createExhibitionShipment(input.toDto())
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun updateExhibitionShipmentStatus(
+        shipmentId: String,
+        notes: String?,
+        status: String
+    ): DataResult<com.prayatna.lookiesapp.domain.shipment.ExhibitionShipment> {
+        return try {
+            val result = supabaseShipmentService.updateExhibitionShipmentStatus(shipmentId, notes, status)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
         }
