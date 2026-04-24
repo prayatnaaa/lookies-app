@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.domain.model.transaction
+package com.prayatna.lookiesapp.domain.model.shipment
 
 data class Shipment(
     val id: String,

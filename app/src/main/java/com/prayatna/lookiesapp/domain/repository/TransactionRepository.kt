@@ -9,8 +9,8 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequest
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
-import com.prayatna.lookiesapp.domain.model.transaction.Shipment
-import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
+import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.shipment.ShipmentFee
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
@@ -41,10 +41,6 @@ interface TransactionRepository {
             DataResult<List<Ticket>>
     suspend fun getTransactionByOrderId(orderId: String):
             DataResult<Transaction>
-    suspend fun getShipmentByOrderId(orderId: String):
-            DataResult<Shipment>
-    suspend fun getShipmentFees():
-            DataResult<List<ShipmentFee>>
     suspend fun setOrderToComplete(request: SetOrderToCompleteInput):
             DataResult<SetOrderToCompleteResult>
             

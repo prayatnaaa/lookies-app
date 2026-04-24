@@ -2,7 +2,7 @@ package com.prayatna.lookiesapp.presentation.shipmentDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.repository.TransactionRepository
+import com.prayatna.lookiesapp.domain.shipment.GetShipmentByOrderIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.CreateTrackingNumberShipmentUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.UpdateShipmentStatusUseCase
 import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailEvent
@@ -18,8 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ShipmentDetailViewModel @Inject constructor(
-    private val transactionRepository: TransactionRepository,
     private val updateShipmentStatusUseCase: UpdateShipmentStatusUseCase,
+    private val getShipmentByOrderIdUseCase: GetShipmentByOrderIdUseCase,
     private val createTrackingNumberShipmentUseCase: CreateTrackingNumberShipmentUseCase
 ) : ViewModel() {
 
@@ -30,7 +30,7 @@ class ShipmentDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            when (val result = transactionRepository.getShipmentByOrderId(orderId)) {
+            when (val result = getShipmentByOrderIdUseCase(orderId)) {
                 is DataResult.Success -> {
                     _uiState.update { 
                         it.copy(

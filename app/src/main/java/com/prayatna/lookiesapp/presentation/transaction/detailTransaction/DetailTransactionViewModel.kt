@@ -3,7 +3,7 @@ package com.prayatna.lookiesapp.presentation.transaction.detailTransaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteInput
-import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailPaintingOrder
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailPaintingOrderUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.SetOrderToCompleteUseCase
 import com.prayatna.lookiesapp.presentation.transaction.detailTransaction.state.DetailTransactionUiState
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailTransactionViewModel @Inject constructor(
     private val getDetailTransactionUseCase: GetDetailTransactionUseCase,
-    private val getDetailPaintingOrder: GetDetailPaintingOrder,
+    private val getDetailPaintingOrderUseCase: GetDetailPaintingOrderUseCase,
     private val setOrderToCompleteUseCase: SetOrderToCompleteUseCase
 ): ViewModel() {
 
@@ -44,7 +44,7 @@ class DetailTransactionViewModel @Inject constructor(
                     val isPainting = detailTx.transaction.items.any { it.itemType == "painting" }
                     
                     if (isPainting) {
-                        when (val paintingResult = getDetailPaintingOrder(orderId)) {
+                        when (val paintingResult = getDetailPaintingOrderUseCase(orderId)) {
                             is DataResult.Success -> {
                                 _uiState.update {
                                     it.copy(

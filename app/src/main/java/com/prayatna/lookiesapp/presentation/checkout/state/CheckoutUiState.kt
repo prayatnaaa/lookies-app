@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.presentation.checkout.state
 
-import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
+import com.prayatna.lookiesapp.domain.model.shipment.ShipmentFee
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
 
 data class CheckoutUiState(

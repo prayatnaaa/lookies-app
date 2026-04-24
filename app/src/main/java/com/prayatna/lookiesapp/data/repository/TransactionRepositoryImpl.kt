@@ -16,8 +16,8 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequest
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
-import com.prayatna.lookiesapp.domain.model.transaction.Shipment
-import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
+import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.shipment.ShipmentFee
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
@@ -129,26 +129,6 @@ class TransactionRepositoryImpl @Inject constructor(
             val result = transactionService.getUserTransactionByOrderId(orderId)
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
-            val eMessage = extractSupabaseError(e.error)
-            DataResult.Error(eMessage)
-        }
-    }
-
-    override suspend fun getShipmentByOrderId(orderId: String): DataResult<Shipment> {
-        return try {
-            val result = transactionService.getShipmentByOrderId(orderId)
-            DataResult.Success(result.toDomain())
-        } catch (e: RestException) {
-            val eMessage = extractSupabaseError(e.error)
-            DataResult.Error(eMessage)
-        }
-    }
-
-    override suspend fun getShipmentFees(): DataResult<List<ShipmentFee>> {
-        return try {
-            val result = transactionService.getShipmentFees()
-            DataResult.Success(result.map { it.toDomain() })
-        }catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
         }

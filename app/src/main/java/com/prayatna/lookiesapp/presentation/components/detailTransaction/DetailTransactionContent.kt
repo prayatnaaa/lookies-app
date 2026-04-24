@@ -1,6 +1,5 @@
 package com.prayatna.lookiesapp.presentation.components.detailTransaction
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,7 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
-import com.prayatna.lookiesapp.domain.model.transaction.Shipment
+import com.prayatna.lookiesapp.domain.model.shipment.Shipment
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionStatusChip
 import com.prayatna.lookiesapp.utils.formatRupiah
 import androidx.compose.runtime.mutableStateOf
@@ -59,7 +58,7 @@ import com.prayatna.lookiesapp.utils.formatDate
 
 @Composable
 fun DetailTransactionContent(
-    data: DetailTransaction, 
+    data: DetailTransaction,
     shipment: Shipment? = null,
     isCompleting: Boolean = false,
     onCompleteOrder: (() -> Unit)? = null,

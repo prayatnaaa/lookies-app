@@ -1,7 +1,7 @@
 package com.prayatna.lookiesapp.domain.mapper
 
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentFeeDto
-import com.prayatna.lookiesapp.domain.model.transaction.ShipmentFee
+import com.prayatna.lookiesapp.domain.model.shipment.ShipmentFee
 
 fun ShipmentFeeDto.toDomain() = ShipmentFee(
     id = id,

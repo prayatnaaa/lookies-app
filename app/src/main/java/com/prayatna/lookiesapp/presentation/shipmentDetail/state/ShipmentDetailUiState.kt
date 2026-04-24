@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.presentation.shipmentDetail.state
 
-import com.prayatna.lookiesapp.domain.model.transaction.Shipment
+import com.prayatna.lookiesapp.domain.model.shipment.Shipment
 
 data class ShipmentDetailUiState(
     val isLoading: Boolean = false,
