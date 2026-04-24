@@ -119,4 +119,15 @@ class PaintingRepositoryImpl @Inject constructor(
             DataResult.Error(e.message ?: "Something went wrong!")
         }
     }
+
+    override suspend fun updateEventPaintingStatus(eventPaintingId: String, status: String): DataResult<Unit> {
+        return try {
+            paintingService.updateEventPaintingStatus(eventPaintingId, status)
+            DataResult.Success(Unit)
+        } catch (e: RestException) {
+            DataResult.Error(e.message ?: "Something went wrong!")
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong!")
+        }
+    }
 }

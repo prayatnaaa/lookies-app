@@ -254,6 +254,9 @@ fun ArtistDashboardScreen(
                                     subtitle = "Track event participation status",
                                     icon = Icons.Filled.Event,
                                     onClick = {
+                                        navController.navigate(
+                                            "${NavigationRoutes.EXHIBITION_HISTORY}/${currentState.data.businessId}"
+                                        )
                                     }
                                 )
                             }

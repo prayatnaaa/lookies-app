@@ -153,4 +153,11 @@ class SupabasePaintingService @Inject constructor(
         deletePainting(paintingId = paintingId.toInt(), paintingUrl = painting.paintingUrl)
         return "Painting delete successfully"
     }
+
+    suspend fun updateEventPaintingStatus(eventPaintingId: String, status: String) {
+        postgrest.from("event_paintings")
+            .update(mapOf("status" to status, "updated_at" to "now()")) {
+                filter { eq("id", eventPaintingId) }
+            }
+    }
 }

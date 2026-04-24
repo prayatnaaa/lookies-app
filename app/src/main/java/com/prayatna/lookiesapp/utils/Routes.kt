@@ -56,6 +56,9 @@ object NavigationRoutes {
     const val REFUND_LIST = "refund_list"
     const val CREATE_REFUND = "create_refund"
     const val ORDER_REFUNDS = "order_refunds"
+    const val EXHIBITION_SHIPMENT = "exhibition_shipment"
+    const val EXHIBITION_HISTORY = "exhibition_history"
+    const val ARTIST_EXHIBITION_PAINTING_DETAIL = "artist_exhibition_painting_detail"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

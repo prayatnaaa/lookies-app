@@ -20,6 +20,9 @@ import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
 import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListScreen
+import com.prayatna.lookiesapp.presentation.exhibitionHistory.ArtistExhibitionPaintingDetailScreen
+import com.prayatna.lookiesapp.presentation.exhibitionHistory.ExhibitionHistoryScreen
+import com.prayatna.lookiesapp.presentation.exhibitionShipment.exhibitionShipmentNavigation
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
 import com.prayatna.lookiesapp.presentation.forumchannellist.ForumChannelListRoute
 import com.prayatna.lookiesapp.presentation.forumlist.ForumListRoute
@@ -101,6 +104,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         startDestination = NavigationRoutes.MAIN_LOADING
     ) {
 
+        exhibitionShipmentNavigation(navController = navController)
         shipmentListNavigation(navController = navController)
         composable(
             route = "${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}",
@@ -428,5 +432,29 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
 
         refundNavigation(navController)
+
+        composable(
+            route = "${NavigationRoutes.EXHIBITION_HISTORY}/{artistUserId}",
+            arguments = listOf(navArgument("artistUserId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("artistUserId")?.let { userId ->
+                ExhibitionHistoryScreen(
+                    navController = navController,
+                    artistUserId = userId
+                )
+            }
+        }
+
+        composable(
+            route = "${NavigationRoutes.ARTIST_EXHIBITION_PAINTING_DETAIL}/{eventPaintingId}",
+            arguments = listOf(navArgument("eventPaintingId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("eventPaintingId")?.let { id ->
+                ArtistExhibitionPaintingDetailScreen(
+                    navController = navController,
+                    eventPaintingId = id
+                )
+            }
+        }
     }
 }

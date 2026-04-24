@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
+import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EventPaintingDetailViewModel @Inject constructor(
-    private val paintingRepository: PaintingRepository
+    private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase
 ): ViewModel() {
 
     private val _state = MutableStateFlow(EventPaintingDetailUiState())
@@ -29,7 +30,7 @@ class EventPaintingDetailViewModel @Inject constructor(
                 errorMessage = null
             ) }
 
-            when (val result = paintingRepository.getEventPaintingDetail(id)) {
+            when (val result = getEventPaintingByIdUseCase(id)) {
                 is DataResult.Error -> {
                     _state.update {
                         it.copy(
