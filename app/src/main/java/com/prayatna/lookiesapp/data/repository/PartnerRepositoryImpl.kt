@@ -17,6 +17,7 @@ import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
+import com.prayatna.lookiesapp.utils.mapUpdateErrorToMessage
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.flow.Flow
@@ -90,7 +91,9 @@ class PartnerRepositoryImpl @Inject constructor(
             val response = supabasePartnerService.updateEvent(id = id, request = input.toDto())
             DataResult.Success(response.toDomain())
         } catch (e: RestException) {
-            DataResult.Error(e.error)
+            Log.e("UpdateEvent", e.toString())
+
+            DataResult.Error(mapUpdateErrorToMessage(e))
         }
     }
 

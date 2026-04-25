@@ -27,14 +27,14 @@ class SupabaseAdminService @Inject constructor(
     }
 
     suspend fun rejectEvent(id: Int, rejectReason: String): DecideEventResponseDto {
-        val userId = auth.currentSessionOrNull() ?: throw Exception("User not authenticated")
+        val userId = auth.currentSessionOrNull()?.user?.id ?: throw Exception("User not authenticated")
         val result = postgrest.from("events").update(
             mapOf(
                 "status" to "rejected",
                 "updated_at" to "now()",
                 "approved_by" to userId,
                 "approved_at" to "now()",
-                "reject_reason" to rejectReason
+                "rejection_reason" to rejectReason
             )
         ) {
             select(Columns.list("id", "organizer_id", "title", "status"))
