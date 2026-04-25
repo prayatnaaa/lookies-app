@@ -29,7 +29,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.presentation.login.state.AuthState
+import com.prayatna.lookiesapp.presentation.login.state.AuthEvent
 import com.prayatna.lookiesapp.ui.theme.GreyTextLight
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.Constants
@@ -53,11 +53,15 @@ fun LoginScreen(modifier: Modifier = Modifier,
         viewModel.resetLoginState()
     }
 
-    LaunchedEffect(authState) {
-        if (authState is AuthState.Error) {
-            showDialog = true
-            dialogMessage = (authState as AuthState.Error).message
-            isErrorDialog = true
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is AuthEvent.ShowError -> {
+                    showDialog = true
+                    dialogMessage = event.message
+                    isErrorDialog = true
+                }
+            }
         }
     }
 
@@ -66,7 +70,6 @@ fun LoginScreen(modifier: Modifier = Modifier,
         content = { padding -> padding.calculateTopPadding()
             Column(modifier = modifier
                 .fillMaxSize()
-                .imePadding()
                 .background(Constants.gradientBackground),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -102,6 +105,8 @@ fun LoginScreen(modifier: Modifier = Modifier,
                 val emailValue = viewModel.emailValue
                 val passwordValue = viewModel.passwordValue
                 AuthCard(
+                    modifier = Modifier
+                        .imePadding(),
                     isRegister = false,
                     title = "Lookies",
                     onLogin = {

@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.auth.RegisterInput
 import com.prayatna.lookiesapp.domain.model.auth.RegisterOutput
-import com.prayatna.lookiesapp.domain.repository.AuthRepository
+import com.prayatna.lookiesapp.domain.usecase.auth.RegisterUseCase
 import com.prayatna.lookiesapp.presentation.register.events.RegisterEvent
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val registerUseCase: RegisterUseCase
 ) : ViewModel() {
 
     var fullName by mutableStateOf("")
@@ -69,7 +69,7 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             _registerStatus.value = DataResult.Loading
 
-            when (val result = authRepository.signUp(input)) {
+            when (val result = registerUseCase(input)) {
                 is DataResult.Success -> {
                     _registerStatus.value = result
                     _events.emit(

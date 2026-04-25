@@ -4,8 +4,9 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthService
-import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
+import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.auth.LoginOutput
 import com.prayatna.lookiesapp.domain.model.auth.RegisterInput
 import com.prayatna.lookiesapp.domain.model.auth.RegisterOutput
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
@@ -33,15 +34,16 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun signIn(email: String, password: String): DataResult<LoginResponse> {
+    override suspend fun signIn(email: String, password: String): DataResult<LoginOutput> {
         return try {
             val response = supabaseAuthService.signIn(email = email, password = password)
             Log.d("SignIn", "Response: $response")
             if (response.success) {
                 userPreference.setRole(response.role)
-                DataResult.Success(response)
+                DataResult.Success(response.toDomain())
             }
             else {
+                Log.d("LoginTest", "Response: $response")
                 DataResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: RestException) {

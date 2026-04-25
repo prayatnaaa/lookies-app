@@ -41,12 +41,13 @@ import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPainti
 import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScreen
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
-import com.prayatna.lookiesapp.presentation.partner.main.PartnerMainScreen
+import com.prayatna.lookiesapp.presentation.partner.main.home.PartnerHomeScreen
 import com.prayatna.lookiesapp.presentation.partner.manageEvent.PartnerManageEventScreen
 import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
+import com.prayatna.lookiesapp.presentation.refund.refundNavigation
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
 import com.prayatna.lookiesapp.presentation.shipment.shipmentListNavigation
@@ -57,7 +58,6 @@ import com.prayatna.lookiesapp.presentation.user.artistSubmission.artistSubmissi
 import com.prayatna.lookiesapp.presentation.user.createUserAddress.createUserAddressNavigation
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.PartnerSubmissionScreen
-import com.prayatna.lookiesapp.presentation.refund.refundNavigation
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -83,11 +83,6 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                     "user", "artist" -> NavigationRoutes.MAIN
                     else -> NavigationRoutes.LOGIN
                 }
-            }
-
-            is AuthState.Error -> {
-                Log.d("SignIn", "Error: ${state.message}")
-                NavigationRoutes.LOGIN
             }
         }
 
@@ -307,7 +302,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             arguments = listOf(navArgument("businessId") { type = NavType.StringType })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("businessId")?.let { businessId ->
-                PartnerMainScreen(navHostController = navController, businessId = businessId)
+                PartnerHomeScreen(navController = navController, businessId = businessId)
             }
         }
         composable(

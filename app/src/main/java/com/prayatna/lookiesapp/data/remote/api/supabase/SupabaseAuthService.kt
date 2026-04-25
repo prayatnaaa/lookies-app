@@ -43,8 +43,6 @@ class SupabaseAuthService @Inject constructor(
             return LoginResponse(success = false, role = "unknown", message = "Role not found")
         }
 
-        Log.d("ROLE", role.toString())
-
         return LoginResponse(success = true, role = role.toString())
     }
 

@@ -8,19 +8,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
 import com.prayatna.lookiesapp.domain.repository.AuthRepository
-import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
 import com.prayatna.lookiesapp.domain.usecase.auth.ListenUserSessionUseCase
 import com.prayatna.lookiesapp.domain.usecase.auth.LoginUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.GetFcmTokenUseCase
+import com.prayatna.lookiesapp.presentation.login.state.AuthEvent
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.worker.FcmTokenScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.gotrue.SessionStatus
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,7 +30,7 @@ class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val listenUserSessionUseCase: ListenUserSessionUseCase,
     private val getFcmTokenUseCase: GetFcmTokenUseCase,
-    private val getRoleUseCase: GetRoleUseCase,
+//    private val getRoleUseCase: GetRoleUseCase,
     private val fcmTokenScheduler: FcmTokenScheduler,
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -46,6 +47,9 @@ class LoginViewModel @Inject constructor(
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
+
+    private val _eventFlow = MutableSharedFlow<AuthEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     init {
         observeSession()
@@ -81,7 +85,8 @@ class LoginViewModel @Inject constructor(
                 }
 
                 is DataResult.Error -> {
-                    _authState.value = AuthState.Error(result.error)
+                    _eventFlow.emit(AuthEvent.ShowError(result.error))
+                    _authState.value = AuthState.Unauthenticated
                 }
 
                 else -> Unit
@@ -93,7 +98,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = listenUserSessionUseCase()) {
                 is DataResult.Error -> {
-                    _authState.value = AuthState.Error(result.error)
+                    _eventFlow.emit(AuthEvent.ShowError(result.error))
                 }
                 is DataResult.Success -> {
                     val session = result.data
