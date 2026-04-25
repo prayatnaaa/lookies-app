@@ -14,9 +14,10 @@ enum class EventStatus(val value: String) {
     PendingValidation("pending_validation"),
     Published("published"),
     Ongoing("ongoing"),
-    Completed("completed"),
+    Completed("finished"),
     Cancelled("cancelled"),
-    Unknown("unknown");
+    Unknown("unknown"),
+    Upcoming("upcoming");
 
     companion object {
         fun from(value: String): EventStatus =
@@ -39,6 +40,7 @@ fun EventStatusText(
         EventStatus.Completed -> "Completed" to Color(0xFF2196F3)
         EventStatus.Cancelled -> "Cancelled" to Color.Gray
         EventStatus.Unknown -> "Unknown" to Color.LightGray
+        EventStatus.Upcoming -> "Upcoming" to Color.Green
     }
 
     Row(

@@ -16,5 +16,6 @@ data class Painting(
     val yearCreated: Int,
     val createdAt: Instant? = null,
     val updatedAt: Instant? = null,
-    val price: Double
+    val price: Double,
+    val status: String? = null
 )

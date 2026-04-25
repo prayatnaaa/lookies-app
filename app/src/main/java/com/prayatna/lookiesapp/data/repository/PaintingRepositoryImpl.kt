@@ -59,6 +59,7 @@ class PaintingRepositoryImpl @Inject constructor(
     override suspend fun getPaintingsByArtist(id: String): DataResult<List<Painting>> {
         return try {
             val response = paintingService.getPaintingByArtistId(id)
+            Log.d("PaintingRepository", response.toString())
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong! Please check your connection")

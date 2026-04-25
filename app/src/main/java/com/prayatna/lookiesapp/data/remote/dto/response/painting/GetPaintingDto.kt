@@ -29,5 +29,6 @@ data class GetPaintingDto(
     @SerialName("updated_at")
     val updatedAt: Instant? = null,
     val price: Double,
+    @SerialName("availability_status")
     val status: String? = null
 )

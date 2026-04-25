@@ -95,11 +95,11 @@ fun EventPaintingListScreen(
                         ) {
                             items(uiState.filteredPaintings.size) { item ->
                                 PaintingCard(
+                                    status = uiState.filteredPaintings[item].status,
                                     paintingUrl = uiState.filteredPaintings[item].painting.paintingUrl,
                                     name = uiState.filteredPaintings[item].painting.title,
                                     price = uiState.filteredPaintings[item].finalPrice,
                                     artistName = uiState.filteredPaintings[item].participant.artist.fullName!!,
-                                    isSold = uiState.filteredPaintings[item].status.equals("sold", ignoreCase = true),
                                     onClick = {
                                         navController
                                             .navigate("${NavigationRoutes.DETAIL_EVENT_PAINTING}/${uiState.filteredPaintings[item].id}")

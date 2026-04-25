@@ -36,6 +36,24 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.utils.formatRupiah
 
+private fun getStatusColor(status: String): Color {
+    return when (status) {
+        "available" -> Color(0xFF4CAF50)
+        "sold" -> Color(0xFFF44336)
+        "in_exhibition" -> Color(0xFFFF9800)
+        else -> Color.Gray
+    }
+}
+
+private fun getStatusLabel(status: String): String {
+    return when (status) {
+        "available" -> "Available"
+        "sold" -> "Sold"
+        "in_exhibition" -> "Exhibition"
+        else -> status
+    }
+}
+
 @Composable
 fun PaintingCard(
     modifier: Modifier = Modifier,
@@ -43,14 +61,14 @@ fun PaintingCard(
     name: String,
     artistName: String? = null,
     price: Double? = null,
-    isSold: Boolean = false,
+    status: String? = null,
     isSelected: Boolean = false,
-    isOwnPainting: Boolean = false,
     onClick: () -> Unit,
 ) {
     val highlightColor = MaterialTheme.colorScheme.primary
 
     ElevatedCard(
+        enabled = status != "sold",
         shape = RectangleShape,
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -63,6 +81,14 @@ fun PaintingCard(
             ),
         onClick = onClick
     ) {
+
+        if (status == "sold") {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f))
+            )
+        }
         Box {
             Box(modifier = Modifier
                 .fillMaxSize()) {
@@ -87,28 +113,22 @@ fun PaintingCard(
                 )
             }
 
-            if (isSold) {
+            if (status != null) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.6f))
-                )
-
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.Center)
+                        .align(Alignment.TopStart)
+                        .padding(8.dp)
                         .background(
-                            color = Color.Red.copy(alpha = 0.8f),
-                            shape = RoundedCornerShape(4.dp)
+                            color = getStatusColor(status),
+                            shape = RoundedCornerShape(6.dp)
                         )
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "SOLD",
+                        text = getStatusLabel(status),
                         color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        letterSpacing = 1.sp
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -152,7 +172,7 @@ fun PaintingCard(
                     price?.let {
                         Text(
                             text = formatRupiah(it),
-                            color = if (isSold) Color.LightGray else MaterialTheme.colorScheme.primaryContainer,
+                            color = if (status != "available") Color.LightGray else MaterialTheme.colorScheme.primaryContainer,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -168,7 +188,7 @@ fun PaintingCard(
                         .background(Color.White, CircleShape)
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.CheckCircle,
+                        imageVector = Icons.Default.CheckCircle,
                         contentDescription = "Selected",
                         tint = highlightColor,
                         modifier = Modifier.size(24.dp)

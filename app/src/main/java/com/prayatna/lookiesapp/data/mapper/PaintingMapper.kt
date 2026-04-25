@@ -20,7 +20,8 @@ fun GetPaintingDto.toDomain(): Painting {
         yearCreated =this.yearCreated,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
-        price = this.price
+        price = this.price,
+        status = this.status
     )
 }
 

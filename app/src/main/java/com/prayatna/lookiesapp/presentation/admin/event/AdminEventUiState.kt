@@ -13,8 +13,8 @@ data class AdminEventUiState(
 enum class EventStatus(val type: String) {
     PENDING("pending_validation"),
     PUBLISHED("published"),
-    ONGOING("ongoing"),
-    COMPLETED("completed"),
+    UPCOMING("upcoming"),
+    COMPLETED("finished"),
     CANCELLED("cancelled"),
     REJECTED("rejected");
 }

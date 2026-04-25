@@ -55,7 +55,7 @@ class HomeViewModel @Inject constructor(
             }
 
             when (val result = getEventsUseCase(
-                status = "published, ongoing"
+                status = "published, upcoming"
             )) {
                 is DataResult.Success -> {
                     _uiState.update {

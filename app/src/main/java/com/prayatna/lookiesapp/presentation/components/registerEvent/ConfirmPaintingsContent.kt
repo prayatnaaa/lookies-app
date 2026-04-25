@@ -75,12 +75,16 @@ fun ConfirmPaintingsContent(
                         name = painting.title,
                         price = painting.price,
                         onClick = {},
-                        artistName = painting.medium
+                        artistName = painting.medium,
+                        status = painting.status
                     )
 
                     IconButton(
+                        enabled = painting.status == "available",
                         onClick = {
-                            onEvent(RegisterEventEvent.TogglePainting(painting.id))
+                            if (painting.status == "available") {
+                                onEvent(RegisterEventEvent.TogglePainting(painting.id))
+                            }
                         },
                         modifier = Modifier
                             .padding(4.dp)
