@@ -24,8 +24,5 @@ fun ForumListRoute(
                 else -> viewModel.onEvent(event)
             }
         },
-        onBackClick = {
-            navController.popBackStack()
-        }
     )
 }

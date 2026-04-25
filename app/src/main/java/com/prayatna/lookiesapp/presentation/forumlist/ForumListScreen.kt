@@ -36,20 +36,11 @@ import com.prayatna.lookiesapp.domain.model.message.ForumsView
 fun ForumListScreen(
     state: ForumListUiState,
     onEvent: (ForumListEvent) -> Unit,
-    onBackClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("My Forums") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
             )
         }
     ) { paddingValues ->
