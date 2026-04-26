@@ -89,7 +89,7 @@ fun ParticipantPaintingListScreen(
                                 isLoading = uiState.loadingPaintingId == painting.id,
                                 onClick = {
                                     navController.navigate(
-                                        "${NavigationRoutes.DETAIL_PAINTING}/${painting.painting.id}"
+                                        "${NavigationRoutes.PARTNER_EXHIBITION_PAINTING_DETAIL}/${painting.id}"
                                     )
                                 },
                                 onApprove = {

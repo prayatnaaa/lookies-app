@@ -24,6 +24,7 @@ class SupabaseShipmentService @Inject constructor(
         return postgrest.from("shipment_fees").select().decodeList<ShipmentFeeDto>()
     }
 
+
     suspend fun createExhibitionShipment(data: CreateExhibitionShipmentRequest): ExhibitionShipmentDto {
         return postgrest.from("exhibition_shipments")
             .insert(data) {

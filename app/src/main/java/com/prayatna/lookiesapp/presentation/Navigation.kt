@@ -20,7 +20,8 @@ import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
 import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListScreen
-import com.prayatna.lookiesapp.presentation.exhibitionHistory.ArtistExhibitionPaintingDetailScreen
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.ArtistExhibitionPaintingDetailScreen
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.PartnerExhibitionPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.exhibitionHistory.ExhibitionHistoryScreen
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.exhibitionShipmentNavigation
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
@@ -446,6 +447,18 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("eventPaintingId")?.let { id ->
                 ArtistExhibitionPaintingDetailScreen(
+                    navController = navController,
+                    eventPaintingId = id
+                )
+            }
+        }
+
+        composable(
+            route = "${NavigationRoutes.PARTNER_EXHIBITION_PAINTING_DETAIL}/{eventPaintingId}",
+            arguments = listOf(navArgument("eventPaintingId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("eventPaintingId")?.let { id ->
+                PartnerExhibitionPaintingDetailScreen(
                     navController = navController,
                     eventPaintingId = id
                 )

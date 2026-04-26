@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.exhibitionShipment
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.shipment.CreateExhibitionShipmentInput
@@ -178,6 +179,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
      */
     private fun confirmArtworkReceived() {
         val state = _uiState.value
+        Log.d("ExhibitionShipmentViewModel", "confirmArtworkReceived: $state")
         val shipmentId = state.shipment?.id?.toString() ?: run {
             _uiState.update { it.copy(errorMessage = "No shipment record found") }
             return

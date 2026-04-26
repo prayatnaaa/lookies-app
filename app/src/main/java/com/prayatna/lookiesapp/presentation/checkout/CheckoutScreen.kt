@@ -49,7 +49,7 @@ fun CheckoutScreen(
             confirmText = "Pay now",
             onConfirm = {
                 showSuccessDialog.value = false
-                onEvent(CheckoutEvent.OnPayClick) // lanjut payment
+                onEvent(CheckoutEvent.OnPayClick)
             },
             onDismiss = {
                 showSuccessDialog.value = false

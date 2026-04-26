@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,10 +30,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
+import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.error.ErrorScreen
 import com.prayatna.lookiesapp.utils.NavigationRoutes
-import com.prayatna.lookiesapp.utils.PartnerBottomNavItem
 
 @Composable
 fun MerchantMemberListScreen(
@@ -61,26 +62,24 @@ fun MerchantMemberListScreen(
         }
 
         else -> {
-            Column(
+            Scaffold(
+                topBar = {
+                    BackTopBar(
+                        onBackClick = { navController.popBackStack() },
+                        title = "Merchant Members"
+                    )
+                },
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
                     .statusBarsPadding()
-            ) {
-                Text(
-                    text = "Merchant Memberships",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
-                )
-
+            ) { innerPadding ->
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 16.dp)
+                        .padding(innerPadding)
+                    ,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(uiState.merchantMembers) { member ->

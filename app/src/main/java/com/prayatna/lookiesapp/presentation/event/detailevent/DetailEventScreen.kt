@@ -1,23 +1,46 @@
 package com.prayatna.lookiesapp.presentation.event.detailevent
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
-import com.prayatna.lookiesapp.presentation.components.detailevent.*
+import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventBottomModal
+import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventContent
+import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventFooter
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.event.detailevent.state.DetailEventUiEvent
+import com.prayatna.lookiesapp.ui.theme.Maroon
 import com.prayatna.lookiesapp.utils.NavigationRoutes
-import kotlinx.coroutines.delay
 
 @Composable
 fun DetailEventScreen(
@@ -28,47 +51,48 @@ fun DetailEventScreen(
 ) {
     val detailEventState by viewModel.state.collectAsStateWithLifecycle()
     val quantity by viewModel.quantityValue.collectAsStateWithLifecycle()
-    val adminState by viewModel.adminState.collectAsStateWithLifecycle()
     val role by viewModel.roleState.collectAsStateWithLifecycle()
+    val adminState by viewModel.adminState.collectAsStateWithLifecycle()
 
     var isTicketSheetOpen by rememberSaveable { mutableStateOf(false) }
-    var showResultModal by remember { mutableStateOf(false) }
-    var message by remember { mutableStateOf("") }
-
     var isRejectSheetOpen by rememberSaveable { mutableStateOf(false) }
     var rejectReason by rememberSaveable { mutableStateOf("") }
 
+    var resultState by remember {
+        mutableStateOf<DetailEventUiEvent.ShowResult?>(null)
+    }
+
+    // Load data
     LaunchedEffect(eventId) {
         viewModel.getEvent(eventId)
         viewModel.getEventPaintings(eventId)
     }
 
-    LaunchedEffect(adminState.success) {
-        if (adminState.success != null) {
-            val data = adminState.success
-            showResultModal = true
-            message = "Event has been ${data?.status}"
-            delay(2000)
-            navController.navigateUp()
+    // Collect UI Event (FIXED)
+    LaunchedEffect(viewModel) {
+        viewModel.uiEvent.collect { event ->
+            if (event is DetailEventUiEvent.ShowResult) {
+                resultState = event
+            }
         }
     }
 
-    LaunchedEffect(adminState.error) {
-        if (adminState.error != null) {
-            val data = adminState.error
-            showResultModal = true
-            message = data!!
-            delay(2000)
-            navController.navigateUp()
-        }
-    }
-
-    if (showResultModal) {
+    // =========================
+    // RESULT MODAL (GLOBAL)
+    // =========================
+    resultState?.let { result ->
         CustomBottomSheet(
-            onDismiss = { showResultModal = false },
-            message = message,
-            title = "",
-            onConfirm = { showResultModal = false }
+            title = result.message,
+            message = "",
+            confirmText = "Ok",
+            onConfirm = {
+                resultState = null
+                navController.popBackStack()
+            },
+            onDismiss = {
+                resultState = null
+                navController.popBackStack()
+            }
         )
     }
 
@@ -77,10 +101,9 @@ fun DetailEventScreen(
 
         topBar = {
             BackTopBar(
-                onBackClick = {
-                navController.popBackStack()
-            },
-                title = "Detail event")
+                onBackClick = { navController.popBackStack() },
+                title = "Detail event"
+            )
         },
 
         bottomBar = {
@@ -88,6 +111,8 @@ fun DetailEventScreen(
                 DetailEventBottomBar(
                     role = role,
                     event = event,
+                    isApproveLoading = adminState.isLoading,
+                    isRejectLoading = adminState.isLoading,
                     onApprove = { viewModel.approveEvent(eventId) },
                     onReject = { isRejectSheetOpen = true },
                     onRegister = {
@@ -149,37 +174,42 @@ fun DetailEventScreen(
             }
         }
 
-        // Ticket Bottom Sheet
-        if (isTicketSheetOpen) {
-            DetailEventBottomModal(
-                onDismiss = { isTicketSheetOpen = false },
-                value = quantity,
-                onValueChange = { viewModel.setQuantityValue(it) },
-                onBuyButtonClick = {
-                    isTicketSheetOpen = false
-                    navController.navigate(
-                        "${NavigationRoutes.CHECKOUT}/event_ticket/$eventId/$quantity"
-                    )
-                }
-            )
-        }
+        // =========================
+        // OTHER SHEETS (LOCK WHEN RESULT SHOWING)
+        // =========================
+        if (resultState == null) {
 
-        if (isRejectSheetOpen) {
-            RejectEventBottomSheet(
-                reason = rejectReason,
-                onReasonChange = { rejectReason = it },
-                onDismiss = { isRejectSheetOpen = false },
-                onConfirm = {
-                    isRejectSheetOpen = false
-                    viewModel.rejectEvent(eventId, rejectReason)
-                    rejectReason = ""
-                }
-            )
+            if (isTicketSheetOpen) {
+                DetailEventBottomModal(
+                    onDismiss = { isTicketSheetOpen = false },
+                    value = quantity,
+                    onValueChange = { viewModel.setQuantityValue(it) },
+                    onBuyButtonClick = {
+                        isTicketSheetOpen = false
+                        navController.navigate(
+                            "${NavigationRoutes.CHECKOUT}/event_ticket/$eventId/$quantity"
+                        )
+                    }
+                )
+            }
+
+            if (isRejectSheetOpen) {
+                RejectEventBottomSheet(
+                    reason = rejectReason,
+                    onReasonChange = { rejectReason = it },
+                    onDismiss = { isRejectSheetOpen = false },
+                    onConfirm = {
+                        isRejectSheetOpen = false
+                        viewModel.rejectEvent(eventId, rejectReason)
+                        rejectReason = ""
+                    }
+                )
+            }
         }
     }
 }
 
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RejectEventBottomSheet(
     reason: String,
@@ -187,7 +217,7 @@ fun RejectEventBottomSheet(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    androidx.compose.material3.ModalBottomSheet(
+    ModalBottomSheet(
         onDismissRequest = onDismiss
     ) {
         Column(
@@ -201,10 +231,10 @@ fun RejectEventBottomSheet(
             Text(
                 text = "Reject Event",
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
 
-            androidx.compose.material3.OutlinedTextField(
+            OutlinedTextField(
                 value = reason,
                 onValueChange = onReasonChange,
                 label = { Text("Rejection Reason") },
@@ -216,20 +246,20 @@ fun RejectEventBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                androidx.compose.material3.OutlinedButton(
+                OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Cancel")
                 }
                 
-                androidx.compose.material3.Button(
+                Button(
                     onClick = onConfirm,
                     modifier = Modifier.weight(1f),
                     enabled = reason.isNotBlank(),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = com.prayatna.lookiesapp.ui.theme.Maroon,
-                        contentColor = androidx.compose.ui.graphics.Color.White
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Maroon,
+                        contentColor = Color.White
                     )
                 ) {
                     Text("Reject")
@@ -242,17 +272,24 @@ fun RejectEventBottomSheet(
 @Composable
 private fun DetailEventBottomBar(
     role: String,
-    event: com.prayatna.lookiesapp.domain.model.event.Event,
+    event: Event,
     onApprove: () -> Unit,
     onReject: () -> Unit,
+    isApproveLoading: Boolean = false,
+    isRejectLoading: Boolean = false,
     onRegister: () -> Unit,
     onBuy: () -> Unit,
     onSeeArts: () -> Unit
 ) {
     DetailEventFooter(
         showDecideButton = role == "admin",
-        onApproveButtonClick = onApprove,
-        onRejectButtonClick = onReject,
+
+        onApproveButtonClick = {
+            if (!isApproveLoading) onApprove()
+        },
+        onRejectButtonClick = {
+            if (!isRejectLoading) onReject()
+        },
 
         showRegisterButton = role == "artist" &&
                 event.eventType.slug == "open_call",

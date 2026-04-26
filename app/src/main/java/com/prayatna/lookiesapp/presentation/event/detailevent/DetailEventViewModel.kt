@@ -8,11 +8,14 @@ import com.prayatna.lookiesapp.domain.usecase.admin.RejectEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetPaintingUseCase
 import com.prayatna.lookiesapp.presentation.event.detailevent.state.DecideEventState
+import com.prayatna.lookiesapp.presentation.event.detailevent.state.DetailEventUiEvent
 import com.prayatna.lookiesapp.presentation.event.detailevent.state.DetailEventUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,6 +32,9 @@ class DetailEventViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(DetailEventUiState())
     val state = _state.asStateFlow()
+
+    private val _uiEvent = MutableSharedFlow<DetailEventUiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
 
     private val _adminState = MutableStateFlow(DecideEventState())
     val adminState: StateFlow<DecideEventState> = _adminState.asStateFlow()
@@ -129,31 +135,31 @@ class DetailEventViewModel @Inject constructor(
 
     fun approveEvent(eventId: String) {
         viewModelScope.launch {
-            _adminState.update { it.copy(isLoading = true, error = null, success = null) }
+            _adminState.update { it.copy(isLoading = true) }
 
             when (val result = approveEventUseCase(eventId.toInt())) {
                 is DataResult.Success -> {
-                    _adminState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = null,
-                            success = result.data,
+                    _adminState.update { it.copy(isLoading = false) }
+
+                    _uiEvent.emit(
+                        DetailEventUiEvent.ShowResult(
+                            isSuccess = true,
+                            message = "Event has been ${result.data.status}"
                         )
-                    }
+                    )
+
                     getEvent(eventId, forceRefresh = true)
                 }
 
                 is DataResult.Error -> {
-                    _adminState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = result.error
-                        )
-                    }
-                }
+                    _adminState.update { it.copy(isLoading = false) }
 
-                is DataResult.Loading -> {
-                    _adminState.update { it.copy(isLoading = true) }
+                    _uiEvent.emit(
+                        DetailEventUiEvent.ShowResult(
+                            isSuccess = false,
+                            message = result.error
+                        )
+                    )
                 }
 
                 else -> Unit
@@ -163,31 +169,31 @@ class DetailEventViewModel @Inject constructor(
 
     fun rejectEvent(eventId: String, rejectReason: String) {
         viewModelScope.launch {
-            _adminState.update { it.copy(isLoading = true, error = null, success = null) }
+            _adminState.update { it.copy(isLoading = true) }
 
-            when (val result = rejectEventUseCase(eventId.toInt(), rejectReason = rejectReason)) {
+            when (val result = rejectEventUseCase(eventId.toInt(), rejectReason)) {
                 is DataResult.Success -> {
-                    _adminState.update {
-                        it.copy(
-                            isLoading = false,
-                            success = result.data,
+                    _adminState.update { it.copy(isLoading = false) }
+
+                    _uiEvent.emit(
+                        DetailEventUiEvent.ShowResult(
+                            isSuccess = true,
+                            message = "Event rejected successfully"
                         )
-                    }
+                    )
 
                     getEvent(eventId, forceRefresh = true)
                 }
 
                 is DataResult.Error -> {
-                    _adminState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = result.error
-                        )
-                    }
-                }
+                    _adminState.update { it.copy(isLoading = false) }
 
-                is DataResult.Loading -> {
-                    _adminState.update { it.copy(isLoading = true) }
+                    _uiEvent.emit(
+                        DetailEventUiEvent.ShowResult(
+                            isSuccess = false,
+                            message = result.error
+                        )
+                    )
                 }
 
                 else -> Unit

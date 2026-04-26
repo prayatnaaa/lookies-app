@@ -17,7 +17,8 @@ enum class EventStatus(val value: String) {
     Completed("finished"),
     Cancelled("cancelled"),
     Unknown("unknown"),
-    Upcoming("upcoming");
+    Upcoming("upcoming"),
+    Rejected("rejected");
 
     companion object {
         fun from(value: String): EventStatus =
@@ -41,6 +42,7 @@ fun EventStatusText(
         EventStatus.Cancelled -> "Cancelled" to Color.Gray
         EventStatus.Unknown -> "Unknown" to Color.LightGray
         EventStatus.Upcoming -> "Upcoming" to Color.Green
+        EventStatus.Rejected -> "Rejected" to Color.Red
     }
 
     Row(

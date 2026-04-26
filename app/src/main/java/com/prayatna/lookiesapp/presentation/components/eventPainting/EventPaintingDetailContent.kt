@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.exhibitionHistory
+package com.prayatna.lookiesapp.presentation.components.eventPainting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,100 +18,25 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocalShipping
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
-import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
-import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailViewModel
-import com.prayatna.lookiesapp.utils.NavigationRoutes
+import com.prayatna.lookiesapp.presentation.exhibitionHistory.EventPaintingStatusBadge
 import com.prayatna.lookiesapp.utils.formatRupiah
 
-/** Statuses where the artist has a shipment action to take. */
-private val SHIPMENT_ACTIONABLE_STATUSES = setOf(
-    "accepted",            // artist submits inbound shipment
-    "shipping_to_event",   // waiting for organizer confirmation (view only)
-    "exhibited",           // artwork in gallery (view only)
-    "unsold",              // organizer will create return — view only for artist
-    "returning_to_creator",// artist confirms receipt
-)
-
 @Composable
-fun ArtistExhibitionPaintingDetailScreen(
-    navController: NavController,
-    eventPaintingId: String,
-    viewModel: EventPaintingDetailViewModel = hiltViewModel()
-) {
-    LaunchedEffect(eventPaintingId) {
-        viewModel.getEventPaintingDetail(eventPaintingId)
-    }
-
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            BackTopBar(
-                onBackClick = { navController.popBackStack() },
-                title = "Artwork Detail"
-            )
-        },
-        bottomBar = {
-            state.data?.let { painting ->
-                if (painting.status in SHIPMENT_ACTIONABLE_STATUSES) {
-                    ShipmentActionBar(
-                        status = painting.status,
-                        onManageShipment = {
-                            navController.navigate(
-                                NavigationRoutes.EXHIBITION_SHIPMENT + "/${painting.id}"
-                            )
-                        }
-                    )
-                }
-            }
-        }
-    ) { innerPadding ->
-        if (state.isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularLoading()
-            }
-            return@Scaffold
-        }
-
-        state.data?.let { painting ->
-            ArtistPaintingDetailContent(
-                painting = painting,
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
-    }
-}
-
-@Composable
-private fun ArtistPaintingDetailContent(
+fun EventPaintingDetailContent(
     painting: EventPainting,
     modifier: Modifier = Modifier
 ) {
@@ -249,57 +173,5 @@ private fun LabelValue(label: String, value: String) {
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium
         )
-    }
-}
-
-@Composable
-private fun ShipmentActionBar(
-    status: String,
-    onManageShipment: () -> Unit
-) {
-    val (label, enabled) = when (status.lowercase()) {
-        "approved" -> "Submit Inbound Shipment" to true
-        "shipping_to_event" -> "Shipment In Progress…" to false
-        "exhibited" -> "Artwork Exhibited" to false
-        "unsold" -> "Return Being Arranged" to false
-        "returning_to_creator" -> "Confirm Artwork Received" to true
-        else -> "Manage Shipment" to true
-    }
-
-    Surface(
-        shadowElevation = 16.dp,
-        tonalElevation = 4.dp,
-        color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .navigationBarsPadding(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.LocalShipping,
-                contentDescription = null,
-                tint = if (enabled) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(24.dp)
-            )
-            Button(
-                onClick = onManageShipment,
-                enabled = enabled,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Text(text = label, fontWeight = FontWeight.Bold)
-            }
-        }
     }
 }
