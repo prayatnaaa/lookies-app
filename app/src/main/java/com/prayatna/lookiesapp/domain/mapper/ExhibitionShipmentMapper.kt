@@ -2,10 +2,11 @@ package com.prayatna.lookiesapp.domain.mapper
 
 import com.prayatna.lookiesapp.data.remote.dto.ExhibitionShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.request.shipment.CreateExhibitionShipmentRequest
-import com.prayatna.lookiesapp.domain.shipment.DeliveryMethod
-import com.prayatna.lookiesapp.domain.shipment.ExhibitionShipment
-import com.prayatna.lookiesapp.domain.shipment.ShipmentStatus
-import com.prayatna.lookiesapp.domain.shipment.ShipmentType
+import com.prayatna.lookiesapp.domain.model.shipment.CreateExhibitionShipmentInput
+import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
+import com.prayatna.lookiesapp.domain.model.shipment.ExhibitionShipment
+import com.prayatna.lookiesapp.domain.model.shipment.ShipmentStatus
+import com.prayatna.lookiesapp.domain.model.shipment.ShipmentType
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -47,7 +48,7 @@ fun ExhibitionShipmentDto.toInsertDto(): CreateExhibitionShipmentRequest {
     )
 }
 
-fun com.prayatna.lookiesapp.domain.shipment.CreateExhibitionShipmentInput.toDto(): CreateExhibitionShipmentRequest {
+fun CreateExhibitionShipmentInput.toDto(): CreateExhibitionShipmentRequest {
     return CreateExhibitionShipmentRequest(
         eventPaintingId = eventPaintingId.toString(),
         artistId = artistId.toString(),

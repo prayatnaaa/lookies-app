@@ -21,6 +21,7 @@ fun ExhibitionShipmentRoute(
     }
 
     ExhibitionShipmentScreen(
+        backAction = { navController.popBackStack() },
         uiState = uiState,
         onEvent = { event ->
             when (event) {

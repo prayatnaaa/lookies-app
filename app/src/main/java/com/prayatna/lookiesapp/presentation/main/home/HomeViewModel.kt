@@ -93,7 +93,7 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            when (val result = getPaintingsUseCase()) {
+            when (val result = getPaintingsUseCase(status = "on_sale")) {
                 is DataResult.Success -> {
                     _uiState.update {
                         it.copy(

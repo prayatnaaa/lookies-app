@@ -1,6 +1,6 @@
 package com.prayatna.lookiesapp.presentation.exhibitionShipment.state
 
-import com.prayatna.lookiesapp.domain.shipment.DeliveryMethod
+import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
 
 sealed class ExhibitionShipmentEvent {
 

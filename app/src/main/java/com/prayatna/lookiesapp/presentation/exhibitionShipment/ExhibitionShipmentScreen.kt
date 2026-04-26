@@ -42,7 +42,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.domain.shipment.DeliveryMethod
+import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.state.ExhibitionShipmentEvent
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.state.ExhibitionShipmentUiState
@@ -51,15 +51,22 @@ import com.prayatna.lookiesapp.presentation.exhibitionShipment.state.ExhibitionS
 fun ExhibitionShipmentScreen(
     uiState: ExhibitionShipmentUiState,
     onEvent: (ExhibitionShipmentEvent) -> Unit,
+    backAction: () -> Unit = {}
 ) {
     // Error dialog
     uiState.errorMessage?.let { message ->
         AlertDialog(
-            onDismissRequest = { onEvent(ExhibitionShipmentEvent.DismissError) },
+            onDismissRequest = {
+                onEvent(ExhibitionShipmentEvent.DismissError)
+                backAction()
+                               },
             title = { Text("Error") },
             text = { Text(message) },
             confirmButton = {
-                TextButton(onClick = { onEvent(ExhibitionShipmentEvent.DismissError) }) {
+                TextButton(onClick = {
+                    onEvent(ExhibitionShipmentEvent.DismissError)
+                    backAction()
+                }) {
                     Text("OK")
                 }
             }

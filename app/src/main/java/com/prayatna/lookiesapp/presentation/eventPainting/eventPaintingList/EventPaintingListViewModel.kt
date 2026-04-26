@@ -26,9 +26,7 @@ class PaintingListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val result = getPaintingUseCase(status = "accepted")
-
-            when (result) {
+            when (val result = getPaintingUseCase(status = "on_sale")) {
                 is DataResult.Success -> {
                     _uiState.update { state ->
                         state.copy(

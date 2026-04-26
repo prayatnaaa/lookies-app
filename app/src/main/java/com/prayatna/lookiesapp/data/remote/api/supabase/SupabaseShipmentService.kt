@@ -49,4 +49,12 @@ class SupabaseShipmentService @Inject constructor(
             }.decodeSingle<ExhibitionShipmentDto>()
     }
 
+    suspend fun getExhibitionShipmentByEventPaintingId(eventPaintingId: String): ExhibitionShipmentDto {
+        return postgrest.from("exhibition_shipments").select {
+            filter {
+                eq("event_painting_id", eventPaintingId)
+            }
+        }.decodeSingle<ExhibitionShipmentDto>()
+    }
+
 }

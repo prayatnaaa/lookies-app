@@ -1,11 +1,14 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseShipmentService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
 import com.prayatna.lookiesapp.domain.model.shipment.ShipmentFee
 import com.prayatna.lookiesapp.domain.repository.ShipmentRepository
+import com.prayatna.lookiesapp.domain.model.shipment.CreateExhibitionShipmentInput
+import com.prayatna.lookiesapp.domain.model.shipment.ExhibitionShipment
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.RestException
@@ -34,7 +37,7 @@ class ShipmentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createExhibitionShipment(input: com.prayatna.lookiesapp.domain.shipment.CreateExhibitionShipmentInput): DataResult<com.prayatna.lookiesapp.domain.shipment.ExhibitionShipment> {
+    override suspend fun createExhibitionShipment(input: CreateExhibitionShipmentInput): DataResult<ExhibitionShipment> {
         return try {
             val result = supabaseShipmentService.createExhibitionShipment(input.toDto())
             DataResult.Success(result.toDomain())
@@ -48,9 +51,21 @@ class ShipmentRepositoryImpl @Inject constructor(
         shipmentId: String,
         notes: String?,
         status: String
-    ): DataResult<com.prayatna.lookiesapp.domain.shipment.ExhibitionShipment> {
+    ): DataResult<ExhibitionShipment> {
         return try {
             val result = supabaseShipmentService.updateExhibitionShipmentStatus(shipmentId, notes, status)
+            Log.d("ShipmentRepositoryImpl", "updateExhibitionShipmentStatus: $result")
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            Log.e("ShipmentRepositoryImpl", "updateExhibitionShipmentStatus: ${e.error}")
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getExhibitionShipmentByEventPaintingId(eventPaintingId: String): DataResult<ExhibitionShipment> {
+        return try {
+            val result = supabaseShipmentService.getExhibitionShipmentByEventPaintingId(eventPaintingId)
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)

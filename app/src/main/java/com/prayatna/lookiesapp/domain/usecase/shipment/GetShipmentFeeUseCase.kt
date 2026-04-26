@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.domain.shipment
+package com.prayatna.lookiesapp.domain.usecase.shipment
 
 import com.prayatna.lookiesapp.domain.repository.ShipmentRepository
 import javax.inject.Inject

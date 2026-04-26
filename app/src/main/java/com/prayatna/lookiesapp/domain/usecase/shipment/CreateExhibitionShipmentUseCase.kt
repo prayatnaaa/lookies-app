@@ -1,6 +1,8 @@
-package com.prayatna.lookiesapp.domain.shipment
+package com.prayatna.lookiesapp.domain.usecase.shipment
 
 import com.prayatna.lookiesapp.domain.repository.ShipmentRepository
+import com.prayatna.lookiesapp.domain.model.shipment.CreateExhibitionShipmentInput
+import com.prayatna.lookiesapp.domain.model.shipment.ExhibitionShipment
 import com.prayatna.lookiesapp.utils.DataResult
 import javax.inject.Inject
 

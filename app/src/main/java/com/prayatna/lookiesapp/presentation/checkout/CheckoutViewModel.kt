@@ -8,7 +8,7 @@ import com.prayatna.lookiesapp.domain.usecase.event.GetEventByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.CreateOrderUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
-import com.prayatna.lookiesapp.domain.shipment.GetShipmentFeeUseCase
+import com.prayatna.lookiesapp.domain.usecase.shipment.GetShipmentFeeUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.GetUserAddressesUseCase
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutEffect
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutEvent

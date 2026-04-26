@@ -1,7 +1,8 @@
 package com.prayatna.lookiesapp.presentation.exhibitionShipment.state
 
-import com.prayatna.lookiesapp.domain.shipment.DeliveryMethod
-import com.prayatna.lookiesapp.domain.shipment.ExhibitionShipment
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
+import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
+import com.prayatna.lookiesapp.domain.model.shipment.ExhibitionShipment
 
 data class ExhibitionShipmentUiState(
     // Loading / error
@@ -28,7 +29,7 @@ data class ExhibitionShipmentUiState(
     val returnTrackingNumberInput: String = "",
 
     // Contextual IDs needed to build the shipment
-    val eventPaintingId: String = "",
+    val eventPainting: EventPainting? = null,
     val artistId: String = "",
     val organizerId: String = "",
     val eventId: Int = 0,

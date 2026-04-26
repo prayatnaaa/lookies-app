@@ -3,14 +3,13 @@ package com.prayatna.lookiesapp.presentation.exhibitionShipment
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.shipment.CreateExhibitionShipmentInput
-import com.prayatna.lookiesapp.domain.shipment.CreateExhibitionShipmentUseCase
-import com.prayatna.lookiesapp.domain.shipment.DeliveryMethod
-import com.prayatna.lookiesapp.domain.shipment.ShipmentStatus
-import com.prayatna.lookiesapp.domain.shipment.ShipmentType
-import com.prayatna.lookiesapp.domain.shipment.UpdateExhibitionShipmentStatusUseCase
-import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
-import com.prayatna.lookiesapp.domain.usecase.painting.UpdateEventPaintingStatusUseCase
+import com.prayatna.lookiesapp.domain.model.shipment.CreateExhibitionShipmentInput
+import com.prayatna.lookiesapp.domain.usecase.shipment.CreateExhibitionShipmentUseCase
+import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
+import com.prayatna.lookiesapp.domain.model.shipment.ShipmentStatus
+import com.prayatna.lookiesapp.domain.model.shipment.ShipmentType
+import com.prayatna.lookiesapp.domain.usecase.shipment.UpdateExhibitionShipmentStatusUseCase
+import com.prayatna.lookiesapp.domain.usecase.shipment.GetExhibitionShipmentByEventPaintingIdUseCase
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.state.ExhibitionShipmentEvent
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.state.ExhibitionShipmentUiState
 import com.prayatna.lookiesapp.utils.DataResult
@@ -27,8 +26,8 @@ import javax.inject.Inject
 class ExhibitionShipmentViewModel @Inject constructor(
     private val createExhibitionShipmentUseCase: CreateExhibitionShipmentUseCase,
     private val updateExhibitionShipmentStatusUseCase: UpdateExhibitionShipmentStatusUseCase,
-    private val updateEventPaintingStatusUseCase: UpdateEventPaintingStatusUseCase,
-    private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
+//    private val updateEventPaintingStatusUseCase: UpdateEventPaintingStatusUseCase,
+    private val getExhibitionShipmentByEventPaintingIdUseCase: GetExhibitionShipmentByEventPaintingIdUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ExhibitionShipmentUiState())
@@ -41,24 +40,23 @@ class ExhibitionShipmentViewModel @Inject constructor(
     fun init(eventPaintingId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            when (val result = getEventPaintingByIdUseCase(eventPaintingId)) {
+            when (val result = getExhibitionShipmentByEventPaintingIdUseCase(eventPaintingId)) {
                 is DataResult.Success -> {
-                    val ep = result.data
-                    val event = ep.participant.event
+                    val data = result.data
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            eventPaintingId = ep.id,
-                            artistId = ep.artistId,
-                            organizerId = event.organizer.id,
-                            eventId = event.id.toIntOrNull() ?: 0,
-                            eventPaintingStatus = ep.status,
-                            paintingTitle = ep.painting.title,
-                            eventTitle = event.title,
-                            eventLocation = event.location,
-                            organizerName = event.organizer.legalName,
-                            eventStartDate = event.startDate.take(10),
-                            eventEndDate = event.endDate.take(10),
+                            shipment = data.exhibitionShipment,
+                            eventPainting = data.eventPainting,
+                            artistId = data.eventPainting.artistId,
+                            organizerId = data.exhibitionShipment.organizerId.toString(),
+                            eventId = data.exhibitionShipment.eventId,
+                            eventPaintingStatus = data.eventPainting.status,
+                            paintingTitle = data.eventPainting.painting.title,
+                            eventTitle = data.eventPainting.participant.event.title,
+                            eventLocation = data.eventPainting.participant.event.location,
+                            organizerName = data.eventPainting.participant.event.organizer.legalName,
+
                         )
                     }
                 }
@@ -131,7 +129,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
             _uiState.update { it.copy(isSubmitting = true, errorMessage = null) }
 
             val input = CreateExhibitionShipmentInput(
-                eventPaintingId = UUID.fromString(state.eventPaintingId),
+                eventPaintingId = UUID.fromString(state.eventPainting?.id),
                 artistId = UUID.fromString(state.artistId),
                 organizerId = UUID.fromString(state.organizerId),
                 shipmentType = ShipmentType.INBOUND,
@@ -144,25 +142,8 @@ class ExhibitionShipmentViewModel @Inject constructor(
 
             when (val shipmentResult = createExhibitionShipmentUseCase(input)) {
                 is DataResult.Success -> {
-                    // Also update event_painting status to shipping_to_event
-                    val statusResult = updateEventPaintingStatusUseCase(
-                        eventPaintingId = state.eventPaintingId,
-                        status = "shipping_to_event"
-                    )
-                    when (statusResult) {
-                        is DataResult.Success -> _uiState.update {
-                            it.copy(
-                                isSubmitting = false,
-                                shipment = shipmentResult.data,
-                                eventPaintingStatus = "shipping_to_event",
-                                successMessage = "Shipment submitted! The organizer will verify arrival."
-                            )
-                        }
-                        is DataResult.Error -> _uiState.update {
-                            it.copy(isSubmitting = false, errorMessage = statusResult.error)
-                        }
-                        else -> Unit
-                    }
+                    _uiState.update { it.copy(successMessage = "Inbound shipment created successfully") }
+
                 }
                 is DataResult.Error -> _uiState.update {
                     it.copy(isSubmitting = false, errorMessage = shipmentResult.error)
@@ -179,11 +160,11 @@ class ExhibitionShipmentViewModel @Inject constructor(
      */
     private fun confirmArtworkReceived() {
         val state = _uiState.value
-        Log.d("ExhibitionShipmentViewModel", "confirmArtworkReceived: $state")
         val shipmentId = state.shipment?.id?.toString() ?: run {
             _uiState.update { it.copy(errorMessage = "No shipment record found") }
             return
         }
+        Log.d("ExhibitionShipmentViewModel", "confirmArtworkReceived: $shipmentId")
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true, errorMessage = null) }
@@ -195,25 +176,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
             )
             when (shipmentResult) {
                 is DataResult.Success -> {
-                    val statusResult = updateEventPaintingStatusUseCase(
-                        eventPaintingId = state.eventPaintingId,
-                        status = "exhibited"
-                    )
-                    when (statusResult) {
-                        is DataResult.Success -> _uiState.update {
-                            it.copy(
-                                isSubmitting = false,
-                                shipment = shipmentResult.data,
-                                eventPaintingStatus = "exhibited",
-                                notesInput = "",
-                                successMessage = "Artwork marked as exhibited and ready to display!"
-                            )
-                        }
-                        is DataResult.Error -> _uiState.update {
-                            it.copy(isSubmitting = false, errorMessage = statusResult.error)
-                        }
-                        else -> Unit
-                    }
+                    _uiState.update { it.copy(successMessage = "Artwork received successfully") }
                 }
                 is DataResult.Error -> _uiState.update {
                     it.copy(isSubmitting = false, errorMessage = shipmentResult.error)
@@ -241,7 +204,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
             _uiState.update { it.copy(isSubmitting = true, errorMessage = null) }
 
             val input = CreateExhibitionShipmentInput(
-                eventPaintingId = UUID.fromString(state.eventPaintingId),
+                eventPaintingId = UUID.fromString(state.eventPainting?.id),
                 artistId = UUID.fromString(state.artistId),
                 organizerId = UUID.fromString(state.organizerId),
                 shipmentType = ShipmentType.RETURN,
@@ -254,24 +217,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
 
             when (val shipmentResult = createExhibitionShipmentUseCase(input)) {
                 is DataResult.Success -> {
-                    val statusResult = updateEventPaintingStatusUseCase(
-                        eventPaintingId = state.eventPaintingId,
-                        status = "returning_to_creator"
-                    )
-                    when (statusResult) {
-                        is DataResult.Success -> _uiState.update {
-                            it.copy(
-                                isSubmitting = false,
-                                shipment = shipmentResult.data,
-                                eventPaintingStatus = "returning_to_creator",
-                                successMessage = "Return shipment created. Artist will confirm receipt."
-                            )
-                        }
-                        is DataResult.Error -> _uiState.update {
-                            it.copy(isSubmitting = false, errorMessage = statusResult.error)
-                        }
-                        else -> Unit
-                    }
+                    _uiState.update { it.copy(successMessage = "Return shipment created successfully") }
                 }
                 is DataResult.Error -> _uiState.update {
                     it.copy(isSubmitting = false, errorMessage = shipmentResult.error)
@@ -303,25 +249,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
             )
             when (shipmentResult) {
                 is DataResult.Success -> {
-                    val statusResult = updateEventPaintingStatusUseCase(
-                        eventPaintingId = state.eventPaintingId,
-                        status = "returned"
-                    )
-                    when (statusResult) {
-                        is DataResult.Success -> _uiState.update {
-                            it.copy(
-                                isSubmitting = false,
-                                shipment = shipmentResult.data,
-                                eventPaintingStatus = "returned",
-                                notesInput = "",
-                                successMessage = "Artwork returned successfully. The cycle is complete!"
-                            )
-                        }
-                        is DataResult.Error -> _uiState.update {
-                            it.copy(isSubmitting = false, errorMessage = statusResult.error)
-                        }
-                        else -> Unit
-                    }
+                    _uiState.update { it.copy(successMessage = "Artwork returned successfully") }
                 }
                 is DataResult.Error -> _uiState.update {
                     it.copy(isSubmitting = false, errorMessage = shipmentResult.error)

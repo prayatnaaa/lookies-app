@@ -2,7 +2,7 @@ package com.prayatna.lookiesapp.presentation.shipmentDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.shipment.GetShipmentByOrderIdUseCase
+import com.prayatna.lookiesapp.domain.usecase.shipment.GetShipmentByOrderIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.CreateTrackingNumberShipmentUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.UpdateShipmentStatusUseCase
 import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailEvent

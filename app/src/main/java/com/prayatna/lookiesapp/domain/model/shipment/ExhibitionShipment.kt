@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.domain.shipment
+package com.prayatna.lookiesapp.domain.model.shipment
 
 import java.time.OffsetDateTime
 import java.util.UUID
