@@ -63,11 +63,13 @@ class ShipmentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getExhibitionShipmentByEventPaintingId(eventPaintingId: String): DataResult<ExhibitionShipment> {
+    override suspend fun getExhibitionShipmentByEventPaintingId(eventPaintingId: String): DataResult<ExhibitionShipment?> {
         return try {
             val result = supabaseShipmentService.getExhibitionShipmentByEventPaintingId(eventPaintingId)
-            DataResult.Success(result.toDomain())
+            Log.d("ShipmentRepositoryImpl", "getExhibitionShipmentByEventPaintingId: $result")
+            DataResult.Success(result?.toDomain())
         } catch (e: RestException) {
+            Log.e("ShipmentRepositoryImpl", "getExhibitionShipmentByEventPaintingId: ${e.error}")
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
         }

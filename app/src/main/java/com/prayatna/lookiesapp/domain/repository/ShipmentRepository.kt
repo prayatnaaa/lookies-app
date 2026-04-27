@@ -19,5 +19,5 @@ interface ShipmentRepository  {
             DataResult<ExhibitionShipment>
 
     suspend fun getExhibitionShipmentByEventPaintingId(eventPaintingId: String):
-            DataResult<ExhibitionShipment>
+            DataResult<ExhibitionShipment?>
 }

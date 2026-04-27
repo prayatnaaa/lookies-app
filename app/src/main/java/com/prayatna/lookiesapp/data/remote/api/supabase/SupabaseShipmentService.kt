@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.ExhibitionShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentFeeDto
@@ -49,12 +50,14 @@ class SupabaseShipmentService @Inject constructor(
             }.decodeSingle<ExhibitionShipmentDto>()
     }
 
-    suspend fun getExhibitionShipmentByEventPaintingId(eventPaintingId: String): ExhibitionShipmentDto {
-        return postgrest.from("exhibition_shipments").select {
+    suspend fun getExhibitionShipmentByEventPaintingId(eventPaintingId: String): ExhibitionShipmentDto? {
+        val response = postgrest.from("exhibition_shipments").select {
             filter {
                 eq("event_painting_id", eventPaintingId)
             }
-        }.decodeSingle<ExhibitionShipmentDto>()
+        }.decodeSingleOrNull<ExhibitionShipmentDto>()
+        Log.d("SupabaseShipmentService", "getExhibitionShipmentByEventPaintingId: $response")
+        return response
     }
 
 }
