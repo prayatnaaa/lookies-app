@@ -17,11 +17,13 @@ import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.worker.FcmTokenScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.gotrue.SessionStatus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -103,7 +105,7 @@ class LoginViewModel @Inject constructor(
                 is DataResult.Success -> {
                     val session = result.data
 
-                    session.collect { sessionStatus ->
+                    session.collectLatest { sessionStatus ->
                         when (sessionStatus) {
                             is SessionStatus.Authenticated -> {
                                 Log.d("SignIn", "Authenticated")
@@ -125,19 +127,16 @@ class LoginViewModel @Inject constructor(
     private fun loadAuthenticatedUser() {
         viewModelScope.launch {
             val role = authRepository.getRole()
-            val token = getFcmTokenUseCase()
-
-            if (token != null) {
-                Log.d("UserRepositoryImpl", "Token in lAU: $token")
-                fcmTokenScheduler.enqueue(token)
-            }
-
-            Log.d("SignIn", "Role in lAU: $role")
 
             _authState.value = if (role.isBlank()) {
                 AuthState.Unauthenticated
             } else {
                 AuthState.Authenticated(role)
+            }
+
+            launch(Dispatchers.IO) {
+                val token = getFcmTokenUseCase()
+                token?.let { fcmTokenScheduler.enqueue(it) }
             }
         }
     }

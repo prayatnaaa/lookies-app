@@ -54,6 +54,7 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import com.prayatna.lookiesapp.presentation.components.checkout.CheckoutPaymentMethodContent
 import com.prayatna.lookiesapp.utils.formatDate
 
 @Composable
@@ -322,6 +323,13 @@ fun DetailTransactionContent(
                 }
             }
         }
+
+//        if(transaction.status == "awaiting_payment") {
+//            CheckoutPaymentMethodContent(
+//                selectedMethod = transaction.paymentMethod,
+//                onPaymentMethodSelected = {}
+//            )
+//        }
 
         if (data.tickets.isNotEmpty()) {
             item {

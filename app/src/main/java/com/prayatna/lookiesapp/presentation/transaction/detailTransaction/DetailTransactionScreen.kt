@@ -112,7 +112,7 @@ fun DetailTransactionScreen(
                         isCompleting = state.isCompleting,
                         onCompleteOrder = { viewModel.setOrderToComplete(orderId) },
                         onRequestRefund = {
-                            navController.navigate("${NavigationRoutes.CREATE_REFUND}/$orderId")
+                            navController.navigate("${NavigationRoutes.CREATE_REFUND}/$orderId/${state.data?.transaction?.totalAmount}")
                         },
                         onViewRefunds = {
                             navController.navigate("${NavigationRoutes.ORDER_REFUNDS}/$orderId")

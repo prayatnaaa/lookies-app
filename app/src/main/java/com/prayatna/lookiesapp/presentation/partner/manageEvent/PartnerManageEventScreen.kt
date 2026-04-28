@@ -99,20 +99,6 @@ fun PartnerManageEventScreen(
                         )
                     }
 
-                    if (!isSelfExhibition) {
-                        item {
-                            ManagementOptionCard(
-                                title = "Participants / Artists",
-                                description = "Approve pendaftar, lihat list seniman, dan status keikutsertaan.",
-                                icon = Icons.Default.Group,
-                                alertCount = uiState.statistics?.pendingParticipants?.toInt() ?: 0,
-                                onClick = {
-                                    navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/${event.id}")
-                                }
-                            )
-                        }
-                    }
-
                     item {
                         ManagementOptionCard(
                             title = "Artworks & Gallery",

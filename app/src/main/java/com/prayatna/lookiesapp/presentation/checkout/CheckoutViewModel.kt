@@ -176,6 +176,8 @@ class CheckoutViewModel @Inject constructor(
             )) {
 
                 is DataResult.Success -> {
+                    Log.d("CHECKOUT", "type=${item.type}")
+                    Log.d("CHECKOUT", "id=${item.id}")
                     _uiState.update { it.copy(isLoading = false) }
                     handleCheckoutSuccess(
                         orderId = result.data,
@@ -185,6 +187,9 @@ class CheckoutViewModel @Inject constructor(
                 }
 
                 is DataResult.Error -> {
+                    Log.d("CHECKOUT", "type=${item.type}")
+                    Log.d("CHECKOUT", "id=${item.id}")
+
                     _uiState.update { it.copy(isLoading = false) }
                     emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
                 }
@@ -254,6 +259,7 @@ class CheckoutViewModel @Inject constructor(
         when (val result = getEventPaintingByIdUseCase(id)) {
             is DataResult.Success -> {
                 val data = result.data
+                Log.d("CHECKOUT", "handlePaintingFetch: $data")
                 _uiState.update {
                     it.copy(
                         isLoading = false,

@@ -28,11 +28,12 @@ class CreateRefundViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val orderId: String = savedStateHandle["orderId"] ?: ""
+    private val totalAmount: Float= savedStateHandle["totalAmount"] ?: 0f
 
     private val _uiState = MutableStateFlow<CreateRefundUiState>(CreateRefundUiState.Idle)
     val uiState: StateFlow<CreateRefundUiState> = _uiState.asStateFlow()
 
-    private val _formState = MutableStateFlow(CreateRefundFormState(orderId = orderId))
+    private val _formState = MutableStateFlow(CreateRefundFormState(orderId = orderId, amount = totalAmount.toString()))
     val formState: StateFlow<CreateRefundFormState> = _formState.asStateFlow()
 
     fun onEvent(event: CreateRefundEvent) {
@@ -53,30 +54,6 @@ class CreateRefundViewModel @Inject constructor(
     private fun submitRefund() {
         val form = _formState.value
 
-        if (form.orderId.isBlank()) {
-            _uiState.value = CreateRefundUiState.Error("Order ID is required")
-            return
-        }
-        if (form.amount.isBlank()) {
-            _uiState.value = CreateRefundUiState.Error("Amount is required")
-            return
-        }
-        if (form.bankCode.isBlank()) {
-            _uiState.value = CreateRefundUiState.Error("Bank code is required")
-            return
-        }
-        if (form.accountNumber.isBlank()) {
-            _uiState.value = CreateRefundUiState.Error("Account number is required")
-            return
-        }
-        if (form.accountHolderName.isBlank()) {
-            _uiState.value = CreateRefundUiState.Error("Account holder name is required")
-            return
-        }
-        if (form.reason.isBlank()) {
-            _uiState.value = CreateRefundUiState.Error("Reason is required")
-            return
-        }
         if (form.proofImageUri == null) {
             _uiState.value = CreateRefundUiState.Error("Proof image is required")
             return
@@ -89,7 +66,7 @@ class CreateRefundViewModel @Inject constructor(
 
             val input = CreateRefundRequestInput(
                 orderId = form.orderId,
-                userId = "", // filled by service from auth session
+                userId = "",
                 amount = form.amount,
                 bankCode = form.bankCode,
                 accountNumber = form.accountNumber,
