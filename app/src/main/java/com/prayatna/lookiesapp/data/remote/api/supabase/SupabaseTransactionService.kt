@@ -4,8 +4,6 @@ import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
 import com.prayatna.lookiesapp.data.remote.dto.RefundDto
-import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
-import com.prayatna.lookiesapp.data.remote.dto.ShipmentFeeDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
@@ -161,18 +159,6 @@ class SupabaseTransactionService @Inject constructor(
         return result
     }
 
-    suspend fun getShipmentByOrderId(orderId: String): ShipmentDto {
-        return postgrest.from("shipments").select {
-            filter {
-                eq("order_id", orderId)
-            }
-        }.decodeSingle<ShipmentDto>()
-    }
-
-    suspend fun getShipmentFees(): List<ShipmentFeeDto> {
-        return postgrest.from("shipment_fees").select().decodeList<ShipmentFeeDto>()
-    }
-
     suspend fun setOrderToComplete(request: SetOrderToCompleteRequest): SetOrderToCompleteResponse {
         val session = auth.currentSessionOrNull()
             ?: throw IllegalStateException("No active session")
@@ -264,6 +250,14 @@ class SupabaseTransactionService @Inject constructor(
         }.decodeList<RefundDto>()
     }
 
+    suspend fun getRefundById(id: String): RefundDto {
+        return postgrest.from("refund_requests").select {
+            filter {
+                eq("id", id)
+            }
+        }.decodeSingle<RefundDto>()
+    }
+
     suspend fun setRefundAsComplete(refundRequestId: String): SetRefundAsCompleteResponse {
         val session = auth.currentSessionOrNull()
             ?: throw IllegalStateException("No active session")
@@ -279,5 +273,21 @@ class SupabaseTransactionService @Inject constructor(
         }
         Log.d("CreatePayment", response.body())
         return response.body()
+    }
+
+    suspend fun updateRefundStatus(id: String, status: String, note: String? = null): RefundDto {
+        val refund = postgrest.from("refund_requests").update({
+            set("status", status)
+            if (note != null) {
+                set("admin_notes", note)
+            }
+        }) {
+            select()
+            filter {
+                eq("id", id)
+            }
+        }.decodeSingle<RefundDto>()
+        Log.d("Refund", refund.toString())
+        return refund
     }
 }

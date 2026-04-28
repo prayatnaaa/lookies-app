@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
-import com.prayatna.lookiesapp.domain.usecase.transaction.GetRefundsByOrderIdUseCase
+import com.prayatna.lookiesapp.domain.usecase.refund.GetRefundsByOrderIdUseCase
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -2,7 +2,7 @@ package com.prayatna.lookiesapp.presentation.refund.refundList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.usecase.transaction.GetRefundsUseCase
+import com.prayatna.lookiesapp.domain.usecase.refund.GetRefundsUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.SetRefundAsCompleteUseCase
 import com.prayatna.lookiesapp.presentation.refund.refundList.state.RefundListEvent
 import com.prayatna.lookiesapp.presentation.refund.refundList.state.RefundListUiState

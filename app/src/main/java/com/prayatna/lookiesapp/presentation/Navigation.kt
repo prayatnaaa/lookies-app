@@ -45,6 +45,7 @@ import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
 import com.prayatna.lookiesapp.presentation.partner.main.home.PartnerHomeScreen
 import com.prayatna.lookiesapp.presentation.partner.manageEvent.PartnerManageEventScreen
 import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
+import com.prayatna.lookiesapp.presentation.partner.partnerRefund.partnerRefundNavigation
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
@@ -204,6 +205,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         composable(NavigationRoutes.REGISTER) {
             RegisterScreen(navController = navController)
         }
+
+        partnerRefundNavigation(navController)
         composable(
             route = "${NavigationRoutes.CREATE_EVENT}/{businessId}",
             arguments = listOf(navArgument("businessId") { type = NavType.StringType })

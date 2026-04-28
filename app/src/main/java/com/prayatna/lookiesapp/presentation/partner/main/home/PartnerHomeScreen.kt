@@ -296,6 +296,14 @@ fun PartnerHomeScreen(
                                     }
                                 )
                                 DashboardActionItem(
+                                    title = "Refunds",
+                                    subtitle = "Manage refund requests from buyer",
+                                    icon = Icons.Filled.Group,
+                                    onClick = {
+                                        navController.navigate(NavigationRoutes.REFUND_LIST)
+                                    }
+                                )
+                                DashboardActionItem(
                                     title = "Paintings",
                                     subtitle = "Manage paintings collection",
                                     icon = Icons.Filled.Group,

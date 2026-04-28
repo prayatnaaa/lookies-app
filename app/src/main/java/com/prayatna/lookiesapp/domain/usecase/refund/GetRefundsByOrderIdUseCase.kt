@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.domain.usecase.transaction
+package com.prayatna.lookiesapp.domain.usecase.refund
 
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository

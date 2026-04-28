@@ -129,6 +129,7 @@ fun CreateRefundScreen(
             item {
                 OutlinedTextField(
                     value = formState.amount,
+                    enabled = false,
                     onValueChange = { viewModel.onEvent(CreateRefundEvent.AmountChanged(it)) },
                     label = { Text("Refund Amount (IDR)") },
                     modifier = Modifier.fillMaxWidth(),

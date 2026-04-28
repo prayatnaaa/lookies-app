@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.refund.refundList
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,19 +18,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.MoneyOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -50,6 +46,7 @@ import com.prayatna.lookiesapp.domain.model.transaction.Refund
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.refund.refundList.state.RefundListEvent
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,11 +137,15 @@ fun RefundListScreen(
                     ) {
                         items(uiState.refunds) { refund ->
                             RefundCard(
+                                onClicked = {
+                                    navController.navigate("${NavigationRoutes.PARTNER_REFUND}/${refund.id}")
+
+                                },
                                 refund = refund,
-                                isProcessing = uiState.isProcessing,
-                                onSetComplete = {
-                                    viewModel.onEvent(RefundListEvent.SetRefundComplete(refund.id))
-                                }
+//                                isProcessing = uiState.isProcessing,
+//                                onSetComplete = {
+//                                    viewModel.onEvent(RefundListEvent.SetRefundComplete(refund.id))
+//                                }
                             )
                         }
                     }
@@ -156,9 +157,8 @@ fun RefundListScreen(
 
 @Composable
 private fun RefundCard(
+    onClicked: () -> Unit = {},
     refund: Refund,
-    isProcessing: Boolean,
-    onSetComplete: () -> Unit
 ) {
     val statusColor = when (refund.status.lowercase()) {
         "pending" -> MaterialTheme.colorScheme.tertiary
@@ -169,7 +169,7 @@ private fun RefundCard(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onClicked() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -217,37 +217,37 @@ private fun RefundCard(
             RefundInfoRow(label = "Account Holder", value = refund.accountHolderName)
             RefundInfoRow(label = "Reason", value = refund.reason)
 
-            if (refund.status.lowercase() in listOf("pending", "processing")) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Button(
-                    onClick = onSetComplete,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    enabled = !isProcessing,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2E7D32)
-                    )
-                ) {
-                    if (isProcessing) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Mark as Complete", fontWeight = FontWeight.SemiBold, color = Color.White)
-                    }
-                }
-            }
+//            if (refund.status.lowercase() in listOf("pending", "processing")) {
+//                Spacer(modifier = Modifier.height(12.dp))
+//                Button(
+//                    onClick = onSetComplete,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(44.dp),
+//                    shape = RoundedCornerShape(10.dp),
+//                    enabled = !isProcessing,
+//                    colors = ButtonDefaults.buttonColors(
+//                        containerColor = Color(0xFF2E7D32)
+//                    )
+//                ) {
+//                    if (isProcessing) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier.size(20.dp),
+//                            color = Color.White,
+//                            strokeWidth = 2.dp
+//                        )
+//                    } else {
+//                        Icon(
+//                            imageVector = Icons.Default.CheckCircle,
+//                            contentDescription = null,
+//                            modifier = Modifier.size(16.dp),
+//                            tint = Color.White
+//                        )
+//                        Spacer(modifier = Modifier.width(6.dp))
+//                        Text("Mark as Complete", fontWeight = FontWeight.SemiBold, color = Color.White)
+//                    }
+//                }
+//            }
         }
     }
 }

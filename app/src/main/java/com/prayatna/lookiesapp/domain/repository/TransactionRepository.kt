@@ -48,10 +48,18 @@ interface TransactionRepository {
         request: CreateRefundRequestInput, 
         proofImage: ByteArray?
     ): DataResult<Refund>
-    
-    suspend fun getRefunds(): DataResult<List<Refund>>
-    
-    suspend fun getRefundsByOrderId(orderId: String): DataResult<List<Refund>>
-    
-    suspend fun setRefundAsComplete(refundRequestId: String): DataResult<SetRefundAsCompleteResult>
+
+    suspend fun getRefunds():
+            DataResult<List<Refund>>
+
+    suspend fun getRefundsByOrderId(orderId: String):
+            DataResult<List<Refund>>
+
+    suspend fun setRefundAsComplete(refundRequestId: String):
+            DataResult<SetRefundAsCompleteResult>
+
+    suspend fun updateRefundStatus(id: String, status: String, note: String? = null):
+            DataResult<Refund>
+    suspend fun getRefundById(id: String):
+            DataResult<Refund>
 }

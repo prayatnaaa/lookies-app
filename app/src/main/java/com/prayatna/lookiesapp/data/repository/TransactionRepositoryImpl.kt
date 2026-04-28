@@ -16,8 +16,6 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequest
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
-import com.prayatna.lookiesapp.domain.model.shipment.Shipment
-import com.prayatna.lookiesapp.domain.model.shipment.ShipmentFee
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
@@ -182,6 +180,26 @@ class TransactionRepositoryImpl @Inject constructor(
     override suspend fun setRefundAsComplete(refundRequestId: String): DataResult<SetRefundAsCompleteResult> {
         return try {
             val result = transactionService.setRefundAsComplete(refundRequestId)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun updateRefundStatus(id: String, status: String, note: String?): DataResult<Refund> {
+        return try {
+            val result = transactionService.updateRefundStatus(id = id, status = status, note)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getRefundById(id: String): DataResult<Refund> {
+        return try {
+            val result = transactionService.getRefundById(id)
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
