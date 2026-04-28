@@ -1,10 +1,10 @@
 package com.prayatna.lookiesapp.domain.usecase.refund
 
-import com.prayatna.lookiesapp.domain.repository.TransactionRepository
+import com.prayatna.lookiesapp.domain.repository.RefundRepository
 import javax.inject.Inject
 
 class GetRefundByIdUseCase @Inject constructor(
-    private val transactionRepository: TransactionRepository
+    private val refundRepository: RefundRepository
 ) {
-    suspend operator fun invoke(id: String) = transactionRepository.getRefundById(id)
+    suspend operator fun invoke(id: String) = refundRepository.getRefundById(id)
 }

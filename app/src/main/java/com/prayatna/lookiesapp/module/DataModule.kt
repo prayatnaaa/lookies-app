@@ -10,6 +10,7 @@ import com.prayatna.lookiesapp.data.repository.MerchantRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.PaintingRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.PartnerRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.PaymentRepositoryImpl
+import com.prayatna.lookiesapp.data.repository.RefundRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.ShipmentRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.TransactionRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.UserRepositoryImpl
@@ -23,6 +24,7 @@ import com.prayatna.lookiesapp.domain.repository.MerchantRepository
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.domain.repository.PaymentRepository
+import com.prayatna.lookiesapp.domain.repository.RefundRepository
 import com.prayatna.lookiesapp.domain.repository.ShipmentRepository
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.domain.repository.UserRepository
@@ -86,4 +88,8 @@ interface DataModule {
     @Singleton
     @Binds
     fun shipmentRepository(shipmentRepositoryImpl: ShipmentRepositoryImpl): ShipmentRepository
+
+    @Singleton
+    @Binds
+    fun bindsRefundRepository(refundRepositoryImpl: RefundRepositoryImpl): RefundRepository
 }
