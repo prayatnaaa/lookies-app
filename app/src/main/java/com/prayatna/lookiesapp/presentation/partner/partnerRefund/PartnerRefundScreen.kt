@@ -64,10 +64,11 @@ fun PartnerRefundScreen(
 
     val statusOptions = listOf(
         "pending",
-        "approved",
-        "processing",
-        "completed",
-        "rejected"
+        "waiting_for_return",
+        "returning",
+        "return_received",
+        "rejected",
+        "completed"
     )
 
     var expanded by remember { mutableStateOf(false) }
@@ -220,6 +221,17 @@ fun PartnerRefundScreen(
                                 enabled = !state.isLoading
                             ) {
                                 Text("Save Changes")
+                            }
+                            Button(
+                                onClick = {
+                                    onEvent(
+                                        PartnerRefundEvent.ProcessClicked
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = !state.isLoading
+                            ) {
+                                Text("Accept and Process")
                             }
                         }
                     }

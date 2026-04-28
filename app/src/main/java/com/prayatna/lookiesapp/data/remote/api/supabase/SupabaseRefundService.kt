@@ -5,7 +5,9 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.RefundDto
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateRefundRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.SetRefundAsCompleteRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.refund.ProcessRefundRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetRefundAsCompleteResponse
+import com.prayatna.lookiesapp.data.remote.dto.response.refund.ProcessRefundResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -40,10 +42,8 @@ class SupabaseRefundService @Inject constructor(
         var uploadedPath: String? = null
 
         try {
-            // Generate unique storage path
             val path = "refunds/${request.userId}/${UUID.randomUUID()}.png"
 
-            // Upload to Supabase Storage
             storage.from("refund_proof").upload(
                 path = path,
                 data = proofImage,
@@ -52,25 +52,21 @@ class SupabaseRefundService @Inject constructor(
 
             uploadedPath = path
 
-            // Build public URL
             val proofImageUrl = Helper.buildImageUrl(
                 bucketName = "refund_proof",
                 imageName = path
             )
 
-            // Attach URL into request
             val finalRequest = request.copy(
                 proofImageUrl = proofImageUrl,
                 userId = user.id
             )
 
-            // Get session
             val session = auth.currentSessionOrNull()
                 ?: throw IllegalStateException("No active session")
 
             Log.d("Create-Refund", "Access token: ${session.accessToken}")
 
-            // Call Edge Function / API
             val response = postgrest.from("refund_requests")
                 .insert(finalRequest) {
                     select()
@@ -141,5 +137,22 @@ class SupabaseRefundService @Inject constructor(
         }.decodeSingle<RefundDto>()
         Log.d("Refund", refund.toString())
         return refund
+    }
+
+    suspend fun processRefund(refundRequestId: String): ProcessRefundResponse {
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
+        val request = ProcessRefundRequest(
+            refundRequestId = refundRequestId
+        )
+        val response =  httpClient.post(
+            "${BuildConfig.SUPABASE_EDGE_BASE_URL}/process-refund"
+        ) {
+            contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer ${session.accessToken}")
+            setBody(request)
+        }
+        Log.d("PROCESS-REFUND", response.body())
+        return response.body()
     }
 }

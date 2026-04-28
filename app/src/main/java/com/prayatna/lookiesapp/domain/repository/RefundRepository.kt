@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.domain.repository
 
+import com.prayatna.lookiesapp.domain.model.refund.ProcessRefundOutput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
 import com.prayatna.lookiesapp.domain.model.transaction.SetRefundAsCompleteResult
@@ -24,4 +25,6 @@ interface RefundRepository {
             DataResult<Refund>
     suspend fun getRefundById(id: String):
             DataResult<Refund>
+    suspend fun processRefund(refundRequestId: String):
+            DataResult<ProcessRefundOutput>
 }

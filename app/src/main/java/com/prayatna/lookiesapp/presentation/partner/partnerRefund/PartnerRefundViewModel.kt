@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.refund.GetRefundByIdUseCase
+import com.prayatna.lookiesapp.domain.usecase.refund.ProcessRefundUseCase
 import com.prayatna.lookiesapp.domain.usecase.refund.UpdateRefundStatusUseCase
 import com.prayatna.lookiesapp.presentation.partner.partnerRefund.state.PartnerRefundEffect
 import com.prayatna.lookiesapp.presentation.partner.partnerRefund.state.PartnerRefundEvent
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class PartnerRefundViewModel @Inject constructor(
     private val getRefundByIdUseCase: GetRefundByIdUseCase,
     private val updateRefundStatusUseCase: UpdateRefundStatusUseCase,
+    private val processRefundUseCase: ProcessRefundUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -50,6 +52,25 @@ class PartnerRefundViewModel @Inject constructor(
             PartnerRefundEvent.UpdateClicked -> updateRefundStatus()
             is PartnerRefundEvent.StatusChanged -> {
                 _state.update { it.copy(status = event.value) }
+            }
+
+            PartnerRefundEvent.ProcessClicked -> processRefund()
+        }
+    }
+
+    private fun processRefund() {
+        _state.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            when(val result = processRefundUseCase(refundId)) {
+                is DataResult.Error -> {
+                    _state.update { it.copy(isLoading = false, error = result.error) }
+                    _effect.emit(PartnerRefundEffect.ShowToast(result.error))
+                }
+                is DataResult.Success -> {
+                    _state.update { it.copy(isLoading = false, processRefundData = result.data) }
+                    _effect.emit(PartnerRefundEffect.ShowToast("Refund processed successfully!"))
+                }
+                else -> Unit
             }
         }
     }

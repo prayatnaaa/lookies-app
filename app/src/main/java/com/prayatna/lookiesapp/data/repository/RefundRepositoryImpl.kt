@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.repository
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseRefundService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.refund.ProcessRefundOutput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
 import com.prayatna.lookiesapp.domain.model.transaction.SetRefundAsCompleteResult
@@ -73,6 +74,19 @@ class RefundRepositoryImpl @Inject constructor(
     override suspend fun getRefundById(id: String): DataResult<Refund> {
         return try {
             val result = refundService.getRefundById(id)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun processRefund(refundRequestId: String): DataResult<ProcessRefundOutput> {
+        return try {
+            val result = refundService.processRefund(refundRequestId)
+            if (result.status == "error") {
+                return DataResult.Error(result.message)
+            }
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)

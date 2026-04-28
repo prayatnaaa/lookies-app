@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.partner.partnerRefund.state
 
+import com.prayatna.lookiesapp.domain.model.refund.ProcessRefundOutput
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
 
 data class PartnerRefundUiState (
@@ -8,5 +9,6 @@ data class PartnerRefundUiState (
     val data: Refund? = null,
     val notes: String? = null,
     val updatedData: Refund? = null,
-    val status: String = "pending"
+    val status: String = "pending",
+    val processRefundData: ProcessRefundOutput? = null
 )
