@@ -6,7 +6,8 @@ data class TransactionItem(
     val quantity: Int,
     val unitPrice: Double,
     val subtotal: Double,
-    val details: ItemDetail? = null
+    val details: ItemDetail? = null,
+    val itemRefId: String
 )
 
 data class ItemDetail(

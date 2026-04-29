@@ -30,7 +30,8 @@ fun TransactionItemDto.toDomain(): TransactionItem {
         quantity = quantity,
         unitPrice = unitPrice,
         subtotal = subtotal,
-        details = details?.toDomain()
+        details = details?.toDomain(),
+        itemRefId = itemRefId
     )
 }
 

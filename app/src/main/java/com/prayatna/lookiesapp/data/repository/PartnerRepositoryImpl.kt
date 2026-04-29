@@ -118,9 +118,9 @@ class PartnerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun rejectPainting(id: String): DataResult<String> {
+    override suspend fun rejectPainting(id: String, reason: String): DataResult<String> {
         return try {
-            val response = supabasePartnerService.rejectPainting(eventPaintingId = id)
+            val response = supabasePartnerService.rejectPainting(eventPaintingId = id, reason = reason)
             DataResult.Success(response)
         } catch (e: RestException) {
             DataResult.Error(e.message.toString())

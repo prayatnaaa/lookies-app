@@ -18,7 +18,9 @@ data class TransactionItemDto(
 
     val subtotal: Double,
 
-    val details: ItemDetailDto? = null
+    val details: ItemDetailDto? = null,
+    @SerialName("item_ref_id")
+    val itemRefId: String
 )
 
 @Serializable

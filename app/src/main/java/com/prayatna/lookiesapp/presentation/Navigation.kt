@@ -16,12 +16,13 @@ import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
 import com.prayatna.lookiesapp.presentation.artistDashboard.ArtistDashboardScreen
 import com.prayatna.lookiesapp.presentation.checkout.state.checkoutNavigation
+import com.prayatna.lookiesapp.presentation.createPaintingReview.createPaintingReviewNavigation
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
 import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.ArtistExhibitionPaintingDetailScreen
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.PartnerExhibitionPaintingDetailScreen
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.PartnerExhibitionPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.exhibitionHistory.ExhibitionHistoryScreen
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.exhibitionShipmentNavigation
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
@@ -101,6 +102,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         startDestination = NavigationRoutes.MAIN_LOADING
     ) {
 
+        createPaintingReviewNavigation(navController)
         exhibitionShipmentNavigation(navController = navController)
         shipmentListNavigation(navController = navController)
         composable(

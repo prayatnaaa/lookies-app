@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
+import com.prayatna.lookiesapp.domain.usecase.partner.ApprovePaintingUseCase
+import com.prayatna.lookiesapp.domain.usecase.partner.RejectPaintingUseCase
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +18,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EventPaintingDetailViewModel @Inject constructor(
-    private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase
+    private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
+    private val approvePaintingUseCase: ApprovePaintingUseCase,
+    private val rejectPaintingUseCase: RejectPaintingUseCase
 ): ViewModel() {
 
     private val _state = MutableStateFlow(EventPaintingDetailUiState())

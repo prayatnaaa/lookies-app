@@ -287,14 +287,14 @@ fun PartnerHomeScreen(
                                         navController.navigate("${NavigationRoutes.SELF_EVENT_LIST}/$businessId")
                                     }
                                 )
-                                DashboardActionItem(
-                                    title = "Team Members",
-                                    subtitle = "Manage your team and roles",
-                                    icon = Icons.Filled.Group,
-                                    onClick = {
-                                        navController.navigate("${NavigationRoutes.MERCHANT_MEMBER_LIST}/$businessId")
-                                    }
-                                )
+//                                DashboardActionItem(
+//                                    title = "Team Members",
+//                                    subtitle = "Manage your team and roles",
+//                                    icon = Icons.Filled.Group,
+//                                    onClick = {
+//                                        navController.navigate("${NavigationRoutes.MERCHANT_MEMBER_LIST}/$businessId")
+//                                    }
+//                                )
                                 DashboardActionItem(
                                     title = "Refunds",
                                     subtitle = "Manage refund requests from buyer",

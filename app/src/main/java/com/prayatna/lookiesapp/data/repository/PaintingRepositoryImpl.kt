@@ -5,16 +5,20 @@ import android.net.Uri
 import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePaintingService
+import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
+import com.prayatna.lookiesapp.domain.model.painting.CreatePaintingReviewInput
 import com.prayatna.lookiesapp.domain.model.painting.DetailPainting
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.model.painting.PaintingAttribute
+import com.prayatna.lookiesapp.domain.model.painting.PaintingReview
 import com.prayatna.lookiesapp.domain.model.painting.UploadPaintingOutput
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
+import com.prayatna.lookiesapp.utils.extractSupabaseError
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.Dispatchers
@@ -127,6 +131,18 @@ class PaintingRepositoryImpl @Inject constructor(
             DataResult.Success(Unit)
         } catch (e: RestException) {
             DataResult.Error(e.message ?: "Something went wrong!")
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong!")
+        }
+    }
+
+    override suspend fun createPaintingReview(paintingReview: CreatePaintingReviewInput): DataResult<PaintingReview> {
+        return try {
+            val result = paintingService.createPaintingReview(paintingReview.toDto())
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong!")
         }

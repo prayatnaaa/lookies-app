@@ -5,7 +5,6 @@ import com.prayatna.lookiesapp.data.remote.dto.ExhibitionShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentFeeDto
 import com.prayatna.lookiesapp.data.remote.dto.request.shipment.CreateExhibitionShipmentRequest
-import com.prayatna.lookiesapp.domain.mapper.toInsertDto
 import io.github.jan.supabase.postgrest.Postgrest
 import javax.inject.Inject
 
@@ -17,6 +16,7 @@ class SupabaseShipmentService @Inject constructor(
         return postgrest.from("shipments").select {
             filter {
                 eq("order_id", orderId)
+                neq("status", "awaiting_payment")
             }
         }.decodeSingle<ShipmentDto>()
     }

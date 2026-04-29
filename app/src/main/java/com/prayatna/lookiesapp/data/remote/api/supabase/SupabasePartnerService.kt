@@ -168,11 +168,12 @@ class SupabasePartnerService @Inject constructor(
         return "Painting approved"
     }
 
-    suspend fun rejectPainting(eventPaintingId: String): String {
+    suspend fun rejectPainting(eventPaintingId: String, reason: String): String {
         postgrest
             .from("event_paintings")
             .update(
                 mapOf(
+                    "rejection_reason" to reason,
                     "status" to "rejected",
                     "updated_at" to "now()"
                 )

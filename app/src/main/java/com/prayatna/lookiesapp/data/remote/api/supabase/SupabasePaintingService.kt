@@ -2,6 +2,8 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.EventPaintingDto
+import com.prayatna.lookiesapp.data.remote.dto.PaintingReviewDto
+import com.prayatna.lookiesapp.data.remote.dto.request.painting.CreatePaintingReviewRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.UploadPaintingRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetDetailPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetPaintingDto
@@ -79,6 +81,16 @@ class SupabasePaintingService @Inject constructor(
                 }
             }
             .decodeList<GetPaintingDto>()
+    }
+
+    suspend fun createPaintingReview(review: CreatePaintingReviewRequest): PaintingReviewDto {
+        val user = auth.currentUserOrNull() ?: throw IllegalStateException("User not logged in")
+        val finalReq = review.copy(
+            userId = user.id
+        )
+        return postgrest.from("painting_reviews").insert(finalReq) {
+            select()
+        }.decodeSingle<PaintingReviewDto>()
     }
 
 

@@ -99,7 +99,7 @@ class ParticipantPaintingListViewModel @Inject constructor(
                 )
             }
 
-            when (val result = rejectPaintingUseCase(id)) {
+            when (val result = rejectPaintingUseCase(id, reason = "Painting rejected")) {
                 is DataResult.Success -> {
                     _uiState.update { state ->
                         state.copy(

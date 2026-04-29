@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
 import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.domain.model.admin.GetKycDocument
+import com.prayatna.lookiesapp.domain.model.ticket.Ticket
 import com.prayatna.lookiesapp.domain.repository.AdminRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
@@ -59,6 +60,17 @@ class AdminRepositoryImpl @Inject constructor(
         return try {
             val result = supabaseAdminService.getKycDocuments(businessId)
             DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
+
+    override suspend fun getTicketByCode(code: String): DataResult<Ticket> {
+        return try {
+            val ticket = supabaseAdminService.getTicketByCode(code)
+            DataResult.Success(ticket.toDomain())
+
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)

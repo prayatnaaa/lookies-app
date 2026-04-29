@@ -7,7 +7,7 @@ import javax.inject.Inject
 class RejectPaintingUseCase @Inject constructor(
     private val repository: PartnerRepository
 ) {
-    suspend operator fun invoke(id: String): DataResult<String> {
-        return repository.rejectPainting(id)
+    suspend operator fun invoke(id: String, reason: String): DataResult<String> {
+        return repository.rejectPainting(id, reason)
     }
 }

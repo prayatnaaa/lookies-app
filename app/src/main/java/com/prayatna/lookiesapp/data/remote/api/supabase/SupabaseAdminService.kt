@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import com.prayatna.lookiesapp.data.remote.dto.GetKycDocumentDto
+import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecideEventResponseDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecidePartnerApplicationResponseDto
 import io.github.jan.supabase.gotrue.Auth
@@ -72,5 +73,13 @@ class SupabaseAdminService @Inject constructor(
                 eq("business_id", businessId)
             }
         }.decodeList<GetKycDocumentDto>()
+    }
+
+    suspend fun getTicketByCode(code: String): TicketDto {
+        return postgrest.from("tickets").select {
+            filter {
+                eq("purchased_tickets", code)
+            }
+        }.decodeSingle<TicketDto>()
     }
 }

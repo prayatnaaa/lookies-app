@@ -106,8 +106,17 @@ fun DetailTransactionScreen(
                 }
 
                 state.data != null -> {
+                    val transactionData = state.data!!
                     DetailTransactionContent(
-                        data = state.data!!,
+                        onRatePainting = {
+                            val eventPaintingId = transactionData.transaction.items.firstOrNull()?.itemRefId
+                            val transactionId = transactionData.transaction.id
+
+                            if (eventPaintingId != null) {
+                                navController.navigate("${NavigationRoutes.CREATE_PAINTING_REVIEW}/$eventPaintingId/$transactionId")
+                            }
+                        },
+                        data = transactionData,
                         shipment = state.shipment,
                         isCompleting = state.isCompleting,
                         onCompleteOrder = { viewModel.setOrderToComplete(orderId) },

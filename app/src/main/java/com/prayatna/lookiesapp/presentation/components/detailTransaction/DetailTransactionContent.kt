@@ -1,6 +1,9 @@
 package com.prayatna.lookiesapp.presentation.components.detailTransaction
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,20 +19,30 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -37,25 +50,11 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionStatusChip
-import com.prayatna.lookiesapp.utils.formatRupiah
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.LocalShipping
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import com.prayatna.lookiesapp.presentation.components.checkout.CheckoutPaymentMethodContent
 import com.prayatna.lookiesapp.utils.formatDate
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
 fun DetailTransactionContent(
@@ -64,6 +63,7 @@ fun DetailTransactionContent(
     isCompleting: Boolean = false,
     onCompleteOrder: (() -> Unit)? = null,
     onRequestRefund: (() -> Unit)? = null,
+    onRatePainting: (() -> Unit)? = null,
     onViewRefunds: (() -> Unit)? = null
 ) {
     val transaction = data.transaction
@@ -393,6 +393,18 @@ fun DetailTransactionContent(
                 ) {
                     Text("View Refund Requests", fontWeight = FontWeight.Bold)
                 }
+            }
+        }
+
+        item {
+            OutlinedButton(
+                onClick = {
+                    onRatePainting?.invoke()
+                },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Rate painting")
             }
         }
 
