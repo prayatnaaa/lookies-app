@@ -16,6 +16,8 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequest
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
+import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
+import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
@@ -133,6 +135,16 @@ class TransactionRepositoryImpl @Inject constructor(
         return try {
             val result = transactionService.setOrderToComplete(request.toDto())
             DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getMonthlyFinancialReport(filter: MonthlyFinancialReportFilterInput): DataResult<List<MonthlyFinancialReport>> {
+        return try {
+            val result = transactionService.getMonthlyFinancialReport(filter.toDto())
+            DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)

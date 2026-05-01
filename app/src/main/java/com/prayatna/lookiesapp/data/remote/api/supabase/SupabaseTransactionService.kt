@@ -2,29 +2,25 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
+import com.prayatna.lookiesapp.data.remote.dto.MonthlyFinancialReportDto
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
-import com.prayatna.lookiesapp.data.remote.dto.RefundDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.request.order.OrderItemRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateQrisPaymentRequestRequest
-import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateRefundRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateXenditPaymentRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.SetOrderToCompleteRequest
-import com.prayatna.lookiesapp.data.remote.dto.request.payment.SetRefundAsCompleteRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.transaction.MonthlyFinancialReportFilterRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateQrisPaymentRequestResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateXenditPaymentResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteResponse
-import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetRefundAsCompleteResponse
-import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.realtime.selectSingleValueAsFlow
-import io.github.jan.supabase.storage.Storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.header
@@ -33,14 +29,12 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
 import javax.inject.Inject
 
 class SupabaseTransactionService @Inject constructor(
     private val auth: Auth,
     private val postgrest: Postgrest,
     private val httpClient: HttpClient,
-    private val storage: Storage
 ) {
     suspend fun createOrder(
         items: List<OrderItemRequest>,
@@ -172,5 +166,10 @@ class SupabaseTransactionService @Inject constructor(
         }
         Log.d("CreatePayment", response.body())
         return response.body()
+    }
+
+    suspend fun getMonthlyFinancialReport(filter: MonthlyFinancialReportFilterRequest): List<MonthlyFinancialReportDto> {
+        return postgrest.rpc("get_monthly_financial_report", filter)
+            .decodeList<MonthlyFinancialReportDto>()
     }
 }
