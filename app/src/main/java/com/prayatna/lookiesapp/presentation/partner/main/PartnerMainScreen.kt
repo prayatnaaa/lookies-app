@@ -82,7 +82,7 @@ fun PartnerContent(
         composable(
             route = PartnerBottomNavItem.Home.route,
         ) {
-            PartnerHomeScreen(navController = navHostController, businessId = businessId)
+//            PartnerHomeScreen(navController = navHostController, businessId = businessId)
         }
 
 //        composable(PartnerBottomNavItem.Chat.route) {

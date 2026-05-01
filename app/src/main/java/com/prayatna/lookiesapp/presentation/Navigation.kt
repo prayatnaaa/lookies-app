@@ -19,10 +19,10 @@ import com.prayatna.lookiesapp.presentation.checkout.state.checkoutNavigation
 import com.prayatna.lookiesapp.presentation.createPaintingReview.createPaintingReviewNavigation
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
 import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.ArtistExhibitionPaintingDetailScreen
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.PartnerExhibitionPaintingDetailScreen
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListScreen
 import com.prayatna.lookiesapp.presentation.exhibitionHistory.ExhibitionHistoryScreen
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.exhibitionShipmentNavigation
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
@@ -43,7 +43,7 @@ import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPainti
 import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScreen
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
-import com.prayatna.lookiesapp.presentation.partner.main.home.PartnerHomeScreen
+import com.prayatna.lookiesapp.presentation.partner.main.home.partnerHomeScreenNavigation
 import com.prayatna.lookiesapp.presentation.partner.manageEvent.PartnerManageEventScreen
 import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerRefund.partnerRefundNavigation
@@ -303,14 +303,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         ) {
             PartnerListScreen(navController = navController)
         }
-        composable(
-            route = "${NavigationRoutes.PARTNER_MAIN_SCREEN}/{businessId}",
-            arguments = listOf(navArgument("businessId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            backStackEntry.arguments?.getString("businessId")?.let { businessId ->
-                PartnerHomeScreen(navController = navController, businessId = businessId)
-            }
-        }
+        partnerHomeScreenNavigation(navController)
         composable(
             route = "${NavigationRoutes.PARTICIPANT_LIST}/{eventId}",
             arguments = listOf(navArgument("eventId") { type = NavType.StringType })

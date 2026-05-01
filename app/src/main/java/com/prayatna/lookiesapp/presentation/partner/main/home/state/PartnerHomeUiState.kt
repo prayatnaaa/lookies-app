@@ -3,14 +3,10 @@ package com.prayatna.lookiesapp.presentation.partner.main.home.state
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 
-sealed class PartnerHomeUiState {
-    data object Loading : PartnerHomeUiState()
-    data class PartialSuccess(
-        val profile: MerchantProfile,
-    ) : PartnerHomeUiState()
-    data class Success(
-        val profile: MerchantProfile,
-        val dashboard: PartnerDashboard
-    ) : PartnerHomeUiState()
-    data class Error(val message: String) : PartnerHomeUiState()
-}
+data class PartnerHomeUiState(
+    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val profile: MerchantProfile? = null,
+    val dashboard: PartnerDashboard? = null,
+    val errorMessage: String? = null
+)

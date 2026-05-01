@@ -41,8 +41,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,57 +48,49 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.presentation.components.partner.DashboardActionItem
 import com.prayatna.lookiesapp.presentation.components.partner.StatCard
+import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEvent
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeUiState
-import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartnerHomeScreen(
-    navController: NavController,
-    businessId: String,
-    viewModel: PartnerHomeViewModel = hiltViewModel()
+    state: PartnerHomeUiState,
+    onEvent: (PartnerHomeEvent) -> Unit
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.getDashboardData(businessId)
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
+                    IconButton(
+                        onClick = {
+                            onEvent(PartnerHomeEvent.BackClicked)
+                        }
+                    ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
                 },
+
                 title = {
                     Column {
                         Text(
-                            text = when (val s = state) {
-                                is PartnerHomeUiState.Success -> s.profile.tradingName
-                                    ?: s.profile.legalName
-                                else -> "Partner Dashboard"
-                            },
+                            text = state.profile?.tradingName
+                                ?: state.profile?.legalName
+                                ?: "Partner Dashboard",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+
                         Text(
                             text = "Manage your business",
                             style = MaterialTheme.typography.bodySmall,
@@ -108,32 +98,38 @@ fun PartnerHomeScreen(
                         )
                     }
                 },
+
                 actions = {
-                    IconButton(onClick = { /* TODO: notifications */ }) {
+                    IconButton(onClick = {}) {
                         Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications"
+                            Icons.Default.Notifications,
+                            contentDescription = null
                         )
                     }
                 },
+
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     scrolledContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
         },
+
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    navController.navigate("${NavigationRoutes.CREATE_EVENT}/$businessId")
+                    onEvent(PartnerHomeEvent.CreateEventClicked)
                 },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = CircleShape,
-                icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Create Event") }
+                icon = {
+                    Icon(Icons.Default.Add, null)
+                },
+                text = {
+                    Text("Create Event")
+                },
+                shape = CircleShape
             )
         },
+
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
 
@@ -142,295 +138,259 @@ fun PartnerHomeScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            when (val currentState = state) {
-                is PartnerHomeUiState.Loading -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            "Loading dashboard...",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+
+            when {
+
+                state.isLoading && state.profile == null -> {
+                    LoadingContent()
                 }
 
-                is PartnerHomeUiState.Error -> {
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.WarningAmber,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(64.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Failed to load dashboard",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = currentState.message,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { viewModel.getDashboardData(businessId) }) {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Retry")
+                state.errorMessage != null &&
+                        state.profile == null -> {
+                    ErrorContent(
+                        message = state.errorMessage,
+                        onRetry = {
+                            onEvent(PartnerHomeEvent.Retry)
                         }
-                    }
+                    )
                 }
 
-                is PartnerHomeUiState.Success -> {
-                    val profile = currentState.profile
-                    val dashboard = currentState.dashboard
-
-                    LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(24.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        // Welcome Header
-                        item {
-                            WelcomeHeader(
-                                name = profile.tradingName ?: profile.legalName,
-                                pictureUrl = profile.pictureUrl,
-                                description = profile.description
-                            )
-                        }
-
-                        // Quick Stats
-                        item {
-                            Text(
-                                "Business Status",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 12.dp)
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                StatCard(
-                                    modifier = Modifier.weight(1f),
-                                    title = "Status",
-                                    value = profile.kycStatus.replaceFirstChar { it.uppercase() },
-                                    icon = Icons.Outlined.Shield
-                                )
-                                StatCard(
-                                    modifier = Modifier.weight(1f),
-                                    title = "Payout",
-                                    value = if (profile.payoutEnabled) "Enabled" else "Disabled",
-                                    icon = if (profile.payoutEnabled) Icons.Default.CheckCircle else Icons.Default.WarningAmber
-                                )
-                            }
-                        }
-
-                        // Event Stats
-                        item {
-                            Text(
-                                "Event Overview",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 12.dp)
-                            )
-                                Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                StatCard(
-                                    modifier = Modifier.weight(1f),
-                                    title = "Active Events",
-                                    value = dashboard.activeEvents.toString(),
-                                    icon = Icons.Outlined.EventAvailable
-                                )
-                                StatCard(
-                                    modifier = Modifier.weight(1f),
-                                    title = "Tickets Sold",
-                                    value = dashboard.totalTicketsSold.toString(),
-                                    icon = Icons.Outlined.ConfirmationNumber
-                                )
-                            }
-                        }
-
-                        // Management Section
-                        item {
-                            Text(
-                                "Management",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 12.dp)
-                            )
-                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                DashboardActionItem(
-                                    title = "My Events",
-                                    subtitle = "View and manage your events",
-                                    icon = Icons.Filled.Event,
-                                    onClick = {
-                                        navController.navigate("${NavigationRoutes.SELF_EVENT_LIST}/$businessId")
-                                    }
-                                )
-//                                DashboardActionItem(
-//                                    title = "Team Members",
-//                                    subtitle = "Manage your team and roles",
-//                                    icon = Icons.Filled.Group,
-//                                    onClick = {
-//                                        navController.navigate("${NavigationRoutes.MERCHANT_MEMBER_LIST}/$businessId")
-//                                    }
-//                                )
-                                DashboardActionItem(
-                                    title = "Refunds",
-                                    subtitle = "Manage refund requests from buyer",
-                                    icon = Icons.Filled.Group,
-                                    onClick = {
-                                        navController.navigate(NavigationRoutes.REFUND_LIST)
-                                    }
-                                )
-                                DashboardActionItem(
-                                    title = "Paintings",
-                                    subtitle = "Manage paintings collection",
-                                    icon = Icons.Filled.Group,
-                                    onClick = {
-                                        navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/$businessId")
-                                    }
-                                )
-                                DashboardActionItem(
-                                    title = "Shipments",
-                                    subtitle = "Manage shipments of customers",
-                                    icon = Icons.Filled.Group,
-                                    onClick = {
-                                        navController.navigate("${NavigationRoutes.SHIPMENT_LIST}/$businessId")
-                                    }
-                                )
-                            }
-                        }
-
-                        // Bottom spacer for FAB clearance
-                        item { Spacer(modifier = Modifier.height(80.dp)) }
-                    }
-                }
-
-                is PartnerHomeUiState.PartialSuccess -> {
-                    val profile = currentState.profile
-
-                    LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(24.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-
-                        // Header (already available)
-                        item {
-                            WelcomeHeader(
-                                name = profile.tradingName ?: profile.legalName,
-                                pictureUrl = profile.pictureUrl,
-                                description = profile.description
-                            )
-                        }
-
-                        // Business Status (can show immediately)
-                        item {
-                            Text(
-                                "Business Status",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 12.dp)
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                StatCard(
-                                    modifier = Modifier.weight(1f),
-                                    title = "Status",
-                                    value = profile.kycStatus.replaceFirstChar { it.uppercase() },
-                                    icon = Icons.Outlined.Shield
-                                )
-                                StatCard(
-                                    modifier = Modifier.weight(1f),
-                                    title = "Payout",
-                                    value = if (profile.payoutEnabled) "Enabled" else "Disabled",
-                                    icon = if (profile.payoutEnabled)
-                                        Icons.Default.CheckCircle
-                                    else
-                                        Icons.Default.WarningAmber
-                                )
-                            }
-                        }
-
-                        // Dashboard loading state
-                        item {
-                            Text(
-                                "Event Overview",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 12.dp)
-                            )
-
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                CircularProgressIndicator()
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    "Loading stats...",
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                        }
-
-                        // You can still allow navigation actions
-                        item {
-                            Text(
-                                "Management",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 12.dp)
-                            )
-                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                DashboardActionItem(
-                                    title = "My Events",
-                                    subtitle = "View and manage your events",
-                                    icon = Icons.Filled.Event,
-                                    onClick = {
-                                        navController.navigate("${NavigationRoutes.SELF_EVENT_LIST}/$businessId")
-                                    }
-                                )
-                                DashboardActionItem(
-                                    title = "Team Members",
-                                    subtitle = "Manage your team and roles",
-                                    icon = Icons.Filled.Group,
-                                    onClick = {
-                                        navController.navigate("${NavigationRoutes.MERCHANT_MEMBER_LIST}/$businessId")
-                                    }
-                                )
-                            }
-                        }
-
-                        item { Spacer(modifier = Modifier.height(80.dp)) }
-                    }
+                else -> {
+                    DashboardContent(
+                        state = state,
+                        onEvent = onEvent
+                    )
                 }
             }
         }
     }
+}
+
+@Composable
+private fun DashboardContent(
+    state: PartnerHomeUiState,
+    onEvent: (PartnerHomeEvent) -> Unit
+) {
+    val profile = state.profile ?: return
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+
+        item {
+            WelcomeHeader(
+                name = profile.tradingName ?: profile.legalName,
+                pictureUrl = profile.pictureUrl,
+                description = profile.description
+            )
+        }
+
+        item {
+            SectionTitle("Business Status")
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+
+                StatCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Status",
+                    value = profile.kycStatus.replaceFirstChar {
+                        it.uppercase()
+                    },
+                    icon = Icons.Outlined.Shield
+                )
+
+                StatCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Payout",
+                    value = if (profile.payoutEnabled)
+                        "Enabled"
+                    else
+                        "Disabled",
+                    icon = if (profile.payoutEnabled)
+                        Icons.Default.CheckCircle
+                    else
+                        Icons.Default.WarningAmber
+                )
+            }
+        }
+
+        item {
+            SectionTitle("Event Overview")
+
+            if (state.dashboard != null) {
+                EventStats(state.dashboard)
+            } else {
+                StatsLoading()
+            }
+        }
+
+        item {
+            ManagementSection(onEvent)
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(80.dp))
+        }
+    }
+}
+
+@Composable
+private fun EventStats(
+    dashboard: PartnerDashboard
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+
+        StatCard(
+            modifier = Modifier.weight(1f),
+            title = "Active Events",
+            value = dashboard.activeEvents.toString(),
+            icon = Icons.Outlined.EventAvailable
+        )
+
+        StatCard(
+            modifier = Modifier.weight(1f),
+            title = "Tickets Sold",
+            value = dashboard.totalTicketsSold.toString(),
+            icon = Icons.Outlined.ConfirmationNumber
+        )
+    }
+}
+
+@Composable
+private fun StatsLoading() {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text("Loading stats...")
+    }
+}
+
+@Composable
+private fun ManagementSection(
+    onEvent: (PartnerHomeEvent) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+
+        SectionTitle("Management")
+
+        DashboardActionItem(
+            title = "My Events",
+            subtitle = "View and manage your events",
+            icon = Icons.Default.Event,
+            onClick = {
+                onEvent(PartnerHomeEvent.MyEventsClicked)
+            }
+        )
+
+        DashboardActionItem(
+            title = "Refunds",
+            subtitle = "Manage refund requests from buyer",
+            icon = Icons.Default.Group,
+            onClick = {
+                onEvent(PartnerHomeEvent.RefundClicked)
+            }
+        )
+
+        DashboardActionItem(
+            title = "Paintings",
+            subtitle = "Manage paintings collection",
+            icon = Icons.Default.Group,
+            onClick = {
+                onEvent(PartnerHomeEvent.PaintingClicked)
+            }
+        )
+
+        DashboardActionItem(
+            title = "Shipments",
+            subtitle = "Manage shipments of customers",
+            icon = Icons.Default.Group,
+            onClick = {
+                onEvent(PartnerHomeEvent.ShipmentClicked)
+            }
+        )
+    }
+}
+
+@Composable
+private fun LoadingContent() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(48.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("Loading dashboard...")
+    }
+}
+
+@Composable
+private fun ErrorContent(
+    message: String,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Icon(
+            Icons.Default.WarningAmber,
+            null,
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(64.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Failed to load dashboard",
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(text = message)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = onRetry) {
+            Icon(Icons.Default.Refresh, null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Retry")
+        }
+    }
+}
+
+@Composable
+private fun SectionTitle(
+    title: String
+) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold
+    )
 }
 
 @Composable
@@ -453,43 +413,52 @@ private fun WelcomeHeader(
             )
             .padding(20.dp)
     ) {
+
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Profile picture
+
             AsyncImage(
                 model = pictureUrl,
-                contentDescription = "Partner profile",
+                contentDescription = null,
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.2f))
-                    .border(2.dp, Color.White.copy(alpha = 0.5f), CircleShape),
+                    .background(
+                        Color.White.copy(alpha = 0.2f)
+                    )
+                    .border(
+                        2.dp,
+                        Color.White.copy(alpha = 0.5f),
+                        CircleShape
+                    ),
                 contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
                 Text(
                     text = "Welcome back,",
-                    style = MaterialTheme.typography.bodyMedium,
                     color = Color.White.copy(alpha = 0.8f)
                 )
+
                 Text(
                     text = name,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
                     color = Color.White,
+                    fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
                 if (!description.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(4.dp))
+
                     Text(
                         text = description,
-                        style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.7f),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
