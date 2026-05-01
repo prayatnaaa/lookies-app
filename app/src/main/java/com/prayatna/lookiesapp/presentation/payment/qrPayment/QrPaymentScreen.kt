@@ -69,7 +69,12 @@ fun QrPaymentScreen(
             showSuccessDialog = true
 
             delay(1000)
-            navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId")
+            navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
+                popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}") {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
         }
     }
 

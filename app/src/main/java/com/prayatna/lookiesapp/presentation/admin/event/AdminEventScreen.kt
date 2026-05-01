@@ -24,7 +24,7 @@ fun AdminEventScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uiState.events) {
         viewModel.getEvents()
     }
 
@@ -59,36 +59,6 @@ fun AdminEventScreen(
                         selected = uiState.status == status,
                         onClick = { viewModel.onStatusSelected(status) }
                     )
-
-//                    FilterItem(
-//                        title = "Published",
-//                        selected = uiState.status == EventStatus.PUBLISHED,
-//                        onClick = { viewModel.onStatusSelected(EventStatus.PUBLISHED) }
-//                    )
-//
-//                    FilterItem(
-//                        title = "On going",
-//                        selected = uiState.status == EventStatus.ONGOING,
-//                        onClick = { viewModel.onStatusSelected(EventStatus.ONGOING) }
-//                    )
-//
-//                    FilterItem(
-//                        title = "Cancelled",
-//                        selected = uiState.status == EventStatus.CANCELLED,
-//                        onClick = { viewModel.onStatusSelected(EventStatus.CANCELLED) }
-//                    )
-//
-//                    FilterItem(
-//                        title = "Rejected",
-//                        selected = uiState.status == EventStatus.REJECTED,
-//                        onClick = { viewModel.onStatusSelected(EventStatus.REJECTED) }
-//                    )
-//
-//                    FilterItem(
-//                        title = "Completed",
-//                        selected = uiState.status == EventStatus.COMPLETED,
-//                        onClick = { viewModel.onStatusSelected(EventStatus.COMPLETED) }
-//                    )
                 }
             }
             Box(

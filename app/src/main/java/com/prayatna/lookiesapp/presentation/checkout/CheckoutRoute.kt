@@ -55,7 +55,12 @@ fun CheckoutRoute(
                 is CheckoutEffect.NavigateToQrisPayment -> {
                     navController.navigate(
                         "${NavigationRoutes.QRIS_PAYMENT}/${effect.orderId}/${effect.merchantId}/${effect.amount}"
-                    )
+                    ) {
+                        popUpTo("${NavigationRoutes.CHECKOUT}/{type}/{id}/{quantity}") {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
 
                 else -> Unit //

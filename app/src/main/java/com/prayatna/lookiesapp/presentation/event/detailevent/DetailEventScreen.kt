@@ -125,7 +125,9 @@ fun DetailEventScreen(
                         )
                     },
                     onBuy = { isTicketSheetOpen = true },
-                    onSeeArts = {}
+                    onSeeArts = {
+                        navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/$eventId?eventType=${event.eventType.slug}")
+                    }
                 )
             }
         }

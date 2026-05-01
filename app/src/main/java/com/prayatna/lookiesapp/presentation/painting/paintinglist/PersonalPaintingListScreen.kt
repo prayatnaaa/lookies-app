@@ -30,7 +30,7 @@ fun PersonalPaintingListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(artistId) {
+    LaunchedEffect(artistId, uiState.paintings) {
         viewModel.init(artistId)
     }
 

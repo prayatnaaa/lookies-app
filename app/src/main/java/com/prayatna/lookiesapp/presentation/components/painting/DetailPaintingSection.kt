@@ -43,7 +43,7 @@ import com.prayatna.lookiesapp.domain.model.painting.DetailPainting
 @Composable
 fun DetailPaintingSection(
     painting: DetailPainting,
-    showStatus: Boolean = false
+    showStatus: Boolean = false,
 ) {
         val scrollState = rememberScrollState()
 
@@ -78,7 +78,7 @@ fun DetailPaintingSection(
                             .padding(top = 40.dp, end = 16.dp)
                     ) {
                         Text(
-                            text = "Available",
+                            text = "",
                             color = Color.White,
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -195,7 +195,6 @@ fun InfoRowItem(
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                color = Color.Black,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -228,6 +227,7 @@ fun PreviewDetailPainting() {
     MaterialTheme {
         DetailPaintingSection(
             painting = dummyPainting,
+            showStatus = true,
         )
     }
 }
