@@ -88,6 +88,10 @@ class PartnerHomeViewModel @Inject constructor(
                     it.copy(filterStartDate = event.date)
                 }
             }
+
+            PartnerHomeEvent.MonthlyFinanceClicked -> {
+                sendEffect(PartnerHomeEffect.NavigateMonthlyFinanceList)
+            }
         }
     }
 

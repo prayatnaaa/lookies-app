@@ -59,6 +59,12 @@ fun PartnerHomeRoute(
                 is PartnerHomeEffect.ShowMessage -> {
                     // show snackbar/toast
                 }
+
+                PartnerHomeEffect.NavigateMonthlyFinanceList -> {
+                    navController.navigate(
+                        "${NavigationRoutes.MONTHLY_FINANCE_LIST_SCREEN}/${businessId}"
+                    )
+                }
             }
         }
     }

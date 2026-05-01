@@ -14,6 +14,7 @@ monthlyFinancialReport: List<MonthlyFinancialReport> = emptyList()
 */
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -126,7 +127,10 @@ fun PartnerHomeScreen(
 
             item {
                 RevenueOverviewCard(
-                    reports = state.monthlyFinancialReport
+                    reports = state.monthlyFinancialReport,
+                    onClick = {
+                        onEvent(PartnerHomeEvent.MonthlyFinanceClicked)
+                    }
                 )
             }
 
@@ -183,7 +187,8 @@ private fun DashboardHeader(
 
 @Composable
 private fun RevenueOverviewCard(
-    reports: List<MonthlyFinancialReport>
+    reports: List<MonthlyFinancialReport>,
+    onClick: () -> Unit
 ) {
     val latest = reports.firstOrNull()
     val gross = latest?.grossRevenue ?: 0.0
@@ -191,7 +196,8 @@ private fun RevenueOverviewCard(
 
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp)
+        shape = RoundedCornerShape(22.dp),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier.padding(18.dp),
@@ -244,7 +250,11 @@ private fun CircularRevenueChart(
     val progressColor = MaterialTheme.colorScheme.primary
 
     Box(
-        modifier = Modifier.size(110.dp),
+        modifier = Modifier
+            .size(110.dp)
+            .clickable {
+
+            },
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
