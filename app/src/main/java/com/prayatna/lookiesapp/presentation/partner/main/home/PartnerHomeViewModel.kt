@@ -2,8 +2,10 @@ package com.prayatna.lookiesapp.presentation.partner.main.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
 import com.prayatna.lookiesapp.domain.usecase.merchant.GetMerchantProfileUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.GetPartnerDashboardSummaryUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetMonthlyFinancialReportUseCase
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEffect
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEvent
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeUiState
@@ -15,12 +17,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PartnerHomeViewModel @Inject constructor(
     private val getMerchantProfileUseCase: GetMerchantProfileUseCase,
+    private val getMonthlyFinancialReportUseCase: GetMonthlyFinancialReportUseCase,
     private val getPartnerDashboardSummaryUseCase: GetPartnerDashboardSummaryUseCase
 ) : ViewModel() {
 
@@ -59,6 +63,60 @@ class PartnerHomeViewModel @Inject constructor(
 
             PartnerHomeEvent.ShipmentClicked ->
                 sendEffect(PartnerHomeEffect.NavigateShipment)
+
+            is PartnerHomeEvent.LoadMonthlyFinancialReport -> {
+                loadMonthlyFinancialReport()
+            }
+
+            is PartnerHomeEvent.EndDateSelected -> {
+                _state.update {
+                    it.copy(filterEndDate = event.date)
+                }
+            }
+            is PartnerHomeEvent.EventIdSelected -> {
+                _state.update {
+                    it.copy(filterEventId = event.id)
+                }
+            }
+            is PartnerHomeEvent.ItemTypeSelected -> {
+                _state.update {
+                    it.copy(filterItemType = event.type)
+                }
+            }
+            is PartnerHomeEvent.StartDateSelected -> {
+                _state.update {
+                    it.copy(filterStartDate = event.date)
+                }
+            }
+        }
+    }
+
+    private fun loadMonthlyFinancialReport() {
+        _state.update { it.copy(isLoading = true) }
+        val filter = MonthlyFinancialReportFilterInput(
+            merchantAccountId = businessId,
+            startDate = _state.value.filterStartDate,
+            endDate = _state.value.filterEndDate,
+            itemType = _state.value.filterItemType,
+            eventId = _state.value.filterEventId
+        )
+        viewModelScope.launch {
+            when (val result = getMonthlyFinancialReportUseCase(filter)) {
+                is DataResult.Error -> {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        errorMessage = result.error
+                    )
+                    sendEffect(PartnerHomeEffect.ShowMessage(result.error))
+                }
+                is DataResult.Success -> {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        monthlyFinancialReport = result.data
+                    )
+                }
+                else -> Unit
+            }
         }
     }
 

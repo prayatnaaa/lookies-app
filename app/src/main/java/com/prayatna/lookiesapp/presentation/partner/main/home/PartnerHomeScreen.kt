@@ -1,7 +1,19 @@
 package com.prayatna.lookiesapp.presentation.partner.main.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+/*
+UPDATED SCREEN IDEA
+- Modern dashboard style
+- Circular revenue overview
+- Monthly finance cards
+- Cleaner hierarchy
+- Existing MVI compatible
+
+Requires:
+PartnerHomeUiState now has:
+monthlyFinancialReport: List<MonthlyFinancialReport> = emptyList()
+*/
+
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,47 +27,40 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.WarningAmber
-import androidx.compose.material.icons.outlined.ConfirmationNumber
-import androidx.compose.material.icons.outlined.EventAvailable
-import androidx.compose.material.icons.outlined.Shield
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
-import com.prayatna.lookiesapp.presentation.components.partner.DashboardActionItem
-import com.prayatna.lookiesapp.presentation.components.partner.StatCard
+import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEvent
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeUiState
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,405 +71,415 @@ fun PartnerHomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            onEvent(PartnerHomeEvent.BackClicked)
-                        }
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-
                 title = {
-                    Column {
-                        Text(
-                            text = state.profile?.tradingName
-                                ?: state.profile?.legalName
-                                ?: "Partner Dashboard",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        Text(
-                            text = "Manage your business",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    DashboardHeader(
+                        title = state.profile?.tradingName
+                            ?: state.profile?.legalName
+                            ?: "Dashboard"
+                    )
                 },
-
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            Icons.Default.Notifications,
-                            contentDescription = null
-                        )
+                navigationIcon = {
+                    IconButton(onClick = { onEvent(PartnerHomeEvent.BackClicked) }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
-                },
-
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
-                )
+                }
             )
         },
-
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
                     onEvent(PartnerHomeEvent.CreateEventClicked)
                 },
-                icon = {
-                    Icon(Icons.Default.Add, null)
-                },
-                text = {
-                    Text("Create Event")
-                },
-                shape = CircleShape
+                icon = { Icon(Icons.Default.Add, null) },
+                text = { Text("Create Event") }
             )
-        },
+        }
+    ) { padding ->
 
-        containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
+        if (state.isLoading && state.profile == null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+            return@Scaffold
+        }
 
-        Box(
+        LazyColumn(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
+                .padding(padding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 
-            when {
+            item {
+                DashboardHeader(
+                    title = state.profile?.tradingName
+                        ?: state.profile?.legalName
+                        ?: "Dashboard"
+                )
+            }
 
-                state.isLoading && state.profile == null -> {
-                    LoadingContent()
-                }
+            item {
+                RevenueOverviewCard(
+                    reports = state.monthlyFinancialReport
+                )
+            }
 
-                state.errorMessage != null &&
-                        state.profile == null -> {
-                    ErrorContent(
-                        message = state.errorMessage,
-                        onRetry = {
-                            onEvent(PartnerHomeEvent.Retry)
-                        }
+            item {
+                QuickStatsSection(state)
+            }
+
+            item {
+                ActionGrid(onEvent)
+            }
+
+            if (state.monthlyFinancialReport.isNotEmpty()) {
+                item {
+                    Text(
+                        "Monthly Finance",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
-                else -> {
-                    DashboardContent(
-                        state = state,
-                        onEvent = onEvent
-                    )
+                items(state.monthlyFinancialReport) { report ->
+                    MonthlyReportCard(report)
                 }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(90.dp))
+            }
+        }
+    }
+}
+
+/* --------------------------------------------------- */
+
+@Composable
+private fun DashboardHeader(
+    title: String
+) {
+    Column {
+        Text(
+            text = "Welcome back",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+/* --------------------------------------------------- */
+
+@Composable
+private fun RevenueOverviewCard(
+    reports: List<MonthlyFinancialReport>
+) {
+    val latest = reports.firstOrNull()
+    val gross = latest?.grossRevenue ?: 0.0
+    val net = latest?.netRevenue ?: 0.0
+
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(18.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            CircularRevenueChart(
+                gross = gross,
+                net = net
+            )
+
+            Spacer(modifier = Modifier.width(18.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    "Revenue Overview",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text("Gross : Rp ${gross.toLong()}")
+                Text("Net : Rp ${net.toLong()}")
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    "Latest month",
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }
 }
 
 @Composable
-private fun DashboardContent(
-    state: PartnerHomeUiState,
-    onEvent: (PartnerHomeEvent) -> Unit
+private fun CircularRevenueChart(
+    gross: Double,
+    net: Double
 ) {
-    val profile = state.profile ?: return
+    val progress =
+        if (gross <= 0.0) 0f
+        else (net / gross).toFloat().coerceIn(0f, 1f)
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+    // 1. Resolve colors here in the @Composable scope!
+    val trackColor = MaterialTheme.colorScheme.surfaceVariant
+    val progressColor = MaterialTheme.colorScheme.primary
+
+    Box(
+        modifier = Modifier.size(110.dp),
+        contentAlignment = Alignment.Center
     ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
 
-        item {
-            WelcomeHeader(
-                name = profile.tradingName ?: profile.legalName,
-                pictureUrl = profile.pictureUrl,
-                description = profile.description
+            val stroke = 12.dp.toPx()
+            val canvasSize = min(size.width, size.height)
+
+            drawArc(
+                color = trackColor, // 2. Use the resolved color
+                startAngle = 0f,
+                sweepAngle = 360f,
+                useCenter = false,
+                style = Stroke(
+                    width = stroke,
+                    cap = StrokeCap.Round
+                ),
+                size = Size(canvasSize, canvasSize),
+                topLeft = Offset.Zero
+            )
+
+            drawArc(
+                color = progressColor, // 2. Use the resolved color
+                startAngle = -90f,
+                sweepAngle = 360f * progress,
+                useCenter = false,
+                style = Stroke(
+                    width = stroke,
+                    cap = StrokeCap.Round
+                ),
+                size = Size(canvasSize, canvasSize),
+                topLeft = Offset.Zero
             )
         }
 
-        item {
-            SectionTitle("Business Status")
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    title = "Status",
-                    value = profile.kycStatus.replaceFirstChar {
-                        it.uppercase()
-                    },
-                    icon = Icons.Outlined.Shield
-                )
-
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    title = "Payout",
-                    value = if (profile.payoutEnabled)
-                        "Enabled"
-                    else
-                        "Disabled",
-                    icon = if (profile.payoutEnabled)
-                        Icons.Default.CheckCircle
-                    else
-                        Icons.Default.WarningAmber
-                )
-            }
-        }
-
-        item {
-            SectionTitle("Event Overview")
-
-            if (state.dashboard != null) {
-                EventStats(state.dashboard)
-            } else {
-                StatsLoading()
-            }
-        }
-
-        item {
-            ManagementSection(onEvent)
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(80.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "${(progress * 100).toInt()}%",
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                "Net",
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }
 
 @Composable
-private fun EventStats(
-    dashboard: PartnerDashboard
+private fun QuickStatsSection(
+    state: PartnerHomeUiState
 ) {
+    val dashboard = state.dashboard
+
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
 
-        StatCard(
-            modifier = Modifier.weight(1f),
-            title = "Active Events",
-            value = dashboard.activeEvents.toString(),
-            icon = Icons.Outlined.EventAvailable
+        SmallStatCard(
+            title = "Events",
+            value = dashboard?.activeEvents?.toString() ?: "-",
+            modifier = Modifier.weight(1f)
         )
 
-        StatCard(
-            modifier = Modifier.weight(1f),
-            title = "Tickets Sold",
-            value = dashboard.totalTicketsSold.toString(),
-            icon = Icons.Outlined.ConfirmationNumber
+        SmallStatCard(
+            title = "Tickets",
+            value = dashboard?.totalTicketsSold?.toString() ?: "-",
+            modifier = Modifier.weight(1f)
+        )
+
+        SmallStatCard(
+            title = "Payout",
+            value = if (state.profile?.payoutEnabled == true)
+                "ON" else "OFF",
+            modifier = Modifier.weight(1f)
         )
     }
 }
 
 @Composable
-private fun StatsLoading() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+private fun SmallStatCard(
+    title: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    ElevatedCard(
+        modifier = modifier,
+        shape = RoundedCornerShape(18.dp)
     ) {
-        CircularProgressIndicator()
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Loading stats...")
+        Column(
+            modifier = Modifier.padding(14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                value,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                title,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
     }
 }
 
+/* --------------------------------------------------- */
+
 @Composable
-private fun ManagementSection(
+private fun ActionGrid(
     onEvent: (PartnerHomeEvent) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
-        SectionTitle("Management")
-
-        DashboardActionItem(
-            title = "My Events",
-            subtitle = "View and manage your events",
-            icon = Icons.Default.Event,
-            onClick = {
-                onEvent(PartnerHomeEvent.MyEventsClicked)
-            }
-        )
-
-        DashboardActionItem(
-            title = "Refunds",
-            subtitle = "Manage refund requests from buyer",
-            icon = Icons.Default.Group,
-            onClick = {
-                onEvent(PartnerHomeEvent.RefundClicked)
-            }
-        )
-
-        DashboardActionItem(
-            title = "Paintings",
-            subtitle = "Manage paintings collection",
-            icon = Icons.Default.Group,
-            onClick = {
-                onEvent(PartnerHomeEvent.PaintingClicked)
-            }
-        )
-
-        DashboardActionItem(
-            title = "Shipments",
-            subtitle = "Manage shipments of customers",
-            icon = Icons.Default.Group,
-            onClick = {
-                onEvent(PartnerHomeEvent.ShipmentClicked)
-            }
-        )
-    }
-}
-
-@Composable
-private fun LoadingContent() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(48.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Loading dashboard...")
-    }
-}
-
-@Composable
-private fun ErrorContent(
-    message: String,
-    onRetry: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-
-        Icon(
-            Icons.Default.WarningAmber,
-            null,
-            tint = MaterialTheme.colorScheme.error,
-            modifier = Modifier.size(64.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         Text(
-            text = "Failed to load dashboard",
+            "Management",
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ActionCircle(
+                title = "Events",
+                icon = { Icon(Icons.Default.Event, null) },
+                onClick = {
+                    onEvent(PartnerHomeEvent.MyEventsClicked)
+                },
+                modifier = Modifier.weight(1f)
+            )
 
-        Text(text = message)
+            ActionCircle(
+                title = "Refund",
+                icon = { Icon(Icons.Default.Payments, null) },
+                onClick = {
+                    onEvent(PartnerHomeEvent.RefundClicked)
+                },
+                modifier = Modifier.weight(1f)
+            )
+        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ActionCircle(
+                title = "Painting",
+                icon = { Icon(Icons.Default.Group, null) },
+                onClick = {
+                    onEvent(PartnerHomeEvent.PaintingClicked)
+                },
+                modifier = Modifier.weight(1f)
+            )
 
-        Button(onClick = onRetry) {
-            Icon(Icons.Default.Refresh, null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Retry")
+            ActionCircle(
+                title = "Shipment",
+                icon = { Icon(Icons.Default.LocalShipping, null) },
+                onClick = {
+                    onEvent(PartnerHomeEvent.ShipmentClicked)
+                },
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
 
 @Composable
-private fun SectionTitle(
-    title: String
+private fun ActionCircle(
+    title: String,
+    icon: @Composable () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold
-    )
+    ElevatedCard(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(22.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Surface(
+                shape = CircleShape,
+                tonalElevation = 4.dp
+            ) {
+                Box(
+                    modifier = Modifier.padding(14.dp)
+                ) { icon() }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(title)
+        }
+    }
 }
 
-@Composable
-private fun WelcomeHeader(
-    name: String,
-    pictureUrl: String?,
-    description: String?
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(
-                Brush.horizontalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.secondary
-                    )
-                )
-            )
-            .padding(20.dp)
-    ) {
+/* --------------------------------------------------- */
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+@Composable
+private fun MonthlyReportCard(
+    report: MonthlyFinancialReport
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
 
-            AsyncImage(
-                model = pictureUrl,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Color.White.copy(alpha = 0.2f)
-                    )
-                    .border(
-                        2.dp,
-                        Color.White.copy(alpha = 0.5f),
-                        CircleShape
-                    ),
-                contentScale = ContentScale.Crop
+            Text(
+                report.reportMonth,
+                fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Text("Orders : ${report.totalOrders}")
+            Text("Gross : Rp ${report.grossRevenue.toLong()}")
+            Text("Fee : Rp ${report.platformFees.toLong()}")
+            Text("Gateway : Rp ${report.paymentGatewayFees.toLong()}")
 
-                Text(
-                    text = "Welcome back,",
-                    color = Color.White.copy(alpha = 0.8f)
-                )
+            Spacer(modifier = Modifier.height(6.dp))
 
-                Text(
-                    text = name,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                if (!description.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = description,
-                        color = Color.White.copy(alpha = 0.7f),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
+            Text(
+                "Net : Rp ${report.netRevenue.toLong()}",
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
