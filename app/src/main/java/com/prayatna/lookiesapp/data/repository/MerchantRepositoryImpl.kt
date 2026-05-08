@@ -1,7 +1,10 @@
 package com.prayatna.lookiesapp.data.repository
 
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseMerchantService
+import com.prayatna.lookiesapp.domain.mapper.toData
 import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberInput
+import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberOutput
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
@@ -16,6 +19,26 @@ import javax.inject.Inject
 class MerchantRepositoryImpl @Inject constructor(
     private val supabaseMerchantService: SupabaseMerchantService
 ): MerchantRepository {
+    override suspend fun inviteMerchantMember(input: InviteMerchantMemberInput): DataResult<InviteMerchantMemberOutput> {
+        return try {
+            val response = supabaseMerchantService.inviteMerchantMember(input.toData())
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getMerchantMembersByMerchantId(merchantBusinessId: String): DataResult<List<MerchantMember>> {
+        return try {
+            val res = supabaseMerchantService.getMerchantMembersByMerchantId(merchantBusinessId)
+            DataResult.Success(data = res.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
     override suspend fun getMerchantProfile(businessId: String): DataResult<MerchantProfile> {
         return try {
             val response = supabaseMerchantService.getMerchantProfile(id = businessId)

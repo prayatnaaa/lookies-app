@@ -19,6 +19,9 @@ data class MerchantMemberDto(
     val tradingName: String?,
     @SerialName("kyc_status")
     val kycStatus: String?,
+    val username: String,
+    @SerialName("full_name")
+    val fullName: String,
     @SerialName("created_at")
     val createdAt: String,
     @SerialName("updated_at")

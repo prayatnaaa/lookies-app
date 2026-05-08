@@ -15,5 +15,7 @@ fun MerchantMemberDto.toDomain(): MerchantMember {
         kycStatus = kycStatus,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        fullName = fullName,
+        username = username
     )
 }

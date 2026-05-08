@@ -3,6 +3,8 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
+import com.prayatna.lookiesapp.data.remote.dto.request.merchant.InviteMerchantMemberRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.merchant.InviteMerchantMemberResponse
 import io.github.jan.supabase.postgrest.Postgrest
 import javax.inject.Inject
 
@@ -10,6 +12,20 @@ class SupabaseMerchantService @Inject constructor(
     private val postgrest: Postgrest
 ) {
 
+    suspend fun inviteMerchantMember(request: InviteMerchantMemberRequest): InviteMerchantMemberResponse {
+        return postgrest.from("merchant_members").insert(request) {
+            select()
+        }.decodeSingle<InviteMerchantMemberResponse>()
+    }
+    suspend fun getMerchantMembersByMerchantId(merchantBusinessId: String): List<MerchantMemberDto> {
+        return postgrest
+            .from("merchant_member_views")
+            .select {
+                filter {
+                    eq("business_id", merchantBusinessId)
+                }
+            }.decodeList<MerchantMemberDto>()
+    }
     suspend fun getMerchantProfile(id: String, merchantType: String? = null): MerchantProfileDto {
         val response = postgrest
             .from("merchant_account_profiles")
