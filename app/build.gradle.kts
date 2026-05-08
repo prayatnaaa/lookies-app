@@ -136,4 +136,7 @@ dependencies {
 
     //Worker
     implementation(libs.androidx.work.runtime.ktx)
+
+    //Ktor
+    implementation(libs.ktor.client.okhttp)
 }
