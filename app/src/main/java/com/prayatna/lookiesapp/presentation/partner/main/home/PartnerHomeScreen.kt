@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -74,6 +75,9 @@ fun PartnerHomeScreen(
             TopAppBar(
                 title = {
                     DashboardHeader(
+                        onMemberClick = {
+                            onEvent(PartnerHomeEvent.MemberListClicked)
+                        },
                         title = state.profile?.tradingName
                             ?: state.profile?.legalName
                             ?: "Dashboard"
@@ -118,14 +122,6 @@ fun PartnerHomeScreen(
         ) {
 
             item {
-                DashboardHeader(
-                    title = state.profile?.tradingName
-                        ?: state.profile?.legalName
-                        ?: "Dashboard"
-                )
-            }
-
-            item {
                 RevenueOverviewCard(
                     reports = state.monthlyFinancialReport,
                     onClick = {
@@ -167,19 +163,37 @@ fun PartnerHomeScreen(
 
 @Composable
 private fun DashboardHeader(
-    title: String
+    title: String,
+    onMemberClick: () -> Unit
 ) {
-    Column {
-        Text(
-            text = "Welcome back",
-            style = MaterialTheme.typography.bodyMedium
-        )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
 
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
+        Column {
+            Text(
+                text = "Welcome back",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        IconButton(
+            onClick = onMemberClick
+        ) {
+            Icon(
+                imageVector = Icons.Default.People,
+                contentDescription = "Member"
+            )
+        }
     }
 }
 

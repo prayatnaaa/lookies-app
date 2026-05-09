@@ -46,6 +46,7 @@ import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerS
 import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
 import com.prayatna.lookiesapp.presentation.partner.main.home.partnerHomeScreenNavigation
 import com.prayatna.lookiesapp.presentation.partner.manageEvent.PartnerManageEventScreen
+import com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId.merchantMemberByMerchantIdNavigation
 import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerRefund.partnerRefundNavigation
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
@@ -305,6 +306,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             PartnerListScreen(navController = navController)
         }
         partnerHomeScreenNavigation(navController)
+        merchantMemberByMerchantIdNavigation(navController)
         monthlyFinanceListScreen(navController)
         composable(
             route = "${NavigationRoutes.PARTICIPANT_LIST}/{eventId}",

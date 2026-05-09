@@ -92,6 +92,12 @@ class PartnerHomeViewModel @Inject constructor(
             PartnerHomeEvent.MonthlyFinanceClicked -> {
                 sendEffect(PartnerHomeEffect.NavigateMonthlyFinanceList)
             }
+
+            PartnerHomeEvent.MemberListClicked -> {
+                sendEffect(PartnerHomeEffect.NavigateMemberList(
+                    merchantBusinessId = businessId
+                ))
+            }
         }
     }
 

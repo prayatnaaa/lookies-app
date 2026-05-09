@@ -8,6 +8,7 @@ sealed interface PartnerHomeEffect {
     data object NavigatePainting : PartnerHomeEffect
     data object NavigateShipment : PartnerHomeEffect
     data object NavigateMonthlyFinanceList : PartnerHomeEffect
+    data class NavigateMemberList(val merchantBusinessId: String): PartnerHomeEffect
 
     data class ShowMessage(val message: String) : PartnerHomeEffect
 }

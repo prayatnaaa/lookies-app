@@ -16,6 +16,7 @@ object NavigationRoutes {
     const val SHIPMENT_LIST = "shipment_list"
     const val QRIS_PAYMENT = "qris_payment"
     const val MERCHANT_MEMBER_LIST = "merchant_member_list"
+    const val MERCHANT_MEMBER_BY_MERCHANT_ID_LIST = "merchant_member_by_merchant_id_list"
     const val PAYMENT = "payment"
     const val MESSAGES = "messages"
     const val ARTIST_DASHBOARD = "artist_dashboard"

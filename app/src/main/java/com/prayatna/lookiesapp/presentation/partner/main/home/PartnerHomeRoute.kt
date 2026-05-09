@@ -65,6 +65,10 @@ fun PartnerHomeRoute(
                         "${NavigationRoutes.MONTHLY_FINANCE_LIST_SCREEN}/${businessId}"
                     )
                 }
+
+                is PartnerHomeEffect.NavigateMemberList -> {
+                    navController.navigate("${NavigationRoutes.MERCHANT_MEMBER_BY_MERCHANT_ID_LIST}/${effect.merchantBusinessId}")
+                }
             }
         }
     }

@@ -11,6 +11,7 @@ sealed interface PartnerHomeEvent {
     data object ShipmentClicked : PartnerHomeEvent
     data object BackClicked : PartnerHomeEvent
     data object MonthlyFinanceClicked : PartnerHomeEvent
+    data object MemberListClicked : PartnerHomeEvent
 
     data class StartDateSelected(val date: String) : PartnerHomeEvent
     data class EndDateSelected(val date: String) : PartnerHomeEvent
