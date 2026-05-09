@@ -17,6 +17,7 @@ import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
+import com.prayatna.lookiesapp.domain.model.user.UserEmail
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
@@ -41,8 +42,20 @@ class UserRepositoryImpl @Inject constructor(
     private val storage: Storage,
     private val userPreference: UserPreference,
     private val supabaseUserService: SupabaseUserService,
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ): UserRepository {
+    override suspend fun getUsersEmail(query: String?): DataResult<List<UserEmail>> {
+        return try {
+            val result = supabaseUserService.getUsersEmail(query)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
+
     override suspend fun updateFcmToken(token: String): DataResult<Unit> {
         return try {
             val result = supabaseUserService.updateFcmToken(token)
@@ -82,7 +95,7 @@ class UserRepositoryImpl @Inject constructor(
                 } catch (e: HttpRequestException) {
                     emit(DataResult.Error(e.message ?: "Network error"))
                 } catch (e: Exception) {
-                    emit(DataResult.Error("Something went wrong! Please check your connection"))
+                    emit(DataResult.Error(e.message ?: "Something went wrong! Please check your connection"))
                 }
             }
 
@@ -102,7 +115,7 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: HttpRequestException) {
             DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error("Something went wrong! Please check your connection")
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }
 
@@ -134,7 +147,7 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: HttpRequestException) {
             DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error("Something went wrong! Please check your connection")
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }
 

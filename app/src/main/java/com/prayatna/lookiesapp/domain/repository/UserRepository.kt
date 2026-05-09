@@ -7,10 +7,13 @@ import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
+import com.prayatna.lookiesapp.domain.model.user.UserEmail
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
+    suspend fun getUsersEmail(query: String? = null):
+            DataResult<List<UserEmail>>
     suspend fun updateFcmToken(token: String):
             DataResult<Unit>
     fun getProfile():

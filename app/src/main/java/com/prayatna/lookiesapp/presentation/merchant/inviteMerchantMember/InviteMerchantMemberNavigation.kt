@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId
+package com.prayatna.lookiesapp.presentation.merchant.inviteMerchantMember
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -7,15 +7,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
-fun NavGraphBuilder.merchantMemberByMerchantIdNavigation(navController: NavController) {
+fun NavGraphBuilder.inviteMerchantMemberNavigation(navController: NavController) {
     composable(
-        route = "${NavigationRoutes.MERCHANT_MEMBER_BY_MERCHANT_ID_LIST}/{businessId}",
+        route = "${NavigationRoutes.INVITE_MERCHANT_MEMBER}/{businessId}",
         arguments = listOf(
             navArgument("businessId") { type = NavType.StringType }
         )
-    ) { 
-        MerchantMemberByMerchantIdRoute(
-            navController = navController
-        )
+    ) {
+        InviteMerchantMemberRoute(navController = navController)
     }
 }

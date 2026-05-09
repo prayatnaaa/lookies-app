@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId.state
+package com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.state
 
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 

@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId
+package com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -6,7 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdEffect
+import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdEffect
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun MerchantMemberByMerchantIdRoute(
@@ -20,6 +21,10 @@ fun MerchantMemberByMerchantIdRoute(
             when (effect) {
                 MerchantMemberByMerchantIdEffect.NavigateBack -> {
                     navController.popBackStack()
+                }
+
+                is MerchantMemberByMerchantIdEffect.NavigateInviteMember -> {
+                    navController.navigate("${NavigationRoutes.INVITE_MERCHANT_MEMBER}/${effect.businessId}")
                 }
             }
         }

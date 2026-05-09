@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.UserAddressDto
+import com.prayatna.lookiesapp.data.remote.dto.UserEmailDto
 import com.prayatna.lookiesapp.data.remote.dto.request.user.ArtistApplicationRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateUserAddressRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.RoleApplicationRequest
@@ -10,6 +11,7 @@ import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResp
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -28,6 +30,17 @@ class SupabaseUserService @Inject constructor(
     private val httpClient: HttpClient
 ) {
 
+    suspend fun getUsersEmail(query: String? = null): List<UserEmailDto> {
+        return postgrest.from("users")
+            .select(Columns.list("id", "email")) {
+                query?.let {
+                    filter {
+                        ilike("email", "%$it%")
+                    }
+                }
+            }
+            .decodeList<UserEmailDto>()
+    }
 
     suspend fun editProfile(
         fullName: String,

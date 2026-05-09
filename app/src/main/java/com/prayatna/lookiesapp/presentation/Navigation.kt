@@ -35,6 +35,7 @@ import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
+import com.prayatna.lookiesapp.presentation.merchant.inviteMerchantMember.inviteMerchantMemberNavigation
 import com.prayatna.lookiesapp.presentation.merchant.merchantMember.MerchantMemberListScreen
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.monthlyFinanceListScreen
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
@@ -46,7 +47,7 @@ import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerS
 import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
 import com.prayatna.lookiesapp.presentation.partner.main.home.partnerHomeScreenNavigation
 import com.prayatna.lookiesapp.presentation.partner.manageEvent.PartnerManageEventScreen
-import com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId.merchantMemberByMerchantIdNavigation
+import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.merchantMemberByMerchantIdNavigation
 import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerRefund.partnerRefundNavigation
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
@@ -300,6 +301,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         composable(NavigationRoutes.ADMIN_EVENT) {
             AdminEventScreen(navController = navController)
         }
+        inviteMerchantMemberNavigation(navController)
         composable(
             route = NavigationRoutes.PARTNER_LIST
         ) {

@@ -1,12 +1,12 @@
-package com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId
+package com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.merchant.GetMerchantMembersByMerchantIdUseCase
-import com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdEffect
-import com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdEvent
-import com.prayatna.lookiesapp.presentation.partner.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdUiState
+import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdEffect
+import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdEvent
+import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -44,6 +44,18 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
             }
             MerchantMemberByMerchantIdEvent.Retry -> {
                 businessId?.let { loadMembers(it) }
+            }
+
+            MerchantMemberByMerchantIdEvent.InviteMemberClicked -> {
+                viewModelScope.launch {
+                    businessId?.let { id ->
+                        _effect.send(
+                            MerchantMemberByMerchantIdEffect.NavigateInviteMember(
+                                id
+                            )
+                        )
+                    }
+                }
             }
         }
     }
