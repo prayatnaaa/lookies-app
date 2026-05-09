@@ -13,14 +13,23 @@ import androidx.compose.runtime.Composable
 @Composable
 fun BackTopBar(
     onBackClick: () -> Unit,
-    title: String = ""
+    title: String = "",
+    actions: @Composable () -> Unit = {}
 ) {
     TopAppBar(
         title = { Text(title) },
+
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Icon(imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                Icon(
+                    imageVector = Icons.Default.ArrowBackIosNew,
+                    contentDescription = "Back"
+                )
             }
+        },
+
+        actions = {
+            actions()
         }
     )
 }
