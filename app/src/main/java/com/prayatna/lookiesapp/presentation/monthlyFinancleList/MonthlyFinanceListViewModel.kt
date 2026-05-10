@@ -3,13 +3,15 @@ package com.prayatna.lookiesapp.presentation.monthlyFinancleList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
-import com.prayatna.lookiesapp.domain.usecase.transaction.GetMonthlyFinancialReportUseCase
+import com.prayatna.lookiesapp.domain.usecase.merchant.GetMerchantProfileUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetMerchantBalanceLogsUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetOrderSplitsByMerchantIdUseCase
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceEffect
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceEvent
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +22,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MonthlyFinanceListViewModel @Inject constructor(
-    private val getMonthlyFinancialReportUseCase: GetMonthlyFinancialReportUseCase,
+    private val getMerchantProfileUseCase: GetMerchantProfileUseCase,
+    private val getOrderSplitsByMerchantIdUseCase: GetOrderSplitsByMerchantIdUseCase,
+    private val getMerchantBalanceLogsUseCase: GetMerchantBalanceLogsUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -32,61 +36,54 @@ class MonthlyFinanceListViewModel @Inject constructor(
     private val _effect = Channel<MonthlyFinanceEffect>()
     val effect = _effect.receiveAsFlow()
 
+    init {
+        loadData()
+    }
+
     fun onEvent(event: MonthlyFinanceEvent) {
         when (event) {
-            is MonthlyFinanceEvent.EndDateSelected -> {
-                _state.update { it.copy( filterEndDate = event.date) }
-            }
-            is MonthlyFinanceEvent.EventIdSelected -> {
-                _state.update { it.copy( filterEventId = event.id) }
-            }
-            is MonthlyFinanceEvent.GetMonthlyFinancialReport -> {
-                loadMonthlyFinancialReport()
-            }
-            is MonthlyFinanceEvent.ItemTypeSelected -> {
-                _state.update { it.copy( filterItemType = event.type) }
+            MonthlyFinanceEvent.LoadData -> {
+                loadData()
             }
             MonthlyFinanceEvent.NavigateBack -> {
                 viewModelScope.launch {
                     _effect.send(MonthlyFinanceEffect.NavigateBack)
                 }
             }
-            is MonthlyFinanceEvent.StartDateSelected -> {
-                _state.update { it.copy( filterStartDate = event.date) }
+            is MonthlyFinanceEvent.TabSelected -> {
+                _state.update { it.copy(selectedTab = event.index) }
             }
         }
     }
 
-    private fun loadMonthlyFinancialReport() {
-        _state.update { it.copy(isLoading = true) }
+    private fun loadData() {
+        _state.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            val filter = MonthlyFinancialReportFilterInput(
-                startDate = _state.value.filterStartDate,
-                endDate = _state.value.filterEndDate,
-                itemType = _state.value.filterItemType,
-                eventId = _state.value.filterEventId,
-                merchantAccountId = businessId
-            )
+            when (val profileResult = getMerchantProfileUseCase(businessId)) {
+                is DataResult.Success -> {
+                    val accountId = profileResult.data.accountId
+                    
+                    val orderSplitsDeferred = async { getOrderSplitsByMerchantIdUseCase(accountId) }
+                    val balanceLogsDeferred = async { getMerchantBalanceLogsUseCase(accountId) }
 
-            when (val result = getMonthlyFinancialReportUseCase(filter)) {
+                    val orderSplitsResult = orderSplitsDeferred.await()
+                    val balanceLogsResult = balanceLogsDeferred.await()
+
+                    _state.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            orderSplits = if (orderSplitsResult is DataResult.Success) orderSplitsResult.data else emptyList(),
+                            balanceLogs = if (balanceLogsResult is DataResult.Success) balanceLogsResult.data else emptyList(),
+                            errorMessage = if (orderSplitsResult is DataResult.Error) orderSplitsResult.error else if (balanceLogsResult is DataResult.Error) balanceLogsResult.error else null
+                        )
+                    }
+                }
                 is DataResult.Error -> {
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = result.error
-                        )
-                    }
-                    _effect.send(MonthlyFinanceEffect.ShowToast(title = "Error", message = result.error))
+                    _state.update { it.copy(isLoading = false, errorMessage = profileResult.error) }
                 }
-                is DataResult.Success-> {
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            monthlyFinancialReports = result.data
-                        )
-                    }
+                else -> {
+                    _state.update { it.copy(isLoading = false) }
                 }
-                else -> Unit
             }
         }
     }

@@ -12,6 +12,6 @@ fun NavGraphBuilder.monthlyFinanceListScreen(navController: NavController) {
         route = "${NavigationRoutes.MONTHLY_FINANCE_LIST_SCREEN}/{businessId}",
         arguments = listOf(navArgument("businessId") { type = NavType.StringType })
     ) {
-        MonthlyFinanceListScreen(navController = navController)
+        MonthlyFinanceListRoute(navController = navController)
     }
 }

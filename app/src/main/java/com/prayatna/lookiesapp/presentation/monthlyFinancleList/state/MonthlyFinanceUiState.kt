@@ -1,13 +1,12 @@
 package com.prayatna.lookiesapp.presentation.monthlyFinancleList.state
 
-import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
+import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
+import com.prayatna.lookiesapp.domain.model.transaction.OrderSplit
 
 data class MonthlyFinanceUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val filterStartDate: String? = null,
-    val filterEndDate: String? = null,
-    val filterItemType: String? = null,
-    val filterEventId: Int? = null,
-    val monthlyFinancialReports: List<MonthlyFinancialReport> = emptyList()
+    val orderSplits: List<OrderSplit> = emptyList(),
+    val balanceLogs: List<MerchantBalanceLog> = emptyList(),
+    val selectedTab: Int = 0
 )

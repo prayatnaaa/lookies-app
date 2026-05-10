@@ -13,7 +13,7 @@ import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceEffect
 
 @Composable
-fun MonthlyFinanceListScreen(
+fun MonthlyFinanceListRoute(
     navController: NavController,
     viewModel: MonthlyFinanceListViewModel = hiltViewModel()
 ) {
@@ -24,7 +24,7 @@ fun MonthlyFinanceListScreen(
     var bottomSheetMessage by remember { mutableStateOf("") }
     var isSuccessStatus by remember { mutableStateOf(false) }
 
-    LaunchedEffect(viewModel) {
+    LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 MonthlyFinanceEffect.NavigateBack -> {

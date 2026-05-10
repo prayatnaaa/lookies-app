@@ -3,27 +3,20 @@ package com.prayatna.lookiesapp.presentation.monthlyFinancleList
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
-import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
+import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
+import com.prayatna.lookiesapp.domain.model.transaction.OrderSplit
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceEvent
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceUiState
 
@@ -36,7 +29,7 @@ fun MonthlyFinanceListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Monthly Finance", fontWeight = FontWeight.SemiBold) },
+                title = { Text("Financial Records", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = { onEvent(MonthlyFinanceEvent.NavigateBack) }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -55,12 +48,23 @@ fun MonthlyFinanceListScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // 1. Filter Section (Horizontal Scroll)
-            FilterSection(state = state, onEvent = onEvent)
+            TabRow(
+                selectedTabIndex = state.selectedTab,
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.primary
+            ) {
+                Tab(
+                    selected = state.selectedTab == 0,
+                    onClick = { onEvent(MonthlyFinanceEvent.TabSelected(0)) },
+                    text = { Text("Payout Logs") }
+                )
+                Tab(
+                    selected = state.selectedTab == 1,
+                    onClick = { onEvent(MonthlyFinanceEvent.TabSelected(1)) },
+                    text = { Text("Balance History") }
+                )
+            }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-
-            // 2. Content Area (Loading, Empty, or List)
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -68,16 +72,30 @@ fun MonthlyFinanceListScreen(
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
                     )
-                } else if (state.monthlyFinancialReports.isEmpty()) {
-                    EmptyFinanceState()
+                } else if (state.errorMessage != null) {
+                    ErrorState(message = state.errorMessage)
                 } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(state.monthlyFinancialReports) { report ->
-                            FinanceReportCard(report = report)
+                    val currentList = if (state.selectedTab == 0) state.orderSplits else state.balanceLogs
+                    
+                    if (currentList.isEmpty()) {
+                        EmptyFinanceState(
+                            message = if (state.selectedTab == 0) "No payout logs found" else "No balance history found"
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            if (state.selectedTab == 0) {
+                                items(state.orderSplits) { split ->
+                                    PayoutLogCard(split = split)
+                                }
+                            } else {
+                                items(state.balanceLogs) { log ->
+                                    BalanceLogCard(log = log)
+                                }
+                            }
                         }
                     }
                 }
@@ -86,230 +104,50 @@ fun MonthlyFinanceListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FilterSection(
-    state: MonthlyFinanceUiState,
-    onEvent: (MonthlyFinanceEvent) -> Unit
-) {
-    var showStartDatePicker by remember { mutableStateOf(false) }
-    var showEndDatePicker by remember { mutableStateOf(false) }
-    var expandedItemType by remember { mutableStateOf(false) }
-
-    val itemTypeOptions = listOf("All", "ticket", "event_registration", "painting")
-
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        item {
-            Icon(
-                imageVector = Icons.Default.FilterAlt,
-                contentDescription = "Filters",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(end = 4.dp)
-            )
-        }
-
-        // 1. START DATE FILTER
-        item {
-            FilterChip(
-                selected = state.filterStartDate != null,
-                onClick = { showStartDatePicker = true },
-                label = { Text(state.filterStartDate ?: "Start Date") },
-                leadingIcon = {
-                    Icon(Icons.Default.CalendarMonth, null, modifier = Modifier.size(16.dp))
-                }
-            )
-        }
-
-        // 2. END DATE FILTER
-        item {
-            FilterChip(
-                selected = state.filterEndDate != null,
-                onClick = { showEndDatePicker = true },
-                label = { Text(state.filterEndDate ?: "End Date") },
-                leadingIcon = {
-                    Icon(Icons.Default.CalendarMonth, null, modifier = Modifier.size(16.dp))
-                }
-            )
-        }
-
-        // 3. ITEM TYPE FILTER (Dropdown)
-        item {
-            Box {
-                FilterChip(
-                    selected = state.filterItemType != null,
-                    onClick = { expandedItemType = true },
-                    label = { Text(state.filterItemType ?: "Item Type") }
-                )
-                DropdownMenu(
-                    expanded = expandedItemType,
-                    onDismissRequest = { expandedItemType = false }
-                ) {
-                    itemTypeOptions.forEach { type ->
-                        DropdownMenuItem(
-                            text = { Text(type) },
-                            onClick = {
-                                val selectedType = if (type == "All") null else type
-                                onEvent(MonthlyFinanceEvent.ItemTypeSelected(selectedType ?: ""))
-                                expandedItemType = false
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
-        // 4. APPLY BUTTON
-        item {
-            FilledTonalButton(
-                onClick = {
-                    onEvent(
-                        MonthlyFinanceEvent.GetMonthlyFinancialReport(
-                            MonthlyFinancialReportFilterInput(
-                                startDate = state.filterStartDate,
-                                endDate = state.filterEndDate,
-                                itemType = state.filterItemType,
-                                eventId = state.filterEventId,
-                                merchantAccountId = ""
-                            )
-                        )
-                    )
-                },
-                contentPadding = PaddingValues(horizontal = 16.dp)
-            ) {
-                Text("Apply")
-            }
-        }
-    }
-
-    if (showStartDatePicker) {
-        val datePickerState = rememberDatePickerState()
-        DatePickerDialog(
-            onDismissRequest = { showStartDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        onEvent(MonthlyFinanceEvent.StartDateSelected(millis.toFormattedDateString()))
-                    }
-                    showStartDatePicker = false
-                }) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showStartDatePicker = false }) { Text("Cancel") }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
-
-    if (showEndDatePicker) {
-        val datePickerState = rememberDatePickerState()
-        DatePickerDialog(
-            onDismissRequest = { showEndDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        onEvent(MonthlyFinanceEvent.EndDateSelected(millis.toFormattedDateString()))
-                    }
-                    showEndDatePicker = false
-                }) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showEndDatePicker = false }) { Text("Cancel") }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
-}
-
-private fun Long.toFormattedDateString(): String {
-    val formatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-    formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
-    return formatter.format(java.util.Date(this))
-}
-@Composable
-private fun FinanceReportCard(report: MonthlyFinancialReport) {
+private fun PayoutLogCard(split: OrderSplit) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
         ) {
-            // Card Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = RoundedCornerShape(10.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Receipt,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            text = report.reportMonth,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "${report.totalOrders} Orders",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Financial Breakdown
-            FinancialRowItem(label = "Gross Revenue", value = "Rp ${report.grossRevenue.toLong()}")
-            FinancialRowItem(label = "Platform Fees", value = "- Rp ${report.platformFees.toLong()}")
-            FinancialRowItem(label = "Payment Gateway", value = "- Rp ${report.paymentGatewayFees.toLong()}")
-
-            Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Net Revenue (Highlighted)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Net Revenue",
+                    text = "Order #${split.orderId.take(8)}",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Rp ${report.netRevenue.toLong()}",
+                    text = split.payoutStatus.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (split.payoutStatus == "completed") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            FinancialRowItem(label = "Gross Amount", value = "Rp ${split.grossAmount.toLong()}")
+            FinancialRowItem(label = "Platform Fee", value = "- Rp ${split.platformFee.toLong()}")
+            
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Net Amount",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Rp ${split.netAmount.toLong()}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.primary
@@ -320,11 +158,64 @@ private fun FinanceReportCard(report: MonthlyFinancialReport) {
 }
 
 @Composable
+private fun BalanceLogCard(log: MerchantBalanceLog) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = log.transactionType.replace("_", " ").uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (log.amount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                )
+                Text(
+                    text = log.createdAt.take(10),
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = if (log.amount > 0) "+ Rp ${log.amount}" else "- Rp ${-log.amount}",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = if (log.amount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+            )
+
+            log.description?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Balance after: Rp ${log.balanceAfter}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
 private fun FinancialRowItem(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -335,14 +226,13 @@ private fun FinancialRowItem(label: String, value: String) {
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+            fontWeight = FontWeight.Medium
         )
     }
 }
 
 @Composable
-private fun BoxScope.EmptyFinanceState() {
+private fun BoxScope.EmptyFinanceState(message: String) {
     Column(
         modifier = Modifier
             .align(Alignment.Center)
@@ -357,17 +247,28 @@ private fun BoxScope.EmptyFinanceState() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No reports found",
+            text = "No records found",
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Try adjusting your filters or check back later after your events have completed.",
+            text = message,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
     }
+}
+
+@Composable
+private fun BoxScope.ErrorState(message: String) {
+    Text(
+        text = message,
+        modifier = Modifier
+            .align(Alignment.Center)
+            .padding(32.dp),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.error
+    )
 }
