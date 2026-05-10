@@ -30,7 +30,7 @@ class SupabasePaintingService @Inject constructor(
     ): List<EventPaintingDto> {
         val user = auth.currentUserOrNull() ?:
         throw IllegalStateException("User not logged in")
-        val result = postgrest.from("v2_event_painting_view")
+        val result = postgrest.from("event_paintings_view")
             .select {
                 filter {
                     if (eventId != null) {

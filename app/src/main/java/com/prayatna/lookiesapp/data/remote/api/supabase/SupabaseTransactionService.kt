@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
+import com.prayatna.lookiesapp.data.remote.dto.MerchantBalanceLogDto
 import com.prayatna.lookiesapp.data.remote.dto.MonthlyFinancialReportDto
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
@@ -36,6 +37,14 @@ class SupabaseTransactionService @Inject constructor(
     private val postgrest: Postgrest,
     private val httpClient: HttpClient,
 ) {
+
+    suspend fun getMerchantBalanceLogs(merchantId: String): List<MerchantBalanceLogDto> {
+        return postgrest.from("merchant_balance_logs").select {
+            filter {
+                MerchantBalanceLogDto::merchantId eq merchantId
+            }
+        }.decodeList<MerchantBalanceLogDto>()
+    }
     suspend fun createOrder(
         items: List<OrderItemRequest>,
         shippingCost: Double,

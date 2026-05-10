@@ -81,6 +81,7 @@ class SupabaseMerchantService @Inject constructor(
             .select {
                 filter {
                     ShipmentDto::merchantId eq merchantId
+                    ShipmentDto::status neq "awaiting_payment"
                 }
             }.decodeList<ShipmentDto>()
     }

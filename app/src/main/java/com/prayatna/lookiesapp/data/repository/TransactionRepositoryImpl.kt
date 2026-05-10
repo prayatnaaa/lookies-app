@@ -16,6 +16,7 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequest
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
+import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
@@ -34,6 +35,17 @@ import javax.inject.Inject
 class TransactionRepositoryImpl @Inject constructor(
     private val transactionService: SupabaseTransactionService
 ) : TransactionRepository {
+
+    override suspend fun getMerchantBalanceLogs(merchantId: String): DataResult<List<MerchantBalanceLog>> {
+        return try {
+            val result = transactionService.getMerchantBalanceLogs(merchantId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
     override suspend fun createOrder(
         items: List<OrderItemInput>,
         shippingCost: Double,

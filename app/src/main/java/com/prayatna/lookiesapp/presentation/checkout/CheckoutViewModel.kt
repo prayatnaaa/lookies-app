@@ -16,7 +16,6 @@ import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutItemDisplay
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -379,9 +378,9 @@ class CheckoutViewModel @Inject constructor(
             val totalAmount =
                 (item.price?.times(quantity)?.plus(shippingCost))?.toLong() ?: 0L
 
-            emitEffect(CheckoutEffect.ShowSuccessDialog)
-
-            delay(1000)
+//            emitEffect(CheckoutEffect.ShowSuccessDialog)
+//
+//            delay(1000)
 
             emitEffect(
                 CheckoutEffect.NavigateToQrisPayment(
