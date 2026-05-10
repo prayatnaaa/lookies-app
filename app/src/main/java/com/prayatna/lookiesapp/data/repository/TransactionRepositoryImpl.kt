@@ -19,6 +19,8 @@ import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentReque
 import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
+import com.prayatna.lookiesapp.domain.model.transaction.OrderSplit
+import com.prayatna.lookiesapp.domain.model.transaction.PendingOrderSplits
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.utils.DataResult
@@ -35,6 +37,26 @@ import javax.inject.Inject
 class TransactionRepositoryImpl @Inject constructor(
     private val transactionService: SupabaseTransactionService
 ) : TransactionRepository {
+
+    override suspend fun getPendingOrderSplitByMerchantId(merchantId: String): DataResult<PendingOrderSplits> {
+        return try {
+            val result = transactionService.getPendingOrderSplitByMerchantId(merchantId)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getOrderSplitsByMerchantId(merchantId: String): DataResult<List<OrderSplit>> {
+        return try {
+            val result = transactionService.getOrderSplitsByMerchantId(merchantId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
 
     override suspend fun getMerchantBalanceLogs(merchantId: String): DataResult<List<MerchantBalanceLog>> {
         return try {

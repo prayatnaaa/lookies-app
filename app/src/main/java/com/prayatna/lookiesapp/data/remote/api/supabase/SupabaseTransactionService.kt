@@ -4,7 +4,9 @@ import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBalanceLogDto
 import com.prayatna.lookiesapp.data.remote.dto.MonthlyFinancialReportDto
+import com.prayatna.lookiesapp.data.remote.dto.OrderSplitDto
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
+import com.prayatna.lookiesapp.data.remote.dto.PendingOrderSplitsDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
@@ -38,6 +40,20 @@ class SupabaseTransactionService @Inject constructor(
     private val httpClient: HttpClient,
 ) {
 
+    suspend fun getPendingOrderSplitByMerchantId(merchantId: String): PendingOrderSplitsDto {
+        return postgrest.rpc(
+            "merchant_pending_order_splits",
+            mapOf("p_merchant_id" to merchantId)
+        ).decodeSingle<PendingOrderSplitsDto>()
+    }
+
+    suspend fun getOrderSplitsByMerchantId(merchantId: String): List<OrderSplitDto> {
+        return postgrest.from("order_splits").select {
+            filter {
+                OrderSplitDto::merchantId eq merchantId
+            }
+        }.decodeList<OrderSplitDto>()
+    }
     suspend fun getMerchantBalanceLogs(merchantId: String): List<MerchantBalanceLogDto> {
         return postgrest.from("merchant_balance_logs").select {
             filter {
