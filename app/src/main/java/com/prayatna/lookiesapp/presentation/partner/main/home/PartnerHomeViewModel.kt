@@ -2,15 +2,16 @@ package com.prayatna.lookiesapp.presentation.partner.main.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
 import com.prayatna.lookiesapp.domain.usecase.merchant.GetMerchantProfileUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.GetPartnerDashboardSummaryUseCase
-import com.prayatna.lookiesapp.domain.usecase.transaction.GetMonthlyFinancialReportUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetMerchantBalanceLogsUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetPendingOrderSplitByMerchantIdUseCase
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEffect
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEvent
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,8 +25,9 @@ import javax.inject.Inject
 @HiltViewModel
 class PartnerHomeViewModel @Inject constructor(
     private val getMerchantProfileUseCase: GetMerchantProfileUseCase,
-    private val getMonthlyFinancialReportUseCase: GetMonthlyFinancialReportUseCase,
-    private val getPartnerDashboardSummaryUseCase: GetPartnerDashboardSummaryUseCase
+    private val getPartnerDashboardSummaryUseCase: GetPartnerDashboardSummaryUseCase,
+    private val getPendingOrderSplitByMerchantIdUseCase: GetPendingOrderSplitByMerchantIdUseCase,
+    private val getMerchantBalanceLogsUseCase: GetMerchantBalanceLogsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PartnerHomeUiState())
@@ -103,31 +105,7 @@ class PartnerHomeViewModel @Inject constructor(
 
     private fun loadMonthlyFinancialReport() {
         _state.update { it.copy(isLoading = true) }
-        val filter = MonthlyFinancialReportFilterInput(
-            merchantAccountId = businessId,
-            startDate = _state.value.filterStartDate,
-            endDate = _state.value.filterEndDate,
-            itemType = _state.value.filterItemType,
-            eventId = _state.value.filterEventId
-        )
-        viewModelScope.launch {
-            when (val result = getMonthlyFinancialReportUseCase(filter)) {
-                is DataResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = result.error
-                    )
-                    sendEffect(PartnerHomeEffect.ShowMessage(result.error))
-                }
-                is DataResult.Success -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        monthlyFinancialReport = result.data
-                    )
-                }
-                else -> Unit
-            }
-        }
+        
     }
 
     private fun loadData() {
@@ -141,11 +119,25 @@ class PartnerHomeViewModel @Inject constructor(
             when (val result = getMerchantProfileUseCase(businessId)) {
 
                 is DataResult.Success -> {
+                    val profile = result.data
+                    val accountId = profile.accountId
 
                     _state.value = _state.value.copy(
-                        profile = result.data,
-                        isLoading = true
+                        profile = profile,
                     )
+
+                    val pendingSplitsDeferred = async { getPendingOrderSplitByMerchantIdUseCase(accountId) }
+                    val balanceLogsDeferred = async { getMerchantBalanceLogsUseCase(accountId) }
+
+                    val pendingResult = pendingSplitsDeferred.await()
+                    if (pendingResult is DataResult.Success) {
+                        _state.update { it.copy(pendingOrderSplits = pendingResult.data) }
+                    }
+
+                    val balanceLogsResult = balanceLogsDeferred.await()
+                    if (balanceLogsResult is DataResult.Success) {
+                        _state.update { it.copy(balanceLogs = balanceLogsResult.data) }
+                    }
 
                     getPartnerDashboardSummaryUseCase(businessId)
                         .catch { e ->
@@ -170,7 +162,7 @@ class PartnerHomeViewModel @Inject constructor(
                     )
                 }
 
-                else -> Unit
+                else -> _state.update { it.copy(isLoading = false) }
             }
         }
     }

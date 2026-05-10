@@ -13,7 +13,6 @@ PartnerHomeUiState now has:
 monthlyFinancialReport: List<MonthlyFinancialReport> = emptyList()
 */
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,7 +58,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
+import com.prayatna.lookiesapp.domain.model.transaction.PendingOrderSplits
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEvent
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeUiState
 import kotlin.math.min
@@ -123,11 +124,11 @@ fun PartnerHomeScreen(
 
             item {
                 RevenueOverviewCard(
-                    reports = state.monthlyFinancialReport,
-                    onClick = {
-                        onEvent(PartnerHomeEvent.MonthlyFinanceClicked)
-                    }
-                )
+                    balanceLogs = state.balanceLogs,
+                    pendingOrderSplits = state.pendingOrderSplits
+                ) {
+                    onEvent(PartnerHomeEvent.MonthlyFinanceClicked)
+                }
             }
 
             item {
@@ -136,6 +137,20 @@ fun PartnerHomeScreen(
 
             item {
                 ActionGrid(onEvent)
+            }
+
+            if (state.balanceLogs.isNotEmpty()) {
+                item {
+                    Text(
+                        "Balance History",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                items(state.balanceLogs.take(5)) { log ->
+                    BalanceLogCard(log)
+                }
             }
 
             if (state.monthlyFinancialReport.isNotEmpty()) {
@@ -201,119 +216,55 @@ private fun DashboardHeader(
 
 @Composable
 private fun RevenueOverviewCard(
-    reports: List<MonthlyFinancialReport>,
+    balanceLogs: List<MerchantBalanceLog>,
+    pendingOrderSplits: PendingOrderSplits?,
     onClick: () -> Unit
 ) {
-    val latest = reports.firstOrNull()
-    val gross = latest?.grossRevenue ?: 0.0
-    val net = latest?.netRevenue ?: 0.0
+    val latestBalance = balanceLogs.firstOrNull()?.balanceAfter ?: 0L
+    val pending = pendingOrderSplits?.totalAmount ?: 0L
 
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         onClick = onClick
     ) {
-        Row(
-            modifier = Modifier.padding(18.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            CircularRevenueChart(
-                gross = gross,
-                net = net
-            )
-
-            Spacer(modifier = Modifier.width(18.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    "Revenue Overview",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text("Gross : Rp ${gross.toLong()}")
-                Text("Net : Rp ${net.toLong()}")
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    "Latest month",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CircularRevenueChart(
-    gross: Double,
-    net: Double
-) {
-    val progress =
-        if (gross <= 0.0) 0f
-        else (net / gross).toFloat().coerceIn(0f, 1f)
-
-    // 1. Resolve colors here in the @Composable scope!
-    val trackColor = MaterialTheme.colorScheme.surfaceVariant
-    val progressColor = MaterialTheme.colorScheme.primary
-
-    Box(
-        modifier = Modifier
-            .size(110.dp)
-            .clickable {
-
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-
-            val stroke = 12.dp.toPx()
-            val canvasSize = min(size.width, size.height)
-
-            drawArc(
-                color = trackColor, // 2. Use the resolved color
-                startAngle = 0f,
-                sweepAngle = 360f,
-                useCenter = false,
-                style = Stroke(
-                    width = stroke,
-                    cap = StrokeCap.Round
-                ),
-                size = Size(canvasSize, canvasSize),
-                topLeft = Offset.Zero
-            )
-
-            drawArc(
-                color = progressColor, // 2. Use the resolved color
-                startAngle = -90f,
-                sweepAngle = 360f * progress,
-                useCenter = false,
-                style = Stroke(
-                    width = stroke,
-                    cap = StrokeCap.Round
-                ),
-                size = Size(canvasSize, canvasSize),
-                topLeft = Offset.Zero
-            )
-        }
-
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .padding(24.dp)
+                .fillMaxWidth()
         ) {
             Text(
-                "${(progress * 100).toInt()}%",
-                fontWeight = FontWeight.Bold
+                "Current Balance",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
             Text(
-                "Net",
-                style = MaterialTheme.typography.labelSmall
+                "Rp $latestBalance",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
             )
+
+            if (pending > 0) {
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Pending Payout: ",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        "Rp $pending",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
 }
@@ -503,6 +454,58 @@ private fun MonthlyReportCard(
             Text(
                 "Net : Rp ${report.netRevenue.toLong()}",
                 fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun BalanceLogCard(
+    log: MerchantBalanceLog
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = log.transactionType.uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (log.amount > 0) MaterialTheme.colorScheme.primary 
+                            else MaterialTheme.colorScheme.error
+                )
+                Text(
+                    text = log.createdAt.take(10), // Simple date
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Amount : Rp ${log.amount}",
+                fontWeight = FontWeight.Bold
+            )
+            
+            log.description?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Balance After : Rp ${log.balanceAfter}",
+                style = MaterialTheme.typography.labelSmall
             )
         }
     }

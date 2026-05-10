@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class PendingOrderSplitsDto(
     @SerialName("created_at")
     val createdAt: String,
-    @SerialName("total_amount")
+    @SerialName("total_pending")
     val totalAmount: Long
 )
