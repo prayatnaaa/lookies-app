@@ -20,7 +20,7 @@ data class MerchantBalanceLogDto(
     @SerialName("order_id")
     val orderId: String,
     @SerialName("event_id")
-    val eventId: Int,
+    val eventId: Int? = null,
     val description: String? = null,
     @SerialName("created_at")
     val createdAt: String
