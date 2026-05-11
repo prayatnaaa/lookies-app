@@ -1,30 +1,19 @@
 package com.prayatna.lookiesapp.presentation.components.shipment
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
 import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailEvent
 import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailUiState
 
@@ -37,6 +26,14 @@ fun ShipmentDetailContent(
 ) {
     val shipment = uiState.shipment
     var expanded by remember { mutableStateOf(false) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            onEvent(ShipmentDetailEvent.OnArrivalProofSelected(it))
+        }
+    }
 
     Column(
         modifier = modifier
@@ -57,6 +54,56 @@ fun ShipmentDetailContent(
                     Text(text = "Name: ${shipment.reciepentName}", style = MaterialTheme.typography.bodyMedium)
                     Text(text = "Phone: ${shipment.phoneNumber}", style = MaterialTheme.typography.bodyMedium)
                     Text(text = "Address: ${shipment.addressLine}\n${shipment.province}", style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+
+            HorizontalDivider()
+
+            Text(text = "Arrival Proof", style = MaterialTheme.typography.titleMedium)
+            
+            if (shipment.arrivalProofUrl != null) {
+                CustomAsyncImage(
+                    model = shipment.arrivalProofUrl,
+                    contentDescription = "Arrival Proof",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                )
+            } else {
+                OutlinedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    onClick = { imagePickerLauncher.launch("image/*") }
+                ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        if (uiState.selectedArrivalProof != null) {
+                            CustomAsyncImage(
+                                model = uiState.selectedArrivalProof,
+                                contentDescription = "Selected Proof",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(48.dp))
+                                Text("Upload Arrival Proof", style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
+                }
+
+                if (uiState.selectedArrivalProof != null) {
+                    Button(
+                        onClick = { onEvent(ShipmentDetailEvent.SubmitArrivalProof) },
+                        enabled = !uiState.isUploadingProof,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (uiState.isUploadingProof) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
+                        } else {
+                            Text("Submit Proof")
+                        }
+                    }
                 }
             }
 

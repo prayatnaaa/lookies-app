@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.shipment.GetShipmentByOrderIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.CreateTrackingNumberShipmentUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.UpdateShipmentStatusUseCase
+import com.prayatna.lookiesapp.domain.usecase.merchant.UploadShipmentArrivalProofUseCase
 import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailEvent
 import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailUiState
 import com.prayatna.lookiesapp.utils.DataResult
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class ShipmentDetailViewModel @Inject constructor(
     private val updateShipmentStatusUseCase: UpdateShipmentStatusUseCase,
     private val getShipmentByOrderIdUseCase: GetShipmentByOrderIdUseCase,
-    private val createTrackingNumberShipmentUseCase: CreateTrackingNumberShipmentUseCase
+    private val createTrackingNumberShipmentUseCase: CreateTrackingNumberShipmentUseCase,
+    private val uploadShipmentArrivalProofUseCase: UploadShipmentArrivalProofUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ShipmentDetailUiState())
@@ -62,6 +64,12 @@ class ShipmentDetailViewModel @Inject constructor(
             }
             ShipmentDetailEvent.SubmitTrackingNumberUpdate -> {
                 updateTrackingNumber()
+            }
+            is ShipmentDetailEvent.OnArrivalProofSelected -> {
+                _uiState.update { it.copy(selectedArrivalProof = event.image) }
+            }
+            ShipmentDetailEvent.SubmitArrivalProof -> {
+                uploadArrivalProof()
             }
             ShipmentDetailEvent.OnErrorConfirmed -> {
                 _uiState.update { it.copy(errorMessage = null) }
@@ -127,6 +135,30 @@ class ShipmentDetailViewModel @Inject constructor(
                 }
                 is DataResult.Error -> {
                     _uiState.update { it.copy(isUpdating = false, errorMessage = result.error) }
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    private fun uploadArrivalProof() {
+        val shipmentId = _uiState.value.shipment?.id ?: return
+        val image = _uiState.value.selectedArrivalProof ?: return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isUploadingProof = true, errorMessage = null) }
+            when (val result = uploadShipmentArrivalProofUseCase(shipmentId, image)) {
+                is DataResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isUploadingProof = false,
+                            updateSuccessMessage = "Arrival proof uploaded successfully",
+                            shipment = it.shipment?.copy(arrivalProofUrl = result.data)
+                        )
+                    }
+                }
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(isUploadingProof = false, errorMessage = result.error) }
                 }
                 else -> Unit
             }

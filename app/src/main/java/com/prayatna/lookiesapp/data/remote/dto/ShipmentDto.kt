@@ -31,4 +31,6 @@ data class ShipmentDto(
     val createdAt: String,
     @SerialName("shipped_at")
     val shippedAt: String? = null,
+    @SerialName("arrival_proof_url")
+    val arrivalProofUrl: String? = null,
 )

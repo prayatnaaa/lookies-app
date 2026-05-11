@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -90,6 +91,7 @@ fun EventPaintingDetailScreen(
                     price = data.finalPrice,
                     isSold = data.status == "sold",
                     onBuyClick = {
+                        Log.d("CHECK-PAINTING", data.id)
                         navController.navigate("${NavigationRoutes.CHECKOUT}/painting/${data.id}/1")
                     }
                 )

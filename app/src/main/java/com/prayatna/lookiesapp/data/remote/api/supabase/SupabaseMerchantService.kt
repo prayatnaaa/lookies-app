@@ -5,12 +5,38 @@ import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
 import com.prayatna.lookiesapp.data.remote.dto.request.merchant.InviteMerchantMemberRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.merchant.InviteMerchantMemberResponse
+import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
+import java.util.UUID
 import javax.inject.Inject
 
 class SupabaseMerchantService @Inject constructor(
-    private val postgrest: Postgrest
+    private val postgrest: Postgrest,
+    private val storage: Storage
 ) {
+
+    suspend fun uploadArrivalProof(shipmentId: String, image: ByteArray): String {
+        val fileName = "${UUID.randomUUID()}.png"
+        val bucketName = "shipment_proofs"
+        val path = "regular/$fileName"
+
+        val uploadedPath = storage.from(bucketName).upload(
+            path = path,
+            data = image,
+            upsert = true
+        )
+
+        val imageUrl = Helper.buildImageUrl(imageName = uploadedPath, bucketName = bucketName)
+
+        postgrest.from("shipments").update({
+            set("arrival_proof_url", imageUrl)
+        }) {
+            filter { eq("id", shipmentId) }
+        }
+
+        return imageUrl
+    }
 
     suspend fun inviteMerchantMember(request: InviteMerchantMemberRequest): InviteMerchantMemberResponse {
         return postgrest.from("merchant_members").insert(request) {

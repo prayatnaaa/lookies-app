@@ -1,16 +1,11 @@
 package com.prayatna.lookiesapp.presentation.exhibitionShipment
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.Image
+import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -29,6 +24,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -311,6 +307,14 @@ private fun OrganizerConfirmReceivedSection(
     uiState: ExhibitionShipmentUiState,
     onEvent: (ExhibitionShipmentEvent) -> Unit
 ) {
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            onEvent(ExhibitionShipmentEvent.OnArrivalProofSelected(it))
+        }
+    }
+
     Text(
         text = "Confirm Artwork Received",
         style = MaterialTheme.typography.titleMedium,
@@ -321,6 +325,53 @@ private fun OrganizerConfirmReceivedSection(
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
+
+    Text(text = "Arrival Proof", style = MaterialTheme.typography.labelLarge)
+    if (uiState.shipment?.arrivalProofUrl != null) {
+        CustomAsyncImage(
+            model = uiState.shipment.arrivalProofUrl,
+            contentDescription = "Arrival Proof",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        )
+    } else {
+        OutlinedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            onClick = { imagePickerLauncher.launch("image/*") }
+        ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                if (uiState.selectedArrivalProof != null) {
+                    CustomAsyncImage(
+                        model = uiState.selectedArrivalProof,
+                        contentDescription = "Selected Proof",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(48.dp))
+                        Text("Upload Arrival Proof", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
+        }
+
+        if (uiState.selectedArrivalProof != null) {
+            Button(
+                onClick = { onEvent(ExhibitionShipmentEvent.SubmitArrivalProof) },
+                enabled = !uiState.isUploadingProof,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (uiState.isUploadingProof) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
+                } else {
+                    Text("Submit Proof")
+                }
+            }
+        }
+    }
 
     OutlinedTextField(
         value = uiState.notesInput,

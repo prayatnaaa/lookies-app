@@ -1,5 +1,7 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.content.Context
+import android.net.Uri
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseMerchantService
 import com.prayatna.lookiesapp.domain.mapper.toData
 import com.prayatna.lookiesapp.domain.mapper.toDomain
@@ -10,14 +12,17 @@ import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
 import com.prayatna.lookiesapp.domain.repository.MerchantRepository
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.compressImage
 import com.prayatna.lookiesapp.utils.extractSupabaseError
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import javax.inject.Inject
 
 class MerchantRepositoryImpl @Inject constructor(
-    private val supabaseMerchantService: SupabaseMerchantService
+    private val supabaseMerchantService: SupabaseMerchantService,
+    @param:ApplicationContext private val context: Context
 ): MerchantRepository {
     override suspend fun inviteMerchantMember(input: InviteMerchantMemberInput): DataResult<InviteMerchantMemberOutput> {
         return try {
@@ -96,6 +101,17 @@ class MerchantRepositoryImpl @Inject constructor(
                     DataResult.Error(eMessage)
                 }
             }
+        }
+    }
+
+    override suspend fun uploadShipmentArrivalProof(shipmentId: String, image: Uri): DataResult<String> {
+        return try {
+            val compressedBytes = image.compressImage(context, 500_000L)
+                ?: return DataResult.Error("Failed to compress image")
+            val result = supabaseMerchantService.uploadArrivalProof(shipmentId, compressedBytes)
+            DataResult.Success(result)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
         }
     }
 }

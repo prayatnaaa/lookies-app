@@ -18,7 +18,8 @@ data class ExhibitionShipment(
     val artistConditionNotes: String?,
     val status: ShipmentStatus,
     val createdAt: OffsetDateTime?,
-    val eventId: Int
+    val eventId: Int,
+    val arrivalProofUrl: String? = null
 )
 
 enum class ShipmentType {

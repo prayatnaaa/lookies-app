@@ -49,5 +49,8 @@ data class ExhibitionShipmentDto(
     val createdAt: String? = null,
 
     @SerialName("event_id")
-    val eventId: Int
+    val eventId: Int,
+
+    @SerialName("arrival_proof_url")
+    val arrivalProofUrl: String? = null
 )

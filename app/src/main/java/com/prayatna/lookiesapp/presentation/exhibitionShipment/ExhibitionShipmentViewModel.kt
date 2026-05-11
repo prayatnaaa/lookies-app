@@ -9,6 +9,7 @@ import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
 import com.prayatna.lookiesapp.domain.model.shipment.ShipmentStatus
 import com.prayatna.lookiesapp.domain.model.shipment.ShipmentType
 import com.prayatna.lookiesapp.domain.usecase.shipment.UpdateExhibitionShipmentStatusUseCase
+import com.prayatna.lookiesapp.domain.usecase.shipment.UploadExhibitionArrivalProofUseCase
 import com.prayatna.lookiesapp.domain.usecase.shipment.GetExhibitionShipmentByEventPaintingIdUseCase
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.state.ExhibitionShipmentEvent
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.state.ExhibitionShipmentUiState
@@ -26,7 +27,7 @@ import javax.inject.Inject
 class ExhibitionShipmentViewModel @Inject constructor(
     private val createExhibitionShipmentUseCase: CreateExhibitionShipmentUseCase,
     private val updateExhibitionShipmentStatusUseCase: UpdateExhibitionShipmentStatusUseCase,
-//    private val updateEventPaintingStatusUseCase: UpdateEventPaintingStatusUseCase,
+    private val uploadExhibitionArrivalProofUseCase: UploadExhibitionArrivalProofUseCase,
     private val getExhibitionShipmentByEventPaintingIdUseCase: GetExhibitionShipmentByEventPaintingIdUseCase
 ) : ViewModel() {
 
@@ -83,6 +84,11 @@ class ExhibitionShipmentViewModel @Inject constructor(
 
             is ExhibitionShipmentEvent.OnGalleryNotesChanged ->
                 _uiState.update { it.copy(notesInput = event.notes) }
+
+            is ExhibitionShipmentEvent.OnArrivalProofSelected ->
+                _uiState.update { it.copy(selectedArrivalProof = event.image) }
+
+            ExhibitionShipmentEvent.SubmitArrivalProof -> uploadArrivalProof()
 
             is ExhibitionShipmentEvent.OnReturnTrackingNumberChanged ->
                 _uiState.update { it.copy(returnTrackingNumberInput = event.trackingNumber) }
@@ -253,6 +259,30 @@ class ExhibitionShipmentViewModel @Inject constructor(
                 }
                 is DataResult.Error -> _uiState.update {
                     it.copy(isSubmitting = false, errorMessage = shipmentResult.error)
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    private fun uploadArrivalProof() {
+        val shipmentId = _uiState.value.shipment?.id?.toString() ?: return
+        val image = _uiState.value.selectedArrivalProof ?: return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isUploadingProof = true, errorMessage = null) }
+            when (val result = uploadExhibitionArrivalProofUseCase(shipmentId, image)) {
+                is DataResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isUploadingProof = false,
+                            successMessage = "Arrival proof uploaded successfully",
+                            shipment = it.shipment?.copy(arrivalProofUrl = result.data)
+                        )
+                    }
+                }
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(isUploadingProof = false, errorMessage = result.error) }
                 }
                 else -> Unit
             }

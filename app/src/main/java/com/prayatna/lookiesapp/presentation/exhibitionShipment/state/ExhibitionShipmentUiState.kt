@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.exhibitionShipment.state
 
+import android.net.Uri
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
 import com.prayatna.lookiesapp.domain.model.shipment.ExhibitionShipment
@@ -8,8 +9,10 @@ data class ExhibitionShipmentUiState(
     // Loading / error
     val isLoading: Boolean = false,
     val isSubmitting: Boolean = false,
+    val isUploadingProof: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null,
+    val selectedArrivalProof: Uri? = null,
 
     // Existing shipment (if any)
     val shipment: ExhibitionShipment? = null,

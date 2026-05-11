@@ -7,13 +7,18 @@ import coil3.compose.AsyncImage
 
 @Composable
 fun CustomAsyncImage(
-    model: String,
+    model: Any?,
     contentDescription: String?,
     modifier: Modifier
 ) {
+    val finalModel = if (model is String) {
+        model.replace("http://172.21.179.110", "http://10.0.2.2")
+    } else {
+        model
+    }
+    
     AsyncImage(
-        model = model
-            .replace("http://172.21.179.110", "http://10.0.2.2"),
+        model = finalModel,
         contentDescription = contentDescription,
         contentScale = ContentScale.Crop,
         modifier = modifier

@@ -13,5 +13,6 @@ data class Shipment(
     val phoneNumber: String,
     val addressLine: String,
     val province: String,
-    val postalCode: String
+    val postalCode: String,
+    val arrivalProofUrl: String? = null
 )

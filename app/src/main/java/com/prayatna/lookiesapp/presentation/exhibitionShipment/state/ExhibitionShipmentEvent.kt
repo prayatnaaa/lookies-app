@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.exhibitionShipment.state
 
+import android.net.Uri
 import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
 
 sealed class ExhibitionShipmentEvent {
@@ -20,6 +21,8 @@ sealed class ExhibitionShipmentEvent {
     // ── Inbound: Organizer confirms artwork received ──────────────────────────
     /** Organizer confirms artwork arrived at gallery → status → exhibited */
     data class OnGalleryNotesChanged(val notes: String) : ExhibitionShipmentEvent()
+    data class OnArrivalProofSelected(val image: Uri) : ExhibitionShipmentEvent()
+    data object SubmitArrivalProof : ExhibitionShipmentEvent()
     data object ConfirmArtworkReceived : ExhibitionShipmentEvent()
 
     // ── Outbound: Organizer arranges return shipment ──────────────────────────

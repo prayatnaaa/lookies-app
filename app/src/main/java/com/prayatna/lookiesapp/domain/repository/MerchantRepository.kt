@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.domain.repository
 
+import android.net.Uri
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberOutput
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
@@ -23,4 +24,6 @@ interface MerchantRepository {
             DataResult<Shipment>
     suspend fun getShipmentsByMerchantId(merchantId: String):
             DataResult<List<Shipment>>
+    suspend fun uploadShipmentArrivalProof(shipmentId: String, image: Uri):
+            DataResult<String>
 }

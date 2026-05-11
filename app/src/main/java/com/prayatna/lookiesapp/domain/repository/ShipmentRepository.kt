@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.domain.repository
 
+import android.net.Uri
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
 import com.prayatna.lookiesapp.domain.model.shipment.ShipmentFee
 import com.prayatna.lookiesapp.domain.model.shipment.CreateExhibitionShipmentInput
@@ -20,4 +21,7 @@ interface ShipmentRepository  {
 
     suspend fun getExhibitionShipmentByEventPaintingId(eventPaintingId: String):
             DataResult<ExhibitionShipment?>
+
+    suspend fun uploadExhibitionArrivalProof(shipmentId: String, image: Uri):
+            DataResult<String>
 }

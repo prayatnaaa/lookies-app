@@ -1,5 +1,7 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseShipmentService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
@@ -10,12 +12,15 @@ import com.prayatna.lookiesapp.domain.repository.ShipmentRepository
 import com.prayatna.lookiesapp.domain.model.shipment.CreateExhibitionShipmentInput
 import com.prayatna.lookiesapp.domain.model.shipment.ExhibitionShipment
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.compressImage
 import com.prayatna.lookiesapp.utils.extractSupabaseError
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.RestException
 import javax.inject.Inject
 
 class ShipmentRepositoryImpl @Inject constructor(
-    private val supabaseShipmentService: SupabaseShipmentService
+    private val supabaseShipmentService: SupabaseShipmentService,
+    @param:ApplicationContext private val context: Context
 ): ShipmentRepository {
     override suspend fun getShipmentByOrderId(orderId: String): DataResult<Shipment> {
         return try {
@@ -72,6 +77,17 @@ class ShipmentRepositoryImpl @Inject constructor(
             Log.e("ShipmentRepositoryImpl", "getExhibitionShipmentByEventPaintingId: ${e.error}")
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun uploadExhibitionArrivalProof(shipmentId: String, image: Uri): DataResult<String> {
+        return try {
+            val compressedBytes = image.compressImage(context, 500_000L)
+                ?: return DataResult.Error("Failed to compress image")
+            val result = supabaseShipmentService.uploadArrivalProof(shipmentId, compressedBytes)
+            DataResult.Success(result)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
         }
     }
 }
