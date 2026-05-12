@@ -3,8 +3,9 @@ package com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.usecase.withdrawal.GetMerchantWithdrawalRequestsUseCase
+import com.prayatna.lookiesapp.domain.usecase.withdrawal.GetWithdrawalRequestsByMerchantIdUseCase
 import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.state.MerchantWithdrawalRequestListEffect
+import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.state.MerchantWithdrawalRequestListEffect.*
 import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.state.MerchantWithdrawalRequestListEvent
 import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.state.MerchantWithdrawalRequestListUiState
 import com.prayatna.lookiesapp.utils.DataResult
@@ -19,8 +20,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MerchantWithdrawalRequestsListViewModel @Inject constructor(
-    private val getMerchantWithdrawalRequestsUseCase: GetMerchantWithdrawalRequestsUseCase,
+    private val getWithdrawalRequestsByMerchantIdUseCase: GetWithdrawalRequestsByMerchantIdUseCase,
+    savedStateHandle: SavedStateHandle
 ): ViewModel() {
+
+    private val businessId: String = savedStateHandle["businessId"] ?: ""
 
     private val _state = MutableStateFlow(MerchantWithdrawalRequestListUiState())
     val state = _state.asStateFlow()
@@ -35,10 +39,16 @@ class MerchantWithdrawalRequestsListViewModel @Inject constructor(
     fun onEvent(event: MerchantWithdrawalRequestListEvent) {
         when(event) {
             MerchantWithdrawalRequestListEvent.BackClicked -> {
-                viewModelScope.launch { _effect.send(MerchantWithdrawalRequestListEffect.NavigateBack) }
+                viewModelScope.launch { _effect.send(NavigateBack) }
             }
             is MerchantWithdrawalRequestListEvent.DetailClicked -> {
-                viewModelScope.launch { _effect.send(MerchantWithdrawalRequestListEffect.NavigateToDetail(event.id)) }
+                viewModelScope.launch { _effect.send(NavigateToDetail(event.id)) }
+            }
+
+            MerchantWithdrawalRequestListEvent.CreateWithdrawalClicked -> {
+                viewModelScope.launch {
+                    _effect.send(NavigateCreateWithdrawal(businessId))
+                }
             }
         }
     }
@@ -46,7 +56,7 @@ class MerchantWithdrawalRequestsListViewModel @Inject constructor(
     private fun getMerchantWithdrawalRequest() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            when (val result = getMerchantWithdrawalRequestsUseCase()) {
+            when (val result = getWithdrawalRequestsByMerchantIdUseCase(businessId)) {
                 is DataResult.Error -> {
                     _state.update {
                         it.copy(isLoading = false, errorMessage = result.error)

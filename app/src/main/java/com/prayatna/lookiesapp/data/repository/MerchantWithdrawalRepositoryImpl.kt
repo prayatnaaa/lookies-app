@@ -25,6 +25,16 @@ class MerchantWithdrawalRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getWithdrawalRequestsByMerchantId(merchantId: String): DataResult<List<WithdrawalRequest>> {
+        return try {
+            val res = supabaseMerchantWithdrawalService.getWithdrawalRequestsByMerchantId(merchantId)
+            DataResult.Success(res.map { it.toDomain() })
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
+
     override suspend fun createWithdrawalRequest(input: CreateWithdrawalRequestInput): DataResult<WithdrawalRequest> {
         return try {
             val res = supabaseMerchantWithdrawalService.createWithdrawalRequest(input.toDto())

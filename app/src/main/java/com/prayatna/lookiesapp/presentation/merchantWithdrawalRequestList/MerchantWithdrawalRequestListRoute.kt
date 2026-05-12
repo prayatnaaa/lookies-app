@@ -7,6 +7,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.state.MerchantWithdrawalRequestListEffect
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun MerchantWithdrawalRequestListRoute(
@@ -23,6 +24,10 @@ fun MerchantWithdrawalRequestListRoute(
                 }
                 is MerchantWithdrawalRequestListEffect.NavigateToDetail -> {
                     // Navigate to detail if implemented
+                }
+
+                is MerchantWithdrawalRequestListEffect.NavigateCreateWithdrawal -> {
+                    navController.navigate("${NavigationRoutes.CREATE_WITHDRAWAL_REQUEST}/${effect.id}")
                 }
             }
         }

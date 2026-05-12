@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -40,6 +41,15 @@ fun MonthlyFinanceListScreen(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
+        },
+        floatingActionButton = {
+            if (state.selectedTab == 1) {
+                ExtendedFloatingActionButton(
+                    onClick = { onEvent(MonthlyFinanceEvent.WithdrawalListClicked) },
+                    icon = { Icon(Icons.Default.History, contentDescription = null) },
+                    text = { Text("Withdrawal History") }
+                )
+            }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->

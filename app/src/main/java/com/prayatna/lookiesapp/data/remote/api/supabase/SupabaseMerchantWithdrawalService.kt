@@ -19,4 +19,14 @@ class SupabaseMerchantWithdrawalService @Inject constructor(
             .select()
             .decodeList<WithdrawalRequestDto>()
     }
+
+    suspend fun getWithdrawalRequestsByMerchantId(merchantId: String): List<WithdrawalRequestDto> {
+        return postgrest.from("withdrawal_requests")
+            .select {
+                filter {
+                    eq("merchant_id", merchantId)
+                }
+            }
+            .decodeList<WithdrawalRequestDto>()
+    }
 }

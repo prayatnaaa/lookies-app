@@ -53,6 +53,11 @@ class MonthlyFinanceListViewModel @Inject constructor(
             is MonthlyFinanceEvent.TabSelected -> {
                 _state.update { it.copy(selectedTab = event.index) }
             }
+            MonthlyFinanceEvent.WithdrawalListClicked -> {
+                viewModelScope.launch {
+                    _effect.send(MonthlyFinanceEffect.NavigateToWithdrawalList(businessId))
+                }
+            }
         }
     }
 

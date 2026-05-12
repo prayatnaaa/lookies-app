@@ -11,6 +11,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceEffect
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun MonthlyFinanceListRoute(
@@ -35,6 +36,9 @@ fun MonthlyFinanceListRoute(
                     bottomSheetMessage = effect.message
                     isSuccessStatus = effect.title == "Success"
                     showBottomSheet = true
+                }
+                is MonthlyFinanceEffect.NavigateToWithdrawalList -> {
+                    navController.navigate("${NavigationRoutes.MERCHANT_WITHDRAWAL_REQUEST_LIST}/${effect.businessId}")
                 }
             }
         }
