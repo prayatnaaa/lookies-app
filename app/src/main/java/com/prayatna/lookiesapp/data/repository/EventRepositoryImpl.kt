@@ -33,10 +33,12 @@ class EventRepositoryImpl @Inject constructor(
         location: String?,
         startDate: String?,
         endDate: String? ,
-        isTicketPriceAscending: Boolean
+        isTicketPriceAscending: Boolean,
+        limitCount: Long?
     ): DataResult<List<Event>> {
         return try {
             val response = supabaseEventService.getEvents(
+                limitCount = limitCount,
                 title = title,
                 organizerId = organizerId,
                 status = status,

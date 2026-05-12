@@ -33,14 +33,16 @@ class PaintingRepositoryImpl @Inject constructor(
         id: String?,
         status: String?,
         eventId: String?,
-        showSelfPaintings: Boolean
+        showSelfPaintings: Boolean,
+        limitCount: Long?
     ): DataResult<List<EventPainting>> {
         return try {
             val response = paintingService.getPaintings(
                 id = id,
                 status = status,
                 eventId = eventId,
-                showSelfPaintings = showSelfPaintings
+                showSelfPaintings = showSelfPaintings,
+                limitCount = limitCount
             )
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {

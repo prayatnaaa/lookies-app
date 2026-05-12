@@ -18,7 +18,8 @@ interface EventRepository {
         location: String? = null,
         startDate: String? = null,
         endDate: String? = null,
-        isTicketPriceAscending: Boolean = true
+        isTicketPriceAscending: Boolean = true,
+        limitCount: Long? = null
     ): DataResult<List<Event>>
     suspend fun getEvent(eventId: String, forceRefresh: Boolean = false): DataResult<Event>
     suspend fun getEventStatistics(eventId: String): Flow<DataResult<EventStatisticDto>>

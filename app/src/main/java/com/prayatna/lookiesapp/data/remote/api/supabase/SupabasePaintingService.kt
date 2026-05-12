@@ -26,12 +26,16 @@ class SupabasePaintingService @Inject constructor(
         id: String?,
         status: String?,
         eventId: String?,
-        showSelfPaintings: Boolean = false
+        showSelfPaintings: Boolean = false,
+        limitCount: Long? = null
     ): List<EventPaintingDto> {
         val user = auth.currentUserOrNull() ?:
         throw IllegalStateException("User not logged in")
         val result = postgrest.from("event_paintings_view")
             .select {
+                if (limitCount != null) {
+                    limit(count = limitCount)
+                }
                 filter {
                     if (eventId != null) {
                         eq("event_id", eventId)

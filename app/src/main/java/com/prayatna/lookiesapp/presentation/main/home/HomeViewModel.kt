@@ -55,6 +55,7 @@ class HomeViewModel @Inject constructor(
             }
 
             when (val result = getEventsUseCase(
+                limitCount = 5,
                 status = "published, upcoming"
             )) {
                 is DataResult.Success -> {
@@ -93,7 +94,7 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            when (val result = getPaintingsUseCase(status = "on_sale")) {
+            when (val result = getPaintingsUseCase(status = "on_sale", limitCount = 5)) {
                 is DataResult.Success -> {
                     _uiState.update {
                         it.copy(

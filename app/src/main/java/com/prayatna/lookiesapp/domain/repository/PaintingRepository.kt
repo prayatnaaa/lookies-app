@@ -16,7 +16,8 @@ interface PaintingRepository {
         id: String?,
         status: String?,
         eventId: String?,
-        showSelfPaintings: Boolean = false
+        showSelfPaintings: Boolean = false,
+        limitCount: Long? = null
     ): DataResult<List<EventPainting>>
     suspend fun getEventPaintingDetail(id: String): DataResult<EventPainting>
     suspend fun getPaintingsByArtist(id: String): DataResult<List<Painting>>

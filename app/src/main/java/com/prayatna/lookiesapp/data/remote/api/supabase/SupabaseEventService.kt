@@ -117,12 +117,16 @@ class SupabaseEventService @Inject constructor(
         location: String? = null,
         startDate: String? = null,
         endDate: String? = null,
+        limitCount: Long? = null,
         isTicketPriceAscending: Boolean = true
     ): List<EventDto> {
 
         val query = postgrest
             .from("v2_event_view")
             .select {
+                if (limitCount != null) {
+                    limit(count = limitCount)
+                }
                 filter {
                     if (title != null) {
                         ilike("title", "%$title%")

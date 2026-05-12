@@ -11,11 +11,13 @@ class GetPaintingUseCase @Inject constructor(
     suspend operator fun invoke(
         id: String? = null,
         status: String? = null,
+        limitCount: Long? = null,
         eventId: String? = null,
         showSelfPaintings: Boolean = false
     ): DataResult<List<EventPainting>> {
         return paintingRepository.getPaintings(
             id = id,
+            limitCount = limitCount,
             status = status,
             eventId = eventId,
             showSelfPaintings = showSelfPaintings

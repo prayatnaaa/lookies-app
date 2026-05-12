@@ -15,9 +15,11 @@ class GetEventsUseCase @Inject constructor(
         location: String? = null,
         startDate: String? = null,
         endDate: String? = null,
-        isTicketPriceAscending: Boolean = true
+        isTicketPriceAscending: Boolean = true,
+        limitCount: Long? = null
     ): DataResult<List<Event>> {
         val result =  repository.getEvents(
+            limitCount = limitCount,
             title = title,
             organizerId = organizerId,
             status = status,
