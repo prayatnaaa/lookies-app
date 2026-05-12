@@ -35,8 +35,10 @@ import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
+import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.createWithdrawalRequestNavigation
 import com.prayatna.lookiesapp.presentation.merchant.inviteMerchantMember.inviteMerchantMemberNavigation
 import com.prayatna.lookiesapp.presentation.merchant.merchantMember.MerchantMemberListScreen
+import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.merchantWithdrawalRequestListNavigation
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.monthlyFinanceListScreen
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
 import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
@@ -308,6 +310,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             PartnerListScreen(navController = navController)
         }
         partnerHomeScreenNavigation(navController)
+        createWithdrawalRequestNavigation(navController)
+        merchantWithdrawalRequestListNavigation(navController)
         merchantMemberByMerchantIdNavigation(navController)
         monthlyFinanceListScreen(navController)
         composable(
