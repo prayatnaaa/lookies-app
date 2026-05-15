@@ -1,9 +1,11 @@
 package com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.withdrawal.CreateWithdrawalRequestInput
+import com.prayatna.lookiesapp.domain.usecase.merchant.GetMerchantBankAccountsUseCase
 import com.prayatna.lookiesapp.domain.usecase.withdrawal.CreateWithdrawalRequestUseCase
 import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.state.CreateWithdrawalRequestEffect
 import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.state.CreateWithdrawalRequestEvent
@@ -21,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateWithdrawalRequestViewModel @Inject constructor(
     private val createWithdrawalRequestUseCase: CreateWithdrawalRequestUseCase,
+    private val getMerchantBankAccountsUseCase: GetMerchantBankAccountsUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -31,6 +34,38 @@ class CreateWithdrawalRequestViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     private val businessId: String = savedStateHandle["businessId"] ?: ""
+
+    init {
+        Log.e("CreateReq", "businessId = $businessId")
+        getMerchantBankAccount()
+    }
+
+    private fun getMerchantBankAccount() {
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            when (val result = getMerchantBankAccountsUseCase(businessId)) {
+                is DataResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.error
+                        )
+                    }
+                }
+                is DataResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            bankCode = result.data[0].bankCode,
+                            accountNumber = result.data[0].accountNumber,
+                            accountName = result.data[0].accountHolderName
+                        )
+                    }
+                }
+                else -> Unit
+            }
+        }
+    }
 
     fun onEvent(event: CreateWithdrawalRequestEvent) {
         when (event) {

@@ -21,9 +21,9 @@ data class WithdrawalRequestDto(
     @SerialName("admin_notes")
     val adminNotes: String? = null,
     @SerialName("xendit_disbursement_id")
-    val xenditDisbursementId: String,
+    val xenditDisbursementId: String? = null,
     @SerialName("updated_at")
-    val updatedAt: String,
+    val updatedAt: String? = null,
     @SerialName("processed_at")
-    val processedAt: String
+    val processedAt: String? = null
 )

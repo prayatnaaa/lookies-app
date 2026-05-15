@@ -10,7 +10,7 @@ data class WithdrawalRequest(
     val status: String,
     val createdAt: String,
     val adminNotes: String? = null,
-    val xenditDisbursementId: String,
-    val updatedAt: String,
-    val processedAt: String
+    val xenditDisbursementId: String? = null,
+    val updatedAt: String? = null,
+    val processedAt: String? = null
 )

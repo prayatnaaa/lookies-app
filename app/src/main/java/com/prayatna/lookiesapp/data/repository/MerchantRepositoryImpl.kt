@@ -7,6 +7,7 @@ import com.prayatna.lookiesapp.domain.mapper.toData
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberOutput
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
@@ -19,6 +20,7 @@ import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import javax.inject.Inject
+import kotlin.collections.map
 
 class MerchantRepositoryImpl @Inject constructor(
     private val supabaseMerchantService: SupabaseMerchantService,
@@ -58,6 +60,16 @@ class MerchantRepositoryImpl @Inject constructor(
         return try {
             val response = supabaseMerchantService.getMerchantMembers(userId)
             DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getMerchantBankAccounts(merchantAccountId: String): DataResult<List<MerchantBankAccount>> {
+        return try {
+            val response = supabaseMerchantService.getMerchantBankAccounts(merchantAccountId)
+            DataResult.Success(response.map { it.toDomain()  })
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)

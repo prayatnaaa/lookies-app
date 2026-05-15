@@ -29,6 +29,7 @@ class MonthlyFinanceListViewModel @Inject constructor(
 ): ViewModel() {
 
     private val businessId = checkNotNull(savedStateHandle.get<String>("businessId"))
+    private var accountId: String? = null
 
     private val _state = MutableStateFlow(MonthlyFinanceUiState())
     val state = _state.asStateFlow()
@@ -54,8 +55,9 @@ class MonthlyFinanceListViewModel @Inject constructor(
                 _state.update { it.copy(selectedTab = event.index) }
             }
             MonthlyFinanceEvent.WithdrawalListClicked -> {
+                val id = accountId ?: return
                 viewModelScope.launch {
-                    _effect.send(MonthlyFinanceEffect.NavigateToWithdrawalList(businessId))
+                    _effect.send(MonthlyFinanceEffect.NavigateToWithdrawalList(id))
                 }
             }
         }
@@ -67,6 +69,7 @@ class MonthlyFinanceListViewModel @Inject constructor(
             when (val profileResult = getMerchantProfileUseCase(businessId)) {
                 is DataResult.Success -> {
                     val accountId = profileResult.data.accountId
+                    this@MonthlyFinanceListViewModel.accountId = accountId
                     
                     val orderSplitsDeferred = async { getOrderSplitsByMerchantIdUseCase(accountId) }
                     val balanceLogsDeferred = async { getMerchantBalanceLogsUseCase(accountId) }
