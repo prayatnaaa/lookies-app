@@ -15,9 +15,11 @@ import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateQrisPayment
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateXenditPaymentRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.SetOrderToCompleteRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.transaction.MonthlyFinancialReportFilterRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.transaction.PayoutRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateQrisPaymentRequestResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateXenditPaymentResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteResponse
+import com.prayatna.lookiesapp.data.remote.dto.response.transaction.PayoutResponse
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -65,6 +67,22 @@ class SupabaseTransactionService @Inject constructor(
                 order = Order.DESCENDING
             )
         }.decodeList<MerchantBalanceLogDto>()
+    }
+
+
+    suspend fun payouts(withdrawalRequestId: String): PayoutResponse {
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
+
+        val response = httpClient.post(
+            "${BuildConfig.SUPABASE_EDGE_BASE_URL}/payouts"
+        ) {
+            contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer ${session.accessToken}")
+            setBody(PayoutRequest(withdrawalId = withdrawalRequestId))
+        }
+        Log.d("PayoutService", response.body())
+        return response.body()
     }
     suspend fun createOrder(
         items: List<OrderItemRequest>,
