@@ -76,9 +76,9 @@ class SupabaseAdminService @Inject constructor(
     }
 
     suspend fun getTicketByCode(code: String): TicketDto {
-        return postgrest.from("tickets").select {
+        return postgrest.from("purchased_tickets").select {
             filter {
-                eq("purchased_tickets", code)
+                eq("ticket_code", code)
             }
         }.decodeSingle<TicketDto>()
     }

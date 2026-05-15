@@ -102,7 +102,7 @@ fun PartnerManageEventScreen(
                     item {
                         ManagementOptionCard(
                             title = "Artworks & Gallery",
-                            description = "Lihat semua lukisan yang masuk, kurasi lukisan, dan atur display.",
+                            description = "Look for every paintings and displays.",
                             icon = Icons.Default.Palette,
                             onClick = {
                                 navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/${event.id}?eventType=${event.eventType.slug}&businessId=${event.organizer.id}")
@@ -113,10 +113,20 @@ fun PartnerManageEventScreen(
                     item {
                         ManagementOptionCard(
                             title = "Edit Event Details",
-                            description = "Ubah deskripsi, banner, tanggal, atau informasi lokasi.",
+                            description = "Change description or anything about your event.",
                             icon = Icons.Default.Edit,
                             onClick = {
                                 navController.navigate("${NavigationRoutes.EDIT_EVENT}/${event.id}")
+                            }
+                        )
+                    }
+                    item {
+                        ManagementOptionCard(
+                            title = "Scan Barcodes",
+                            description = "Scan barcodes for event.",
+                            icon = Icons.Default.Edit,
+                            onClick = {
+                                navController.navigate(NavigationRoutes.BARCODE_SCANNER)
                             }
                         )
                     }

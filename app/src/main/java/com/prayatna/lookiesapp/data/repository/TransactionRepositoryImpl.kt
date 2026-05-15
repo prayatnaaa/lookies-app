@@ -41,7 +41,18 @@ class TransactionRepositoryImpl @Inject constructor(
     override suspend fun getPendingOrderSplitByMerchantId(merchantId: String): DataResult<PendingOrderSplits> {
         return try {
             val result = transactionService.getPendingOrderSplitByMerchantId(merchantId)
-            DataResult.Success(result.toDomain())
+            
+            if (result == null) {
+                DataResult.Success(
+                    PendingOrderSplits(
+                        createdAt = "",
+                        totalAmount = 0L
+                    )
+                )
+            }
+            else {
+                DataResult.Success(result.toDomain())
+            }
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
@@ -128,6 +139,7 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: HttpRequestException) {
             DataResult.Error(e.message ?: "Something went wrong!")
         } catch (e: ConnectTimeoutException) {
+            Log.e("Create Payment Request",e.message ?: e.toString())
             DataResult.Error("Connection timeout")
         }
     }

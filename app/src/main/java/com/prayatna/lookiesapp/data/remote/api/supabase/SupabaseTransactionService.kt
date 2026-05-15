@@ -40,11 +40,11 @@ class SupabaseTransactionService @Inject constructor(
     private val httpClient: HttpClient,
 ) {
 
-    suspend fun getPendingOrderSplitByMerchantId(merchantId: String): PendingOrderSplitsDto {
+    suspend fun getPendingOrderSplitByMerchantId(merchantId: String): PendingOrderSplitsDto? {
         return postgrest.rpc(
             "merchant_pending_order_splits",
             mapOf("p_merchant_id" to merchantId)
-        ).decodeSingle<PendingOrderSplitsDto>()
+        ).decodeSingleOrNull<PendingOrderSplitsDto>()
     }
 
     suspend fun getOrderSplitsByMerchantId(merchantId: String): List<OrderSplitDto> {
@@ -59,6 +59,11 @@ class SupabaseTransactionService @Inject constructor(
             filter {
                 MerchantBalanceLogDto::merchantId eq merchantId
             }
+
+            order(
+                column = "created_at",
+                order = Order.DESCENDING
+            )
         }.decodeList<MerchantBalanceLogDto>()
     }
     suspend fun createOrder(

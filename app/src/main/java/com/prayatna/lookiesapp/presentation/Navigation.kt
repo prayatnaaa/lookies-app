@@ -57,6 +57,7 @@ import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListS
 import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
 import com.prayatna.lookiesapp.presentation.refund.refundNavigation
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
+import com.prayatna.lookiesapp.presentation.scanner.ScannerScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
 import com.prayatna.lookiesapp.presentation.shipment.shipmentListNavigation
 import com.prayatna.lookiesapp.presentation.shipmentDetail.shipmentDetailNavigation
@@ -436,6 +437,10 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
 
         refundNavigation(navController)
+
+        composable(NavigationRoutes.BARCODE_SCANNER) {
+            ScannerScreen(onNavigateBack = { navController.popBackStack() })
+        }
 
         composable(
             route = "${NavigationRoutes.EXHIBITION_HISTORY}/{artistUserId}",
