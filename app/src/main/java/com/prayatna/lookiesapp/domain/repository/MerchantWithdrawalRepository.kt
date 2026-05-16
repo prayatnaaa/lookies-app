@@ -11,4 +11,6 @@ interface MerchantWithdrawalRepository {
             DataResult<List<WithdrawalRequest>>
     suspend fun createWithdrawalRequest(input: CreateWithdrawalRequestInput):
             DataResult<WithdrawalRequest>
+    suspend fun getWithdrawalRequestById(id: String):
+            DataResult<WithdrawalRequest>
 }
