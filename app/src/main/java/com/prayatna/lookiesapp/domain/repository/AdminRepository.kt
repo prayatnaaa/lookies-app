@@ -4,6 +4,7 @@ import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
 import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.domain.model.admin.GetKycDocument
 import com.prayatna.lookiesapp.domain.model.ticket.Ticket
+import com.prayatna.lookiesapp.domain.model.withdrawal.WithdrawalRequest
 import com.prayatna.lookiesapp.utils.DataResult
 
 interface AdminRepository {
@@ -13,4 +14,5 @@ interface AdminRepository {
     suspend fun rejectEvent(eventId: Int, rejectReason: String): DataResult<DecideEventResult>
     suspend fun getKycDocuments(businessId: String): DataResult<List<GetKycDocument>>
     suspend fun getTicketByCode(code: String): DataResult<Ticket>
+    suspend fun updateWithdrawalStatus(id: String, status: String, adminNotes: String?): DataResult<WithdrawalRequest>
 }

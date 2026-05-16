@@ -68,6 +68,8 @@ object NavigationRoutes {
     const val PARTNER_EXHIBITION_PAINTING_DETAIL = "partner_exhibition_painting_detail"
     const val PARTNER_REFUND = "partner_refund"
     const val BARCODE_SCANNER = "barcode_scanner"
+    const val ADMIN_WITHDRAWAL_LIST = "admin_withdrawal_list"
+    const val ADMIN_WITHDRAWAL_DETAIL = "admin_withdrawal_detail"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

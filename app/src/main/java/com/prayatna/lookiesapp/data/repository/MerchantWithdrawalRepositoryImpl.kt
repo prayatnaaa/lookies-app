@@ -44,4 +44,14 @@ class MerchantWithdrawalRepositoryImpl @Inject constructor(
             DataResult.Error(msg)
         }
     }
+
+    override suspend fun getWithdrawalRequestById(id: String): DataResult<WithdrawalRequest> {
+        return try {
+            val res = supabaseMerchantWithdrawalService.getWithdrawalRequestById(id)
+            DataResult.Success(res.toDomain())
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
 }

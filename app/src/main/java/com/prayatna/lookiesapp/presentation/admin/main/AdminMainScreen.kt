@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.admin.withdrawal.state.navigateToAdminWithdrawalList
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -121,6 +122,17 @@ fun AdminMainScreen(
                 subtitle = "Manage event applications",
                 onClick = {
                     navController.navigate(NavigationRoutes.ADMIN_EVENT)
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            AdminDashboardCard(
+                icon = Icons.Filled.People,
+                title = "Withdrawal Requests",
+                subtitle = "Manage merchant withdrawals",
+                onClick = {
+                    navController.navigateToAdminWithdrawalList()
                 }
             )
 

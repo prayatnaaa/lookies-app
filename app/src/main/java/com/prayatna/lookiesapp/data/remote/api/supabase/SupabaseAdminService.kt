@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import com.prayatna.lookiesapp.data.remote.dto.GetKycDocumentDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
+import com.prayatna.lookiesapp.data.remote.dto.WithdrawalRequestDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecideEventResponseDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecidePartnerApplicationResponseDto
 import io.github.jan.supabase.gotrue.Auth
@@ -81,5 +82,21 @@ class SupabaseAdminService @Inject constructor(
                 eq("ticket_code", code)
             }
         }.decodeSingle<TicketDto>()
+    }
+
+    suspend fun updateWithdrawalStatus(id: String, status: String, adminNotes: String?): WithdrawalRequestDto {
+        return postgrest.from("withdrawal_requests").update(
+            buildMap {
+                put("status", status)
+                put("updated_at", "now()")
+                if (adminNotes != null) put("admin_notes", adminNotes)
+                if (status == "completed") put("processed_at", "now()")
+            }
+        ) {
+            select()
+            filter {
+                eq("id", id)
+            }
+        }.decodeSingle<WithdrawalRequestDto>()
     }
 }

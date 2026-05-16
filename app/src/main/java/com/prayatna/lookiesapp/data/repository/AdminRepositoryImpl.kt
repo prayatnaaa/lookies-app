@@ -6,6 +6,7 @@ import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
 import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.domain.model.admin.GetKycDocument
 import com.prayatna.lookiesapp.domain.model.ticket.Ticket
+import com.prayatna.lookiesapp.domain.model.withdrawal.WithdrawalRequest
 import com.prayatna.lookiesapp.domain.repository.AdminRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.extractSupabaseError
@@ -71,6 +72,21 @@ class AdminRepositoryImpl @Inject constructor(
             val ticket = supabaseAdminService.getTicketByCode(code)
             DataResult.Success(ticket.toDomain())
 
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
+
+
+    override suspend fun updateWithdrawalStatus(
+        id: String,
+        status: String,
+        adminNotes: String?
+    ): DataResult<WithdrawalRequest> {
+        return try {
+            val result = supabaseAdminService.updateWithdrawalStatus(id, status, adminNotes)
+            DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
