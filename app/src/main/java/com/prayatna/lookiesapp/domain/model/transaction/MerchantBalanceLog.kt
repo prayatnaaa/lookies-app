@@ -8,7 +8,7 @@ data class MerchantBalanceLog(
     val balanceBefore: Long,
     val balanceAfter: Long,
     val refId: String,
-    val orderId: String,
+    val orderId: String? = null,
     val eventId: Int? = null,
     val description: String?,
     val createdAt: String

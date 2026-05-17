@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.CustomDialog
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.createEvent.DetailEventForm
@@ -129,7 +130,7 @@ fun CreateEventScreen(
     }
 
     if (showDialog) {
-        CustomDialog(
+        CustomBottomSheet(
             title = dialogTitle,
             message = dialogMessage,
             onConfirm = {

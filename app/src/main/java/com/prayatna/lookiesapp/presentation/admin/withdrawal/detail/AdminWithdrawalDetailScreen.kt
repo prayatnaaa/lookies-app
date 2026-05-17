@@ -24,7 +24,6 @@ fun AdminWithdrawalDetailScreen(
 ) {
     val request = uiState.withdrawalRequest ?: return
 
-    var notes by remember { mutableStateOf("") }
     var showRejectSheet by remember { mutableStateOf(false) }
     var showApproveSheet by remember { mutableStateOf(false) }
 
@@ -63,8 +62,12 @@ fun AdminWithdrawalDetailScreen(
 
             if (request.status == "pending") {
                 OutlinedTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
+                    value = uiState.notes,
+                    onValueChange = {
+                        onEvent(AdminWithdrawalDetailUiEvent.OnNotesChanged(
+                            it
+                        ))
+                    },
                     label = { Text("Admin Notes (Optional)") },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3
@@ -119,7 +122,7 @@ fun AdminWithdrawalDetailScreen(
                     AdminWithdrawalDetailUiEvent.UpdateStatus(
                         request.id,
                         "rejected",
-                        notes.ifBlank { null }
+                        uiState.notes.ifBlank { null }
                     )
                 )
                 showRejectSheet = false

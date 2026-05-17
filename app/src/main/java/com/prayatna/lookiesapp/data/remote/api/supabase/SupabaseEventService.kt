@@ -35,6 +35,9 @@ class SupabaseEventService @Inject constructor(
         request: CreateEventRequest,
         bannerImage: ByteArray?
     ): CreateEventResponse {
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
+        Log.d("TEST", session.toString())
 
         if (bannerImage == null) {
             throw IllegalArgumentException("Banner image cannot be null")
@@ -48,7 +51,7 @@ class SupabaseEventService @Inject constructor(
             storage.from("partner_assets").upload(
                 path = path,
                 data = bannerImage,
-                upsert = true
+//                upsert = true
             )
 
             uploadedPath = path
@@ -61,9 +64,6 @@ class SupabaseEventService @Inject constructor(
             val finalRequest = request.copy(
                 bannerImageUrl = bannerUrl
             )
-
-            val session = auth.currentSessionOrNull()
-                ?: throw IllegalStateException("No active session")
 
             Log.d("Create-Event", "Access token: ${session.accessToken}")
 

@@ -7,5 +7,7 @@ data class AdminWithdrawalDetailUiState(
     val isLoading: Boolean = false,
     val withdrawalRequest: WithdrawalRequest? = null,
     val errorMessage: String? = null,
-    val payoutSuccessData: PayoutResult? = null
+    val payoutSuccessData: PayoutResult? = null,
+
+    val notes: String = ""
 )

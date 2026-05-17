@@ -37,6 +37,9 @@ class AdminWithdrawalDetailViewModel @Inject constructor(
             is AdminWithdrawalDetailUiEvent.UpdateStatus -> updateStatus(event.id, event.status, event.notes)
             is AdminWithdrawalDetailUiEvent.ProcessPayout -> processPayout(event.id)
             AdminWithdrawalDetailUiEvent.ClearError -> _uiState.update { it.copy(errorMessage = null) }
+            is AdminWithdrawalDetailUiEvent.OnNotesChanged -> {
+                _uiState.update { it.copy(notes = event.value) }
+            }
         }
     }
 
