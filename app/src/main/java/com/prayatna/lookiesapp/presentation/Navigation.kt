@@ -24,7 +24,7 @@ import com.prayatna.lookiesapp.presentation.event.eventlist.EventListRoute
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.ArtistExhibitionPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.PartnerExhibitionPaintingDetailScreen
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListScreen
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListRoute
 import com.prayatna.lookiesapp.presentation.exhibitionHistory.ExhibitionHistoryScreen
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.exhibitionShipmentNavigation
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
@@ -329,7 +329,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             }
         }
         composable(route = NavigationRoutes.EVENT_PAINTING_LIST) {
-            EventPaintingListScreen(navController = navController)
+            EventPaintingListRoute(navController = navController)
         }
         composable(
             route = NavigationRoutes.ARTIST_DASHBOARD

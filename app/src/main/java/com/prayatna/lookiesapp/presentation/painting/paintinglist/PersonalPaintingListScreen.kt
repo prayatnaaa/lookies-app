@@ -76,7 +76,8 @@ fun PersonalPaintingListScreen(
                         paintings = uiState.paintings,
                         onClick = { id ->
                             navController.navigate("${NavigationRoutes.DETAIL_PAINTING}/$id")
-                        })
+                        }
+                    )
                 }
             }
         }

@@ -135,7 +135,9 @@ fun HomeScreen(
             }
 
             item(span = StaggeredGridItemSpan.FullLine) {
-                SectionHeader(title = "Curated For You", onSeeAll = {})
+                SectionHeader(title = "Curated For You", onSeeAll = {
+                    navController.navigate(NavigationRoutes.EVENT_PAINTING_LIST)
+                })
             }
 
             if (state.isLoadingPaintings) {
