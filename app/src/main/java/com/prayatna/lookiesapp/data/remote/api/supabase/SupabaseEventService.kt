@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventFormatDto
 import com.prayatna.lookiesapp.data.remote.dto.EventPaintingDto
+import com.prayatna.lookiesapp.data.remote.dto.EventRevenueRulesDto
 import com.prayatna.lookiesapp.data.remote.dto.EventStatisticDto
 import com.prayatna.lookiesapp.data.remote.dto.EventTypeDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.CreateEventRequest
@@ -30,6 +31,15 @@ class SupabaseEventService @Inject constructor(
     private val storage: Storage,
     private val postgrest: Postgrest
 ) {
+
+    suspend fun getRevenueRulesByEventId(eventId: Int): List<EventRevenueRulesDto> {
+        return postgrest.from("event_revenue_rules")
+            .select {
+                filter {
+                    EventRevenueRulesDto::eventId eq eventId
+                }
+            }.decodeList<EventRevenueRulesDto>()
+    }
 
     suspend fun createEvent(
         request: CreateEventRequest,

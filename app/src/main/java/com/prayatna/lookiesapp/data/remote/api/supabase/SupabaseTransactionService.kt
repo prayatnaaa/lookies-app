@@ -127,6 +127,7 @@ class SupabaseTransactionService @Inject constructor(
             .select {
                 filter {
                     eq("buyer_id", user.id)
+                    neq("status", "awaiting_payment")
                 }
                 order("created_at", order = Order.DESCENDING)
             }

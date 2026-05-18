@@ -16,7 +16,7 @@ val BlackText = Color(0xFF111111)
 val GreyText = Color(0xFF9E9E9E)
 val GreyTextLight = Color(0xFF6E6E6E)
 
-val Maroon = Color(0xFFaa0a0a)
+val Maroon = Color(0xFFADADAD)
 val MaroonLight = Color(0xFFE53935)
 val MaroonContainer = Color(0xFFFFDAD6)
 val OnMaroonContainer = Color(0xFF410002)

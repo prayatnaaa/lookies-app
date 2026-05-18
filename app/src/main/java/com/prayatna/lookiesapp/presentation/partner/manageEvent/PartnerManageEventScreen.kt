@@ -124,7 +124,7 @@ fun PartnerManageEventScreen(
                         ManagementOptionCard(
                             title = "Scan Barcodes",
                             description = "Scan barcodes for event.",
-                            icon = Icons.Default.Edit,
+                            icon = Icons.Default.QrCodeScanner,
                             onClick = {
                                 navController.navigate(NavigationRoutes.BARCODE_SCANNER)
                             }
@@ -194,7 +194,7 @@ fun EventStatisticsDashboard(
                         count = stats.paintingsSold.toString(),
                         revenue = formatRupiah(stats.paintingRevenue),
                         icon = Icons.Default.ShoppingBag,
-                        color = MaterialTheme.colorScheme.tertiary
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
 
@@ -206,21 +206,21 @@ fun EventStatisticsDashboard(
                         modifier = Modifier.weight(1f)
                     )
 
-                    if (!isSelfExhibition) {
-                        StatBoxSimple(
-                            label = "Artists",
-                            value = "${stats.approvedArtists}/${stats.approvedArtists + stats.pendingParticipants}",
-                            icon = Icons.Default.Group,
-                            modifier = Modifier.weight(1f)
-                        )
-                    } else {
-                        StatBoxSimple(
-                            label = "Avg. Price",
-                            value = if (stats.paintingsSold > 0) formatRupiah(stats.paintingRevenue / stats.paintingsSold) else "-",
-                            icon = Icons.Default.Analytics,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+//                    if (!isSelfExhibition) {
+//                        StatBoxSimple(
+//                            label = "Artists",
+//                            value = "${stats.approvedArtists}/${stats.approvedArtists + stats.pendingParticipants}",
+//                            icon = Icons.Default.Group,
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                    } else {
+//                        StatBoxSimple(
+//                            label = "Avg. Price",
+//                            value = if (stats.paintingsSold > 0) formatRupiah(stats.paintingRevenue / stats.paintingsSold) else "-",
+//                            icon = Icons.Default.Analytics,
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                    }
                 }
             }
         }

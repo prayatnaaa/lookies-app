@@ -11,6 +11,7 @@ import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.event.CreateEventParams
 import com.prayatna.lookiesapp.domain.model.event.EventFormat
+import com.prayatna.lookiesapp.domain.model.event.EventRevenueRules
 import com.prayatna.lookiesapp.domain.model.event.TEventType
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.repository.EventRepository
@@ -128,6 +129,15 @@ class EventRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             Log.e("getEventPaintings", e.error)
+            DataResult.Error(e.error)
+        }
+    }
+
+    override suspend fun getRevenueRulesByEventId(eventId: Int): DataResult<List<EventRevenueRules>> {
+        return try {
+            val response = supabaseEventService.getRevenueRulesByEventId(eventId)
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
             DataResult.Error(e.error)
         }
     }

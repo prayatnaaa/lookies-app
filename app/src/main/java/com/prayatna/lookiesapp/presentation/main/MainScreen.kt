@@ -13,11 +13,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -27,9 +25,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -43,7 +38,6 @@ import com.prayatna.lookiesapp.presentation.SharedViewModel
 import com.prayatna.lookiesapp.presentation.forumlist.ForumListRoute
 import com.prayatna.lookiesapp.presentation.main.home.HomeScreen
 import com.prayatna.lookiesapp.presentation.main.profile.ProfileScreen
-import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
 import com.prayatna.lookiesapp.presentation.main.transactionList.TransactionListScreen
 import com.prayatna.lookiesapp.utils.BottomNavItem
 
@@ -53,7 +47,7 @@ fun MainScreen(
     navHostController: NavHostController,
     sharedViewModel: SharedViewModel
 ) {
-    var selectedRoute by remember { mutableStateOf("home") }
+//    var selectedRoute by remember { mutableStateOf("home") }
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: BottomNavItem.Home.route
@@ -62,7 +56,7 @@ fun MainScreen(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
             BottomNavigationBar(selectedRoute = currentRoute) { itemRoute ->
-                selectedRoute = currentRoute
+//                selectedRoute = currentRoute
                 navController.navigate(itemRoute) {
                     popUpTo(navController.graph.startDestinationId) {
                         saveState = true
@@ -95,9 +89,9 @@ fun Content(modifier: Modifier = Modifier,
             HomeScreen(navController = navHostController)
         }
 
-        composable(BottomNavItem.Search.route) {
-            SearchScreen(navController = navHostController)
-        }
+//        composable(BottomNavItem.Search.route) {
+//            SearchScreen(navController = navHostController)
+//        }
 
         composable(BottomNavItem.Inbox.route) {
             ForumListRoute(navController = navHostController)
@@ -120,7 +114,7 @@ fun BottomNavigationBar(
 ) {
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.Search,
+//        BottomNavItem.Search,
         BottomNavItem.Inbox,
         BottomNavItem.Transaction,
         BottomNavItem.Profile
@@ -161,12 +155,12 @@ fun BottomNavigationBar(
                                 contentDescription = item.label
                             )
 
-                            BottomNavItem.Search.route -> Icon(
-                                imageVector = if (isSelected) Icons.Filled.Search else Icons.Outlined.Search,
-                                tint = if (isSelected) MaterialTheme.colorScheme.onSurface
-                                else MaterialTheme.colorScheme.onSurfaceVariant,
-                                contentDescription = item.label
-                            )
+//                            BottomNavItem.Search.route -> Icon(
+//                                imageVector = if (isSelected) Icons.Filled.Search else Icons.Outlined.Search,
+//                                tint = if (isSelected) MaterialTheme.colorScheme.onSurface
+//                                else MaterialTheme.colorScheme.onSurfaceVariant,
+//                                contentDescription = item.label
+//                            )
 
                             BottomNavItem.Inbox.route -> Icon(
                                 imageVector = if (isSelected) Icons.Filled.Inbox else Icons.Outlined.Inbox,

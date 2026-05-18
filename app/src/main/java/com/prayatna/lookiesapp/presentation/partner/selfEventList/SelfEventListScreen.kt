@@ -55,7 +55,9 @@ fun SelfEventListScreen(
         "published" to "Published",
         "rejected" to "Draft",
         "pending_validation" to "Pending",
-        "completed" to "Ended"
+        "completed" to "Ended",
+        "ongoing" to "On going",
+        "cancelled" to "Cancelled"
     )
 
     Scaffold(
@@ -166,7 +168,7 @@ fun SelfEventListScreen(
                             events = uiState.events,
                             modifier = Modifier.fillMaxSize(),
                             onClick = { event ->
-                                if (event.status != "published") {
+                                if (event.status == "pending_validation") {
                                     navController.navigate("${NavigationRoutes.EDIT_EVENT}/${event.id}")
                                 } else {
                                     navController.navigate("${NavigationRoutes.PARTNER_EVENT_MANAGE}/${event.id}")

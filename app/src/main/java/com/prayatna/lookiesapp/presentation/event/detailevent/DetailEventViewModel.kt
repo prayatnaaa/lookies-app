@@ -2,10 +2,10 @@ package com.prayatna.lookiesapp.presentation.event.detailevent
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.usecase.admin.ApproveEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.admin.RejectEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
+import com.prayatna.lookiesapp.domain.usecase.event.GetDetailEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetPaintingUseCase
 import com.prayatna.lookiesapp.presentation.event.detailevent.state.DecideEventState
 import com.prayatna.lookiesapp.presentation.event.detailevent.state.DetailEventUiEvent
@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailEventViewModel @Inject constructor(
-    private val repository: EventRepository,
+    private val getDetailEventUseCase: GetDetailEventUseCase,
     private val getRoleUseCase: GetRoleUseCase,
     private val getPaintingUseCase: GetPaintingUseCase,
     private val approveEventUseCase: ApproveEventUseCase,
@@ -105,7 +105,7 @@ class DetailEventViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = DetailEventUiState(isLoading = true)
 
-            when (val result = repository.getEvent(eventId)) {
+            when (val result = getDetailEventUseCase(eventId)) {
                 is DataResult.Error -> {
                     _state.update {
                         it.copy(

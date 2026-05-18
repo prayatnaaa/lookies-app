@@ -126,7 +126,7 @@ class SupabasePaintingService @Inject constructor(
             storage.from("paintings").upload(
                 path = path,
                 data = image,
-                upsert = true
+                upsert = false
             )
 
             uploadedPath = path

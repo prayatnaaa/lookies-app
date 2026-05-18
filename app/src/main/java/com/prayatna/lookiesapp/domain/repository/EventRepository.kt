@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.data.remote.dto.EventStatisticDto
 import com.prayatna.lookiesapp.domain.model.event.CreateEventParams
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.event.EventFormat
+import com.prayatna.lookiesapp.domain.model.event.EventRevenueRules
 import com.prayatna.lookiesapp.domain.model.event.TEventType
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.utils.DataResult
@@ -27,4 +28,5 @@ interface EventRepository {
     suspend fun getEventTypes(): DataResult<List<TEventType>>
     suspend fun getEventFormats(): DataResult<List<EventFormat>>
     suspend fun getEventPaintings(eventId: String, status: String? = null): DataResult<List<EventPainting>>
+    suspend fun getRevenueRulesByEventId(eventId: Int): DataResult<List<EventRevenueRules>>
 }

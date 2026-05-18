@@ -31,10 +31,12 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun EarningsOverviewCard(
+    onClick: () -> Unit,
     totalEarnings: String,
     pendingPayout: String
 ) {
     Card(
+        onClick = onClick,
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -53,7 +55,7 @@ fun EarningsOverviewCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Total Earnings",
+                    text = "Available earnings",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                 )

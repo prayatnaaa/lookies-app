@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
+import com.prayatna.lookiesapp.presentation.admin.detailEvent.adminDetailEventNavigation
 import com.prayatna.lookiesapp.presentation.admin.withdrawal.state.adminWithdrawalNavigation
 import com.prayatna.lookiesapp.presentation.artistDashboard.ArtistDashboardScreen
 import com.prayatna.lookiesapp.presentation.checkout.state.checkoutNavigation
@@ -307,6 +308,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
 
         adminWithdrawalNavigation(navController)
+        adminDetailEventNavigation(navController)
         inviteMerchantMemberNavigation(navController)
         composable(
             route = NavigationRoutes.PARTNER_LIST

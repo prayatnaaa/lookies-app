@@ -70,12 +70,13 @@ object NavigationRoutes {
     const val BARCODE_SCANNER = "barcode_scanner"
     const val ADMIN_WITHDRAWAL_LIST = "admin_withdrawal_list"
     const val ADMIN_WITHDRAWAL_DETAIL = "admin_withdrawal_detail"
+    const val ADMIN_DETAIL_EVENT = "admin_detail_event"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {
     data object Home: BottomNavItem(route = "home", label = "Home")
     data object Search: BottomNavItem(route = "search", label = "Search")
-    data object Inbox: BottomNavItem(route = "inbox", label = "Inbox")
+    data object Inbox: BottomNavItem(route = "inbox", label = "Forum")
     data object Transaction: BottomNavItem(route = "transaction", label = "Purchase")
     data object Profile: BottomNavItem(route = "profile", label = "Profile")
 }

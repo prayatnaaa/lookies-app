@@ -46,7 +46,8 @@ fun DetailEventContent(
     showStatus: Boolean = false,
     isUserArtist: Boolean = false,
     onPartnerClick: (String) -> Unit = {},
-    onPaintingClick: (String) -> Unit = {}
+    onPaintingClick: (String) -> Unit = {},
+    extraContent: @Composable (() -> Unit)? = null
 ) {
     val isOnlineEvent = remember(event.eventFormat) { event.eventFormat.slug == "online" }
     val isSelfExhibition = remember(event.eventType) { event.eventType.slug == "self_exhibition" }
@@ -187,6 +188,8 @@ fun DetailEventContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                extraContent?.invoke()
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -262,10 +265,10 @@ fun ArtistRestrictedSection(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
+            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
         ),
         shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -273,7 +276,7 @@ fun ArtistRestrictedSection(
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary,
+                    tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -281,13 +284,13 @@ fun ArtistRestrictedSection(
                     text = "Artist Information",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.tertiary
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 12.dp),
-                color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
             )
 
             // --- CAPACITY INFO ---
@@ -477,7 +480,7 @@ fun CompactInfoCard(title: String, value: String, icon: ImageVector, modifier: M
             modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(20.dp))
+            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = value,

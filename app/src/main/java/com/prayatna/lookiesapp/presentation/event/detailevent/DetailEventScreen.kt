@@ -300,7 +300,6 @@ private fun DetailEventBottomBar(
         onRegisterButtonClick = onRegister,
 
         showBuyButton = role != "admin" &&
-                role != "partner" &&
                 event.eventFormat.slug != "online",
 
         onBuyButtonClick = onBuy,

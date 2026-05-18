@@ -27,7 +27,8 @@ fun DashboardStatCard(
     value: String,
     icon: ImageVector,
     iconTint: Color,
-    containerColor: Color
+    containerColor: Color,
+    textColor: Color? = null
 ) {
     Card(
         modifier = modifier,
@@ -52,12 +53,12 @@ fun DashboardStatCard(
                 text = value,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black.copy(alpha = 0.8f)
+                color = textColor ?: Color.Black.copy(alpha = 0.8f)
             )
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Black.copy(alpha = 0.5f)
+                color = textColor ?: Color.Black.copy(alpha = 0.5f)
             )
         }
     }

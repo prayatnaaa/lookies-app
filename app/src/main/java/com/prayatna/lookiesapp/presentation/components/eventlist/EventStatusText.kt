@@ -14,7 +14,7 @@ enum class EventStatus(val value: String) {
     PendingValidation("pending_validation"),
     Published("published"),
     Ongoing("ongoing"),
-    Completed("finished"),
+    Completed("completed"),
     Cancelled("cancelled"),
     Unknown("unknown"),
     Upcoming("upcoming"),

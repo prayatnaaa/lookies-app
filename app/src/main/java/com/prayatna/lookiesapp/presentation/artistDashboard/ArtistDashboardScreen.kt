@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.TrendingUp
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.MonetizationOn
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -46,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.prayatna.lookiesapp.presentation.artistDashboard.state.ArtistDashboardUiState
+import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
 import com.prayatna.lookiesapp.presentation.components.artistDashboard.DashboardActionItem
 import com.prayatna.lookiesapp.presentation.components.artistDashboard.DashboardStatCard
 import com.prayatna.lookiesapp.presentation.components.artistDashboard.EarningsOverviewCard
@@ -98,10 +101,8 @@ fun ArtistDashboardScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    if (state is ArtistDashboardUiState.Success) {
-                        val data = (state as ArtistDashboardUiState.Success).data
-                        navController.navigate("${NavigationRoutes.UPLOAD_PAINTING}/${data.businessId}")
-
+                    state.summary?.let { summary ->
+                        navController.navigate("${NavigationRoutes.UPLOAD_PAINTING}/${summary.businessId}")
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -119,52 +120,46 @@ fun ArtistDashboardScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            when (val currentState = state) {
-                is ArtistDashboardUiState.Loading -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Loading studio...", style = MaterialTheme.typography.bodyMedium)
-                    }
+            if (state.isLoading && state.summary == null) {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Loading studio...", style = MaterialTheme.typography.bodyMedium)
                 }
-
-                is ArtistDashboardUiState.Error -> {
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.WarningAmber,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(64.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Failed to load dashboard",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = currentState.message,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+            } else if (state.errorMessage != null && state.summary == null) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.WarningAmber,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Failed to load dashboard",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = state.errorMessage!!,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-
-                is ArtistDashboardUiState.Success -> {
-                    val summary = currentState.data
-
+            } else {
+                state.summary?.let { summary ->
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -172,8 +167,13 @@ fun ArtistDashboardScreen(
                     ) {
                         item {
                             EarningsOverviewCard(
+                                onClick = {
+                                    navController.navigate(
+                                        "${NavigationRoutes.MONTHLY_FINANCE_LIST_SCREEN}/${summary.businessId}"
+                                    )
+                                },
                                 totalEarnings = formatRupiah(summary.totalRevenue),
-                                pendingPayout = formatRupiah(summary.pendingPayout)
+                                pendingPayout = formatRupiah(state.pendingOrderSplits?.totalAmount?.toDouble() ?: 0.0)
                             )
                         }
 
@@ -207,6 +207,7 @@ fun ArtistDashboardScreen(
                                 DashboardStatCard(
                                     modifier = Modifier.weight(1f),
                                     title = "On Sale",
+                                    textColor = MaterialTheme.colorScheme.primary,
                                     value = summary.totalPaintings.toString(),
                                     icon = Icons.Outlined.Inventory2,
                                     iconTint = MaterialTheme.colorScheme.primary,
@@ -245,6 +246,20 @@ fun ArtistDashboardScreen(
                             }
                         }
 
+                        if (state.balanceLogs.isNotEmpty()) {
+                            item {
+                                Text(
+                                    "Balance History",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            items(state.balanceLogs.take(5)) { log ->
+                                BalanceLogCard(log)
+                            }
+                        }
+
                         item {
                             Text(
                                 "Management",
@@ -258,7 +273,7 @@ fun ArtistDashboardScreen(
                                     subtitle = "Manage portfolio, pricing & stock",
                                     icon = Icons.Filled.Brush,
                                     onClick = {
-                                        navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${currentState.data.businessId}")
+                                        navController.navigate("${NavigationRoutes.PERSONAL_PAINTING}/${summary.businessId}")
                                     }
                                 )
                                 DashboardActionItem(
@@ -267,7 +282,7 @@ fun ArtistDashboardScreen(
                                     icon = Icons.Filled.Event,
                                     onClick = {
                                         navController.navigate(
-                                            "${NavigationRoutes.EXHIBITION_HISTORY}/${currentState.data.businessId}"
+                                            "${NavigationRoutes.EXHIBITION_HISTORY}/${summary.businessId}"
                                         )
                                     }
                                 )
@@ -278,6 +293,58 @@ fun ArtistDashboardScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun BalanceLogCard(
+    log: MerchantBalanceLog
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = log.transactionType.uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (log.amount > 0) MaterialTheme.colorScheme.primary 
+                            else MaterialTheme.colorScheme.error
+                )
+                Text(
+                    text = log.createdAt.take(10),
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Amount : ${formatRupiah(log.amount.toDouble())}",
+                fontWeight = FontWeight.Bold
+            )
+            
+            log.description?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Balance After : ${formatRupiah(log.balanceAfter.toDouble())}",
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }

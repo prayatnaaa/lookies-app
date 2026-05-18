@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -72,7 +73,9 @@ fun HomeScreen(
         ) {
 
             item(span = StaggeredGridItemSpan.FullLine) {
-                Column {
+                Column(
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
                     SearchBar(onClick = {
                         navController.navigate(NavigationRoutes.SEARCH)
                     })

@@ -15,6 +15,7 @@ import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventCardList
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.partner.FilterItem
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun AdminEventScreen(
@@ -31,7 +32,7 @@ fun AdminEventScreen(
     Scaffold(
         topBar = { BackTopBar(onBackClick = {
             navController.popBackStack()
-        }) }
+        }) },
     ) { innerPadding ->
         Column(
             modifier = modifier
@@ -94,7 +95,7 @@ fun AdminEventScreen(
                             showTicketPrice = true,
                             events = uiState.events,
                             onClick = { event ->
-                                navController.navigate("detail_event/${event.id}")
+                                navController.navigate("${NavigationRoutes.ADMIN_DETAIL_EVENT}/${event.id}")
                             }
                         )
                     } else -> {
