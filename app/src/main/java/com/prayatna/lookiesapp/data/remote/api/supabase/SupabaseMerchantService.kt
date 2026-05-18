@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBankAccountDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
@@ -112,13 +113,23 @@ class SupabaseMerchantService @Inject constructor(
             }.decodeSingle<ShipmentDto>()
     }
 
-    suspend fun getShipmentsByMerchantId(merchantId: String): List<ShipmentDto> {
-        return postgrest.from("shipments")
+    suspend fun getShipmentsByMerchantId(
+        merchantId: String,
+        status: String? = null
+    ): List<ShipmentDto> {
+        return postgrest
+            .from("shipments")
             .select {
                 filter {
                     ShipmentDto::merchantId eq merchantId
-                    ShipmentDto::status neq "awaiting_payment"
+
+                    if (status != null) {
+                        ShipmentDto::status eq status
+                    } else {
+                        ShipmentDto::status neq "awaiting_payment"
+                    }
                 }
-            }.decodeList<ShipmentDto>()
+            }
+            .decodeList<ShipmentDto>()
     }
 }
