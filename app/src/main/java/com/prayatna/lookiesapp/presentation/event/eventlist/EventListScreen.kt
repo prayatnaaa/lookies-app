@@ -22,9 +22,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -35,7 +37,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,22 +45,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventCardList
+import com.prayatna.lookiesapp.presentation.components.eventlist.EventFilterBottomSheet
 import com.prayatna.lookiesapp.presentation.components.loading.EventListLoading
+import com.prayatna.lookiesapp.presentation.event.eventlist.state.EventListEvent
+import com.prayatna.lookiesapp.presentation.event.eventlist.state.EventListUiState
 import com.prayatna.lookiesapp.utils.Constants
-import com.prayatna.lookiesapp.utils.NavigationRoutes
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventListScreen(
-    navController: NavController,
-    modifier: Modifier = Modifier,
-    viewModel: EventListViewModel = hiltViewModel()
+    uiState: EventListUiState,
+    onEvent: (EventListEvent) -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
 
     val statusFilters = listOf(
@@ -70,10 +69,12 @@ fun EventListScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
-        topBar = { BackTopBar(onBackClick = { navController.popBackStack() }, title = "Events") }
+        topBar = { BackTopBar(onBackClick = {
+            onEvent(EventListEvent.OnBackClicked)
+        }, title = "Events") }
     ) { innerPadding ->
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
@@ -84,49 +85,72 @@ fun EventListScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Search bar with server‑side trigger
-                OutlinedTextField(
-                    value = uiState.searchQuery,
-                    onValueChange = { viewModel.onSearchQueryChange(it) },
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Search event or location...") },
-                    singleLine = true,
-                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    trailingIcon = {
-                        if (uiState.searchQuery.isNotEmpty()) {
-                            IconButton(onClick = {
-                                viewModel.onSearchQueryChange("")
-                                viewModel.onSearchTriggered()
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "Clear",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Search bar
+                    OutlinedTextField(
+                        value = uiState.searchQuery,
+                        onValueChange = { onEvent(EventListEvent.OnSearchQueryChange(it)) },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("Search event...") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        trailingIcon = {
+                            if (uiState.searchQuery.isNotEmpty()) {
+                                IconButton(onClick = {
+                                    onEvent(EventListEvent.OnSearchQueryChange(""))
+                                    onEvent(EventListEvent.OnSearchTriggered)
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Clear",
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            viewModel.onSearchTriggered()
-                            focusManager.clearFocus()
-                        }
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                        },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(
+                            onSearch = {
+                                onEvent(EventListEvent.OnSearchTriggered)
+                                focusManager.clearFocus()
+                            }
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                        )
                     )
-                )
+
+                    // Advanced Filter Button
+                    IconButton(
+                        onClick = { onEvent(EventListEvent.OnFilterSheetToggle) },
+                        modifier = Modifier
+                            .size(50.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterAlt,
+                            contentDescription = "Filters",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
 
                 // Status filter chips
                 LazyRow(
@@ -136,7 +160,7 @@ fun EventListScreen(
                     item {
                         FilterChip(
                             selected = uiState.selectedStatus == null,
-                            onClick = { viewModel.onFilterSelected(null) },
+                            onClick = { onEvent(EventListEvent.OnStatusSelected(null)) },
                             label = { Text("All") },
                             leadingIcon = if (uiState.selectedStatus == null) {
                                 {
@@ -153,7 +177,7 @@ fun EventListScreen(
                         val isSelected = uiState.selectedStatus == slug
                         FilterChip(
                             selected = isSelected,
-                            onClick = { viewModel.onFilterSelected(slug) },
+                            onClick = { onEvent(EventListEvent.OnStatusSelected(slug)) },
                             label = { Text(label) },
                             leadingIcon = if (isSelected) {
                                 {
@@ -172,7 +196,7 @@ fun EventListScreen(
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .clickable { viewModel.onSortToggled() }
+                        .clickable { onEvent(EventListEvent.OnSortToggled) }
                         .background(
                             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                             RoundedCornerShape(8.dp)
@@ -207,8 +231,8 @@ fun EventListScreen(
 
                     uiState.errorMessage != null -> {
                         ErrorState(
-                            message = uiState.errorMessage ?: "Unknown error",
-                            onRetry = { viewModel.retry() },
+                            message = uiState.errorMessage,
+                            onRetry = { onEvent(EventListEvent.OnRetry) },
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
@@ -218,7 +242,7 @@ fun EventListScreen(
                             events = uiState.events,
                             modifier = Modifier.fillMaxSize(),
                             onClick = { event ->
-                                navController.navigate("${NavigationRoutes.DETAIL_EVENT}/${event.id}")
+                                onEvent(EventListEvent.OnDetailEventClicked(event.id))
                             }
                         )
                     }
@@ -226,13 +250,21 @@ fun EventListScreen(
                     else -> {
                         EmptyState(
                             query = uiState.searchQuery,
-                            hasFilters = uiState.selectedStatus != null,
+                            hasFilters = uiState.selectedStatus != null || uiState.selectedLocation != null,
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
                 }
             }
         }
+    }
+
+    if (uiState.isFilterSheetOpen) {
+        EventFilterBottomSheet(
+            uiState = uiState,
+            onEvent = onEvent,
+            onDismiss = { onEvent(EventListEvent.OnFilterSheetToggle) }
+        )
     }
 }
 

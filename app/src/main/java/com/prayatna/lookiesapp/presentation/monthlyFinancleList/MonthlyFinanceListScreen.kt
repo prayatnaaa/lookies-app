@@ -135,9 +135,9 @@ private fun PayoutLogCard(split: OrderSplit) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = split.payoutStatus.uppercase(),
+                    text = split.payoutStatus.formatStatus(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (split.payoutStatus == "completed") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    color = if (split.payoutStatus == "on_hold") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                 )
             }
 
@@ -270,6 +270,14 @@ private fun BoxScope.EmptyFinanceState(message: String) {
             textAlign = TextAlign.Center
         )
     }
+}
+
+private fun String.formatStatus(): String {
+    return replace("_", " ")
+        .split(" ")
+        .joinToString(" ") { word ->
+            word.lowercase().replaceFirstChar { it.uppercase() }
+        }
 }
 
 @Composable

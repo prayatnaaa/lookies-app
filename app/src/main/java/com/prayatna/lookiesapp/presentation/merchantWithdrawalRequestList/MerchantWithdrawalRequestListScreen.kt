@@ -152,7 +152,7 @@ private fun WithdrawalRequestCard(
                 )
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
                 Text(
-                    text = "${request.bankCode} - ${request.accountNumber}",
+                    text = "${request.bankCode.formatStatus()} - ${request.accountNumber}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -227,3 +227,12 @@ private fun EmptyWithdrawalState() {
         )
     }
 }
+
+private fun String.formatStatus(): String {
+    return replace("_", " ")
+        .split(" ")
+        .joinToString(" ") { word ->
+            word.uppercase()
+        }
+}
+

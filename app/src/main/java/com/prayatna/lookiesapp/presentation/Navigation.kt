@@ -20,7 +20,7 @@ import com.prayatna.lookiesapp.presentation.artistDashboard.ArtistDashboardScree
 import com.prayatna.lookiesapp.presentation.checkout.state.checkoutNavigation
 import com.prayatna.lookiesapp.presentation.createPaintingReview.createPaintingReviewNavigation
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
-import com.prayatna.lookiesapp.presentation.event.eventlist.EventListScreen
+import com.prayatna.lookiesapp.presentation.event.eventlist.EventListRoute
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.ArtistExhibitionPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.PartnerExhibitionPaintingDetailScreen
@@ -198,7 +198,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             MainScreen(navHostController = navController, sharedViewModel = sharedViewModel)
         }
         composable(NavigationRoutes.EVENT_LIST) {
-            EventListScreen(navController = navController)
+            EventListRoute(navController = navController)
         }
         composable(
             route = "${NavigationRoutes.SELF_EVENT_LIST}/{businessId}",
