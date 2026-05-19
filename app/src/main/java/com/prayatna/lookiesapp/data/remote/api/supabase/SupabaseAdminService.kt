@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.GetKycDocumentDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.WithdrawalRequestDto
@@ -64,6 +65,8 @@ class SupabaseAdminService @Inject constructor(
 
             }
         }.decodeSingle<DecideEventResponseDto>()
+
+        Log.d("ApproveEvent", result.toString())
 
         return result
     }

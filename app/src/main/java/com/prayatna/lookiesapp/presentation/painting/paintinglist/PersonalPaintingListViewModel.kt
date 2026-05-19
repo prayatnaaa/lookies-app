@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.painting.paintinglist
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.painting.PaintingFilter
@@ -17,9 +18,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PersonalPaintingListViewModel @Inject constructor(
-    private val getPaintingsUseCase: GetArtistPaintingsUseCase
+    private val getPaintingsUseCase: GetArtistPaintingsUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+
+    val refresh = savedStateHandle.getStateFlow(
+        key = "refresh",
+        initialValue = false
+    )
     private val _uiState = MutableStateFlow(PaintingUiState())
     val uiState: StateFlow<PaintingUiState> = _uiState.asStateFlow()
 
@@ -31,6 +38,8 @@ class PersonalPaintingListViewModel @Inject constructor(
             this.artistId = artistId
             loadPaintings()
         }
+
+        observeRefresh()
     }
 
     private fun loadPaintings(filter: PaintingFilter = currentFilter) {
@@ -61,6 +70,18 @@ class PersonalPaintingListViewModel @Inject constructor(
                     }
                 }
                 else -> {}
+            }
+        }
+    }
+
+    private fun observeRefresh() {
+        viewModelScope.launch {
+            refresh.collect { shouldRefresh ->
+                if (shouldRefresh) {
+                    loadPaintings()
+
+                    savedStateHandle["refresh"] = false
+                }
             }
         }
     }

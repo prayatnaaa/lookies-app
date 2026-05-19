@@ -145,7 +145,7 @@ fun UploadPaintingForm(
                             painter = rememberAsyncImagePainter(selectedImage),
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Fit
                         )
                     } else {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {

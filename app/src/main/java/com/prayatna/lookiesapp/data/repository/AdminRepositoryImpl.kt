@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAdminService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
@@ -42,6 +43,7 @@ class AdminRepositoryImpl @Inject constructor(
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
+            Log.d("Approve Event", e.message.toString())
             DataResult.Error(msg)
         }
     }

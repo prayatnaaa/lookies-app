@@ -29,6 +29,10 @@ fun UploadPaintingScreen(
 
     LaunchedEffect(uiState) {
         if (uiState is UploadPaintingUiState.Success) {
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("refresh", true)
+
             navController.popBackStack()
         }
     }
