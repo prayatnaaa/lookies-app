@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
@@ -45,6 +46,7 @@ class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
 
             when (val result = getEventPaintingByIdUseCase(id)) {
                 is DataResult.Success -> {
+                    Log.d("DetailPaintingTSTS", result.data.toString())
                     _state.update {
                         it.copy(
                             isLoading = false,
@@ -54,6 +56,7 @@ class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
                 }
 
                 is DataResult.Error -> {
+                    Log.e("DetailPaintingTSTS", result.error)
                     _state.update { it.copy(isLoading = false, errorMessage = result.error) }
 
                     _event.send(

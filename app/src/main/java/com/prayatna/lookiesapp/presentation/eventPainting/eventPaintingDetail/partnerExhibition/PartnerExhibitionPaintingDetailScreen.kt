@@ -178,7 +178,7 @@ fun PartnerPaintingDecisionActionBar(
     androidx.compose.material3.Surface(
         shadowElevation = 8.dp,
         color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxWidth()
     ) {
         androidx.compose.foundation.layout.Row(
             modifier = Modifier
