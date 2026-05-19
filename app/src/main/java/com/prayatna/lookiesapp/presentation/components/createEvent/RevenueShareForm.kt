@@ -14,16 +14,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PieChart
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -33,11 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.presentation.components.registerBusiness.FormSectionCard
-import com.prayatna.lookiesapp.ui.theme.DarkGreen
-import com.prayatna.lookiesapp.ui.theme.MaroonLight
-import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun RevenueShareForm(
@@ -69,16 +66,16 @@ fun RevenueShareForm(
 
         // --- Painting Revenue Section ---
         RevenueSubSection(
-            title = "🎨 Painting Sales Revenue",
+            title = "Painting Sales Revenue",
             artistPercent = paintingArtistPercent,
             onArtistPercentChange = onPaintingArtistPercentChange,
             eventPercent = paintingEventPercent,
             onEventPercentChange = onPaintingEventPercentChange,
             platformPercent = paintingPlatformPercent ?: 0,
             onPlatformPercentChange = onPaintingPlatformPercentChange,
-            artistColor = DarkGreen,
-            eventColor = MaterialTheme.colorScheme.primary,
-            platformColor = MaroonLight
+            showArtist = true,
+            showPlatform = false
+
         )
 
         // --- Ticket Revenue Section (conditionally shown) ---
@@ -90,16 +87,15 @@ fun RevenueShareForm(
             Column {
                 Spacer(modifier = Modifier.height(16.dp))
                 RevenueSubSection(
-                    title = "🎟️ Ticket Sales Revenue",
+                    title = "Ticket Sales Revenue",
                     artistPercent = ticketArtistPercent ?: 0,
                     onArtistPercentChange = onTicketArtistPercentChange,
                     eventPercent = ticketEventPercent ?: 0,
                     onEventPercentChange = onTicketEventPercentChange,
                     platformPercent = ticketPlatformPercent ?: 0,
                     onPlatformPercentChange = onTicketPlatformPercentChange,
-                    artistColor = DarkGreen,
-                    eventColor = MaterialTheme.colorScheme.primary,
-                    platformColor = MaroonLight
+                    showArtist = false,
+                    showPlatform = true
                 )
             }
         }
@@ -115,23 +111,25 @@ private fun RevenueSubSection(
     onEventPercentChange: (Int) -> Unit,
     platformPercent: Int,
     onPlatformPercentChange: (Int) -> Unit,
-    artistColor: Color,
-    eventColor: Color,
-    platformColor: Color
+    showArtist: Boolean = true,
+    showPlatform: Boolean = true,
 ) {
-    val total = artistPercent + eventPercent + platformPercent
+    val total =
+        (if (showArtist) artistPercent else 0) +
+                eventPercent +
+                (if (showPlatform) platformPercent else 0)
+
+    val remaining = 100 - total
     val isValid = total == 100
 
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-        ),
-        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = title,
@@ -139,59 +137,91 @@ private fun RevenueSubSection(
                 fontWeight = FontWeight.SemiBold
             )
 
-            // Distribution bar
-            DistributionBar(
-                artistPercent = artistPercent,
-                eventPercent = eventPercent,
-                platformPercent = platformPercent,
-                artistColor = artistColor,
-                eventColor = eventColor,
-                platformColor = platformColor
-            )
-
-            // Total indicator
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Total: $total%",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isValid) DarkGreen else MaterialTheme.colorScheme.error
-                )
-                if (!isValid) {
-                    Text(
-                        text = " (must be 100%)",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-
-            // Sliders
-            PercentSliderRow(
-                label = "Artist",
-                percent = artistPercent,
-                onPercentChange = onArtistPercentChange,
-                color = artistColor
-            )
-
-            PercentSliderRow(
-                label = "Event",
-                percent = eventPercent,
-                onPercentChange = onEventPercentChange,
-                color = eventColor
-            )
-
-            PercentSliderRow(
-                label = "Platform",
-                percent = platformPercent,
-                onPercentChange = onPlatformPercentChange,
-                color = platformColor
+            Text(
+                text = if (isValid) "$total% ✓" else "$total%",
+                color = if (isValid) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.error
+                },
+                fontWeight = FontWeight.Bold
             )
         }
+
+        if (showArtist) {
+            PercentInputRow(
+                label = "Artist",
+                value = artistPercent,
+                onValueChange = onArtistPercentChange
+            )
+        }
+
+        PercentInputRow(
+            label = "Event",
+            value = eventPercent,
+            onValueChange = onEventPercentChange
+        )
+
+        if (showPlatform) {
+            PercentInputRow(
+                label = "Platform",
+                value = platformPercent,
+                onValueChange = onPlatformPercentChange
+            )
+        }
+
+        if (!isValid) {
+            Text(
+                text = if (remaining > 0) {
+                    "$remaining% remaining"
+                } else {
+                    "${-remaining}% over limit"
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+    }
+}
+
+@Composable
+private fun PercentInputRow(
+    label: String,
+    value: Int,
+    onValueChange: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+
+        Text(
+            text = label,
+            modifier = Modifier.width(72.dp),
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        OutlinedTextField(
+            value = value.toString(),
+            onValueChange = { input ->
+                val number = input.toIntOrNull()
+
+                if (number != null && number in 0..100) {
+                    onValueChange(number)
+                } else if (input.isEmpty()) {
+                    onValueChange(0)
+                }
+            },
+            modifier = Modifier.weight(1f),
+            singleLine = true,
+            suffix = {
+                Text("%")
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            )
+        )
     }
 }
 
@@ -236,7 +266,7 @@ private fun DistributionBar(
                     .background(platformColor)
             )
         }
-        // Fill remaining with a subtle grey if total < 100
+        // Fill remaining with a subtle gray if total < 100
         if (total < 100) {
             Box(
                 modifier = Modifier

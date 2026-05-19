@@ -41,7 +41,7 @@ fun ParticipationRulesForm(
                 onValueChange = { input ->
                     if (input.all { it.isDigit() }) onMaxParticipantsChange(input)
                 },
-                label = "Maximum Artists (Participants)",
+                label = "Maximum Ticket Purchased",
                 keyboardType = KeyboardType.Number
             )
             Spacer(modifier = Modifier.height(8.dp))

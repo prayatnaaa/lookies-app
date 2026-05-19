@@ -68,7 +68,7 @@ fun EventBannerCard(modifier: Modifier = Modifier,
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(shape),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Fit
                 )
             } else if (imageUrl != null) {
                 AsyncImage(

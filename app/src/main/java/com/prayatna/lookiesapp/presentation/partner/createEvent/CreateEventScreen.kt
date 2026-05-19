@@ -46,7 +46,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
-import com.prayatna.lookiesapp.presentation.components.CustomDialog
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.createEvent.DetailEventForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.EventAboutForm
@@ -113,7 +112,7 @@ fun CreateEventScreen(
         viewModel.onEvent(CreateEventFormEvent.LoadEventMeta)
     }
 
-    LaunchedEffect(uiState) {
+    LaunchedEffect(uiState.isSuccess, uiState.errorMessage) {
         when {
             uiState.isSuccess -> {
                 dialogTitle = "Success"
@@ -140,6 +139,8 @@ fun CreateEventScreen(
                 }
             },
             onDismiss = {
+                dialogTitle = ""
+                dialogMessage = ""
                 showDialog = false
             }
         )
