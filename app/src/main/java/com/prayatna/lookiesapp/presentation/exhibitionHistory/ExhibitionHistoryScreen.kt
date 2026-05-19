@@ -2,7 +2,6 @@ package com.prayatna.lookiesapp.presentation.exhibitionHistory
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +22,6 @@ import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -239,7 +237,8 @@ private fun ExhibitionHistoryCard(
 @Composable
 fun EventPaintingStatusBadge(status: String) {
     val (label, containerColor, contentColor) = when (status.lowercase()) {
-        "pending" -> Triple("Pending", Color(0xFFFFF3E0), Color(0xFFE65100))
+        "pending" -> Triple("Wait approval", Color(0xFFFFF3E0), Color(0xFFE65100))
+        "await_payment" -> Triple("Awaiting Payment", Color(0xFFEFEBE9), Color(0xFF4E342E))
         "approved", "accepted" -> Triple("Approved", Color(0xFFE8F5E9), Color(0xFF2E7D32))
         "rejected" -> Triple("Rejected", Color(0xFFFFEBEE), Color(0xFFC62828))
         "shipping_to_event" -> Triple("Shipping", Color(0xFFE3F2FD), Color(0xFF1565C0))

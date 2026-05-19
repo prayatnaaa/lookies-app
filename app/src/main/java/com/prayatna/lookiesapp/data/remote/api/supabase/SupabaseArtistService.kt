@@ -71,11 +71,16 @@ class SupabaseArtistService @Inject constructor(
         return response.body()
     }
 
-    suspend fun getArtistEventPaintings(artistId: String): List<EventPaintingDto> {
+    suspend fun getArtistEventPaintings(artistId: String, status: String? = null): List<EventPaintingDto> {
         val response = postgrest.from("v2_event_painting_view")
             .select {
                 filter {
                     eq("artist_user_id", artistId)
+                    if (status != null) {
+                        eq("status", status)
+                    } else {
+                        neq("status", "await_payment")
+                    }
                 }
             }.decodeList<EventPaintingDto>()
         return response

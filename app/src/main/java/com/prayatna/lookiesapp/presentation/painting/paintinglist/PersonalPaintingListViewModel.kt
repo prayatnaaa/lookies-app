@@ -33,13 +33,15 @@ class PersonalPaintingListViewModel @Inject constructor(
     private var currentFilter = PaintingFilter()
     private var artistId: String? = null
 
+    init {
+        observeRefresh()
+    }
+
     fun init(artistId: String) {
         if (this.artistId == null) {
             this.artistId = artistId
             loadPaintings()
         }
-
-        observeRefresh()
     }
 
     private fun loadPaintings(filter: PaintingFilter = currentFilter) {

@@ -1,7 +1,9 @@
 package com.prayatna.lookiesapp.presentation.registerEvent
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.domain.model.painting.PaintingFilter
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.domain.usecase.painting.GetArtistPaintingsUseCase
 import com.prayatna.lookiesapp.presentation.registerEvent.state.RegisterEventEvent
@@ -76,7 +78,11 @@ class RegisterEventViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            val result = getArtistPaintingsUseCase()
+            val filter = PaintingFilter(
+                status = "available"
+            )
+
+            val result = getArtistPaintingsUseCase(filter = filter)
 
             _state.update { currentState ->
                 when (result) {
@@ -110,6 +116,9 @@ class RegisterEventViewModel @Inject constructor(
                 eventId = currentState.eventId,
                 paintingIds = currentState.selectedIds.toList()
             )
+
+            Log.d("RegisterEvent", currentState.eventId.toString())
+            Log.d("RegisterEvent", currentState.selectedIds.toString())
 
             _state.update {
                 when (result) {

@@ -397,14 +397,16 @@ fun DetailTransactionContent(
         }
 
         item {
-            OutlinedButton(
-                onClick = {
-                    onRatePainting?.invoke()
-                },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text("Rate painting")
+            if (shipment != null && shipment.status == "delivered") {
+                OutlinedButton(
+                    onClick = {
+                        onRatePainting?.invoke()
+                    },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Rate painting")
+                }
             }
         }
 

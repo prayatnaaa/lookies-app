@@ -54,9 +54,9 @@ class ArtistRepositoryImpl @Inject constructor(
             .getDashboardSummary()
             .map { it.toDomain() }
 
-    override suspend fun getArtistEventPaintings(artistId: String): DataResult<List<EventPainting>> {
+    override suspend fun getArtistEventPaintings(artistId: String, status: String?): DataResult<List<EventPainting>> {
         return try {
-            val response = supabaseArtistService.getArtistEventPaintings(artistId = artistId)
+            val response = supabaseArtistService.getArtistEventPaintings(artistId = artistId, status = status)
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)

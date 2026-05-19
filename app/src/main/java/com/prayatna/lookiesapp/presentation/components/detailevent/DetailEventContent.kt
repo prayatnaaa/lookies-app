@@ -311,7 +311,7 @@ fun ArtistRestrictedSection(
 
                 if (!isSelfExhibition) {
                     CompactInfoCard(
-                        title = "Artists Quota",
+                        title = "Tickets Quota",
                         value = event.remainingParticipantQuota.toString(),
                         icon = Icons.Default.Person,
                         modifier = Modifier.weight(1f)

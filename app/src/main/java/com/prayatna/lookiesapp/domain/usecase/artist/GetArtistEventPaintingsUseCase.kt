@@ -9,8 +9,8 @@ import javax.inject.Inject
 class GetArtistEventPaintingsUseCase @Inject constructor(
     private val artistRepository: ArtistRepository
 ){
-    suspend operator fun invoke(artistId: String): DataResult<List<EventPainting>> {
-        val result = artistRepository.getArtistEventPaintings(artistId = artistId)
+    suspend operator fun invoke(artistId: String, status: String? = null): DataResult<List<EventPainting>> {
+        val result = artistRepository.getArtistEventPaintings(artistId = artistId, status = status)
         return result
     }
 }

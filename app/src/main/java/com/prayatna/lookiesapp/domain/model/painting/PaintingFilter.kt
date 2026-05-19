@@ -7,6 +7,7 @@ data class PaintingFilter(
     val subject: String? = null,
     val minYear: Int? = null,
     val maxYear: Int? = null,
+    val status: String? = null,
     val sortBy: SortType? = null
 )
 
