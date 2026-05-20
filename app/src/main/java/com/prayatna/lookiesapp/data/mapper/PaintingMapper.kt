@@ -40,7 +40,8 @@ fun Painting.toDto(): GetPaintingDto {
         yearCreated =this.yearCreated,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
-        price = this.price
+        price = this.price,
+        status = status
     )
 }
 

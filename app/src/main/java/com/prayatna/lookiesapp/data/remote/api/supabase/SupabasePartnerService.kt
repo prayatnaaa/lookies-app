@@ -232,22 +232,16 @@ class SupabasePartnerService @Inject constructor(
     suspend fun insertSelfEventPaintings(
         eventId: String,
         selectedPaintings: List<GetPaintingDto>
-    ): InsertSelfEventPaintingsResponse {
+    ): List<InsertSelfEventPaintingsResponse> {
 
-        val availablePaintings = selectedPaintings.filter { painting ->
-            painting.status == "available"
-        }
 
-        if (availablePaintings.isEmpty()) {
-            throw IllegalStateException("Selected paintings is not available.")
-        }
-
-        val insertPayload = availablePaintings.map { painting ->
+        val insertPayload = selectedPaintings.map { painting ->
             SelfEventPaintingInsertRequest(
                 paintingId = painting.id,
                 eventId = eventId,
                 finalPrice = painting.price,
-                status = "accepted"
+                status = "accepted",
+                businessId = painting.artistId
             )
         }
 
@@ -255,6 +249,6 @@ class SupabasePartnerService @Inject constructor(
 
         return postgrest.from("event_paintings").insert(insertPayload) {
             select(Columns.list("id"))
-        }.decodeSingle<InsertSelfEventPaintingsResponse>()
+        }.decodeList<InsertSelfEventPaintingsResponse>()
     }
 }

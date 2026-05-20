@@ -2,10 +2,18 @@ package com.prayatna.lookiesapp.presentation.exhibitionShipment
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.filled.CloudUpload
-import androidx.compose.material.icons.filled.Image
-import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -14,9 +22,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Storefront
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,10 +36,13 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,6 +50,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
+import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
+import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.state.ExhibitionShipmentEvent
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.state.ExhibitionShipmentUiState
@@ -49,42 +62,36 @@ fun ExhibitionShipmentScreen(
     onEvent: (ExhibitionShipmentEvent) -> Unit,
     backAction: () -> Unit = {}
 ) {
-    // Error dialog
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Error Bottom Sheet
     uiState.errorMessage?.let { message ->
-        AlertDialog(
-            onDismissRequest = {
+        CustomBottomSheet(
+            title = "Error",
+            message = message,
+            confirmText = "OK",
+            onConfirm = {
                 onEvent(ExhibitionShipmentEvent.DismissError)
                 backAction()
-                               },
-            title = { Text("Error") },
-            text = { Text(message) },
-            confirmButton = {
-                TextButton(onClick = {
-                    onEvent(ExhibitionShipmentEvent.DismissError)
-                    backAction()
-                }) {
-                    Text("OK")
-                }
+            },
+            onDismiss = {
+                onEvent(ExhibitionShipmentEvent.DismissError)
+                backAction()
             }
         )
     }
 
-    // Success dialog
-    uiState.successMessage?.let { message ->
-        AlertDialog(
-            onDismissRequest = { onEvent(ExhibitionShipmentEvent.DismissSuccess) },
-            title = { Text("Success") },
-            text = { Text(message) },
-            confirmButton = {
-                TextButton(onClick = { onEvent(ExhibitionShipmentEvent.DismissSuccess) }) {
-                    Text("OK")
-                }
-            }
-        )
+    // Success Snackbar
+    LaunchedEffect(uiState.successMessage) {
+        uiState.successMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            onEvent(ExhibitionShipmentEvent.DismissSuccess)
+        }
     }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             BackTopBar(
                 onBackClick = { onEvent(ExhibitionShipmentEvent.OnBackClick) },

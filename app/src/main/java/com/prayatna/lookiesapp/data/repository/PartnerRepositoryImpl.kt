@@ -141,7 +141,7 @@ class PartnerRepositoryImpl @Inject constructor(
                 selectedPaintings = selectedPaintings.map { it.toDto() }
             )
             Log.d("InsertSelfEventPaintings", result.toString())
-            DataResult.Success(result.toDomain())
+            DataResult.Success(result.first().toDomain())
         } catch (e: RestException) {
             Log.e("InsertSelfEventPaintings", e.toString())
             DataResult.Error(e.error)

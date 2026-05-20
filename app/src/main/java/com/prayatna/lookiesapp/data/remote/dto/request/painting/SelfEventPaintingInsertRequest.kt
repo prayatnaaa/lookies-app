@@ -11,5 +11,7 @@ data class SelfEventPaintingInsertRequest(
     val paintingId: Int,
     @SerialName("final_price")
     val finalPrice: Double,
+    @SerialName("artist_business_id")
+    val businessId: String,
     val status: String = "accepted"
 )

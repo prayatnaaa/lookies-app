@@ -6,13 +6,16 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.event.CreateEventParams
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.usecase.event.CreateEventUseCase
+import com.prayatna.lookiesapp.presentation.partner.createEvent.state.CreateEventEffect
 import com.prayatna.lookiesapp.presentation.partner.createEvent.state.CreateEventFormEvent
 import com.prayatna.lookiesapp.presentation.partner.createEvent.state.CreateEventFormState
 import com.prayatna.lookiesapp.presentation.partner.createEvent.state.CreateEventUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,6 +29,9 @@ class CreateEventViewModel @Inject constructor(
 
     private val _formState = MutableStateFlow(CreateEventFormState())
     val formState: StateFlow<CreateEventFormState> = _formState
+
+    private val _effect = MutableSharedFlow<CreateEventEffect>()
+    val effect = _effect.asSharedFlow()
 
     private val _uiState = MutableStateFlow(CreateEventUiState())
     val uiState: StateFlow<CreateEventUiState> = _uiState
@@ -175,6 +181,8 @@ class CreateEventViewModel @Inject constructor(
                         isSuccess = false,
                         isLoading = false
                     ) }
+
+                    _effect.emit(CreateEventEffect.ShowError(result.error))
                 }
                 is DataResult.Success -> {
                     _uiState.update { it.copy(
@@ -182,6 +190,7 @@ class CreateEventViewModel @Inject constructor(
                         errorMessage = null,
                         isLoading = false
                     ) }
+                    _effect.emit(CreateEventEffect.NavigateBack)
                 }
                 is DataResult.Loading -> {
                     _uiState.update { it.copy(isLoading = true) }

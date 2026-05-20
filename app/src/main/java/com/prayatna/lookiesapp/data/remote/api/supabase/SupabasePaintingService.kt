@@ -76,12 +76,15 @@ class SupabasePaintingService @Inject constructor(
         return result
     }
 
-    suspend fun getPaintingByArtistId(id: String): List<GetPaintingDto> {
+    suspend fun getPaintingByArtistId(id: String, status: String? = null): List<GetPaintingDto> {
         return postgrest
             .from("painting_view")
             .select {
                 filter {
                     eq("artist_id", id)
+                    if (status != null) {
+                        eq("availability_status", status)
+                    }
                 }
             }
             .decodeList<GetPaintingDto>()

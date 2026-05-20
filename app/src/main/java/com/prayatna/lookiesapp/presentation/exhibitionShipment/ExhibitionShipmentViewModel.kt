@@ -34,10 +34,6 @@ class ExhibitionShipmentViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ExhibitionShipmentUiState())
     val uiState: StateFlow<ExhibitionShipmentUiState> = _uiState.asStateFlow()
 
-    /**
-     * Fetches the EventPainting by ID and populates all contextual state.
-     * The caller only needs to supply the eventPaintingId.
-     */
     fun init(eventPaintingId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -115,10 +111,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
 
     // ── Inbound Phase ────────────────────────────────────────────────────────
 
-    /**
-     * Artist fills shipment details and submits → creates an INBOUND ExhibitionShipment record
-     * and updates event_paintings.status to "shipping_to_event".
-     */
+
     private fun submitInboundShipment() {
         val state = _uiState.value
 
@@ -148,7 +141,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
 
             when (val shipmentResult = createExhibitionShipmentUseCase(input)) {
                 is DataResult.Success -> {
-                    _uiState.update { it.copy(isLoading = false, successMessage = "Inbound shipment created successfully") }
+                    _uiState.update { it.copy(isLoading = false, isSubmitting = false, successMessage = "Inbound shipment created successfully") }
 
                 }
                 is DataResult.Error -> _uiState.update {
@@ -159,11 +152,6 @@ class ExhibitionShipmentViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Organizer confirms the artwork arrived at the gallery →
-     * updates ExhibitionShipment status to RECEIVED_IN_GALLERY and
-     * event_paintings.status to "exhibited".
-     */
     private fun confirmArtworkReceived() {
         val state = _uiState.value
         val shipmentId = state.shipment?.id?.toString() ?: run {
@@ -182,7 +170,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
             )
             when (shipmentResult) {
                 is DataResult.Success -> {
-                    _uiState.update { it.copy(successMessage = "Artwork received successfully") }
+                    _uiState.update { it.copy(successMessage = "Artwork received successfully", isLoading = true, isSubmitting = false) }
                 }
                 is DataResult.Error -> _uiState.update {
                     it.copy(isSubmitting = false, errorMessage = shipmentResult.error)

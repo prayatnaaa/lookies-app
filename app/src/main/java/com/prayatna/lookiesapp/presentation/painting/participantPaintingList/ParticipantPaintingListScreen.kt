@@ -81,7 +81,7 @@ fun ParticipantPaintingListScreen(
                 onBackClick = {
                     navController.popBackStack()
                 },
-                title = "Participant paintings"
+                title = "Exhibition paintings"
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

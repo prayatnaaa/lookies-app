@@ -53,6 +53,7 @@ import com.prayatna.lookiesapp.presentation.components.createEvent.EventLocation
 import com.prayatna.lookiesapp.presentation.components.createEvent.ParticipationRulesForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.PricingForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.RevenueShareForm
+import com.prayatna.lookiesapp.presentation.partner.createEvent.state.CreateEventEffect
 import com.prayatna.lookiesapp.presentation.partner.createEvent.state.CreateEventFormEvent
 import com.prayatna.lookiesapp.utils.Constants
 
@@ -113,26 +114,30 @@ fun CreateEventScreen(
         viewModel.onEvent(CreateEventFormEvent.LoadEventMeta)
     }
 
-    LaunchedEffect(uiState.isSuccess, uiState.errorMessage) {
-        when {
-            uiState.isSuccess -> {
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set("snackbar_message", "Event created successfully!")
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { event ->
+            when (event) {
+                CreateEventEffect.NavigateBack -> {
 
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set(
-                        "shouldRefresh",
-                        true
-                    )
-                navController.popBackStack()
-            }
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(
+                            "snackbar_message",
+                            "Event created successfully!"
+                        )
 
-            uiState.errorMessage != null -> {
-                dialogTitle = "Error"
-                dialogMessage = uiState.errorMessage!!
-                showDialog = true
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("shouldRefresh", true)
+
+                    navController.popBackStack()
+                }
+
+                is CreateEventEffect.ShowError -> {
+                    dialogTitle = "Error"
+                    dialogMessage = event.message
+                    showDialog = true
+                }
             }
         }
     }

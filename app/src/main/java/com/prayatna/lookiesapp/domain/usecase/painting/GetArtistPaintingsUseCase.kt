@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.domain.usecase.painting
 
+import android.util.Log
 import com.prayatna.lookiesapp.domain.model.painting.Painting
 import com.prayatna.lookiesapp.domain.model.painting.PaintingFilter
 import com.prayatna.lookiesapp.domain.model.painting.SortType
@@ -14,6 +15,7 @@ class GetArtistPaintingsUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(
+        status: String? = null,
         filter: PaintingFilter? = null,
         id: String? = null
     ): DataResult<List<Painting>> {
@@ -26,9 +28,10 @@ class GetArtistPaintingsUseCase @Inject constructor(
                 is DataResult.Idle -> return DataResult.Idle
             }
 
-        return when (val paintingResult = paintingRepository.getPaintingsByArtist(businessId)) {
+        return when (val paintingResult = paintingRepository.getPaintingsByArtist(businessId, status)) {
             is DataResult.Success -> {
                 var list = paintingResult.data
+                Log.d("PaintingStatus", list.toString())
 
                 if (filter != null) {
                     list = list.filter { painting ->

@@ -34,7 +34,7 @@ class InsertEventPaintingsViewModel @Inject constructor(
     private fun getSelfEventPaintings(id: String) {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            when (val result = getArtistPaintingUseCase(id = id)) {
+            when (val result = getArtistPaintingUseCase(id = id, status = "available")) {
                 is DataResult.Error -> {
                     _uiState.update { it.copy(
                         isLoading = false,
@@ -75,6 +75,7 @@ class InsertEventPaintingsViewModel @Inject constructor(
     fun submitSelectedPaintings() {
         val eventId = checkNotNull(savedStateHandle.get<Int>("eventId"))
         if (_uiState.value.selectedPaintings.isEmpty()) return
+        _uiState.update { it.copy(isSubmitting = true) }
         viewModelScope.launch {
             when (val result = insertSelfPaintingsUseCase(
                 eventId = eventId,

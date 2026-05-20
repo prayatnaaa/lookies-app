@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun StatusPill(text: String) {
+    val displayText = text.replace("_", " ")
+
     val dotColor = when (text.lowercase()) {
         "pending" -> Color(0xFFE69B00)
         "approved" -> Color(0xFF188038)
@@ -35,8 +37,9 @@ fun StatusPill(text: String) {
                 .clip(CircleShape)
                 .background(dotColor)
         )
+
         Text(
-            text = text.replaceFirstChar { it.titlecase() },
+            text = displayText.replaceFirstChar { it.titlecase() },
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Medium,
             color = dotColor

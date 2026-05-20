@@ -20,7 +20,7 @@ interface PaintingRepository {
         limitCount: Long? = null
     ): DataResult<List<EventPainting>>
     suspend fun getEventPaintingDetail(id: String): DataResult<EventPainting>
-    suspend fun getPaintingsByArtist(id: String): DataResult<List<Painting>>
+    suspend fun getPaintingsByArtist(id: String, status: String? = null): DataResult<List<Painting>>
     suspend fun getPaintingDetail(id: Int): DataResult<DetailPainting>
     suspend fun uploadPainting(painting: AddPaintingParams, image: Uri): DataResult<UploadPaintingOutput>
     suspend fun deletePainting(paintingId: String): DataResult<String>
