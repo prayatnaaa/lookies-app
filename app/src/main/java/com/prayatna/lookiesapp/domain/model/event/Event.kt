@@ -23,5 +23,8 @@ data class Event (
     val eventFormat: EventFormat,
     val status: String,
     val createdAt: String,
-    val updatedAt: String? = null
+    val updatedAt: String? = null,
+    val rejectionReason: String? = null,
+    val approvedBy: String? = null,
+    val approvedAt: String? = null
 )

@@ -62,4 +62,13 @@ data class EventDto(
 
     @SerialName("event_format")
     val eventFormat: EventFormatDto,
+
+    @SerialName("approved_at")
+    val approvedAt: String? = null,
+
+    @SerialName("approved_by")
+    val approvedBy: String? = null,
+
+    @SerialName("rejection_reason")
+    val rejectionReason: String? = null
 )

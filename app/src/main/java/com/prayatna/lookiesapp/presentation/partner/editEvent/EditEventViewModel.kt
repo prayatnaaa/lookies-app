@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditEventViewModel @Inject constructor(
     private val eventRepository: EventRepository,
-    private val editEventUseCase: EditEventUseCase
+    private val editEventUseCase: EditEventUseCase,
 ) : ViewModel() {
 
     private val _formState = MutableStateFlow(EditEventFormState())
@@ -140,7 +140,7 @@ class EditEventViewModel @Inject constructor(
                 title = event.title,
                 startDate = event.startDate,
                 endDate = event.endDate,
-                location = event.location ?: "",
+                location = event.location ,
                 locationUrl = event.locationUrl,
                 maxParticipant = event.maxParticipant?.toString(),
                 maxPainting = event.maxPainting?.toString(),
@@ -159,7 +159,11 @@ class EditEventViewModel @Inject constructor(
 
         _uiState.update { it.copy(isLoading = true) }
 
-        val input = formState.value.toEditEventInput()
+        val currentStatus = uiState.value.data?.status.orEmpty()
+
+        val input = formState.value.toEditEventInput(
+            currentStatus = currentStatus
+        )
 
         when (val result = editEventUseCase(id, input)) {
             is DataResult.Success -> {

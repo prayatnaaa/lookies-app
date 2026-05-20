@@ -26,6 +26,9 @@ fun EventDto.toDomain() : Event {
         organizer = organizer.toDomain(),
         eventFormat = eventFormat.toDomain(),
         remainingParticipantQuota = remainingParticipantQuota,
-        remainingPaintingQuota = remainingPaintingQuota
+        remainingPaintingQuota = remainingPaintingQuota,
+        rejectionReason = rejectionReason,
+        approvedAt = approvedAt,
+        approvedBy = approvedBy
     )
 }

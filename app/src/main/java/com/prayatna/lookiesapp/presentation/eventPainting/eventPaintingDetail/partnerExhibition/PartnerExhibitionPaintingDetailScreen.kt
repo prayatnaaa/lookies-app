@@ -138,6 +138,8 @@ fun PartnerExhibitionPaintingDetailScreen(
                         )
                     }
 
+                    "rejected" -> {}
+
                     else -> {
                         PartnerShipmentActionBar(
                             status = painting.status,

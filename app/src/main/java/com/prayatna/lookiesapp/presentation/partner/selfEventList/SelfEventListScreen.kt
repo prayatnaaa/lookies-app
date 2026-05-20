@@ -53,7 +53,7 @@ fun SelfEventListScreen(
 
     val statusFilters = listOf(
         "published" to "Published",
-        "rejected" to "Draft",
+        "rejected" to "Rejected",
         "pending_validation" to "Pending",
         "completed" to "Ended",
         "ongoing" to "On going",
@@ -168,7 +168,7 @@ fun SelfEventListScreen(
                             events = uiState.events,
                             modifier = Modifier.fillMaxSize(),
                             onClick = { event ->
-                                if (event.status == "pending_validation") {
+                                if (event.status == "pending_validation" || event.status == "rejected") {
                                     navController.navigate("${NavigationRoutes.EDIT_EVENT}/${event.id}")
                                 } else {
                                     navController.navigate("${NavigationRoutes.PARTNER_EVENT_MANAGE}/${event.id}")

@@ -1,15 +1,24 @@
 package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -50,15 +59,28 @@ fun ArtistExhibitionPaintingDetailScreen(
         },
         bottomBar = {
             state.data?.let { painting ->
-                if (painting.status in SHIPMENT_ACTIONABLE_STATUSES) {
-                    ArtistShipmentActionBar(
-                        status = painting.status,
-                        onManageShipment = {
-                            navController.navigate(
-                                NavigationRoutes.EXHIBITION_SHIPMENT + "/${painting.id}"
-                            )
-                        }
-                    )
+                when {
+                    painting.status.lowercase() == "rejected" -> {
+                        ArtistResubmitActionBar(
+                            onResubmit = {
+                                val eventId = painting.participant.event.id
+                                val merchantId = painting.participant.event.organizer.id
+                                navController.navigate(
+                                    "${NavigationRoutes.INSERT_EVENT_PAINTINGS_ROUTE}/$eventId/$merchantId"
+                                )
+                            }
+                        )
+                    }
+                    painting.status in SHIPMENT_ACTIONABLE_STATUSES -> {
+                        ArtistShipmentActionBar(
+                            status = painting.status,
+                            onManageShipment = {
+                                navController.navigate(
+                                    NavigationRoutes.EXHIBITION_SHIPMENT + "/${painting.id}"
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -75,6 +97,38 @@ fun ArtistExhibitionPaintingDetailScreen(
                 painting = painting,
                 modifier = Modifier.padding(innerPadding)
             )
+        }
+    }
+}
+
+@Composable
+fun ArtistResubmitActionBar(
+    onResubmit: () -> Unit
+) {
+    Surface(
+        shadowElevation = 8.dp,
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .navigationBarsPadding(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Your painting was rejected.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f)
+            )
+            Button(onClick = onResubmit) {
+                Text(
+                    text = "Edit & Resubmit",
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }

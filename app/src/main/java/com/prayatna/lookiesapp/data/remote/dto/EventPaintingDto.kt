@@ -24,6 +24,9 @@ data class EventPaintingDto(
     @SerialName("created_at")
     val createdAt: String,
 
+    @SerialName("rejection_reason")
+    val rejectionReason: String? = null,
+
     @SerialName("paintings")
     val painting: GetPaintingDto,
 

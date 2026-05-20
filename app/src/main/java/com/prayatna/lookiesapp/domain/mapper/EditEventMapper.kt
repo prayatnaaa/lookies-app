@@ -3,7 +3,9 @@ package com.prayatna.lookiesapp.domain.mapper
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.presentation.partner.editEvent.state.EditEventFormState
 
-fun EditEventFormState.toEditEventInput(): EditEventInput {
+fun EditEventFormState.toEditEventInput(
+    currentStatus: String
+): EditEventInput {
     return EditEventInput(
         title = title,
         startDate = startDate,
@@ -17,6 +19,11 @@ fun EditEventFormState.toEditEventInput(): EditEventInput {
         ticketPrice = ticketPrice?.toDoubleOrNull(),
         registrationFee = artistRegistrationFee?.toDoubleOrNull(),
         eventType = eventType.toInt(),
-        eventFormat = eventFormat.toInt()
+        eventFormat = eventFormat.toInt(),
+        status = if (currentStatus == "rejected") {
+            "pending_validation"
+        } else {
+            currentStatus
+        }
     )
 }

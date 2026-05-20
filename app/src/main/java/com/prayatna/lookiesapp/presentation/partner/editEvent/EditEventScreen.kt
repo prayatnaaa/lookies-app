@@ -1,12 +1,17 @@
 package com.prayatna.lookiesapp.presentation.partner.editEvent
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -16,7 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,6 +35,7 @@ import com.prayatna.lookiesapp.presentation.components.createEvent.EventAboutFor
 import com.prayatna.lookiesapp.presentation.components.createEvent.EventLocationForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.ParticipationRulesForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.PricingForm
+import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.partner.editEvent.state.EditEventFormEvent
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -53,7 +61,7 @@ fun EditEventScreen(
         when {
             uiState.isSuccess -> {
                 dialogTitle = "Success"
-                dialogMessage = "Event created successfully"
+                dialogMessage = "Event updated successfully"
                 showDialog = true
             }
 
@@ -72,13 +80,21 @@ fun EditEventScreen(
             message = dialogMessage,
             onConfirm = {
                 showDialog = false
+                dialogMessage = ""
+                dialogTitle = ""
 
                 if (uiState.isSuccess) {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("shouldRefresh", true)
+                    navController.navigateUp()
                     navController.navigateUp()
                 }
             },
             onDismiss = {
                 showDialog = false
+                dialogMessage = ""
+                dialogTitle = ""
             }
         )
     }
@@ -95,11 +111,51 @@ fun EditEventScreen(
         }
     ) { innerPadding ->
 
+        if (uiState.isLoading) {
+            CircularLoading()
+        }
+
         LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
+
+            val event = uiState.data
+
+            if (event?.status == "rejected" && !event.rejectionReason.isNullOrBlank()) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = Color(0xFFFFEBEE),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = Color(0xFFC62828)
+                        )
+                        androidx.compose.foundation.layout.Column {
+                            Text(
+                                text = "Event Rejected",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = Color(0xFFC62828)
+                            )
+                            Text(
+                                text = event.rejectionReason,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFFB71C1C)
+                            )
+                        }
+                    }
+                }
+            }
 
             item {
                 DetailEventForm(
@@ -225,7 +281,11 @@ fun EditEventScreen(
                             }
                         ) {
                             Text(
-                                text = if (uiState.isLoading) "Updating..." else "Update Event",
+                                text = when {
+                                    uiState.isLoading -> "Submitting..."
+                                    event?.status == "rejected" -> "Resubmit"
+                                    else -> "Update Event"
+                                },
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }

@@ -21,5 +21,6 @@ data class EditEventFormState(
     val eventTypes: List<TEventType> = emptyList(),
     val eventFormats: List<EventFormat> = emptyList(),
     val isLoadingMeta: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val status: String? = null
 )

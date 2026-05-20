@@ -9,6 +9,7 @@ data class EventPainting(
     val finalPrice: Double,
     val status: String,
     val createdAt: String,
+    val rejectionReason: String? = null,
     val painting: Painting,
     val participant: EventParticipant
 )

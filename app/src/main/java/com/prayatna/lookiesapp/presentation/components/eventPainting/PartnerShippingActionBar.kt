@@ -30,7 +30,7 @@ fun PartnerShipmentActionBar(
     val (label, enabled) = when (status.lowercase()) {
         "approved" -> "Submit Inbound Shipment" to true
         "shipping_to_event" -> "Shipment In Progress…" to true
-        "exhibited" -> "Artwork Exhibited" to true
+        "on_sale" -> "Artwork Exhibited" to true
         "unsold" -> "Return Being Arranged" to true
         "returning_to_creator" -> "Confirm Artwork Received" to true
         else -> "Manage Shipment" to true

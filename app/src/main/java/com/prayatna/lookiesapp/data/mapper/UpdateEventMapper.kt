@@ -17,6 +17,7 @@ fun EditEventInput.toDto(): UpdateEventRequest {
         ticketPrice = this.ticketPrice,
         registrationFee = this.registrationFee,
         eventType = this.eventType,
-        eventFormat = this.eventFormat
+        eventFormat = this.eventFormat,
+        status = this.status
     )
 }

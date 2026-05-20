@@ -13,5 +13,6 @@ data class EditEventInput(
     val ticketPrice: Double? = null,
     val registrationFee: Double? = null,
     val eventType: Int,
-    val eventFormat: Int
+    val eventFormat: Int,
+    val status: String
 )

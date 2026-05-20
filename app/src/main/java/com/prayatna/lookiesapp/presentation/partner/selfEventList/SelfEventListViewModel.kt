@@ -23,8 +23,26 @@ class SelfEventListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SelfEventListUiState())
     val uiState: StateFlow<SelfEventListUiState> = _uiState.asStateFlow()
 
+    val refresh = savedStateHandle.getStateFlow(
+        key = "shouldRefresh",
+        initialValue = false
+    )
+
     init {
         loadSelfEvents()
+        observeRefresh()
+    }
+
+    private fun observeRefresh() {
+        viewModelScope.launch {
+            refresh.collect { shouldRefresh ->
+                if (shouldRefresh) {
+                    loadSelfEvents()
+
+                    savedStateHandle["shouldRefresh"] = false
+                }
+            }
+        }
     }
 
     private fun loadSelfEvents() {

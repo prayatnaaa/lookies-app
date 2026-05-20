@@ -27,5 +27,6 @@ data class UpdateEventRequest(
     @SerialName("event_type_id")
     val eventType: Int,
     @SerialName("event_format_id")
-    val eventFormat: Int
+    val eventFormat: Int,
+    val status: String
 )
