@@ -25,9 +25,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -50,6 +54,24 @@ fun SelfEventListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+    val snackbarMessage =
+    navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>(
+            "snackbar_message",
+            null
+        )
+        ?.collectAsStateWithLifecycle()
+
+    LaunchedEffect(snackbarMessage?.value) {
+        snackbarMessage?.value?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("snackbar_message")
+        }
+    }
 
     val statusFilters = listOf(
         "published" to "Published",
@@ -61,6 +83,9 @@ fun SelfEventListScreen(
     )
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = { BackTopBar(
             onBackClick = {

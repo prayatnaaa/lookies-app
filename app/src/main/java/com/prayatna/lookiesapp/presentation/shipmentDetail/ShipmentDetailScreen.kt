@@ -5,8 +5,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -24,14 +28,15 @@ fun ShipmentDetailScreen(
     onEvent: (ShipmentDetailEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (uiState.updateSuccessMessage != null) {
-        CustomBottomSheet(
-            title = "Success",
-            message = uiState.updateSuccessMessage,
-            confirmText = "OK",
-            onConfirm = { onEvent(ShipmentDetailEvent.OnSuccessConfirmed) },
-            onDismiss = { onEvent(ShipmentDetailEvent.OnSuccessConfirmed) }
-        )
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
+    LaunchedEffect(uiState.updateSuccessMessage) {
+        uiState.updateSuccessMessage?.let { message ->
+            snackbarHostState.showSnackbar(message, withDismissAction = true)
+        }
     }
 
     if (uiState.errorMessage != null && !uiState.isLoading && uiState.shipment != null) {
@@ -46,6 +51,9 @@ fun ShipmentDetailScreen(
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         topBar = {
             BackTopBar(
                 title = "Shipment Detail",

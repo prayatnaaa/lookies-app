@@ -63,6 +63,7 @@ fun CreateEventScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val formState by viewModel.formState.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
@@ -115,9 +116,17 @@ fun CreateEventScreen(
     LaunchedEffect(uiState.isSuccess, uiState.errorMessage) {
         when {
             uiState.isSuccess -> {
-                dialogTitle = "Success"
-                dialogMessage = "Event created successfully"
-                showDialog = true
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("snackbar_message", "Event created successfully!")
+
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(
+                        "shouldRefresh",
+                        true
+                    )
+                navController.popBackStack()
             }
 
             uiState.errorMessage != null -> {

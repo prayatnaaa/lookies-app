@@ -135,51 +135,81 @@ fun ShipmentDetailContent(
 
             HorizontalDivider()
 
-            Text(text = "Arrival Proof", style = MaterialTheme.typography.titleMedium)
-            
-            if (!shipment.arrivalProofUrl.isNullOrBlank()) {
-                CustomAsyncImage(
-                    model = shipment.arrivalProofUrl,
-                    contentDescription = "Arrival Proof",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                )
-            } else {
-                OutlinedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    onClick = { imagePickerLauncher.launch("image/*") }
+            Text(
+                text = "Arrival Proof",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            OutlinedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                onClick = {
+                    imagePickerLauncher.launch("image/*")
+                }
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        if (uiState.selectedArrivalProof != null) {
+
+                    when {
+                        uiState.selectedArrivalProof != null -> {
                             CustomAsyncImage(
                                 model = uiState.selectedArrivalProof,
                                 contentDescription = "Selected Proof",
                                 modifier = Modifier.fillMaxSize()
                             )
-                        } else {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(48.dp))
-                                Text("Upload Arrival Proof", style = MaterialTheme.typography.bodyMedium)
+                        }
+
+                        !shipment.arrivalProofUrl.isNullOrBlank() -> {
+                            CustomAsyncImage(
+                                model = shipment.arrivalProofUrl,
+                                contentDescription = "Arrival Proof",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+
+                        // default kosong
+                        else -> {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    Icons.Default.CloudUpload,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Text(
+                                    "Upload Arrival Proof",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
                             }
                         }
                     }
                 }
+            }
 
-                if (uiState.selectedArrivalProof != null) {
-                    Button(
-                        onClick = { onEvent(ShipmentDetailEvent.SubmitArrivalProof) },
-                        enabled = !uiState.isUploadingProof,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        if (uiState.isUploadingProof) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
-                        } else {
-                            Text("Submit Proof")
-                        }
-                    }
+            Button(
+                onClick = {
+                    onEvent(ShipmentDetailEvent.SubmitArrivalProof)
+                },
+                enabled = !uiState.isUploadingProof &&
+                        uiState.selectedArrivalProof != null,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (uiState.isUploadingProof) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(
+                        if (!shipment.arrivalProofUrl.isNullOrBlank())
+                            "Update Proof"
+                        else
+                            "Submit Proof"
+                    )
                 }
             }
 

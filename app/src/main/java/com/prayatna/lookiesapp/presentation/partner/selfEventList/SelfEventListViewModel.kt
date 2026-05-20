@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SelfEventListViewModel @Inject constructor(
     private val getSelfEventsUseCase: GetSelfEventsUseCase,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(SelfEventListUiState())

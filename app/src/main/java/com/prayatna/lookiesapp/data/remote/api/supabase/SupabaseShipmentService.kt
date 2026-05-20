@@ -22,13 +22,13 @@ class SupabaseShipmentService @Inject constructor(
         val bucketName = "shipment_proofs"
         val path = "exhibition/$fileName"
 
-        val uploadedPath = storage.from(bucketName).upload(
+        storage.from(bucketName).upload(
             path = path,
             data = image,
-            upsert = true
+//            upsert = true
         )
 
-        val imageUrl = Helper.buildImageUrl(imageName = uploadedPath, bucketName = bucketName)
+        val imageUrl = Helper.buildImageUrl(imageName = path, bucketName = bucketName)
 
         postgrest.from("exhibition_shipments").update({
             set("arrival_proof_url", imageUrl)
