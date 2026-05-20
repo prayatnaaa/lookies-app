@@ -46,6 +46,26 @@ fun ParticipantPaintingListScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow<String?>(
+                "snackbar_message",
+                null
+            )
+            ?.collect { message ->
+
+                if (message != null) {
+
+                    snackbarHostState.showSnackbar(message)
+
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.remove<String>("snackbar_message")
+                }
+            }
+    }
+
     Scaffold(
         bottomBar = {
             if (eventType == "self_exhibition") {

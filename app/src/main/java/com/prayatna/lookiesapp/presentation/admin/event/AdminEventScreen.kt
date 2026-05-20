@@ -24,12 +24,39 @@ fun AdminEventScreen(
     viewModel: AdminEventViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+    val snackbarMessage =
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow<String?>(
+                "snackbar_message",
+                null
+            )
+            ?.collectAsStateWithLifecycle()
 
-    LaunchedEffect(uiState.events) {
+    LaunchedEffect(Unit) {
         viewModel.getEvents()
     }
 
+    LaunchedEffect(snackbarMessage?.value) {
+        snackbarMessage?.value?.let { message ->
+            snackbarHostState.showSnackbar(
+                message,
+                withDismissAction = true
+            )
+
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.remove<String>("snackbar_message")
+        }
+    }
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         topBar = { BackTopBar(onBackClick = {
             navController.popBackStack()
         }) },

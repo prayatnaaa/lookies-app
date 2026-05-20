@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.admin.event
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.event.GetEventsUseCase
@@ -13,14 +14,31 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AdminEventViewModel @Inject constructor(
-    private val getEventsUseCase: GetEventsUseCase
+    private val getEventsUseCase: GetEventsUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AdminEventUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun getEvents(forceRefresh: Boolean = false) {
-        if (!forceRefresh && _uiState.value.events.isNotEmpty()) return
+    init {
+        observeRefresh()
+    }
+
+    private fun observeRefresh() {
+        viewModelScope.launch {
+            savedStateHandle
+                .getStateFlow("refresh", false)
+                .collect { shouldRefresh ->
+                    if (shouldRefresh) {
+                        getEvents()
+                        savedStateHandle["refresh"] = false
+                    }
+                }
+        }
+    }
+
+    fun getEvents() {
         val status = _uiState.value.status?.type
         val title = _uiState.value.title
 
@@ -45,8 +63,8 @@ class AdminEventViewModel @Inject constructor(
     fun onStatusSelected(status: EventStatus?) {
         val newStatus = if (_uiState.value.status == status) null else status
         _uiState.update { it.copy(status = newStatus) }
-        getEvents(forceRefresh = true)
+        getEvents()
     }
 
-    fun retry() = getEvents(forceRefresh = true)
+    fun retry() = getEvents()
 }

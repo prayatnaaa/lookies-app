@@ -80,7 +80,6 @@ class AdminDetailEventViewModel @Inject constructor(
             when (val result = approveEventUseCase(eventId)) {
                 is DataResult.Success -> {
                     _effect.emit(AdminDetailEventUiEffect.ShowToast("Event approved successfully"))
-                    _effect.emit(AdminDetailEventUiEffect.NavigateBack)
                 }
                 is DataResult.Error -> {
                     _uiState.update { it.copy(errorMessage = result.error, isDeciding = false) }

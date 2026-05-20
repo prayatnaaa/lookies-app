@@ -10,6 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventPainting.EventPaintingDetailContent
 import com.prayatna.lookiesapp.presentation.components.eventPainting.PartnerShipmentActionBar
@@ -38,13 +38,17 @@ fun PartnerExhibitionPaintingDetailScreen(
     viewModel: PartnerExhibitionPaintingDetailViewModel = hiltViewModel()
 ) {
 
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     var showRejectSheet by remember { mutableStateOf(false) }
     var rejectReason by remember { mutableStateOf("") }
     var selectedPaintingId by remember { mutableStateOf<String?>(null) }
 
-    var resultMessage by remember { mutableStateOf<String?>(null) }
+//    var resultMessage by remember { mutableStateOf<String?>(null) }
 
     // LOAD
     LaunchedEffect(eventPaintingId) {
@@ -53,36 +57,33 @@ fun PartnerExhibitionPaintingDetailScreen(
         )
     }
 
-    // EVENTS (IMPORTANT: NO DUPLICATE STATE BUG)
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
-            resultMessage = when (event) {
+            when (event) {
+
                 is EventPaintingDetailEffect.ShowResult -> {
-                    event.message
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("snackbar_message", event.message)
+
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(
+                            "refresh",
+                            true
+                        )
+
+                    navController.popBackStack()
                 }
 
                 is EventPaintingDetailEffect.ShowError -> {
-                    event.message
+                    snackbarHostState.showSnackbar(
+                        event.message,
+                        withDismissAction = true
+                    )
                 }
             }
         }
-    }
-
-    // RESULT BOTTOM SHEET
-    resultMessage?.let { message ->
-        CustomBottomSheet(
-            title = message,
-            message = "",
-            confirmText = "OK",
-            onConfirm = {
-                resultMessage = null
-                navController.popBackStack()
-            },
-            onDismiss = {
-                resultMessage = null
-                navController.popBackStack()
-            }
-        )
     }
 
     if (showRejectSheet) {
