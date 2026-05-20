@@ -1,11 +1,14 @@
 package com.prayatna.lookiesapp.presentation.shipmentDetail
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.shipment.GetShipmentByOrderIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.CreateTrackingNumberShipmentUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.UpdateShipmentStatusUseCase
 import com.prayatna.lookiesapp.domain.usecase.merchant.UploadShipmentArrivalProofUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.GetOrderDetailUseCase
 import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailEvent
 import com.prayatna.lookiesapp.presentation.shipmentDetail.state.ShipmentDetailUiState
 import com.prayatna.lookiesapp.utils.DataResult
@@ -22,7 +25,8 @@ class ShipmentDetailViewModel @Inject constructor(
     private val updateShipmentStatusUseCase: UpdateShipmentStatusUseCase,
     private val getShipmentByOrderIdUseCase: GetShipmentByOrderIdUseCase,
     private val createTrackingNumberShipmentUseCase: CreateTrackingNumberShipmentUseCase,
-    private val uploadShipmentArrivalProofUseCase: UploadShipmentArrivalProofUseCase
+    private val uploadShipmentArrivalProofUseCase: UploadShipmentArrivalProofUseCase,
+    private val getOrderDetailUseCase: GetOrderDetailUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ShipmentDetailUiState())
@@ -32,21 +36,26 @@ class ShipmentDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            when (val result = getShipmentByOrderIdUseCase(orderId)) {
-                is DataResult.Success -> {
-                    _uiState.update { 
-                        it.copy(
-                            isLoading = false, 
-                            shipment = result.data,
-                            selectedStatus = result.data.status,
-                            trackingNumberInput = result.data.trackingNumber
-                        ) 
-                    }
+            val shipmentResult = getShipmentByOrderIdUseCase(orderId)
+            val transactionResult = getOrderDetailUseCase(orderId)
+
+            if (shipmentResult is DataResult.Success && transactionResult is DataResult.Success) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        shipment = shipmentResult.data,
+                        transactionDetail = transactionResult.data,
+                        selectedStatus = shipmentResult.data.status,
+                        trackingNumberInput = shipmentResult.data.trackingNumber
+                    )
                 }
-                is DataResult.Error -> {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+            } else {
+                val error = when {
+                    shipmentResult is DataResult.Error -> shipmentResult.error
+                    transactionResult is DataResult.Error -> transactionResult.error
+                    else -> "Failed to load details"
                 }
-                else -> Unit
+                _uiState.update { it.copy(isLoading = false, errorMessage = error) }
             }
         }
     }

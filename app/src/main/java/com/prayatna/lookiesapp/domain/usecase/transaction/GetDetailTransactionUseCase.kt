@@ -12,7 +12,7 @@ class GetDetailTransactionUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(orderId: String): DataResult<DetailTransaction> {
         return supervisorScope {
-            val transactionDef = async { transactionRepository.getTransactionByOrderId(orderId) }
+            val transactionDef = async { transactionRepository.getOrderDetail(orderId) }
             val ticketsDef = async { transactionRepository.getTicketsByOrderId(orderId) }
 
             val transaction = transactionDef.await()

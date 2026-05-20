@@ -2,10 +2,12 @@ package com.prayatna.lookiesapp.presentation.shipmentDetail.state
 
 import android.net.Uri
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.transaction.Transaction
 
 data class ShipmentDetailUiState(
     val isLoading: Boolean = false,
     val shipment: Shipment? = null,
+    val transactionDetail: Transaction? = null,
     val trackingNumberInput: String? = "",
     val selectedStatus: String = "",
     val errorMessage: String? = null,

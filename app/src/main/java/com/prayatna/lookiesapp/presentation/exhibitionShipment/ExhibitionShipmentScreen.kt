@@ -108,7 +108,8 @@ fun ExhibitionShipmentScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .imePadding(),
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             // ── Always-visible context header ─────────────────────────────

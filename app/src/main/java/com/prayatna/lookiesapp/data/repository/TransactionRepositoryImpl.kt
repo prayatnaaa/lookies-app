@@ -178,6 +178,16 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getOrderDetail(orderId: String): DataResult<Transaction> {
+        return try {
+            val result = transactionService.getOrderDetail(orderId)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
     override suspend fun setOrderToComplete(request: SetOrderToCompleteInput): DataResult<SetOrderToCompleteResult> {
         return try {
             val result = transactionService.setOrderToComplete(request.toDto())

@@ -48,6 +48,8 @@ interface TransactionRepository {
             DataResult<List<Ticket>>
     suspend fun getTransactionByOrderId(orderId: String):
             DataResult<Transaction>
+    suspend fun getOrderDetail(orderId: String):
+            DataResult<Transaction>
     suspend fun setOrderToComplete(request: SetOrderToCompleteInput):
             DataResult<SetOrderToCompleteResult>
     suspend fun getMonthlyFinancialReport(filter: MonthlyFinancialReportFilterInput):

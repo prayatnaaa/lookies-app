@@ -148,7 +148,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
 
             when (val shipmentResult = createExhibitionShipmentUseCase(input)) {
                 is DataResult.Success -> {
-                    _uiState.update { it.copy(successMessage = "Inbound shipment created successfully") }
+                    _uiState.update { it.copy(isLoading = false, successMessage = "Inbound shipment created successfully") }
 
                 }
                 is DataResult.Error -> _uiState.update {

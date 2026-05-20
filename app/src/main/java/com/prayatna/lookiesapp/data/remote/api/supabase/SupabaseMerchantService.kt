@@ -26,7 +26,7 @@ class SupabaseMerchantService @Inject constructor(
         val uploadedPath = storage.from(bucketName).upload(
             path = path,
             data = image,
-            upsert = true
+//            upsert = true
         )
 
         val imageUrl = Helper.buildImageUrl(imageName = uploadedPath, bucketName = bucketName)

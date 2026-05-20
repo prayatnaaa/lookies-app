@@ -153,6 +153,18 @@ class SupabaseTransactionService @Inject constructor(
 
     }
 
+    suspend fun getOrderDetail(orderId: String): TransactionDto {
+        return postgrest
+            .from("transactions_view")
+            .select {
+                filter {
+                    eq("order_id", orderId)
+                }
+                order("created_at", order = Order.DESCENDING)
+            }
+            .decodeSingle<TransactionDto>()
+    }
+
     suspend fun createPaymentRequest(request: CreateXenditPaymentRequest): CreateXenditPaymentResponse {
         val session = auth.currentSessionOrNull()
             ?: throw IllegalStateException("No active session")
