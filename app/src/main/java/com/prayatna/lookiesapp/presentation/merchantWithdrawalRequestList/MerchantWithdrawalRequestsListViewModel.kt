@@ -50,6 +50,16 @@ class MerchantWithdrawalRequestsListViewModel @Inject constructor(
                     _effect.send(NavigateCreateWithdrawal(businessId))
                 }
             }
+
+            MerchantWithdrawalRequestListEvent.Refresh -> {
+                getMerchantWithdrawalRequest()
+            }
+
+            MerchantWithdrawalRequestListEvent.ShowCreatedSnackBar -> {
+                viewModelScope.launch {
+                    _effect.send(ShowSnackbar("Withdrawal request created successfully"))
+                }
+            }
         }
     }
 

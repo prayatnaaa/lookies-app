@@ -36,7 +36,6 @@ class CreateWithdrawalRequestViewModel @Inject constructor(
     private val businessId: String = savedStateHandle["businessId"] ?: ""
 
     init {
-        Log.e("CreateReq", "businessId = $businessId")
         getMerchantBankAccount()
     }
 
@@ -107,6 +106,7 @@ class CreateWithdrawalRequestViewModel @Inject constructor(
             when (val result = createWithdrawalRequestUseCase(input)) {
                 is DataResult.Success -> {
                     _uiState.update { it.copy(isLoading = false, successMessage = "Withdrawal request submitted successfully") }
+                    _effect.send(CreateWithdrawalRequestEffect.ShowMessage("Withdrawal request submitted successfully"))
                 }
                 is DataResult.Error -> {
                     _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }

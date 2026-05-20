@@ -22,7 +22,11 @@ fun CreateWithdrawalRequestRoute(
             when (effect) {
                 CreateWithdrawalRequestEffect.NavigateBack -> navController.popBackStack()
                 is CreateWithdrawalRequestEffect.ShowMessage -> {
-                    // Handled via UI State dialogs for consistency with recent screens
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("withdrawal_created", true)
+
+                    navController.popBackStack()
                 }
             }
         }

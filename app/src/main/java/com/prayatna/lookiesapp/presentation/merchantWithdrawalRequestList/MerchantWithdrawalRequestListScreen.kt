@@ -27,6 +27,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,9 +46,13 @@ import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.state.
 @Composable
 fun MerchantWithdrawalRequestListScreen(
     uiState: MerchantWithdrawalRequestListUiState,
+    snackbarHostState: SnackbarHostState,
     onEvent: (MerchantWithdrawalRequestListEvent) -> Unit
 ) {
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { onEvent(MerchantWithdrawalRequestListEvent.CreateWithdrawalClicked) },
