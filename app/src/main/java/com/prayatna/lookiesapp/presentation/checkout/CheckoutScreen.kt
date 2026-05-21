@@ -41,7 +41,6 @@ fun CheckoutScreen(
         }
     }
 
-    // ✅ SUCCESS DIALOG
     if (showSuccessDialog.value) {
         CustomBottomSheet(
             title = "Order Created!",
@@ -57,7 +56,6 @@ fun CheckoutScreen(
         )
     }
 
-    // ✅ ERROR DIALOG
     errorMessage.value?.let { message ->
         CustomBottomSheet(
             title = "Checkout Failed",

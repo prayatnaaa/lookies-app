@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -184,7 +185,7 @@ fun AddressSection(
     onAddressSelected: (UserAddress) -> Unit,
     onAddAddressClick: () -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
         Text("Shipping Address", style = MaterialTheme.typography.titleMedium)
 
@@ -208,16 +209,19 @@ fun AddressSection(
             Column {
             uiState.userAddresses.forEach { address ->
                 val selected = uiState.selectedAddress?.id == address.id
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onAddressSelected(address) },
+                    shape = RoundedCornerShape(12.dp),
+                    border = if (selected) {
+                        BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                    } else {
+                        BorderStroke(1.dp, Color.Gray)
+                    }
+                ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onAddressSelected(address) }
-                            .padding(12.dp)
-                            .border(
-                                width = if (selected) 2.dp else 1.dp,
-                                color = if (selected) MaterialTheme.colorScheme.primary else Color.Gray,
-                                shape = RoundedCornerShape(12.dp)
-                            ),
+                        modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(selected = selected, onClick = null)
@@ -230,6 +234,7 @@ fun AddressSection(
                             Text(address.addressLine)
                         }
                     }
+                }
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 OutlinedButton(
@@ -264,7 +269,7 @@ fun ShippingSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onShipmentFeeSelected(fee) }
-                        .padding(12.dp),
+                        .padding(vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(

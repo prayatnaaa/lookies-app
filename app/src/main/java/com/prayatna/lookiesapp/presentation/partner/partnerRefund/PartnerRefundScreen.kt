@@ -267,14 +267,6 @@ private fun HeaderSection(
         ) {
 
             Text(
-                text = "Refund #${refund.id}",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(
                 text = "Current Status: ${refund.status.uppercase()}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
@@ -317,7 +309,7 @@ private fun ProofImageSection(
                     .fillMaxWidth()
                     .aspectRatio(1.4f)
                     .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
                 placeholder = null,
                 error = null
             )
@@ -350,7 +342,6 @@ private fun DetailCard(
             InfoRow("Account Number", refund.accountNumber)
             InfoRow("Account Name", refund.accountHolderName)
             InfoRow("Reason", refund.reason)
-            InfoRow("Tracking Number", refund.returnTrackingNumber ?: "-")
             InfoRow("Admin Notes", refund.adminNotes ?: "-")
             InfoRow("Created", refund.createdAt)
             InfoRow("Updated", refund.updatedAt)
@@ -371,12 +362,14 @@ private fun InfoRow(
         ) {
             Text(
                 text = title,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall
             )
 
             Text(
                 text = value,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.bodySmall
             )
         }
 
