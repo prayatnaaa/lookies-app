@@ -139,7 +139,7 @@ fun PartnerExhibitionPaintingDetailScreen(
                         )
                     }
 
-                    "rejected" -> {}
+                    "rejected", "sold" -> {}
 
                     else -> {
                         PartnerShipmentActionBar(

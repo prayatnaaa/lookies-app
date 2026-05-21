@@ -1,18 +1,6 @@
 package com.prayatna.lookiesapp.presentation.partner.main.home
 
-/*
-UPDATED SCREEN IDEA
-- Modern dashboard style
-- Circular revenue overview
-- Monthly finance cards
-- Cleaner hierarchy
-- Existing MVI compatible
-
-Requires:
-PartnerHomeUiState now has:
-monthlyFinancialReport: List<MonthlyFinancialReport> = emptyList()
-*/
-
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,18 +11,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +42,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
@@ -56,6 +50,7 @@ import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
 import com.prayatna.lookiesapp.domain.model.transaction.PendingOrderSplits
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEvent
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeUiState
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,12 +68,17 @@ fun PartnerHomeScreen(
                         },
                         title = state.profile?.tradingName
                             ?: state.profile?.legalName
-                            ?: "Dashboard"
+                            ?: "Loading..."
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { onEvent(PartnerHomeEvent.BackClicked) }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                    IconButton(onClick = {
+                        onEvent(PartnerHomeEvent.BackClicked)
+                    }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            null
+                        )
                     }
                 }
             )
@@ -88,8 +88,12 @@ fun PartnerHomeScreen(
                 onClick = {
                     onEvent(PartnerHomeEvent.CreateEventClicked)
                 },
-                icon = { Icon(Icons.Default.Add, null) },
-                text = { Text("Create Event") }
+                icon = {
+                    Icon(Icons.Default.Add, null)
+                },
+                text = {
+                    Text("Create Event")
+                }
             )
         }
     ) { padding ->
@@ -117,7 +121,8 @@ fun PartnerHomeScreen(
             item {
                 RevenueOverviewCard(
                     balanceLogs = state.balanceLogs,
-                    pendingOrderSplits = state.pendingOrderSplits
+                    pendingOrderSplits = state.pendingOrderSplits,
+                    isLoading = state.isLoading
                 ) {
                     onEvent(PartnerHomeEvent.MonthlyFinanceClicked)
                 }
@@ -129,20 +134,6 @@ fun PartnerHomeScreen(
 
             item {
                 ActionGrid(onEvent)
-            }
-
-            if (state.balanceLogs.isNotEmpty()) {
-                item {
-                    Text(
-                        "Balance History",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                items(state.balanceLogs.take(5)) { log ->
-                    BalanceLogCard(log)
-                }
             }
 
             if (state.monthlyFinancialReport.isNotEmpty()) {
@@ -166,16 +157,13 @@ fun PartnerHomeScreen(
     }
 }
 
-/* --------------------------------------------------- */
-
 @Composable
 private fun DashboardHeader(
     title: String,
     onMemberClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -210,56 +198,125 @@ private fun DashboardHeader(
 private fun RevenueOverviewCard(
     balanceLogs: List<MerchantBalanceLog>,
     pendingOrderSplits: PendingOrderSplits?,
+    isLoading: Boolean,
     onClick: () -> Unit
 ) {
-    val latestBalance = balanceLogs.firstOrNull()?.balanceAfter ?: 0L
-    val pending = pendingOrderSplits?.totalAmount ?: 0L
+    val latestBalance = balanceLogs.firstOrNull()?.balanceAfter
+    val pending = pendingOrderSplits?.totalAmount
 
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
-        onClick = onClick
+        shape = RoundedCornerShape(24.dp),
+        onClick = onClick,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier
                 .padding(24.dp)
                 .fillMaxWidth()
         ) {
-            Text(
-                "Current Balance",
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Text(
-                "Rp $latestBalance",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            if (pending > 0) {
-                Spacer(modifier = Modifier.height(12.dp))
-                
+            // Header Card: Icon + Title + Arrow Right (Indikator bisa diklik)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        "Pending Payout: ",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    Icon(
+                        imageVector = Icons.Default.AccountBalanceWallet,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        "Rp $pending",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.error
+                        text = "Current Balance",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                     )
+                }
+
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "View Finance Details",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Main Balance Amount
+            if (isLoading && latestBalance == null) {
+                // Skeleton loading yang lebih elegan daripada CircularProgressIndicator
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .height(40.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.1f))
+                )
+            } else {
+                Text(
+                    text = formatRupiah(latestBalance?.toDouble() ?: 0.0),
+                    style = MaterialTheme.typography.headlineLarge, // Ukuran teks diperbesar
+                    fontWeight = FontWeight.ExtraBold, // Lebih tebal
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+
+            // Pending Payout Section
+            if ((pending ?: 0L) > 0) {
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Dibuat seperti badge/banner di dalam card
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Schedule,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                            Text(
+                                text = "Pending Payout",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+
+                        Text(
+                            text = formatRupiah(pending?.toDouble() ?: 0.0),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             }
         }
     }
 }
+/* --------------------------------------------------- */
 
 @Composable
 private fun QuickStatsSection(
@@ -274,20 +331,27 @@ private fun QuickStatsSection(
 
         SmallStatCard(
             title = "Events",
-            value = dashboard?.activeEvents?.toString() ?: "-",
+            value = dashboard?.activeEvents?.toString(),
+            isLoading = state.isLoading && dashboard == null,
             modifier = Modifier.weight(1f)
         )
 
         SmallStatCard(
             title = "Tickets",
-            value = dashboard?.totalTicketsSold?.toString() ?: "-",
+            value = dashboard?.totalTicketsSold?.toString(),
+            isLoading = state.isLoading && dashboard == null,
             modifier = Modifier.weight(1f)
         )
 
         SmallStatCard(
             title = "Payout",
-            value = if (state.profile?.payoutEnabled == true)
-                "ON" else "OFF",
+            value = when {
+                state.profile == null -> null
+                state.profile.payoutEnabled -> "ON"
+                else -> "OFF"
+            },
+            isLoading = state.isLoading &&
+                    state.profile == null,
             modifier = Modifier.weight(1f)
         )
     }
@@ -296,7 +360,8 @@ private fun QuickStatsSection(
 @Composable
 private fun SmallStatCard(
     title: String,
-    value: String,
+    value: String?,
+    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -307,10 +372,16 @@ private fun SmallStatCard(
             modifier = Modifier.padding(14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                value,
-                fontWeight = FontWeight.Bold
-            )
+
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Text(
+                    text = value ?: "-",
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
             Text(
                 title,
                 style = MaterialTheme.typography.labelSmall
@@ -340,18 +411,26 @@ private fun ActionGrid(
         ) {
             ActionCircle(
                 title = "Events",
-                icon = { Icon(Icons.Default.Event, null) },
+                icon = {
+                    Icon(Icons.Default.Event, null)
+                },
                 onClick = {
-                    onEvent(PartnerHomeEvent.MyEventsClicked)
+                    onEvent(
+                        PartnerHomeEvent.MyEventsClicked
+                    )
                 },
                 modifier = Modifier.weight(1f)
             )
 
             ActionCircle(
                 title = "Refund",
-                icon = { Icon(Icons.Default.Payments, null) },
+                icon = {
+                    Icon(Icons.Default.Payments, null)
+                },
                 onClick = {
-                    onEvent(PartnerHomeEvent.RefundClicked)
+                    onEvent(
+                        PartnerHomeEvent.RefundClicked
+                    )
                 },
                 modifier = Modifier.weight(1f)
             )
@@ -362,18 +441,26 @@ private fun ActionGrid(
         ) {
             ActionCircle(
                 title = "Painting",
-                icon = { Icon(Icons.Default.Group, null) },
+                icon = {
+                    Icon(Icons.Default.Group, null)
+                },
                 onClick = {
-                    onEvent(PartnerHomeEvent.PaintingClicked)
+                    onEvent(
+                        PartnerHomeEvent.PaintingClicked
+                    )
                 },
                 modifier = Modifier.weight(1f)
             )
 
             ActionCircle(
                 title = "Shipment",
-                icon = { Icon(Icons.Default.LocalShipping, null) },
+                icon = {
+                    Icon(Icons.Default.LocalShipping, null)
+                },
                 onClick = {
-                    onEvent(PartnerHomeEvent.ShipmentClicked)
+                    onEvent(
+                        PartnerHomeEvent.ShipmentClicked
+                    )
                 },
                 modifier = Modifier.weight(1f)
             )
@@ -399,13 +486,16 @@ private fun ActionCircle(
                 .padding(18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Surface(
                 shape = CircleShape,
                 tonalElevation = 4.dp
             ) {
                 Box(
                     modifier = Modifier.padding(14.dp)
-                ) { icon() }
+                ) {
+                    icon()
+                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -437,67 +527,15 @@ private fun MonthlyReportCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text("Orders : ${report.totalOrders}")
-            Text("Gross : Rp ${report.grossRevenue.toLong()}")
-            Text("Fee : Rp ${report.platformFees.toLong()}")
-            Text("Gateway : Rp ${report.paymentGatewayFees.toLong()}")
+            Text("Gross : ${formatRupiah(report.grossRevenue)}")
+            Text("Fee : ${formatRupiah(report.platformFees)}")
+            Text("Gateway : ${formatRupiah(report.paymentGatewayFees)}")
 
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                "Net : Rp ${report.netRevenue.toLong()}",
+                "Net : ${formatRupiah(report.netRevenue)}",
                 fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
-private fun BalanceLogCard(
-    log: MerchantBalanceLog
-) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = log.transactionType.uppercase(),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = if (log.amount > 0) MaterialTheme.colorScheme.primary 
-                            else MaterialTheme.colorScheme.error
-                )
-                Text(
-                    text = log.createdAt.take(10), // Simple date
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Amount : Rp ${log.amount}",
-                fontWeight = FontWeight.Bold
-            )
-            
-            log.description?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Balance After : Rp ${log.balanceAfter}",
-                style = MaterialTheme.typography.labelSmall
             )
         }
     }

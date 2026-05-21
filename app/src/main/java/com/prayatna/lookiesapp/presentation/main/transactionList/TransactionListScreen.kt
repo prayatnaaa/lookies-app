@@ -31,9 +31,6 @@ fun TransactionListScreen(
         topBar = {
             TopAppBar(
                 title = { Text("My Orders", fontWeight = FontWeight.SemiBold) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
             )
         },
         containerColor = MaterialTheme.colorScheme.background

@@ -1,13 +1,11 @@
 package com.prayatna.lookiesapp.presentation.monthlyFinancleList
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.*
@@ -21,6 +19,7 @@ import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
 import com.prayatna.lookiesapp.domain.model.transaction.OrderSplit
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceEvent
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceUiState
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,29 +123,37 @@ private fun PayoutLogCard(split: OrderSplit) {
         Column(
             modifier = Modifier.padding(20.dp)
         ) {
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.End
             ) {
-                Text(
-                    text = "Order #${split.orderId.take(8)}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
                 Text(
                     text = split.payoutStatus.formatStatus(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (split.payoutStatus == "on_hold") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    color = if (split.payoutStatus == "on_hold") {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    }
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            FinancialRowItem(label = "Gross Amount", value = "Rp ${split.grossAmount.toLong()}")
-            FinancialRowItem(label = "Platform Fee", value = "- Rp ${split.platformFee.toLong()}")
-            
-            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+            FinancialRowItem(
+                label = "Gross Amount",
+                value = formatRupiah(split.grossAmount)
+            )
+
+            FinancialRowItem(
+                label = "Platform Fee",
+                value = "- ${formatRupiah(split.platformFee)}"
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 12.dp)
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -157,8 +164,9 @@ private fun PayoutLogCard(split: OrderSplit) {
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
+
                 Text(
-                    text = "Rp ${split.netAmount.toLong()}",
+                    text = formatRupiah(split.netAmount),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.primary
@@ -167,7 +175,6 @@ private fun PayoutLogCard(split: OrderSplit) {
         }
     }
 }
-
 @Composable
 private fun BalanceLogCard(log: MerchantBalanceLog) {
     ElevatedCard(
@@ -196,7 +203,7 @@ private fun BalanceLogCard(log: MerchantBalanceLog) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = if (log.amount > 0) "+ Rp ${log.amount}" else "- Rp ${-log.amount}",
+                text = if (log.amount > 0) "+ ${formatRupiah(log.amount.toDouble())}" else "- ${formatRupiah((-log.amount).toDouble())}",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = if (log.amount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
@@ -213,7 +220,7 @@ private fun BalanceLogCard(log: MerchantBalanceLog) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Balance after: Rp ${log.balanceAfter}",
+                text = "Balance after: ${formatRupiah(log.balanceAfter.toDouble())}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
