@@ -286,6 +286,16 @@ fun ArtistDashboardScreen(
                                         )
                                     }
                                 )
+                                DashboardActionItem(
+                                    title = "Shipments & Orders",
+                                    subtitle = "Monitor and manage buyer shipments",
+                                    icon = Icons.Filled.LocalShipping,
+                                    onClick = {
+                                        navController.navigate(
+                                            "${NavigationRoutes.SHIPMENT_LIST}/${summary.businessId}"
+                                        )
+                                    }
+                                )
                             }
                         }
 

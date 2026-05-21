@@ -15,5 +15,6 @@ data class ShipmentDetailUiState(
     val isUploadingProof: Boolean = false,
     val selectedArrivalProof: Uri? = null,
     val updateSuccessMessage: String? = null,
+    val canUpdateShipment: Boolean = true,
     val availableStatuses: List<String> = listOf("processing", "shipped", "delivered", "pending", "cancelled", "refunded")
 )

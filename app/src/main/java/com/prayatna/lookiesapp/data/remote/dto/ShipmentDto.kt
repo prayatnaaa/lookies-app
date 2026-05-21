@@ -9,6 +9,8 @@ data class ShipmentDto(
     val id: String,
     @SerialName("merchant_id")
     val merchantId: String,
+    @SerialName("artist_id")
+    val artistId: String? = null,
     @SerialName("order_id")
     val orderId: String,
     @SerialName("tracking_number")

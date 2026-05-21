@@ -6,6 +6,7 @@ import com.prayatna.lookiesapp.domain.model.shipment.Shipment
 fun ShipmentDto.toDomain() = Shipment(
     id = id,
     merchantId = merchantId,
+    artistId = artistId,
     orderId = orderId,
     trackingNumber = trackingNumber,
     status = status,

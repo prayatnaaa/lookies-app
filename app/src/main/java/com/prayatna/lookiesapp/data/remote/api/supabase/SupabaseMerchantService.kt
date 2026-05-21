@@ -120,7 +120,10 @@ class SupabaseMerchantService @Inject constructor(
             .from("shipments")
             .select {
                 filter {
-                    ShipmentDto::merchantId eq merchantId
+                    or {
+                        ShipmentDto::merchantId eq merchantId
+                        ShipmentDto::artistId eq merchantId
+                    }
 
                     if (status != null) {
                         ShipmentDto::status eq status

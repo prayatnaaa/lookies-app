@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.domain.model.shipment
 data class Shipment(
     val id: String,
     val merchantId: String,
+    val artistId: String? = null,
     val orderId: String,
     val trackingNumber: String? = null,
     val status: String,

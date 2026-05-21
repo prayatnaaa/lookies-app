@@ -149,11 +149,33 @@ class SupabasePartnerService @Inject constructor(
     }
 
     suspend fun approvePainting(eventPaintingId: String): String {
+        val paintingData = postgrest.from("event_paintings")
+            .select(Columns.list("event_id")) {
+                filter { eq("id", eventPaintingId) }
+            }.decodeSingle<Map<String, Int>>()
+            
+        val eventId = paintingData["event_id"] ?: throw Exception("Event not found")
+
+        val eventData = postgrest.from("events")
+            .select(Columns.list("event_format_id")) {
+                filter { eq("id", eventId) }
+            }.decodeSingle<Map<String, Int>>()
+            
+        val formatId = eventData["event_format_id"] ?: throw Exception("Format not found")
+
+        val formatData = postgrest.from("event_formats")
+            .select(Columns.list("slug")) {
+                filter { eq("id", formatId) }
+            }.decodeSingle<Map<String, String>>()
+            
+        val isOnline = formatData["slug"] == "online"
+        val newStatus = if (isOnline) "on_sale" else "accepted"
+
         postgrest
             .from("event_paintings")
             .update(
                 mapOf(
-                    "status" to "accepted",
+                    "status" to newStatus,
                     "updated_at" to "now()"
                 )
             ) {
@@ -165,7 +187,7 @@ class SupabasePartnerService @Inject constructor(
                     }
                 }
             }
-        return "Painting approved"
+        return if (isOnline) "Painting approved and put on sale" else "Painting approved"
     }
 
     suspend fun rejectPainting(eventPaintingId: String, reason: String): String {

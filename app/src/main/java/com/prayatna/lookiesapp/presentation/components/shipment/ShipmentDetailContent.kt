@@ -84,6 +84,12 @@ fun ShipmentDetailContent(
                         Text(text = "Order ID", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(text = shipment.orderId.take(8).uppercase(), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
                     }
+                    if (!shipment.trackingNumber.isNullOrBlank()) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(text = "Tracking Number", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(text = shipment.trackingNumber, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                        }
+                    }
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(text = "Created At", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(text = formatDate(shipment.createdAt), style = MaterialTheme.typography.bodySmall)
@@ -133,146 +139,167 @@ fun ShipmentDetailContent(
                 }
             }
 
-            HorizontalDivider()
-
-            Text(
-                text = "Arrival Proof",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            OutlinedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                onClick = {
-                    imagePickerLauncher.launch("image/*")
-                }
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+            if (uiState.canUpdateShipment) {
+                HorizontalDivider()
+    
+                Text(
+                    text = "Arrival Proof",
+                    style = MaterialTheme.typography.titleMedium
+                )
+    
+                OutlinedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    onClick = {
+                        imagePickerLauncher.launch("image/*")
+                    }
                 ) {
-
-                    when {
-                        uiState.selectedArrivalProof != null -> {
-                            CustomAsyncImage(
-                                model = uiState.selectedArrivalProof,
-                                contentDescription = "Selected Proof",
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-
-                        !shipment.arrivalProofUrl.isNullOrBlank() -> {
-                            CustomAsyncImage(
-                                model = shipment.arrivalProofUrl,
-                                contentDescription = "Arrival Proof",
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-
-                        // default kosong
-                        else -> {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Default.CloudUpload,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(48.dp)
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+    
+                        when {
+                            uiState.selectedArrivalProof != null -> {
+                                CustomAsyncImage(
+                                    model = uiState.selectedArrivalProof,
+                                    contentDescription = "Selected Proof",
+                                    modifier = Modifier.fillMaxSize()
                                 )
-                                Text(
-                                    "Upload Arrival Proof",
-                                    style = MaterialTheme.typography.bodyMedium
+                            }
+    
+                            !shipment.arrivalProofUrl.isNullOrBlank() -> {
+                                CustomAsyncImage(
+                                    model = shipment.arrivalProofUrl,
+                                    contentDescription = "Arrival Proof",
+                                    modifier = Modifier.fillMaxSize()
                                 )
+                            }
+    
+                            // default kosong
+                            else -> {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Icon(
+                                        Icons.Default.CloudUpload,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(48.dp)
+                                    )
+                                    Text(
+                                        "Upload Arrival Proof",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
                             }
                         }
                     }
                 }
-            }
-
-            Button(
-                onClick = {
-                    onEvent(ShipmentDetailEvent.SubmitArrivalProof)
-                },
-                enabled = !uiState.isUploadingProof &&
-                        uiState.selectedArrivalProof != null,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (uiState.isUploadingProof) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Text(
-                        if (!shipment.arrivalProofUrl.isNullOrBlank())
-                            "Update Proof"
-                        else
-                            "Submit Proof"
-                    )
-                }
-            }
-
-            HorizontalDivider()
-
-            Text(text = "Update Status", style = MaterialTheme.typography.titleMedium)
-            
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = uiState.selectedStatus.replaceFirstChar { it.uppercase() },
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Status") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+    
+                Button(
+                    onClick = {
+                        onEvent(ShipmentDetailEvent.SubmitArrivalProof)
+                    },
+                    enabled = !uiState.isUploadingProof &&
+                            uiState.selectedArrivalProof != null,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    uiState.availableStatuses.forEach { status ->
-                        DropdownMenuItem(
-                            text = { Text(status.replaceFirstChar { it.uppercase() }) },
-                            onClick = {
-                                onEvent(ShipmentDetailEvent.OnStatusSelected(status))
-                                expanded = false
-                            }
+                    if (uiState.isUploadingProof) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text(
+                            if (!shipment.arrivalProofUrl.isNullOrBlank())
+                                "Update Proof"
+                            else
+                                "Submit Proof"
                         )
                     }
                 }
-            }
-            
-            Button(
-                onClick = { onEvent(ShipmentDetailEvent.SubmitStatusUpdate) },
-                enabled = !uiState.isUpdating,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Update Status")
-            }
-
-            HorizontalDivider()
-
-            Text(text = "Update Tracking Number", style = MaterialTheme.typography.titleMedium)
-            OutlinedTextField(
-                value = uiState.trackingNumberInput ?: "",
-                onValueChange = { onEvent(ShipmentDetailEvent.OnTrackingNumberChanged(it)) },
-                label = { Text("Tracking Number") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Button(
-                onClick = { onEvent(ShipmentDetailEvent.SubmitTrackingNumberUpdate) },
-                enabled = !uiState.isUpdating && uiState.trackingNumberInput?.isNotBlank() == true,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Update Tracking Number")
+    
+                HorizontalDivider()
+    
+                Text(text = "Update Status", style = MaterialTheme.typography.titleMedium)
+                
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = uiState.selectedStatus.replaceFirstChar { it.uppercase() },
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Status") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        uiState.availableStatuses.forEach { status ->
+                            DropdownMenuItem(
+                                text = { Text(status.replaceFirstChar { it.uppercase() }) },
+                                onClick = {
+                                    onEvent(ShipmentDetailEvent.OnStatusSelected(status))
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+                
+                Button(
+                    onClick = { onEvent(ShipmentDetailEvent.SubmitStatusUpdate) },
+                    enabled = !uiState.isUpdating,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Update Status")
+                }
+    
+                HorizontalDivider()
+    
+                Text(text = "Update Tracking Number", style = MaterialTheme.typography.titleMedium)
+                OutlinedTextField(
+                    value = uiState.trackingNumberInput ?: "",
+                    onValueChange = { onEvent(ShipmentDetailEvent.OnTrackingNumberChanged(it)) },
+                    label = { Text("Tracking Number") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Button(
+                    onClick = { onEvent(ShipmentDetailEvent.SubmitTrackingNumberUpdate) },
+                    enabled = !uiState.isUpdating && uiState.trackingNumberInput?.isNotBlank() == true,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Update Tracking Number")
+                }
+            } else {
+                if (!shipment.arrivalProofUrl.isNullOrBlank()) {
+                    HorizontalDivider()
+                    Text(
+                        text = "Arrival Proof",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    OutlinedCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    ) {
+                        CustomAsyncImage(
+                            model = shipment.arrivalProofUrl,
+                            contentDescription = "Arrival Proof",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
             }
         }
     }
