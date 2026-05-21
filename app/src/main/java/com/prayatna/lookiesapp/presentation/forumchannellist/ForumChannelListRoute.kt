@@ -10,6 +10,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 fun ForumChannelListRoute(
     forumId: String,
     onNavigateToChat: (String) -> Unit,
+    onNavigateToMembers: (String) -> Unit,
     onBackClick: () -> Unit,
     viewModel: ForumChannelListViewModel = hiltViewModel()
 ) {
@@ -27,6 +28,7 @@ fun ForumChannelListRoute(
                 else -> viewModel.onEvent(event)
             }
         },
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onMembersClick = { onNavigateToMembers(forumId) }
     )
 }

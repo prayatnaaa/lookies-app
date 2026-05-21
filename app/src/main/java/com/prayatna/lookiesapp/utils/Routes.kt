@@ -58,6 +58,7 @@ object NavigationRoutes {
     const val FORUM_LIST = "forum_list"
     const val FORUM_CHANNEL_LIST = "forum_channel_list"
     const val FORUM_MESSAGES = "forum_messages"
+    const val FORUM_MEMBERS = "forum_members"
     const val SHIPMENT_DETAIL = "shipment_detail"
     const val REFUND_LIST = "refund_list"
     const val CREATE_REFUND = "create_refund"

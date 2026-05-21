@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,7 +36,8 @@ import com.prayatna.lookiesapp.domain.model.message.ForumChannelView
 fun ForumChannelListScreen(
     state: ForumChannelListUiState,
     onEvent: (ForumChannelListEvent) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onMembersClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -46,6 +48,14 @@ fun ForumChannelListScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onMembersClick) {
+                        Icon(
+                            imageVector = Icons.Default.People,
+                            contentDescription = "Members"
                         )
                     }
                 }

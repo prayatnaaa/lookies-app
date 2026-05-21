@@ -7,10 +7,12 @@ import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView
+import com.prayatna.lookiesapp.domain.model.message.ForumMember
 import com.prayatna.lookiesapp.domain.model.message.ForumMessage
 import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.realtime.PresenceAction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -62,5 +64,20 @@ class ChatRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Error fetching forum channels")
         }
+    }
+
+    override suspend fun getForumMembers(forumId: String): DataResult<List<ForumMember>> {
+        return try {
+            val result = supabaseChatService.getForumMembers(forumId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error fetching forum members")
+        }
+    }
+
+    override fun listenToForumPresence(forumId: String): Flow<PresenceAction> {
+        return supabaseChatService.listenToForumPresence(forumId)
     }
 }

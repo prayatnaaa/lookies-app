@@ -26,8 +26,10 @@ import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.Ev
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.PartnerExhibitionPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListRoute
 import com.prayatna.lookiesapp.presentation.exhibitionHistory.ExhibitionHistoryScreen
+import com.prayatna.lookiesapp.presentation.forum.members.forumMembersNavigation
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.exhibitionShipmentNavigation
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
+import com.prayatna.lookiesapp.presentation.forum.members.navigateToForumMembers
 import com.prayatna.lookiesapp.presentation.forumchannellist.ForumChannelListRoute
 import com.prayatna.lookiesapp.presentation.forumlist.ForumListRoute
 import com.prayatna.lookiesapp.presentation.insertEventPaintings.insertEventPaintingsNavigation
@@ -424,6 +426,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                     onNavigateToChat = { channelId ->
                         navController.navigate("${NavigationRoutes.FORUM_MESSAGES}/$channelId")
                     },
+                    onNavigateToMembers = { id ->
+                        navController.navigateToForumMembers(id)
+                    },
                     onBackClick = { navController.popBackStack() }
                 )
             }
@@ -442,6 +447,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
 
         refundNavigation(navController)
+        forumMembersNavigation(navController)
 
         composable(NavigationRoutes.BARCODE_SCANNER) {
             ScannerScreen(onNavigateBack = { navController.popBackStack() })
