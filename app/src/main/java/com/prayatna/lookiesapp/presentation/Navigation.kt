@@ -59,6 +59,7 @@ import com.prayatna.lookiesapp.presentation.partner.partnerRefund.partnerRefundN
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
+import com.prayatna.lookiesapp.presentation.payment.vaPayment.VaPaymentScreen
 import com.prayatna.lookiesapp.presentation.refund.refundNavigation
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
 import com.prayatna.lookiesapp.presentation.scanner.ScannerScreen
@@ -131,6 +132,32 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 orderId = orderId,
                 merchantId = merchantId,
                 amount = amount,
+                navController = navController
+            )
+        }
+
+        composable(
+            route = "${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType },
+                navArgument("merchantId") { type = NavType.StringType },
+                navArgument("amount") { type = NavType.LongType },
+                navArgument("bankCode") { type = NavType.StringType },
+                navArgument("customerName") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            val merchantId = backStackEntry.arguments?.getString("merchantId") ?: ""
+            val amount = backStackEntry.arguments?.getLong("amount") ?: 0L
+            val bankCode = backStackEntry.arguments?.getString("bankCode") ?: "BRI"
+            val customerName = backStackEntry.arguments?.getString("customerName") ?: "Customer"
+
+            VaPaymentScreen(
+                orderId = orderId,
+                merchantId = merchantId,
+                amount = amount,
+                bankCode = bankCode,
+                customerName = customerName,
                 navController = navController
             )
         }

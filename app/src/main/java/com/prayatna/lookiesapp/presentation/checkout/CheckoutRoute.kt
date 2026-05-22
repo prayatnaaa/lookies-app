@@ -63,6 +63,17 @@ fun CheckoutRoute(
                     }
                 }
 
+                is CheckoutEffect.NavigateToVaPayment -> {
+                    navController.navigate(
+                        "${NavigationRoutes.VA_PAYMENT}/${effect.orderId}/${effect.merchantId}/${effect.amount}/${effect.bankCode}/${effect.customerName}"
+                    ) {
+                        popUpTo("${NavigationRoutes.CHECKOUT}/{type}/{id}/{quantity}") {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+
                 else -> Unit //
             }
         }

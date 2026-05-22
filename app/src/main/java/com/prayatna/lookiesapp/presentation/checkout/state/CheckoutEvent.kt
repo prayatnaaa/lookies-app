@@ -19,4 +19,5 @@ sealed class CheckoutEvent {
     data class OnPaymentMethodSelected(val method: PaymentMethodUiState) : CheckoutEvent()
     data class OnShipmentFeeSelected(val fee: ShipmentFee) : CheckoutEvent()
     data class OnAddressSelected(val address: UserAddress) : CheckoutEvent()
+    data class OnBankCodeSelected(val bankCode: String) : CheckoutEvent()
 }

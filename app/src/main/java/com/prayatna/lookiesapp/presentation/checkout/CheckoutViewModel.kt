@@ -9,11 +9,13 @@ import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCa
 import com.prayatna.lookiesapp.domain.usecase.transaction.CreateOrderUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
 import com.prayatna.lookiesapp.domain.usecase.shipment.GetShipmentFeeUseCase
+import com.prayatna.lookiesapp.domain.usecase.transaction.CreateVaPaymentUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.GetUserAddressesUseCase
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutEffect
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutEvent
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutItemDisplay
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutUiState
+import com.prayatna.lookiesapp.presentation.checkout.state.PaymentMethodUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,7 +34,8 @@ class CheckoutViewModel @Inject constructor(
     private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
     private val getDetailTransactionUseCase: GetDetailTransactionUseCase,
     private val getShipmentFeeUseCase: GetShipmentFeeUseCase,
-    private val getUserAddressesUseCase: GetUserAddressesUseCase
+    private val getUserAddressesUseCase: GetUserAddressesUseCase,
+    private val createVaPaymentUseCase: CreateVaPaymentUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CheckoutUiState())
@@ -80,6 +83,10 @@ class CheckoutViewModel @Inject constructor(
 
             is CheckoutEvent.OnPaymentMethodSelected -> {
                 _uiState.update { it.copy(selectedMethod = event.method) }
+            }
+
+            is CheckoutEvent.OnBankCodeSelected -> {
+                _uiState.update { it.copy(selectedBankCode = event.bankCode) }
             }
 
             is CheckoutEvent.OnShipmentFeeSelected -> {
@@ -213,13 +220,28 @@ class CheckoutViewModel @Inject constructor(
         val total =
             (item.price?.times(state.quantity)?.plus(shippingCost))?.toLong() ?: 0L
 
-        emitEffect(
-            CheckoutEffect.NavigateToQrisPayment(
-                orderId = orderId,
-                merchantId = item.merchantId,
-                amount = total
-            )
-        )
+        when (state.selectedMethod) {
+            PaymentMethodUiState.VA -> {
+                emitEffect(
+                    CheckoutEffect.NavigateToVaPayment(
+                        orderId = orderId,
+                        merchantId = item.merchantId,
+                        amount = total,
+                        bankCode = state.selectedBankCode,
+                        customerName = state.selectedAddress?.name ?: "Customer"
+                    )
+                )
+            }
+            else -> {
+                emitEffect(
+                    CheckoutEffect.NavigateToQrisPayment(
+                        orderId = orderId,
+                        merchantId = item.merchantId,
+                        amount = total
+                    )
+                )
+            }
+        }
     }
 
     // ========================
@@ -378,17 +400,28 @@ class CheckoutViewModel @Inject constructor(
             val totalAmount =
                 (item.price?.times(quantity)?.plus(shippingCost))?.toLong() ?: 0L
 
-//            emitEffect(CheckoutEffect.ShowSuccessDialog)
-//
-//            delay(1000)
-
-            emitEffect(
-                CheckoutEffect.NavigateToQrisPayment(
-                    orderId = orderId,
-                    merchantId = item.merchantId,
-                    amount = totalAmount
-                )
-            )
+            when (state.selectedMethod) {
+                PaymentMethodUiState.VA -> {
+                    emitEffect(
+                        CheckoutEffect.NavigateToVaPayment(
+                            orderId = orderId,
+                            merchantId = item.merchantId,
+                            amount = totalAmount,
+                            bankCode = state.selectedBankCode,
+                            customerName = state.selectedAddress?.name ?: "Customer"
+                        )
+                    )
+                }
+                else -> {
+                    emitEffect(
+                        CheckoutEffect.NavigateToQrisPayment(
+                            orderId = orderId,
+                            merchantId = item.merchantId,
+                            amount = totalAmount
+                        )
+                    )
+                }
+            }
         }
     }
 

@@ -7,6 +7,8 @@ import com.prayatna.lookiesapp.domain.model.payment.SetOrderToCompleteResult
 import com.prayatna.lookiesapp.domain.model.ticket.Ticket
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
+import com.prayatna.lookiesapp.domain.model.transaction.CreateVaPaymentRequestInput
+import com.prayatna.lookiesapp.domain.model.transaction.CreateVaPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
@@ -38,6 +40,8 @@ interface TransactionRepository {
             DataResult<String>
     suspend fun createQrisPaymentRequest(data: CreateQrisPaymentRequestInput):
             DataResult<CreateQrisPaymentRequestResult>
+    suspend fun createVaPaymentRequest(data: CreateVaPaymentRequestInput):
+            DataResult<CreateVaPaymentRequestResult>
     suspend fun getUserTransactions():
             DataResult<List<Transaction>>
     suspend fun createPaymentRequest(request: CreateXenditPaymentRequestInput):

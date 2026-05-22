@@ -14,6 +14,7 @@ data class CheckoutUiState(
     val existingOrderId: String? = null,
 
     val selectedMethod: PaymentMethodUiState = PaymentMethodUiState.QRIS,
+    val selectedBankCode: String = "BRI",
 
     val shipmentFees: List<ShipmentFee> = emptyList(),
     val selectedShipmentFee: ShipmentFee? = null,

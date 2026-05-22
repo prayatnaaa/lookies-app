@@ -93,8 +93,12 @@ fun CheckoutScreen(
         children = {
             CheckoutPaymentMethodContent(
                 selectedMethod = uiState.selectedMethod,
+                selectedBankCode = uiState.selectedBankCode,
                 onPaymentMethodSelected = {
                     onEvent(CheckoutEvent.OnPaymentMethodSelected(it))
+                },
+                onBankCodeSelected = {
+                    onEvent(CheckoutEvent.OnBankCodeSelected(it))
                 }
             )
         },

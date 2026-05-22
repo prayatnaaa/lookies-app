@@ -14,6 +14,8 @@ import com.prayatna.lookiesapp.domain.model.payment.SetOrderToCompleteResult
 import com.prayatna.lookiesapp.domain.model.ticket.Ticket
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateQrisPaymentRequestResult
+import com.prayatna.lookiesapp.domain.model.transaction.CreateVaPaymentRequestInput
+import com.prayatna.lookiesapp.domain.model.transaction.CreateVaPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestInput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateXenditPaymentRequestResult
 import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
@@ -115,6 +117,19 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun createVaPaymentRequest(data: CreateVaPaymentRequestInput): DataResult<CreateVaPaymentRequestResult> {
+        return try {
+            val response = transactionService.createVaPaymentRequest(request = data.toDto())
+            if (response.status == "success") {
+                DataResult.Success(response.toDomain())
+            } else {
+                DataResult.Error(response.message)
+            }
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
         }
     }
 

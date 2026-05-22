@@ -12,11 +12,13 @@ import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.request.order.OrderItemRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateQrisPaymentRequestRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateVaPaymentRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateXenditPaymentRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.SetOrderToCompleteRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.transaction.MonthlyFinancialReportFilterRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.transaction.PayoutRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateQrisPaymentRequestResponse
+import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateVaPaymentResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.CreateXenditPaymentResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteResponse
 import com.prayatna.lookiesapp.data.remote.dto.response.transaction.PayoutResponse
@@ -192,6 +194,20 @@ class SupabaseTransactionService @Inject constructor(
         }
         Log.d("CreatePayment", response.body())
         Log.d("CreatePayment", request.toString())
+        return response.body()
+    }
+
+    suspend fun createVaPaymentRequest(request: CreateVaPaymentRequest): CreateVaPaymentResponse {
+        val session = auth.currentSessionOrNull()
+            ?: throw IllegalStateException("No active session")
+        val response = httpClient.post(
+            "${BuildConfig.SUPABASE_EDGE_BASE_URL}/va-close-amount-xendit"
+        ) {
+            contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer ${session.accessToken}")
+            setBody(request)
+        }
+        Log.d("CreateVaPayment", response.body())
         return response.body()
     }
 
