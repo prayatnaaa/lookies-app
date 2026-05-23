@@ -52,10 +52,12 @@ android {
         val baseUrl = properties.getProperty("BASE_URL") ?: ""
         val apiKey = properties.getProperty("API_KEY") ?: ""
         val supabaseEdgeBaseUrl = properties.getProperty("SUPABASE_EDGE_BASE_URL") ?: ""
+        val xenditSecretKey = properties.getProperty("XENDIT_SECRET_KEY") ?: ""
 
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
         buildConfigField("String", "SUPABASE_EDGE_BASE_URL", "\"$supabaseEdgeBaseUrl\"")
+        buildConfigField("String", "XENDIT_SECRET_KEY", "\"$xenditSecretKey\"")
     }
 
     buildTypes {
