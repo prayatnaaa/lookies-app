@@ -105,7 +105,13 @@ class SupabasePartnerService @Inject constructor(
         return result
     }
 
-    suspend fun getSelfEvents(businessId: String, status: String? = null, name: String? = null): List<EventDto> {
+    suspend fun getSelfEvents(
+        businessId: String,
+        status: String? = null,
+        name: String? = null,
+        eventFormatId: Int? = null,
+        eventTypeId: Int? = null
+    ): List<EventDto> {
         val events = postgrest.from("events_view")
             .select {
                 filter {
@@ -115,6 +121,12 @@ class SupabasePartnerService @Inject constructor(
                     }
                     if (name != null) {
                         ilike("title", "%$name%")
+                    }
+                    if (eventFormatId != null) {
+                        eq("event_format->>id", eventFormatId)
+                    }
+                    if (eventTypeId != null) {
+                        eq("event_type->>id", eventTypeId)
                     }
                 }
             }.decodeList<EventDto>()
@@ -262,7 +274,7 @@ class SupabasePartnerService @Inject constructor(
                 paintingId = painting.id,
                 eventId = eventId,
                 finalPrice = painting.price,
-                status = "accepted",
+                status = "on_sale",
                 businessId = painting.artistId
             )
         }

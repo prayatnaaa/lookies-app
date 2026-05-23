@@ -23,7 +23,9 @@ interface PartnerRepository {
     suspend fun getSelfEvents(
         businessId: String,
         status: String? = null,
-        name: String? = null
+        name: String? = null,
+        eventFormatId: Int? = null,
+        eventTypeId: Int? = null
     ): DataResult<List<Event>>
     suspend fun updateEvent(id: String, input: EditEventInput): DataResult<DefaultEvent>
     suspend fun getParticipantList(eventId: String?): DataResult<List<EventParticipant>>

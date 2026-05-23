@@ -11,12 +11,16 @@ class GetSelfEventsUseCase @Inject constructor(
     suspend operator fun invoke(
         businessId: String,
         status: String? = null,
-        name: String? = null
+        name: String? = null,
+        eventFormatId: Int? = null,
+        eventTypeId: Int? = null
     ): DataResult<List<Event>> {
         val result = partnerRepository.getSelfEvents(
             businessId = businessId,
             status = status,
-            name = name
+            name = name,
+            eventFormatId = eventFormatId,
+            eventTypeId = eventTypeId
         )
 
         return result

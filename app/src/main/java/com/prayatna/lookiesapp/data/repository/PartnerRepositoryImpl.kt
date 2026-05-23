@@ -72,13 +72,17 @@ class PartnerRepositoryImpl @Inject constructor(
     override suspend fun getSelfEvents(
         businessId: String,
         status: String?,
-        name: String?
+        name: String?,
+        eventFormatId: Int?,
+        eventTypeId: Int?
     ): DataResult<List<Event>> {
         return try {
             val response = supabasePartnerService.getSelfEvents(
                 status = status,
                 name = name,
-                businessId = businessId
+                businessId = businessId,
+                eventFormatId = eventFormatId,
+                eventTypeId = eventTypeId
             )
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
