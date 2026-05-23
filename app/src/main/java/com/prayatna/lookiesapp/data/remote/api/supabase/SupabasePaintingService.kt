@@ -4,7 +4,9 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.EventPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.PaintingReviewDto
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.CreatePaintingReviewRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.painting.UpdatePaintingRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.UploadPaintingRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.painting.BasePaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetDetailPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.PaintingAttributeResponse
@@ -180,12 +182,14 @@ class SupabasePaintingService @Inject constructor(
             }
     }
 
-    suspend fun updatePainting(painting: UploadPaintingRequest, paintingId: Int, image: ByteArray?): String {
+    suspend fun updatePainting(painting: UploadPaintingRequest, paintingId: Int, image: ByteArray?): BasePaintingDto {
         auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
+
+        Log.d("EDIT-PAINTING", paintingId.toString())
 
         var uploadedPath: String? = null
         try {
-            val finalPainting = if (image != null) {
+            val imageUrl = if (image != null) {
                 val path = "${painting.artistId}/${UUID.randomUUID()}.png"
                 storage.from("paintings").upload(
                     path = path,
@@ -193,17 +197,30 @@ class SupabasePaintingService @Inject constructor(
                     upsert = false
                 )
                 uploadedPath = path
-                val imageUrl = Helper.buildImageUrl(imageName = path, bucketName = "paintings")
-                painting.copy(paintingUrl = imageUrl)
+                Helper.buildImageUrl(imageName = path, bucketName = "paintings")
             } else {
-                painting
+                null
             }
 
-            postgrest.from("paintings").update(finalPainting) {
+            val request = UpdatePaintingRequest(
+                title = painting.title,
+                paintingUrl = imageUrl, // Only update if new image
+                description = painting.description,
+                dimensionHeight = painting.dimensionHeight,
+                dimensionWidth = painting.dimensionWidth,
+                medium = painting.medium,
+                artStyle = painting.artStyle,
+                subject = painting.subject,
+                yearCreated = painting.yearCreated,
+                price = painting.price
+            )
+
+            val response = postgrest.from("paintings").update(request) {
+                select()
                 filter { eq("id", paintingId) }
-            }
+            }.decodeSingle<BasePaintingDto>()
 
-            return "Painting updated successfully"
+            return response
 
         } catch (e: Exception) {
             uploadedPath?.let {

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
 import com.prayatna.lookiesapp.domain.repository.PaintingRepository
 import com.prayatna.lookiesapp.domain.usecase.painting.EditPaintingUseCase
+import com.prayatna.lookiesapp.domain.usecase.painting.GetDetailPaintingUseCase
 import com.prayatna.lookiesapp.presentation.painting.editpainting.state.EditPaintingUiEffect
 import com.prayatna.lookiesapp.presentation.painting.editpainting.state.EditPaintingUiEvent
 import com.prayatna.lookiesapp.presentation.painting.editpainting.state.EditPaintingUiState
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class EditPaintingViewModel @Inject constructor(
     private val editPaintingUseCase: EditPaintingUseCase,
     private val paintingRepository: PaintingRepository,
+    private val getDetailPaintingUseCase: GetDetailPaintingUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -79,7 +81,7 @@ class EditPaintingViewModel @Inject constructor(
     private fun loadPainting(id: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            when (val result = paintingRepository.getPaintingDetail(id)) {
+            when (val result = getDetailPaintingUseCase(id)) {
                 is DataResult.Success -> {
                     val p = result.data
                     _uiState.update { it.copy(
@@ -91,6 +93,7 @@ class EditPaintingViewModel @Inject constructor(
                         dimensionHeight = p.dimensionHeight.toLong().toString(),
                         dimensionWidth = p.dimensionWidth.toLong().toString(),
                         subject = p.subject ?: "",
+                        artistId = p.artistId,
                         selectedArtStyleId = p.artStyleId ?: "",
                         selectedMediumId = p.mediumId,
                         existingImageUrl = p.paintingUrl
@@ -112,12 +115,12 @@ class EditPaintingViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             
             val params = AddPaintingParams(
-                artistId = "", // Handled by service
+                artistId = state.artistId,
                 title = state.title,
                 description = state.description,
                 dimensionHeight = state.dimensionHeight.toDouble(),
                 dimensionWidth = state.dimensionWidth.toDouble(),
-                paintingUrl = "", // Set by service if image uploaded
+                paintingUrl = state.existingImageUrl ?: "",
                 subject = state.subject.ifBlank { null },
                 yearCreated = state.yearCreated.toInt(),
                 artStyle = state.selectedArtStyleId.ifBlank { null },
@@ -127,9 +130,8 @@ class EditPaintingViewModel @Inject constructor(
 
             when (val result = editPaintingUseCase(params, paintingId, state.bannerUri)) {
                 is DataResult.Success -> {
-                    _uiState.update { it.copy(isLoading = false, isSuccess = true, successMessage = result.data) }
-                    _effect.emit(EditPaintingUiEffect.ShowToast(result.data))
-                    _effect.emit(EditPaintingUiEffect.NavigateBack)
+                    _uiState.update { it.copy(isLoading = false, isSuccess = true, successMessage = "Painting updated successfully") }
+                    _effect.emit(EditPaintingUiEffect.ShowToast("Painting updated successfully"))
                 }
                 is DataResult.Error -> {
                     _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }

@@ -8,6 +8,7 @@ import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePaintingService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
+import com.prayatna.lookiesapp.domain.model.painting.BasePainting
 import com.prayatna.lookiesapp.domain.model.painting.CreatePaintingReviewInput
 import com.prayatna.lookiesapp.domain.model.painting.DetailPainting
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
@@ -103,7 +104,7 @@ class PaintingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun editPainting(painting: AddPaintingParams, paintingId: Int, image: Uri?): DataResult<String> {
+    override suspend fun editPainting(painting: AddPaintingParams, paintingId: Int, image: Uri?): DataResult<BasePainting> {
         return try {
             val compressedImage = image?.compressImage(context, 500_000L)
             val response = paintingService.updatePainting(
@@ -111,9 +112,13 @@ class PaintingRepositoryImpl @Inject constructor(
                 paintingId = paintingId,
                 image = compressedImage
             )
-            DataResult.Success(response)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            Log.e("EDIT-PAINTING", paintingId.toString())
+            Log.e("EDIT-PAINTING", e.message.toString())
+            DataResult.Error(e.error)
         } catch (e: Exception) {
-            Log.d("EDIT-PAINTING", e.message.toString())
+            Log.e("EDIT-PAINTING", e.message.toString())
             DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }

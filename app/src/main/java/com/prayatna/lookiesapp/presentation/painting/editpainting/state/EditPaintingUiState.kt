@@ -11,6 +11,7 @@ data class EditPaintingUiState(
     val dimensionHeight: String = "",
     val dimensionWidth: String = "",
     val subject: String = "",
+    val artistId: String = "",
     val selectedArtStyleId: String = "",
     val selectedMediumId: String = "",
     val bannerUri: Uri? = null,
@@ -30,5 +31,6 @@ data class EditPaintingUiState(
             price.isNotBlank() && 
             dimensionHeight.isNotBlank() && 
             dimensionWidth.isNotBlank() && 
-            selectedMediumId.isNotBlank()
+            selectedMediumId.isNotBlank() &&
+            artistId.isNotBlank()
 }

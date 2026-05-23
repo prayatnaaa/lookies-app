@@ -5,14 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -30,12 +24,38 @@ fun DetailPaintingScreen(
     paintingId: Int
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val snackbarMessage = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>("snackbar_message", null)
+        ?.collectAsStateWithLifecycle()
+
+    val shouldRefresh = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow("refresh", false)
+        ?.collectAsStateWithLifecycle()
+
+    LaunchedEffect(snackbarMessage?.value) {
+        snackbarMessage?.value?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("snackbar_message")
+        }
+    }
+
+    LaunchedEffect(shouldRefresh?.value) {
+        if (shouldRefresh?.value == true) {
+            viewModel.loadDetailPainting(paintingId)
+            navController.currentBackStackEntry?.savedStateHandle?.set("refresh", false)
+        }
+    }
 
     LaunchedEffect(paintingId) {
         viewModel.loadDetailPainting(id = paintingId)
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             BackTopBar(
                 onBackClick = {
@@ -70,7 +90,9 @@ fun DetailPaintingScreen(
                 }
 
                 uiState.error != null -> {
-                    //TODO(): show dialog to refresh
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = uiState.error!!, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         }

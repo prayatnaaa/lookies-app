@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.domain.repository
 
 import android.net.Uri
 import com.prayatna.lookiesapp.domain.model.painting.AddPaintingParams
+import com.prayatna.lookiesapp.domain.model.painting.BasePainting
 import com.prayatna.lookiesapp.domain.model.painting.CreatePaintingReviewInput
 import com.prayatna.lookiesapp.domain.model.painting.DetailPainting
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
@@ -24,7 +25,7 @@ interface PaintingRepository {
     suspend fun getPaintingDetail(id: Int): DataResult<DetailPainting>
     suspend fun uploadPainting(painting: AddPaintingParams, image: Uri): DataResult<UploadPaintingOutput>
     suspend fun deletePainting(paintingId: String): DataResult<String>
-    suspend fun editPainting(painting: AddPaintingParams, paintingId: Int, image: Uri?): DataResult<String>
+    suspend fun editPainting(painting: AddPaintingParams, paintingId: Int, image: Uri?): DataResult<BasePainting>
     suspend fun getPaintingArtStyles(): DataResult<List<PaintingAttribute>>
     suspend fun getPaintingMediums(): DataResult<List<PaintingAttribute>>
     suspend fun updateEventPaintingStatus(eventPaintingId: String, status: String): DataResult<Unit>

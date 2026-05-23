@@ -1,16 +1,9 @@
 package com.prayatna.lookiesapp.presentation.painting.paintinglist
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,12 +22,38 @@ fun PersonalPaintingListScreen(
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(artistId, uiState.paintings) {
+    val snackbarMessage = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>("snackbar_message", null)
+        ?.collectAsStateWithLifecycle()
+
+    val shouldRefresh = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow("refresh", false)
+        ?.collectAsStateWithLifecycle()
+
+    LaunchedEffect(snackbarMessage?.value) {
+        snackbarMessage?.value?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("snackbar_message")
+        }
+    }
+
+    LaunchedEffect(shouldRefresh?.value) {
+        if (shouldRefresh?.value == true) {
+            viewModel.init(artistId)
+            navController.currentBackStackEntry?.savedStateHandle?.set("refresh", false)
+        }
+    }
+
+    LaunchedEffect(artistId) {
         viewModel.init(artistId)
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             BackTopBar(
                 title = "My arts",
@@ -67,7 +86,9 @@ fun PersonalPaintingListScreen(
                     CircularLoading()
                 }
                 uiState.error != null -> {
-                    Text("Error: ${uiState.error}")
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                        Text("Error: ${uiState.error}")
+                    }
                 }
                 else -> {
                     PaintingCardList(
