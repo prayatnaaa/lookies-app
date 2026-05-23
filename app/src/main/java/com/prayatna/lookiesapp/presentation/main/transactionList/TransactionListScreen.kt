@@ -1,9 +1,18 @@
 package com.prayatna.lookiesapp.presentation.main.transactionList
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -15,7 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.transactionList.EmptyTransactionState
-import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionItemCard
+import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionItemItem
 import com.prayatna.lookiesapp.presentation.main.transactionList.state.TransactionListUiState
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -60,14 +69,21 @@ fun TransactionListScreen(
                 }
                 is TransactionListUiState.Success -> {
                     LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
-                        items(currentState.data) { transaction ->
-                            TransactionItemCard(
+                        itemsIndexed(
+                            items = currentState.data,
+                            key = { _, transaction -> transaction.id }
+                        ) { index, transaction ->
+
+                            TransactionItemItem(
                                 transaction = transaction,
+                                showDivider = index != currentState.data.lastIndex,
                                 onClick = {
-                                    navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/${transaction.id}")
+                                    navController.navigate(
+                                        "${NavigationRoutes.DETAIL_TRANSACTION}/${transaction.id}"
+                                    )
                                 }
                             )
                         }

@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingBag
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,106 +32,200 @@ import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
-fun TransactionItemCard(
+fun TransactionItemItem(
     transaction: Transaction,
+    showDivider: Boolean = true,
     onClick: () -> Unit
 ) {
-    val firstItem = transaction.items.firstOrNull()
-    val otherItemsCount = transaction.items.size - 1
 
-    Card(
+    val firstItem = transaction.items.firstOrNull()
+    val otherItemsCount =
+        (transaction.items.size - 1).coerceAtLeast(0)
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement =
+                Arrangement.SpaceBetween,
+            verticalAlignment =
+                Alignment.CenterVertically
         ) {
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment =
+                    Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingBag,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = formatDate(transaction.createdAt),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
 
-                TransactionStatusChip(status = transaction.status)
-            }
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.surfaceVariant)
-
-            Row(modifier = Modifier.fillMaxWidth()) {
-                AsyncImage(
-                    model = firstItem?.details?.imageUrl?.replace("http://172.21.179.110", "http://10.0.2.2"),
+                Icon(
+                    imageVector =
+                        Icons.Default.ShoppingBag,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme
+                        .colorScheme
+                        .onSurfaceVariant
                 )
 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = firstItem?.details?.title.toString(),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                Text(
+                    text = formatDate(
+                        transaction.createdAt
+                    ),
+                    style =
+                        MaterialTheme.typography.bodySmall,
+                    color =
+                        MaterialTheme.colorScheme
+                            .onSurfaceVariant
+                )
+            }
+
+            TransactionStatusChip(
+                status = transaction.status
+            )
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            AsyncImage(
+                model = firstItem?.details
+                    ?.imageUrl
+                    ?.replace(
+                        "http://172.21.179.110",
+                        "http://10.0.2.2"
+                    ),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(72.dp)
+                    .clip(
+                        RoundedCornerShape(10.dp)
+                    )
+                    .background(
+                        MaterialTheme.colorScheme
+                            .surfaceVariant
+                    )
+            )
+
+            Spacer(
+                modifier = Modifier.width(14.dp)
+            )
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
+                Text(
+                    text = firstItem
+                        ?.details
+                        ?.title
+                        .orEmpty(),
+                    style =
+                        MaterialTheme.typography
+                            .titleMedium,
+                    fontWeight =
+                        FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow =
+                        TextOverflow.Ellipsis
+                )
+
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
+
+                Text(
+                    text =
+                        "${firstItem?.quantity ?: 0} × ${
+                            formatRupiah(
+                                firstItem?.unitPrice
+                                    ?: 0.0
+                            )
+                        }",
+                    style =
+                        MaterialTheme.typography
+                            .bodyMedium,
+                    color =
+                        MaterialTheme.colorScheme
+                            .onSurfaceVariant
+                )
+
+                if (otherItemsCount > 0) {
+                    Spacer(
+                        modifier = Modifier.height(2.dp)
                     )
 
                     Text(
-                        text = "${firstItem?.quantity} x ${formatRupiah(firstItem!!.unitPrice)}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text =
+                            "+$otherItemsCount more items",
+                        style =
+                            MaterialTheme.typography
+                                .labelSmall,
+                        color =
+                            MaterialTheme.colorScheme
+                                .primary
+                    )
+                }
+
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
+
+                Row(
+                    modifier =
+                        Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                        Arrangement.SpaceBetween,
+                    verticalAlignment =
+                        Alignment.CenterVertically
+                ) {
+
+                    Text(
+                        text = "Total",
+                        style =
+                            MaterialTheme.typography
+                                .bodySmall,
+                        color =
+                            MaterialTheme.colorScheme
+                                .onSurfaceVariant
                     )
 
-                    if (otherItemsCount > 0) {
-                        Text(
-                            text = "+$otherItemsCount more items",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    Text(
+                        text = formatRupiah(
+                            transaction.totalAmount
+                        ),
+                        style =
+                            MaterialTheme.typography
+                                .titleMedium,
+                        fontWeight =
+                            FontWeight.Bold,
+                        color =
+                            MaterialTheme.colorScheme
+                                .primary
+                    )
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.height(12.dp))
+        if (showDivider) {
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Total Payment",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = formatRupiah(transaction.totalAmount),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            HorizontalDivider(
+                color = MaterialTheme
+                    .colorScheme
+                    .outline
+                    .copy(alpha = 0.12f)
+            )
         }
     }
 }
