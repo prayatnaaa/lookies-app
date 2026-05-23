@@ -1,26 +1,25 @@
 package com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.presentation.components.merchant.MerchantMemberCard
+import com.prayatna.lookiesapp.presentation.components.merchant.MerchantMemberItem
 import com.prayatna.lookiesapp.presentation.error.ErrorScreen
 import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdEvent
 import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.state.MerchantMemberByMerchantIdUiState
@@ -84,15 +83,22 @@ fun MerchantMemberByMerchantIdScreen(
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        contentPadding = PaddingValues(
+                            top = 8.dp,
+                            bottom = 24.dp
+                        )
                     ) {
-                        items(uiState.merchantMembers) { member ->
-                            MerchantMemberCard(
+                        itemsIndexed(
+                            items = uiState.merchantMembers,
+                            key = { _, item -> item.businessId }
+                        ) { index, member ->
+
+                            MerchantMemberItem(
                                 member = member,
                                 isShowMemberName = true,
+                                showDivider = index != uiState.merchantMembers.lastIndex,
                                 onClick = {
-                                    // Handle member click if needed
+
                                 }
                             )
                         }

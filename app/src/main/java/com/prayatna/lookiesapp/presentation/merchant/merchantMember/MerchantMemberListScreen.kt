@@ -1,9 +1,13 @@
 package com.prayatna.lookiesapp.presentation.merchant.merchantMember
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -11,14 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.presentation.components.merchant.MerchantMemberCard
+import com.prayatna.lookiesapp.presentation.components.merchant.MerchantMemberItem
 import com.prayatna.lookiesapp.presentation.error.ErrorScreen
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -89,28 +92,24 @@ fun MerchantMemberListScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(
-                            start = 20.dp,
-                            end = 20.dp,
                             top = 8.dp,
                             bottom = 24.dp
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                        )
                     ) {
-                        items(
+                        itemsIndexed(
                             items = uiState.merchantMembers,
-                            key = { it.businessId }
-                        ) { member ->
+                            key = { _, item -> item.businessId }
+                        ) { index, member ->
 
-                            Box {
-                                MerchantMemberCard(
-                                    member = member,
-                                    onClick = {
-                                        navController.navigate(
-                                            "${NavigationRoutes.PARTNER_MAIN_SCREEN}/${member.businessId}"
-                                        )
-                                    }
-                                )
-                            }
+                            MerchantMemberItem(
+                                member = member,
+                                showDivider = index != uiState.merchantMembers.lastIndex,
+                                onClick = {
+                                    navController.navigate(
+                                        "${NavigationRoutes.PARTNER_MAIN_SCREEN}/${member.businessId}"
+                                    )
+                                }
+                            )
                         }
                     }
                 }

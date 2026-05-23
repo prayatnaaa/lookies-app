@@ -1,14 +1,36 @@
 package com.prayatna.lookiesapp.presentation.monthlyFinancleList
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -94,16 +116,21 @@ fun MonthlyFinanceListScreen(
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                            contentPadding = PaddingValues(vertical = 8.dp)
                         ) {
                             if (state.selectedTab == 0) {
-                                items(state.orderSplits) { split ->
-                                    PayoutLogCard(split = split)
+                                itemsIndexed(state.orderSplits) { index, split ->
+                                    PayoutLogItem(
+                                        split = split,
+                                        showDivider = index != state.orderSplits.lastIndex
+                                    )
                                 }
                             } else {
-                                items(state.balanceLogs) { log ->
-                                    BalanceLogCard(log = log)
+                                itemsIndexed(state.balanceLogs) { index, log ->
+                                    BalanceLogItem(
+                                        log = log,
+                                        showDivider = index != state.balanceLogs.lastIndex
+                                    )
                                 }
                             }
                         }
@@ -115,119 +142,151 @@ fun MonthlyFinanceListScreen(
 }
 
 @Composable
-private fun PayoutLogCard(split: OrderSplit) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+private fun PayoutLogItem(
+    split: OrderSplit,
+    showDivider: Boolean = true
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Text(
-                    text = split.payoutStatus.formatStatus(),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (split.payoutStatus == "on_hold") {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.error
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            FinancialRowItem(
-                label = "Gross Amount",
-                value = formatRupiah(split.grossAmount)
-            )
-
-            FinancialRowItem(
-                label = "Platform Fee",
-                value = "- ${formatRupiah(split.platformFee)}"
-            )
-
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 12.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Column {
                 Text(
                     text = "Net Amount",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Text(
                     text = formatRupiah(split.netAmount),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
+
+            Text(
+                text = split.payoutStatus.formatStatus(),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = if (split.payoutStatus == "on_hold") {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.error
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        FinancialRowItem(
+            label = "Gross Amount",
+            value = formatRupiah(split.grossAmount)
+        )
+
+        FinancialRowItem(
+            label = "Platform Fee",
+            value = "- ${formatRupiah(split.platformFee)}"
+        )
+
+        if (showDivider) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+            )
         }
     }
 }
 @Composable
-private fun BalanceLogCard(log: MerchantBalanceLog) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+private fun BalanceLogItem(
+    log: MerchantBalanceLog,
+    showDivider: Boolean = true
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = log.transactionType.replace("_", " ").uppercase(),
+                    text = log.transactionType
+                        .replace("_", " ")
+                        .uppercase(),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
-                    color = if (log.amount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    color = if (log.amount > 0) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    }
                 )
-                Text(
-                    text = log.createdAt.take(10),
-                    style = MaterialTheme.typography.labelSmall
-                )
+
+                log.description?.let {
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
             Text(
-                text = if (log.amount > 0) "+ ${formatRupiah(log.amount.toDouble())}" else "- ${formatRupiah((-log.amount).toDouble())}",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = if (log.amount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-            )
-
-            log.description?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Balance after: ${formatRupiah(log.balanceAfter.toDouble())}",
+                text = log.createdAt.take(10),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = if (log.amount > 0) {
+                "+ ${formatRupiah(log.amount.toDouble())}"
+            } else {
+                "- ${formatRupiah((-log.amount).toDouble())}"
+            },
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = if (log.amount > 0) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.error
+            }
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Text(
+            text = "Balance after: ${
+                formatRupiah(log.balanceAfter.toDouble())
+            }",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        if (showDivider) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+            )
+        }
     }
 }
-
 @Composable
 private fun FinancialRowItem(label: String, value: String) {
     Row(

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -108,15 +109,16 @@ fun ShipmentListScreen(
                     else -> {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            contentPadding = PaddingValues(vertical = 8.dp)
                         ) {
-                            items(
+                            itemsIndexed(
                                 items = uiState.data,
-                                key = { shipment -> shipment.id }
-                            ) { shipment ->
+                                key = { _, shipment -> shipment.id }
+                            ) { index, shipment ->
+
                                 ShipmentCard(
                                     shipment = shipment,
+                                    showDivider = index != uiState.data.lastIndex,
                                     onClick = {
                                         onShipmentCardClick(shipment.orderId)
                                     }
