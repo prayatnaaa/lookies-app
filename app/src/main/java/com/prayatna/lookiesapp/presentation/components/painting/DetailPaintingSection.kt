@@ -148,7 +148,6 @@ fun DetailPaintingSection(
                 Text(
                     text = "About This Painting",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
