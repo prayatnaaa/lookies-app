@@ -221,7 +221,9 @@ fun PreviewDetailPainting() {
         updatedAt = null,
         yearCreated = 2023,
         mediumName = "Oil on Canvas",
-        artStyleName = "Abstract Expressionism"
+        artStyleName = "Abstract Expressionism",
+        price = 1.0,
+        availabilityStatus = "pending",
     )
 
     MaterialTheme {

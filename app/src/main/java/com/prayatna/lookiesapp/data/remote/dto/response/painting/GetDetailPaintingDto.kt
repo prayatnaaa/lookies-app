@@ -32,5 +32,8 @@ data class GetDetailPaintingDto(
     @SerialName("medium_name")
     val mediumName: String,
     @SerialName("art_style_name")
-    val artStyleName: String?
+    val artStyleName: String?,
+    val price: Double,
+    @SerialName("availability_status")
+    val availabilityStatus: String
 )

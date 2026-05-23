@@ -16,5 +16,7 @@ data class DetailPainting (
     val updatedAt: String?,
     val yearCreated: Int,
     val mediumName: String,
-    val artStyleName: String?
+    val artStyleName: String?,
+    val price: Double,
+    val availabilityStatus: String
 )

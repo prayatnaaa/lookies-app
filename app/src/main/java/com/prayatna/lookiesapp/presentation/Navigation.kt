@@ -45,6 +45,7 @@ import com.prayatna.lookiesapp.presentation.merchant.merchantMember.MerchantMemb
 import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.merchantWithdrawalRequestListNavigation
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.monthlyFinanceListScreen
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
+import com.prayatna.lookiesapp.presentation.painting.editpainting.editPaintingNavigation
 import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.ParticipantPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
@@ -336,6 +337,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             AdminEventScreen(navController = navController)
         }
 
+        editPaintingNavigation(navController)
         adminWithdrawalNavigation(navController)
         adminDetailEventNavigation(navController)
         inviteMerchantMemberNavigation(navController)

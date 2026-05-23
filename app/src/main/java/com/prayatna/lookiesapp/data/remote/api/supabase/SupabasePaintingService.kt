@@ -179,4 +179,37 @@ class SupabasePaintingService @Inject constructor(
                 filter { eq("id", eventPaintingId) }
             }
     }
+
+    suspend fun updatePainting(painting: UploadPaintingRequest, paintingId: Int, image: ByteArray?): String {
+        auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
+
+        var uploadedPath: String? = null
+        try {
+            val finalPainting = if (image != null) {
+                val path = "${painting.artistId}/${UUID.randomUUID()}.png"
+                storage.from("paintings").upload(
+                    path = path,
+                    data = image,
+                    upsert = false
+                )
+                uploadedPath = path
+                val imageUrl = Helper.buildImageUrl(imageName = path, bucketName = "paintings")
+                painting.copy(paintingUrl = imageUrl)
+            } else {
+                painting
+            }
+
+            postgrest.from("paintings").update(finalPainting) {
+                filter { eq("id", paintingId) }
+            }
+
+            return "Painting updated successfully"
+
+        } catch (e: Exception) {
+            uploadedPath?.let {
+                storage.from("paintings").delete(it)
+            }
+            throw e
+        }
+    }
 }

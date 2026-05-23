@@ -103,10 +103,19 @@ class PaintingRepositoryImpl @Inject constructor(
         }
     }
 
-
-
-    override suspend fun editPainting(painting: Painting): DataResult<String> {
-        TODO("Not yet implemented")
+    override suspend fun editPainting(painting: AddPaintingParams, paintingId: Int, image: Uri?): DataResult<String> {
+        return try {
+            val compressedImage = image?.compressImage(context, 500_000L)
+            val response = paintingService.updatePainting(
+                painting = painting.toDto(),
+                paintingId = paintingId,
+                image = compressedImage
+            )
+            DataResult.Success(response)
+        } catch (e: Exception) {
+            Log.d("EDIT-PAINTING", e.message.toString())
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
     }
 
     override suspend fun getPaintingArtStyles(): DataResult<List<PaintingAttribute>> {

@@ -20,6 +20,8 @@ fun GetDetailPaintingDto.toDomain(): DetailPainting {
         updatedAt = updatedAt,
         yearCreated = yearCreated,
         mediumName = mediumName,
-        artStyleName = artStyleName
+        artStyleName = artStyleName,
+        price = price,
+        availabilityStatus = availabilityStatus
     )
 }
