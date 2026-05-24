@@ -239,7 +239,7 @@ fun ChatInputBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send",
-                    tint = Color.White
+                    tint = if (text.isBlank()) Color.White else MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
