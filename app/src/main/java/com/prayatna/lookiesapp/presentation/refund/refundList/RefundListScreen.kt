@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,13 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoneyOff
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -132,15 +131,21 @@ fun RefundListScreen(
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)
+                        contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
-                        items(uiState.refunds) { refund ->
-                            RefundCard(
+                        itemsIndexed(
+                            items = uiState.refunds,
+                            key = { _, refund -> refund.id }
+                        ) { index, refund ->
+
+                            RefundItem(
+                                refund = refund,
+                                showDivider = index != uiState.refunds.lastIndex,
                                 onClicked = {
-                                    navController.navigate("${NavigationRoutes.PARTNER_REFUND}/${refund.id}")
-                                },
-                                refund = refund
+                                    navController.navigate(
+                                        "${NavigationRoutes.PARTNER_REFUND}/${refund.id}"
+                                    )
+                                }
                             )
                         }
                     }
@@ -151,98 +156,164 @@ fun RefundListScreen(
 }
 
 @Composable
-private fun RefundCard(
-    onClicked: () -> Unit = {},
+private fun RefundItem(
     refund: Refund,
+    showDivider: Boolean = true,
+    onClicked: () -> Unit = {}
 ) {
-    val statusColor = when (refund.status.lowercase()) {
-        "pending" -> MaterialTheme.colorScheme.tertiary
-        "processing" -> MaterialTheme.colorScheme.primary
-        "completed" -> Color(0xFF2E7D32)
-        "rejected" -> MaterialTheme.colorScheme.error
-        else -> MaterialTheme.colorScheme.onSurfaceVariant
+
+    val statusColor = when (
+        refund.status.lowercase()
+    ) {
+        "pending" ->
+            MaterialTheme.colorScheme.tertiary
+
+        "processing" ->
+            MaterialTheme.colorScheme.primary
+
+        "completed" ->
+            Color(0xFF2E7D32)
+
+        "rejected" ->
+            MaterialTheme.colorScheme.error
+
+        else ->
+            MaterialTheme.colorScheme.onSurfaceVariant
     }
 
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable { onClicked() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClicked)
+            .padding(
+                horizontal = 16.dp,
+                vertical = 14.dp
+            )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement =
+                Arrangement.SpaceBetween,
+            verticalAlignment =
+                Alignment.CenterVertically
+        ) {
+
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
+
                 Text(
-                    text = "Refund #${refund.id.take(8)}…",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
+                    text =
+                        "Refund #${refund.id.take(8)}",
+                    style =
+                        MaterialTheme.typography
+                            .titleMedium,
+                    fontWeight =
+                        FontWeight.SemiBold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow =
+                        TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = statusColor.copy(alpha = 0.15f),
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = refund.status.replaceFirstChar { it.uppercase() },
-                        style = MaterialTheme.typography.labelSmall,
-                        color = statusColor,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
+
+                Text(
+                    text =
+                        formatRupiah(
+                            refund.amount
+                                .toDoubleOrNull()
+                                ?: 0.0
+                        ),
+                    style =
+                        MaterialTheme.typography
+                            .titleSmall,
+                    fontWeight =
+                        FontWeight.Bold,
+                    color =
+                        MaterialTheme.colorScheme
+                            .primary
+                )
             }
 
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 10.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant
+            Spacer(
+                modifier = Modifier.width(12.dp)
             )
 
-            RefundInfoRow(label = "Order ID", value = refund.orderId)
-            RefundInfoRow(label = "Amount", value = formatRupiah(refund.amount.toDoubleOrNull() ?: 0.0))
-            RefundInfoRow(label = "Bank", value = "${refund.bankCode} – ${refund.accountNumber}")
-            RefundInfoRow(label = "Account Holder", value = refund.accountHolderName)
-            RefundInfoRow(label = "Reason", value = refund.reason)
+            Box(
+                modifier = Modifier
+                    .background(
+                        color =
+                            statusColor.copy(
+                                alpha = 0.12f
+                            ),
+                        shape =
+                            RoundedCornerShape(
+                                8.dp
+                            )
+                    )
+                    .padding(
+                        horizontal = 10.dp,
+                        vertical = 5.dp
+                    )
+            ) {
 
-//            if (refund.status.lowercase() in listOf("pending", "processing")) {
-//                Spacer(modifier = Modifier.height(12.dp))
-//                Button(
-//                    onClick = onSetComplete,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(44.dp),
-//                    shape = RoundedCornerShape(10.dp),
-//                    enabled = !isProcessing,
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = Color(0xFF2E7D32)
-//                    )
-//                ) {
-//                    if (isProcessing) {
-//                        CircularProgressIndicator(
-//                            modifier = Modifier.size(20.dp),
-//                            color = Color.White,
-//                            strokeWidth = 2.dp
-//                        )
-//                    } else {
-//                        Icon(
-//                            imageVector = Icons.Default.CheckCircle,
-//                            contentDescription = null,
-//                            modifier = Modifier.size(16.dp),
-//                            tint = Color.White
-//                        )
-//                        Spacer(modifier = Modifier.width(6.dp))
-//                        Text("Mark as Complete", fontWeight = FontWeight.SemiBold, color = Color.White)
-//                    }
-//                }
-//            }
+                Text(
+                    text =
+                        refund.status
+                            .replaceFirstChar {
+                                it.uppercase()
+                            },
+                    style =
+                        MaterialTheme.typography
+                            .labelSmall,
+                    color = statusColor,
+                    fontWeight =
+                        FontWeight.SemiBold
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        RefundInfoRow(
+            label = "Order",
+            value = refund.orderId
+        )
+
+        RefundInfoRow(
+            label = "Bank",
+            value =
+                "${refund.bankCode.uppercase()} - ${
+                    refund.accountNumber
+                }"
+        )
+
+        RefundInfoRow(
+            label = "Holder",
+            value =
+                refund.accountHolderName
+        )
+
+        RefundInfoRow(
+            label = "Reason",
+            value = refund.reason
+        )
+
+        if (showDivider) {
+
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
+
+            HorizontalDivider(
+                color =
+                    MaterialTheme.colorScheme
+                        .outline
+                        .copy(alpha = 0.12f)
+            )
         }
     }
 }
