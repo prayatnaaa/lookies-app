@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.refund.orderRefunds
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.refund.navigateToRefundDetail
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +119,10 @@ fun OrderRefundsScreen(
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)
                     ) {
                         items(uiState.refunds) { refund ->
-                            OrderRefundCard(refund = refund)
+                            OrderRefundCard(
+                                refund = refund,
+                                onClick = { navController.navigateToRefundDetail(refund.id) }
+                            )
                         }
                     }
                 }
@@ -127,7 +132,10 @@ fun OrderRefundsScreen(
 }
 
 @Composable
-private fun OrderRefundCard(refund: Refund) {
+private fun OrderRefundCard(
+    refund: Refund,
+    onClick: () -> Unit
+) {
     val statusColor = when (refund.status.lowercase()) {
         "pending" -> MaterialTheme.colorScheme.tertiary
         "processing" -> MaterialTheme.colorScheme.primary
@@ -137,7 +145,9 @@ private fun OrderRefundCard(refund: Refund) {
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)

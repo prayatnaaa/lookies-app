@@ -155,4 +155,18 @@ class SupabaseRefundService @Inject constructor(
         Log.d("PROCESS-REFUND", response.body())
         return response.body()
     }
+
+    suspend fun updateReturnTrackingNumber(id: String, trackingNumber: String): RefundDto {
+        val refund = postgrest.from("refund_requests").update({
+            set("return_tracking_number", trackingNumber)
+            set("status", "returning")
+        }) {
+            select()
+            filter {
+                eq("id", id)
+            }
+        }.decodeSingle<RefundDto>()
+        Log.d("RefundTracking", refund.toString())
+        return refund
+    }
 }

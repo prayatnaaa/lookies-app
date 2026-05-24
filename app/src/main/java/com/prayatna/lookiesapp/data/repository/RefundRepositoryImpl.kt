@@ -93,4 +93,16 @@ class RefundRepositoryImpl @Inject constructor(
             DataResult.Error(eMessage)
         }
     }
+
+    override suspend fun updateReturnTrackingNumber(id: String, trackingNumber: String): DataResult<Refund> {
+        return try {
+            val result = refundService.updateReturnTrackingNumber(id, trackingNumber)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
 }

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -119,6 +120,17 @@ fun AdminMainScreen(
                 subtitle = "Manage merchant withdrawals",
                 onClick = {
                     navController.navigateToAdminWithdrawalList()
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            AdminDashboardCard(
+                icon = Icons.Filled.Inbox,
+                title = "Forums",
+                subtitle = "Oversee community discussions",
+                onClick = {
+                    navController.navigate(NavigationRoutes.FORUM_LIST)
                 }
             )
 

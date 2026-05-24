@@ -27,4 +27,6 @@ interface RefundRepository {
             DataResult<Refund>
     suspend fun processRefund(refundRequestId: String):
             DataResult<ProcessRefundOutput>
+    suspend fun updateReturnTrackingNumber(id: String, trackingNumber: String):
+            DataResult<Refund>
 }

@@ -74,6 +74,7 @@ object NavigationRoutes {
     const val ADMIN_WITHDRAWAL_DETAIL = "admin_withdrawal_detail"
     const val ADMIN_DETAIL_EVENT = "admin_detail_event"
     const val EDIT_PAINTING = "edit_painting"
+    const val REFUND_DETAIL = "refund_detail"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

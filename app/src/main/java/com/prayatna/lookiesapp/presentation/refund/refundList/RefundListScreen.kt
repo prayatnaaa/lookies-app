@@ -139,13 +139,8 @@ fun RefundListScreen(
                             RefundCard(
                                 onClicked = {
                                     navController.navigate("${NavigationRoutes.PARTNER_REFUND}/${refund.id}")
-
                                 },
-                                refund = refund,
-//                                isProcessing = uiState.isProcessing,
-//                                onSetComplete = {
-//                                    viewModel.onEvent(RefundListEvent.SetRefundComplete(refund.id))
-//                                }
+                                refund = refund
                             )
                         }
                     }
