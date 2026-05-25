@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
+import com.prayatna.lookiesapp.domain.usecase.payment.GetPayoutChannelsUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.CreateRefundRequestUseCase
 import com.prayatna.lookiesapp.presentation.refund.createRefund.state.CreateRefundEvent
 import com.prayatna.lookiesapp.presentation.refund.createRefund.state.CreateRefundFormState
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateRefundViewModel @Inject constructor(
     private val createRefundRequestUseCase: CreateRefundRequestUseCase,
+    private val getPayoutChannelsUseCase: GetPayoutChannelsUseCase,
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -35,6 +37,21 @@ class CreateRefundViewModel @Inject constructor(
 
     private val _formState = MutableStateFlow(CreateRefundFormState(orderId = orderId, amount = totalAmount.toString()))
     val formState: StateFlow<CreateRefundFormState> = _formState.asStateFlow()
+
+    init {
+        loadPayoutChannels()
+    }
+
+    private fun loadPayoutChannels() {
+        viewModelScope.launch {
+            when (val result = getPayoutChannelsUseCase()) {
+                is DataResult.Success -> {
+                    _uiState.value = CreateRefundUiState.MetaLoaded(payoutChannels = result.data)
+                }
+                else -> Unit
+            }
+        }
+    }
 
     fun onEvent(event: CreateRefundEvent) {
         when (event) {

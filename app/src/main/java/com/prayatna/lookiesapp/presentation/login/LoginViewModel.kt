@@ -50,7 +50,9 @@ class LoginViewModel @Inject constructor(
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
-    private val _eventFlow = MutableSharedFlow<AuthEvent>()
+    private val _eventFlow = MutableSharedFlow<AuthEvent>(
+        replay = 1
+    )
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
@@ -83,10 +85,12 @@ class LoginViewModel @Inject constructor(
             when (val result = loginUseCase(emailValue, passwordValue)) {
 
                 is DataResult.Success -> {
+                    Log.d("SignIn", "Success " + result.data)
                     resetForm()
                 }
 
                 is DataResult.Error -> {
+                    Log.d("SignIn", "Error " + result.error)
                     _eventFlow.emit(AuthEvent.ShowError(result.error))
                     _authState.value = AuthState.Unauthenticated
                 }

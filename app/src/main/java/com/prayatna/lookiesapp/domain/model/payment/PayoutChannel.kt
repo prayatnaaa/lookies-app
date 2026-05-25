@@ -9,7 +9,7 @@ data class PayoutChannel(
 )
 
 data class AmountLimits(
-    val minimum: Long,
-    val maximum: Long,
-    val minimumIncrement: Long
+    val minimum: Double,
+    val maximum: Double,
+    val minimumIncrement: Double
 )

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
+import com.prayatna.lookiesapp.presentation.components.CustomDialog
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.login.state.AuthEvent
@@ -35,6 +35,7 @@ import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier,
@@ -121,7 +122,7 @@ fun LoginScreen(modifier: Modifier = Modifier,
                 )
             }
             if (showDialog) {
-                CustomBottomSheet(
+                CustomDialog(
 
                     title = if (isErrorDialog) "Error" else "Success",
                     onDismiss = {

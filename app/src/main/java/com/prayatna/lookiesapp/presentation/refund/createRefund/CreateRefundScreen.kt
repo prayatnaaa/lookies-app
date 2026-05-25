@@ -6,18 +6,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,25 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +24,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.domain.model.payment.PayoutChannel
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.refund.createRefund.state.CreateRefundEvent
@@ -68,6 +41,8 @@ fun CreateRefundScreen(
     val formState by viewModel.formState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var payoutChannels by remember { mutableStateOf<List<PayoutChannel>>(emptyList()) }
+
     val imageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -75,9 +50,15 @@ fun CreateRefundScreen(
     }
 
     LaunchedEffect(uiState) {
-        if (uiState is CreateRefundUiState.Error) {
-            snackbarHostState.showSnackbar((uiState as CreateRefundUiState.Error).message)
-            viewModel.onEvent(CreateRefundEvent.DismissError)
+        when (uiState) {
+            is CreateRefundUiState.Error -> {
+                snackbarHostState.showSnackbar((uiState as CreateRefundUiState.Error).message)
+                viewModel.onEvent(CreateRefundEvent.DismissError)
+            }
+            is CreateRefundUiState.MetaLoaded -> {
+                payoutChannels = (uiState as CreateRefundUiState.MetaLoaded).payoutChannels
+            }
+            else -> Unit
         }
     }
 
@@ -150,12 +131,10 @@ fun CreateRefundScreen(
             item { SectionLabel("Bank Account Details") }
 
             item {
-                OutlinedTextField(
-                    value = formState.bankCode,
-                    onValueChange = { viewModel.onEvent(CreateRefundEvent.BankCodeChanged(it)) },
-                    label = { Text("Bank Code (e.g. BCA, BNI, MANDIRI)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                PayoutChannelSelector(
+                    selectedCode = formState.bankCode,
+                    channels = payoutChannels,
+                    onSelect = { viewModel.onEvent(CreateRefundEvent.BankCodeChanged(it)) }
                 )
             }
 
@@ -272,6 +251,49 @@ fun CreateRefundScreen(
             }
 
             item { Spacer(modifier = Modifier.height(16.dp)) }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PayoutChannelSelector(
+    selectedCode: String,
+    channels: List<PayoutChannel>,
+    onSelect: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedName = channels.find { it.channelCode == selectedCode }?.channelName ?: "Select Bank"
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = selectedName,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Bank") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+            shape = RoundedCornerShape(12.dp)
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            channels.forEach { channel ->
+                DropdownMenuItem(
+                    text = { Text(channel.channelName) },
+                    onClick = {
+                        onSelect(channel.channelCode)
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }

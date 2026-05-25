@@ -18,8 +18,8 @@ data class PayoutChannelDto(
 
 @Serializable
 data class AmountLimitsDto(
-    val minimum: Long,
-    val maximum: Long,
+    val minimum: Double,
+    val maximum: Double,
     @SerialName("minimum_increment")
-    val minimumIncrement: Long
+    val minimumIncrement: Double
 )

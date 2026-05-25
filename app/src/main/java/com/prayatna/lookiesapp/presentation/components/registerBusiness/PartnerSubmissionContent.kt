@@ -6,43 +6,15 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.Apartment
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.UploadFile
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prayatna.lookiesapp.domain.model.payment.PayoutChannel
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionFormState
 import com.prayatna.lookiesapp.utils.Constants
@@ -60,10 +33,12 @@ import com.prayatna.lookiesapp.utils.Constants
 @Composable
 fun PartnerSubmissionContent(
     modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(0.dp),
     formState: PartnerSubmissionFormState,
     isLoading: Boolean,
     onEvent: (PartnerSubmissionEvent) -> Unit,
-    onPickFileClick: () -> Unit
+    onPickFileClick: () -> Unit,
+    payoutChannels: List<PayoutChannel> = emptyList()
 ) {
     val scrollState = rememberScrollState()
 
@@ -86,6 +61,7 @@ fun PartnerSubmissionContent(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .padding(paddingValues)
             .verticalScroll(scrollState)
             .padding(horizontal = 16.dp)
     ) {
@@ -321,28 +297,14 @@ fun PartnerSubmissionContent(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-                    value = formState.bankName,
-                    onValueChange = { onEvent(PartnerSubmissionEvent.BankNameChanged(it)) },
-                    label = { Text("Bank Name") },
-                    placeholder = { Text("e.g. BCA, BNI, Mandiri") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-                )
-                OutlinedTextField(
-                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-                    value = formState.bankCode,
-                    onValueChange = { onEvent(PartnerSubmissionEvent.BankCodeChanged(it)) },
-                    label = { Text("Bank Code") },
-                    placeholder = { Text("e.g. BCA") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-                )
-            }
+            PayoutChannelDropdown(
+                selectedCode = formState.bankCode,
+                channels = payoutChannels,
+                onSelect = { channel ->
+                    onEvent(PartnerSubmissionEvent.BankCodeChanged(channel.channelCode))
+                    onEvent(PartnerSubmissionEvent.BankNameChanged(channel.channelName))
+                }
+            )
 
             OutlinedTextField(
                 shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
@@ -450,5 +412,48 @@ fun PartnerSubmissionContent(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PayoutChannelDropdown(
+    selectedCode: String,
+    channels: List<PayoutChannel>,
+    onSelect: (PayoutChannel) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedChannel = channels.find { it.channelCode == selectedCode }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = selectedChannel?.channelName ?: "Select Bank",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Bank") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            channels.forEach { channel ->
+                DropdownMenuItem(
+                    text = { Text(channel.channelName) },
+                    onClick = {
+                        onSelect(channel)
+                        expanded = false
+                    }
+                )
+            }
+        }
     }
 }

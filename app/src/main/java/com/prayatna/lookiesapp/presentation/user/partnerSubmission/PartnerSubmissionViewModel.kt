@@ -11,6 +11,7 @@ import com.prayatna.lookiesapp.domain.model.user.CreateAccountHolderInput
 import com.prayatna.lookiesapp.domain.model.user.IndividualDetail
 import com.prayatna.lookiesapp.domain.model.user.KycDocument
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
+import com.prayatna.lookiesapp.domain.usecase.payment.GetPayoutChannelsUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.RegisterBusinessUseCase
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionFormState
@@ -27,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PartnerSubmissionViewModel @Inject constructor(
     private val registerBusinessUseCase: RegisterBusinessUseCase,
+    private val getPayoutChannelsUseCase: GetPayoutChannelsUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -38,6 +40,21 @@ class PartnerSubmissionViewModel @Inject constructor(
 
     private val _formState = MutableStateFlow(PartnerSubmissionFormState())
     val formState: StateFlow<PartnerSubmissionFormState> = _formState.asStateFlow()
+
+    init {
+        loadPayoutChannels()
+    }
+
+    private fun loadPayoutChannels() {
+        viewModelScope.launch {
+            when (val result = getPayoutChannelsUseCase()) {
+                is DataResult.Success -> {
+                    _uiState.value = PartnerSubmissionUiState.MetaLoaded(result.data)
+                }
+                else -> Unit
+            }
+        }
+    }
 
     fun onEvent(event: PartnerSubmissionEvent) {
         when (event) {

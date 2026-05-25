@@ -6,6 +6,7 @@ import com.prayatna.lookiesapp.domain.model.user.Address
 import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.BankAccount
 import com.prayatna.lookiesapp.domain.model.user.KycDocument
+import com.prayatna.lookiesapp.domain.usecase.payment.GetPayoutChannelsUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.BecomeArtistUseCase
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionFormState
@@ -23,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ArtistSubmissionViewModel @Inject constructor(
-    private val becomeArtistUseCase: BecomeArtistUseCase
+    private val becomeArtistUseCase: BecomeArtistUseCase,
+    private val getPayoutChannelsUseCase: GetPayoutChannelsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ArtistSubmissionUiState>(ArtistSubmissionUiState.Idle)
@@ -34,6 +36,21 @@ class ArtistSubmissionViewModel @Inject constructor(
 
     private val _effect = MutableSharedFlow<ArtistSubmissionEffect>()
     val effect = _effect.asSharedFlow()
+
+    init {
+        loadPayoutChannels()
+    }
+
+    private fun loadPayoutChannels() {
+        viewModelScope.launch {
+            when (val result = getPayoutChannelsUseCase()) {
+                is DataResult.Success -> {
+                    _uiState.value = ArtistSubmissionUiState.MetaLoaded(result.data)
+                }
+                else -> Unit
+            }
+        }
+    }
 
     fun onEvent(event: ArtistSubmissionEvent) {
         when (event) {
