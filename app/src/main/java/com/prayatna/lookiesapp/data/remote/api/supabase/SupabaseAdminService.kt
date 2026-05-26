@@ -1,6 +1,8 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.remote.dto.AdminTransactionDetailDto
+import com.prayatna.lookiesapp.data.remote.dto.AdminTransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.GetKycDocumentDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.WithdrawalRequestDto
@@ -9,6 +11,7 @@ import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecidePartnerAppli
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
 import javax.inject.Inject
 
 class SupabaseAdminService @Inject constructor(
@@ -101,5 +104,48 @@ class SupabaseAdminService @Inject constructor(
                 eq("id", id)
             }
         }.decodeSingle<WithdrawalRequestDto>()
+    }
+
+    suspend fun getTransactionList(limit: Int, offset: Int, status: String?): List<AdminTransactionDto> {
+        return  postgrest["orders"]
+            .select(
+                columns = Columns.raw(
+                    """
+                        id, total_amount, status, created_at, 
+                        users!orders_buyer_id_fkey1(email, user_profiles(full_name)), 
+                        payment_attempts(status)
+                        """.trimIndent()
+                )
+            ) {
+                filter {
+                    if (status != null) {
+                        eq("status", status)
+                    }
+                }
+                order("created_at", Order.DESCENDING)
+                limit(count = limit.toLong())
+                range(offset.toLong(), (offset + limit - 1).toLong())
+            }.decodeList<AdminTransactionDto>()
+    }
+
+    suspend fun getTransactionDetail(orderId: String): AdminTransactionDetailDto {
+        return postgrest["orders"]
+            .select(
+                columns = Columns.raw(
+                    """
+                        id, total_amount, status, created_at, 
+                        users!orders_buyer_id_fkey1(email, user_profiles(full_name, phone_number)), 
+                        order_items(id, item_type, unit_price, quantity, subtotal, event_id, event_painting_id), 
+                        order_splits(id, merchant_id, gross_amount, platform_fee, net_amount, payout_status),
+                        payment_attempts(status, provider, channel, external_id, created_at),
+                        shipments(id, tracking_number, status, shipping_cost),
+                        refund_requests(id, status, amount, reason)
+                        """.trimIndent()
+                )
+            ) {
+                filter {
+                    eq("id", orderId)
+                }
+            }.decodeSingle<AdminTransactionDetailDto>()
     }
 }

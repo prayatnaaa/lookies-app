@@ -1,8 +1,11 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAdminService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.admin.AdminTransaction
+import com.prayatna.lookiesapp.domain.model.admin.AdminTransactionDetail
 import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
 import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.domain.model.admin.GetKycDocument
@@ -92,6 +95,32 @@ class AdminRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        }
+    }
+
+    override suspend fun getTransactionList(
+        limit: Int,
+        offset: Int,
+        status: String?
+    ): DataResult<List<AdminTransaction>> {
+        return try {
+            val res = supabaseAdminService.getTransactionList(
+                limit = limit,
+                offset = offset,
+                status = status
+            )
+            DataResult.Success(res.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
+    }
+
+    override suspend fun getTransactionDetail(orderId: String): DataResult<AdminTransactionDetail> {
+        return try {
+            val res = supabaseAdminService.getTransactionDetail(orderId)
+            DataResult.Success(res.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
         }
     }
 }

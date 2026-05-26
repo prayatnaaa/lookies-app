@@ -20,30 +20,16 @@ fun PartnerHomeRoute(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarMessage = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>("snackbar_message", null)
+        ?.collectAsStateWithLifecycle()
 
-    LaunchedEffect(navController.currentBackStackEntry) {
-
-        val savedStateHandle =
-            navController.currentBackStackEntry
-                ?.savedStateHandle
-
-        savedStateHandle
-            ?.getStateFlow<String?>(
-                "snackbar_message",
-                null
-            )
-            ?.collect { message ->
-
-                if (message != null) {
-
-                    snackbarHostState.showSnackbar(
-                        message = message,
-                        withDismissAction = true
-                    )
-
-                    savedStateHandle["snackbar_message"] = null
-                }
-            }
+    LaunchedEffect(snackbarMessage?.value) {
+        snackbarMessage?.value?.let { message ->
+            snackbarHostState.showSnackbar(message, withDismissAction = true)
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("snackbar_message")
+        }
     }
 
     LaunchedEffect(Unit) {
