@@ -14,17 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -111,10 +110,21 @@ fun ForumChannelListScreen(
                         contentPadding = PaddingValues(16.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(state.channels) { channel ->
+                        itemsIndexed(
+                            items = state.channels,
+                            key = { _, channel -> channel.id }
+                        ) { index, channel ->
+
                             ForumChannelItem(
                                 channel = channel,
-                                onClick = { onEvent(ForumChannelListEvent.OnChannelClick(channel.id)) }
+                                showDivider = index != state.channels.lastIndex,
+                                onClick = {
+                                    onEvent(
+                                        ForumChannelListEvent.OnChannelClick(
+                                            channel.id
+                                        )
+                                    )
+                                }
                             )
                         }
                     }
@@ -127,29 +137,28 @@ fun ForumChannelListScreen(
 @Composable
 fun ForumChannelItem(
     channel: ForumChannelView,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    showDivider: Boolean = true
 ) {
-    ElevatedCard(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 2.dp
-        )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
     ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = 14.dp
+                ),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
             Box(
                 modifier = Modifier
-                    .size(52.dp)
+                    .size(46.dp)
                     .background(
                         MaterialTheme.colorScheme.primaryContainer,
                         CircleShape
@@ -172,12 +181,12 @@ fun ForumChannelItem(
                 Text(
                     text = "# ${channel.name}",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
                     text = "Forum discussion channel",
@@ -187,6 +196,13 @@ fun ForumChannelItem(
             }
 
             RoleChip(channel.role)
+        }
+
+        if (showDivider) {
+            HorizontalDivider(
+                modifier = Modifier.padding(start = 76.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+            )
         }
     }
 }

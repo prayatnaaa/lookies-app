@@ -10,11 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -72,7 +73,11 @@ fun AdminDetailEventScreen(
             }
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             when {
                 uiState.isLoading -> {
                     Box(
@@ -160,35 +165,34 @@ private fun AdminDetailEventBottomBar(
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement =
+                Arrangement.spacedBy(12.dp)
         ) {
-
-            Button(
-                onClick = onApprove,
-                modifier = Modifier.weight(1f),
-                enabled = !isDeciding,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                if (isDeciding) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text("Approve")
-                }
-            }
 
             OutlinedButton(
                 onClick = onReject,
                 modifier = Modifier.weight(1f),
-                enabled = !isDeciding,
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Maroon)
+                enabled = !isDeciding
             ) {
                 Text("Reject")
+            }
+
+            Button(
+                onClick = onApprove,
+                modifier = Modifier.weight(1f),
+                enabled = !isDeciding
+            ) {
+
+                if (isDeciding) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Approve Event")
+                }
             }
         }
     }
@@ -214,17 +218,27 @@ private fun RejectEventBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Reject Event",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                text =
+                    "Provide a reason so the organizer can revise and resubmit the event.",
+                style =
+                    MaterialTheme.typography.bodyMedium,
+                color =
+                    MaterialTheme.colorScheme
+                        .onSurfaceVariant
             )
 
             OutlinedTextField(
                 value = reason,
                 onValueChange = onReasonChange,
-                label = { Text("Rejection Reason") },
+                label = { Text("Reason") },
+                placeholder = {
+                    Text("Explain why this event is rejected")
+                },
                 modifier = Modifier.fillMaxWidth(),
-                minLines = 3
+                minLines = 4,
+                supportingText = {
+                    Text("${reason.length}/300")
+                }
             )
 
             Row(
@@ -255,28 +269,105 @@ private fun RejectEventBottomSheet(
 }
 
 @Composable
-private fun RevenueRulesSection(rules: List<EventRevenueRules>) {
-    Column(modifier = Modifier.padding(vertical = 16.dp)) {
+private fun RevenueRulesSection(
+    rules: List<EventRevenueRules>
+) {
+    Column(
+        modifier = Modifier.padding(vertical = 20.dp)
+    ) {
+
         Text(
-            text = "Revenue Splits",
-            style = MaterialTheme.typography.titleMedium,
+            text = "Revenue Distribution",
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        rules.forEach { rule ->
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text(text = rule.itemType.uppercase(), fontWeight = FontWeight.Bold)
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Artist: ${rule.artistPercent}%")
-                        Text("Event: ${rule.eventPercent}%")
-                        Text("Platform: ${rule.platformPercent}%")
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Column(
+            verticalArrangement =
+                Arrangement.spacedBy(12.dp)
+        ) {
+            rules.forEach { rule ->
+
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors =
+                        CardDefaults.elevatedCardColors(
+                            containerColor =
+                                MaterialTheme.colorScheme.surface
+                        )
+                ) {
+
+                    Column(
+                        modifier = Modifier.padding(18.dp)
+                    ) {
+
+                        Text(
+                            text = rule.itemType
+                                .replace("_", " ")
+                                .uppercase(),
+                            style = MaterialTheme
+                                .typography
+                                .titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(14.dp)
+                        )
+
+                        RevenueSplitRow(
+                            label = "Artist",
+                            value = "${rule.artistPercent}%"
+                        )
+
+                        RevenueSplitRow(
+                            label = "Event",
+                            value = "${rule.eventPercent}%"
+                        )
+
+                        RevenueSplitRow(
+                            label = "Platform",
+                            value =
+                                "${rule.platformPercent}%"
+                        )
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun RevenueSplitRow(
+    label: String,
+    value: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement =
+            Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme
+                .typography
+                .bodyMedium,
+            color =
+                MaterialTheme.colorScheme
+                    .onSurfaceVariant
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme
+                .typography
+                .bodyMedium,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
