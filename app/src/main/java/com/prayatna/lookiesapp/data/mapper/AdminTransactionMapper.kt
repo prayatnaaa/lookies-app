@@ -23,11 +23,10 @@ fun AdminTransactionDetailDto.toDomain(): AdminTransactionDetail {
         createdAt = createdAt,
         userEmail = user?.email,
         userFullName = user?.profile?.fullName,
-        userPhoneNumber = user?.profile?.phoneNumber,
         items = items.map { it.toDomain() },
         splits = splits.map { it.toAdminDomain() },
         paymentAttempts = paymentAttempts.map { it.toDomain() },
-        shipments = shipments.map { it.toDomain() },
+        shipments = shipments.map { it.toAdminDomain() },
         refundRequests = refundRequests.map { it.toDomain() }
     )
 }
@@ -65,7 +64,7 @@ fun PaymentAttemptDetailDto.toDomain(): AdminPaymentAttempt {
     )
 }
 
-fun ShipmentDto.toDomain(): AdminShipment {
+fun ShipmentDto.toAdminDomain(): AdminShipment {
     return AdminShipment(
         id = id,
         trackingNumber = trackingNumber,
@@ -79,6 +78,6 @@ fun RefundRequestDto.toDomain(): AdminRefundRequest {
         id = id,
         status = status,
         amount = amount,
-        reason = reason
+        reason = reason,
     )
 }

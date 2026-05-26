@@ -9,12 +9,8 @@ fun NavController.navigateToAdminTransactionList() {
     this.navigate(NavigationRoutes.ADMIN_TRANSACTION_LIST_ROUTE)
 }
 
-fun NavGraphBuilder.adminTransactionListScreen(
-    navController: NavController
-) {
-    composable(route = NavigationRoutes.ADMIN_TRANSACTION_LIST_ROUTE) {
-        AdminTransactionListRoute(
-            navController = navController
-        )
+fun NavGraphBuilder.adminTransactionListNavigation(navController: NavController) {
+    composable(NavigationRoutes.ADMIN_TRANSACTION_LIST_ROUTE) {
+        AdminTransactionListRoute(navController = navController)
     }
 }

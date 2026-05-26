@@ -43,7 +43,6 @@ data class OrderUserDto(
 @Serializable
 data class UserProfileDto(
     @SerialName("full_name") val fullName: String? = null,
-    @SerialName("phone_number") val phoneNumber: String? = null
 )
 
 @Serializable

@@ -134,11 +134,11 @@ class SupabaseAdminService @Inject constructor(
                 columns = Columns.raw(
                     """
                         id, total_amount, status, created_at, 
-                        users!orders_buyer_id_fkey1(email, user_profiles(full_name, phone_number)), 
+                        users!orders_buyer_id_fkey1(email, user_profiles(full_name)), 
                         order_items(id, item_type, unit_price, quantity, subtotal, event_id, event_painting_id), 
-                        order_splits(id, merchant_id, gross_amount, platform_fee, net_amount, payout_status),
+                        order_splits(id, order_id, created_at, merchant_id, gross_amount, platform_fee, net_amount, payout_status),
                         payment_attempts(status, provider, channel, external_id, created_at),
-                        shipments(id, tracking_number, status, shipping_cost),
+                        shipments(id, tracking_number, status, shipping_cost, merchant_id, order_id, reciepent_name, phone_number, address_line, province, postal_code, created_at),
                         refund_requests(id, status, amount, reason)
                         """.trimIndent()
                 )

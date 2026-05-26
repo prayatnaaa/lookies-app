@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.admin.transactionDetail.navigateToAdminTransactionDetail
 import com.prayatna.lookiesapp.presentation.admin.transactionList.state.AdminTransactionListUiEffect
 
 @Composable
@@ -15,17 +16,17 @@ fun AdminTransactionListRoute(
     navController: NavController,
     viewModel: AdminTransactionListViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
-            when(effect) {
+            when (effect) {
                 AdminTransactionListUiEffect.NavigateBack -> {
                     navController.popBackStack()
                 }
                 is AdminTransactionListUiEffect.NavigateToDetail -> {
-                    //TODO: create detail transaction for admin
+                    navController.navigateToAdminTransactionDetail(effect.orderId)
                 }
                 is AdminTransactionListUiEffect.ShowError -> {
                     snackbarHostState.showSnackbar(effect.message)
@@ -35,7 +36,7 @@ fun AdminTransactionListRoute(
     }
 
     AdminTransactionListScreen(
-        uiState = state,
+        uiState = uiState,
         onEvent = viewModel::onEvent,
         snackbarHostState = snackbarHostState
     )

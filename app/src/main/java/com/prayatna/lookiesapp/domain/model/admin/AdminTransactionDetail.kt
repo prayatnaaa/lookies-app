@@ -7,7 +7,6 @@ data class AdminTransactionDetail(
     val createdAt: String,
     val userEmail: String?,
     val userFullName: String?,
-    val userPhoneNumber: String?,
     val items: List<AdminOrderItem>,
     val splits: List<AdminOrderSplit>,
     val paymentAttempts: List<AdminPaymentAttempt>,

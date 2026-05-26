@@ -15,7 +15,8 @@ import androidx.navigation.navArgument
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
 import com.prayatna.lookiesapp.presentation.admin.detailEvent.adminDetailEventNavigation
-import com.prayatna.lookiesapp.presentation.admin.transactionList.adminTransactionListScreen
+import com.prayatna.lookiesapp.presentation.admin.transactionDetail.adminTransactionDetailNavigation
+import com.prayatna.lookiesapp.presentation.admin.transactionList.adminTransactionListNavigation
 import com.prayatna.lookiesapp.presentation.admin.withdrawal.state.adminWithdrawalNavigation
 import com.prayatna.lookiesapp.presentation.artistDashboard.ArtistDashboardScreen
 import com.prayatna.lookiesapp.presentation.checkout.state.checkoutNavigation
@@ -116,7 +117,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     ) {
 
         createPaintingReviewNavigation(navController)
-        adminTransactionListScreen(navController)
+        adminTransactionListNavigation(navController)
+        adminTransactionDetailNavigation(navController)
         exhibitionShipmentNavigation(navController = navController)
         shipmentListNavigation(navController = navController)
         composable(
