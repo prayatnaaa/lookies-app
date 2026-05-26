@@ -1,0 +1,8 @@
+package com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.state
+
+sealed interface MerchantWithdrawalRequestListEffect {
+    data object NavigateBack : MerchantWithdrawalRequestListEffect
+    data class NavigateCreateWithdrawal(val id: String): MerchantWithdrawalRequestListEffect
+    data class NavigateToDetail(val id: String) : MerchantWithdrawalRequestListEffect
+    data class ShowSnackbar(val message: String) : MerchantWithdrawalRequestListEffect
+}

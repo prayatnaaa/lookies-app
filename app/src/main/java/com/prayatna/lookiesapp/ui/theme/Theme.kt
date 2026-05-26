@@ -12,54 +12,73 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = PureWhite,
-    secondary = DarkPurple,
-    tertiary = PurpleGrey,
-    background = DarkBlue
+    onPrimary = AmoledBlack,
+    primaryContainer = SoftGrey,
+    onPrimaryContainer = PureWhite,
+
+    secondary = GreyText,
+    onSecondary = AmoledBlack,
+    secondaryContainer = DarkGrey,
+    onSecondaryContainer = PureWhite,
+
+    tertiary = MaroonLight,
+    onTertiary = AmoledBlack,
+    tertiaryContainer = Maroon.copy(alpha = 0.3f),
+    onTertiaryContainer = MaroonContainer,
+
+    background = AmoledBlack,
+    onBackground = PureWhite,
+    surface = DeepCharcoal,
+    onSurface = PureWhite,
+    surfaceVariant = DarkGrey,
+    onSurfaceVariant = GreyText,
+
+    error = Error,
+    onError = OnError,
+    errorContainer = Error.copy(alpha = 0.3f),
+    onErrorContainer = ErrorContainer,
+
+    outline = GreyText,
+    outlineVariant = SoftGrey
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = DarkBlue,
-    secondary = PureWhite,
-    tertiary = PurpleGrey,
-    background = LightGrey
+    primary = BlackText,
+    onPrimary = PureWhite,
+    primaryContainer = LightGrey,
+    onPrimaryContainer = BlackText,
 
+    secondary = GreyTextLight,
+    onSecondary = PureWhite,
+    secondaryContainer = SoftWhite,
+    onSecondaryContainer = BlackText,
+
+    tertiary = Maroon,
+    onTertiary = PureWhite,
+    tertiaryContainer = MaroonContainer,
+    onTertiaryContainer = OnMaroonContainer,
+
+    background = OffWhite,
+    onBackground = BlackText,
+    surface = PureWhite,
+    onSurface = BlackText,
+    surfaceVariant = SoftWhite,
+    onSurfaceVariant = GreyTextLight,
+
+    error = Error,
+    onError = OnError,
+    errorContainer = ErrorContainer,
+    onErrorContainer = OnErrorContainer,
+
+    outline = GreyTextLight,
+    outlineVariant = LightGrey
 )
-
-//private val LightColorScheme = lightColorScheme(
-//    primary = light_primary,
-//    onPrimary = light_onPrimary,
-//    primaryContainer = light_primaryContainer,
-//    onPrimaryContainer = light_onPrimaryContainer,
-//    secondary = light_secondary,
-//    onSecondary = light_onSecondary,
-//    background = light_background,
-//    onBackground = light_onBackground,
-//    surface = light_surface,
-//    onSurface = light_onSurface,
-//    error = light_error,
-//    onError = light_onError
-//)
-
-//private val DarkColorScheme = darkColorScheme(
-//    primary = dark_primary,
-//    onPrimary = dark_onPrimary,
-//    primaryContainer = dark_primaryContainer,
-//    onPrimaryContainer = dark_onPrimaryContainer,
-//    secondary = dark_secondary,
-//    onSecondary = dark_onSecondary,
-//    background = dark_background,
-//    onBackground = dark_onBackground,
-//    surface = dark_surface,
-//    onSurface = dark_onSurface,
-//    error = dark_error,
-//    onError = dark_onError
-//)\
 
 @Composable
 fun LookiesAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

@@ -1,24 +1,38 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
+import com.google.firebase.FirebaseException
+import com.google.firebase.messaging.FirebaseMessaging
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.domain.model.User
-import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserApi
+import com.prayatna.lookiesapp.data.mapper.asDomainModel
+import com.prayatna.lookiesapp.data.mapper.toDto
+import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseUserService
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
-import com.prayatna.lookiesapp.data.remote.dto.UserRoleDto
-import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
-import com.prayatna.lookiesapp.data.remote.mapper.toDto
+import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
+import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
+import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
+import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
+import com.prayatna.lookiesapp.domain.model.user.UserAddress
+import com.prayatna.lookiesapp.domain.model.user.UserEmail
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
+import com.prayatna.lookiesapp.utils.compressImage
+import com.prayatna.lookiesapp.utils.extractSupabaseError
+import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.tasks.await
 import java.util.UUID
 import javax.inject.Inject
 
@@ -27,25 +41,36 @@ class UserRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage,
     private val userPreference: UserPreference,
-    private val supabaseUserApi: SupabaseUserApi
+    private val supabaseUserService: SupabaseUserService,
+    @param:ApplicationContext private val context: Context,
 ): UserRepository {
+    override suspend fun getUsersEmail(query: String?): DataResult<List<UserEmail>> {
+        return try {
+            val result = supabaseUserService.getUsersEmail(query)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
 
-    override suspend fun getUser(): DataResult<User> {
-       return try {
-           val response = supabaseUserApi.getUser()
-           val user =  response.asDomainModel()
-           DataResult.Success(user)
-       } catch (e: RestException) {
-           DataResult.Error(e.error)
-       } catch (e: Exception) {
-           DataResult.Error(e.message.toString())
-       }
+    override suspend fun updateFcmToken(token: String): DataResult<Unit> {
+        return try {
+            val result = supabaseUserService.updateFcmToken(token)
+            DataResult.Success(result)
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            Log.e("UserRepositoryImpl", "updateFcmToken: $msg")
+            DataResult.Error(msg)
+        }
     }
 
     override fun getProfile(): Flow<DataResult<ProfileDto>> =
         userPreference.getProfile()
             .map { localProfile ->
-                if (localProfile.id.isEmpty()) {
+                if (localProfile.id == null) {
                     DataResult.Loading
                 } else {
                     DataResult.Success(localProfile.toDto())
@@ -56,7 +81,7 @@ class UserRepositoryImpl @Inject constructor(
                     val userId = auth.currentUserOrNull()?.id ?: return@onStart
 
                     val remoteProfile = postgrest
-                        .from("user_profiles")
+                        .from("users_view")
                         .select {
                             filter { eq("user_id", userId) }
                         }
@@ -64,32 +89,33 @@ class UserRepositoryImpl @Inject constructor(
 
                     userPreference.setProfile(remoteProfile.asDomainModel())
 
+                } catch (e: RestException) {
+                    val msg = extractSupabaseError(e.error)
+                    emit(DataResult.Error(msg))
+                } catch (e: HttpRequestException) {
+                    emit(DataResult.Error(e.message ?: "Network error"))
                 } catch (e: Exception) {
-                    emit(DataResult.Error("Something went wrong: ${e.localizedMessage}"))
+                    emit(DataResult.Error(e.message ?: "Something went wrong! Please check your connection"))
                 }
             }
 
 
     override suspend fun editProfile(fullName: String, bio: String, address: String, username: String): DataResult<String> {
         return try {
-
-            val userId = auth.currentUserOrNull()?.id ?: return DataResult.Error("You are not authenticated")
-            val result = postgrest.from("user_profiles")
-                .update({
-                    set("full_name", fullName)
-                    set("bio", bio)
-                    set("address", address)
-                    set("username", username)
-                }) {
-                    filter {
-                        eq("user_id", userId)
-                    }
-                }
-            DataResult.Success(result.data)
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error("Error! ${e.message}")
+            val result = supabaseUserService.editProfile(
+                fullName = fullName,
+                bio = bio,
+                address = address,
+                username = username
+            )
+            DataResult.Success(result)
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error("Error! ${e.message}")
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }
 
@@ -115,36 +141,94 @@ class UserRepositoryImpl @Inject constructor(
             } else {
                 DataResult.Error(error = "Image is not selected")
             }
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error(e.message.toString())
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: HttpRequestException) {
+            DataResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }
 
-    override suspend fun getRole(): String {
+    override suspend fun registerBusiness(
+        request: RoleApplicationInput,
+        kycFile: Uri,
+        fileName: String
+    ): DataResult<RoleApplicationResponse> {
+        val compressedImage = kycFile.compressImage(context, 500_000L)
+            ?: return DataResult.Error("Image is not selected")
         return try {
-            val userId = auth.currentUserOrNull()?.id
-                ?: throw IllegalStateException("User not authenticated")
-
-            val result = postgrest
-                .from("user_roles")
-                .select {
-                    filter { eq("user_id", userId) }
-                }
-                .decodeSingle<UserRoleDto>()
-
-            val roleName = result.roleName
-            Log.d("ROLE", result.toString())
-            Log.d("ROLE", "RESULT FROM SUPABASE: $result")
-            roleName
-        } catch (e: SupabaseEncodingException) {
-            e.message.toString()
+            val result = supabaseUserService.registerBusiness(
+                request = request.toDto(),
+                kycFile = compressedImage,
+                fileName = fileName
+            )
+            if (result.status == "success") {
+                DataResult.Success(result)
+            } else {
+                DataResult.Error(result.message)
+            }
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
         } catch (e: Exception) {
-            e.message.toString()
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }
 
+    override suspend fun becomeArtist(
+        request: ArtistApplicationInput,
+        kycFile: Uri,
+        fileName: String
+    ): DataResult<RoleApplicationResponse> {
+        val compressedImage = kycFile.compressImage(context, 500_000L)
+            ?: return DataResult.Error("Image is not selected")
+        return try {
+            val result = supabaseUserService.becomeArtist(
+                request = request.toDto(),
+                kycFile = compressedImage,
+                fileName = fileName
+            )
+            if (result.status == "success") {
+                DataResult.Success(result)
+            } else {
+                DataResult.Error(result.message)
+            }
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
 
+    override suspend fun getFcmToken(): String? {
+        return try {
+            Log.d("UserRepositoryImpl", "getFcmToken: ${FirebaseMessaging.getInstance().token.await()}")
+            FirebaseMessaging.getInstance().token.await()
+        } catch (e: FirebaseException) {
+            e.message ?: "Something went wrong! Please check your connection"
+        }
+    }
 
+    override suspend fun getUserAddresses(): DataResult<List<UserAddress>> {
+        return try {
+            val result = supabaseUserService.getUserAddresses()
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
+
+    override suspend fun createUserAddress(address: CreateUserAddressInput): DataResult<UserAddress> {
+        return try {
+            val result = supabaseUserService.createUserAddress(address = address.toDto())
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        }
+    }
 }

@@ -5,20 +5,26 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -26,85 +32,135 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.auth.AuthCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.ui.theme.light_onPrimary
+import com.prayatna.lookiesapp.presentation.register.events.RegisterEvent
+import com.prayatna.lookiesapp.ui.theme.BlackText
+import com.prayatna.lookiesapp.ui.theme.GreyTextLight
+import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
-fun RegisterScreen(modifier: Modifier = Modifier,
-                   navController: NavController,
-                   viewModel: RegisterViewModel = hiltViewModel()) {
-
+fun RegisterScreen(
+    navController: NavController,
+    viewModel: RegisterViewModel = hiltViewModel()
+) {
     val registerStatus = viewModel.registerStatus.collectAsStateWithLifecycle()
-    val snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isErrorDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(registerStatus.value) {
-        val status = registerStatus.value
 
-        if (status is DataResult.Success) {
-            val message = status.data
-            message.let {
-                snackBarHostState.showSnackbar(
-                    message = it,
-                    duration = SnackbarDuration.Long,
-                    withDismissAction = true
-                )
-            }
-        } else if (status is DataResult.Error) {
-            val errorMsg = status.error
-            errorMsg.let {
-                snackBarHostState.showSnackbar(
-                    message = it,
-                    duration = SnackbarDuration.Long,
-                    withDismissAction = true
-                )
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+
+                is RegisterEvent.ShowSuccessDialog -> {
+                    dialogMessage = event.message
+                    isErrorDialog = false
+                    showDialog = true
+                }
+
+                is RegisterEvent.ShowErrorDialog -> {
+                    dialogMessage = event.message
+                    isErrorDialog = true
+                    showDialog = true
+                }
             }
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) },
-        modifier = modifier.fillMaxSize(),
-        content = { padding -> padding.calculateTopPadding()
-            Column(modifier = modifier
+    Scaffold { padding -> padding.calculateTopPadding()
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
                 .imePadding()
                 .background(Constants.gradientBackground),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-                Text(text = "Lookies", style = TextStyle(
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                text = "Welcome!",
+                color = PureWhite,
+                style = TextStyle(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
-                    color = light_onPrimary
-                ))
+                ),
+                textAlign = TextAlign.Start
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                text = "Register to continue",
+                color = GreyTextLight,
+                style = TextStyle(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
+                ),
+                textAlign = TextAlign.Start
+            )
 
-                Spacer(modifier = modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                val emailValue = viewModel.emailValue
-                val passwordValue = viewModel.passwordValue
-                AuthCard(
-                    title = "Welcome",
-                    onRegister = {
-                        viewModel.onSignUp()
-                    },
-                    onLogin = {navController.navigate(NavigationRoutes.LOGIN)},
-                    inRegister = true,
-                    emailValue = emailValue,
-                    passwordValue = passwordValue,
-                    onEmailChange = {
-                        viewModel.onEmailChange(it)
-                    },
-                    onPasswordChange = {
-                        viewModel.onPasswordChange(it)
+            AuthCard(
+                verifyPasswordValue = viewModel.verifyPassword,
+                onVerifyPasswordChange = viewModel::onVerifyPasswordChange,
+                isRegister = true,
+                title = "Lookies",
+                onRegister = { viewModel.onSignUp() },
+                onLogin = {
+                    navController.navigate(NavigationRoutes.LOGIN) {
+                        popUpTo(NavigationRoutes.REGISTER) {
+                            inclusive = true
+                        }
                     }
-                )
-            }
-            if (registerStatus.value is DataResult.Loading) {
-                CircularLoading()
-            }
+                },
+                inRegister = true,
+                emailValue = viewModel.email,
+                passwordValue = viewModel.password,
+                fullNameValue = viewModel.fullName,
+                onFullNameChange = viewModel::onFullNameChange,
+                onEmailChange = viewModel::onEmailChange,
+                onPasswordChange = viewModel::onPasswordChange
+            )
         }
-    )
+
+        if (showDialog) {
+            AlertDialog(
+                containerColor = BlackText,
+                shape = MaterialTheme.shapes.medium,
+                textContentColor = PureWhite,
+                onDismissRequest = {},
+                title = {
+                    Text(if (isErrorDialog) "Error" else "Success",
+                        color = PureWhite)
+                },
+                text = {
+                    Text(dialogMessage, color = PureWhite)
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDialog = false
+                        if (!isErrorDialog) {
+                            navController.navigate(NavigationRoutes.LOGIN) {
+                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
+                    }) {
+                        Text("OK", color = PureWhite)
+                    }
+                }
+            )
+        }
+
+        if (registerStatus.value is DataResult.Loading) {
+            CircularLoading()
+        }
+    }
 }

@@ -1,0 +1,12 @@
+package com.prayatna.lookiesapp.domain.model.event
+
+
+data class Exhibition(
+    val eventId: String,
+    val paintingId: String,
+    val exhibitionPrice: Double,
+    val statusInEvent: String,
+    val isAuction: Boolean,
+    val startingPrice: Double,
+    val auctionEndTime: String
+)

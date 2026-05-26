@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 plugins {
@@ -7,7 +8,15 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("kotlin-parcelize")
+    id("com.google.gms.google-services")
 
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("17")
+    }
 }
 
 android {
@@ -15,8 +24,9 @@ android {
     compileSdk = 36
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     composeOptions {
@@ -25,6 +35,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        compose = true
     }
 
     defaultConfig {
@@ -41,10 +52,12 @@ android {
         val baseUrl = properties.getProperty("BASE_URL") ?: ""
         val apiKey = properties.getProperty("API_KEY") ?: ""
         val supabaseEdgeBaseUrl = properties.getProperty("SUPABASE_EDGE_BASE_URL") ?: ""
+        val xenditSecretKey = properties.getProperty("XENDIT_SECRET_KEY") ?: ""
 
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
         buildConfigField("String", "SUPABASE_EDGE_BASE_URL", "\"$supabaseEdgeBaseUrl\"")
+        buildConfigField("String", "XENDIT_SECRET_KEY", "\"$xenditSecretKey\"")
     }
 
     buildTypes {
@@ -55,16 +68,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
     }
 }
 
@@ -101,11 +104,14 @@ dependencies {
     implementation(libs.ktor.client.logging.jvm)
     implementation(libs.coil.compose)
     implementation(libs.postgrest.kt)
+    implementation(libs.realtime.kt)
 
     //Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
@@ -118,4 +124,32 @@ dependencies {
 
     //JWT Decode
     implementation(libs.jwtdecode)
+
+    //Desugar
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    //ZXING (Barcode generator)
+    implementation(libs.core)
+
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
+
+    //Worker
+    implementation(libs.androidx.work.runtime.ktx)
+
+    //Ktor
+    implementation(libs.ktor.client.okhttp)
+
+    // ML Kit Barcode Scanning
+    implementation(libs.barcode.scanning)
+    //camera
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+    //viewModel lifeCycle
+    implementation (libs.androidx.lifecycle.viewmodel.compose)
 }

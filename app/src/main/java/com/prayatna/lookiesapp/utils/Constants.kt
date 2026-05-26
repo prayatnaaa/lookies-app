@@ -1,14 +1,17 @@
 package com.prayatna.lookiesapp.utils
 
 import androidx.compose.ui.graphics.Brush
-import com.prayatna.lookiesapp.ui.theme.light_primary
-import com.prayatna.lookiesapp.ui.theme.light_primaryContainer
+import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.ui.theme.AmoledBlack
+import com.prayatna.lookiesapp.ui.theme.GreyTextLight
 
 object Constants {
     val gradientBackground = Brush.linearGradient(
         colors = listOf(
-            light_primary,
-            light_primaryContainer
+            AmoledBlack,
+            GreyTextLight
         )
     )
+
+    val ROUNDED_CORNER_SHAPE = 16.dp
 }

@@ -1,0 +1,22 @@
+package com.prayatna.lookiesapp.domain.usecase.user
+
+import android.net.Uri
+import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
+import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
+import com.prayatna.lookiesapp.domain.repository.UserRepository
+import com.prayatna.lookiesapp.utils.DataResult
+import javax.inject.Inject
+
+class BecomeArtistUseCase @Inject constructor(private val userRepository: UserRepository) {
+    suspend operator fun invoke(
+        input: ArtistApplicationInput,
+        kycFile: Uri,
+        fileName: String
+    ): DataResult<RoleApplicationResponse> {
+        return userRepository.becomeArtist(
+            request = input,
+            kycFile = kycFile,
+            fileName = fileName
+        )
+    }
+}

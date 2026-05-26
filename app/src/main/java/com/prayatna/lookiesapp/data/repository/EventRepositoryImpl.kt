@@ -1,144 +1,144 @@
 package com.prayatna.lookiesapp.data.repository
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
-import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.domain.model.DetailEventInfo
-import com.prayatna.lookiesapp.domain.model.Event
-import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventApi
-import com.prayatna.lookiesapp.data.remote.dto.DetailEventDto
-import com.prayatna.lookiesapp.data.remote.dto.EventDto
-import com.prayatna.lookiesapp.data.remote.mapper.asDomainModel
-import com.prayatna.lookiesapp.data.remote.response.event.AddEventResponse
+import com.prayatna.lookiesapp.data.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventService
+import com.prayatna.lookiesapp.data.remote.dto.EventStatisticDto
+import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.event.CreateEventParams
+import com.prayatna.lookiesapp.domain.model.event.EventFormat
+import com.prayatna.lookiesapp.domain.model.event.EventRevenueRules
+import com.prayatna.lookiesapp.domain.model.event.TEventType
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.utils.DataResult
-import com.prayatna.lookiesapp.utils.Helper
-import io.github.jan.supabase.exceptions.BadRequestRestException
-import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.NotFoundRestException
+import com.prayatna.lookiesapp.utils.compressImage
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.exceptions.UnknownRestException
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.storage.Storage
-import io.ktor.client.network.sockets.ConnectTimeoutException
-import kotlinx.coroutines.flow.first
-import java.util.UUID
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class EventRepositoryImpl @Inject constructor(
-    private val postgrest: Postgrest,
-    private val storage: Storage,
-    private val auth: Auth,
-    private val userPreference: UserPreference,
-    private val supabaseEventApi: SupabaseEventApi,
+    private val supabaseEventService: SupabaseEventService,
+    @ApplicationContext private val context: Context
 ): EventRepository {
-    override suspend fun getEvents(): DataResult<List<Event>> {
+    override suspend fun getEvents(
+        title: String?,
+        organizerId: String?,
+        status: String?,
+        location: String?,
+        startDate: String?,
+        endDate: String? ,
+        isTicketPriceAscending: Boolean,
+        limitCount: Long?
+    ): DataResult<List<Event>> {
         return try {
-            val eventDto = postgrest
-                .from("events")
-                .select()
-                .decodeList<EventDto>()
-
-            val events = eventDto.map { it.asDomainModel() }
-            DataResult.Success(events)
+            val response = supabaseEventService.getEvents(
+                limitCount = limitCount,
+                title = title,
+                organizerId = organizerId,
+                status = status,
+                location = location,
+                startDate = startDate,
+                endDate = endDate,
+                isTicketPriceAscending = isTicketPriceAscending
+            )
+            DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
-            when (e) {
-                is BadRequestRestException -> DataResult.Error(e.error)
-                is NotFoundRestException -> DataResult.Error(e.error)
-                is UnauthorizedRestException -> DataResult.Error(e.error)
-                is UnknownRestException -> DataResult.Error(e.error)
-            }
-        } catch (e: HttpRequestException) {
-            DataResult.Error(e.message.toString())
-        } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error(e.error)
         }
     }
 
-
-    override suspend fun getEvent(eventId: String): DataResult<DetailEventInfo> {
+    override suspend fun getEvent(
+        eventId: String,
+        forceRefresh: Boolean
+    ): DataResult<Event> {
         return try {
-            val token = userPreference.authTokenPreference.first()
-                ?: auth.currentSessionOrNull()?.accessToken ?: return DataResult.Error("Missing auth token")
-
-            val response = supabaseEventApi.getEvent(token = token, eventId = eventId)
-            Log.d("EVENT", response.toString())
-            DataResult.Success(response.asDomainModel())
+            val response = supabaseEventService.getDetailEvent(eventId)
+            DataResult.Success(response.toDomain())
         } catch (e: RestException) {
-            when (e) {
-                is BadRequestRestException -> DataResult.Error(e.error)
-                is NotFoundRestException -> DataResult.Error(e.error)
-                is UnauthorizedRestException -> DataResult.Error(e.error)
-                is UnknownRestException -> DataResult.Error(e.error)
-            }
-        } catch (e: HttpRequestException) {
-            DataResult.Error(e.message.toString())
-        } catch (e: Exception) {
-            DataResult.Error(e.message.toString())
+            DataResult.Error(e.error)
         }
     }
 
-    override suspend fun addEvent(
-        event: EventDto,
-        detailEvent: DetailEventDto,
-        imageByte: ByteArray
-    ): DataResult<AddEventResponse> {
-        if (imageByte.isEmpty()) {
-            return DataResult.Error("Image banner cannot be empty!")
+    override suspend fun getEventStatistics(eventId: String): Flow<DataResult<EventStatisticDto>> = flow {
+        emit(DataResult.Loading)
+        try {
+            val idInt = eventId.toIntOrNull()
+            if (idInt == null) {
+                emit(DataResult.Error("Invalid Event ID"))
+                return@flow
+            }
+
+            val result = supabaseEventService.getEventStatistics(eventId)
+            emit(DataResult.Success(result))
+
+        } catch (e: Exception) {
+            emit(DataResult.Error(e.message ?: "Failed to load statistics"))
         }
-
+    }
+    override suspend fun createEvent(
+        params: CreateEventParams,
+        imageByte: Uri
+    ): DataResult<Event> {
+        val compressedBannerImage = imageByte.compressImage(context, 500_000L)
         return try {
-            val path = "${UUID.randomUUID()}.png"
-
-            storage.from("event_image_banner").upload(
-                path = path,
-                data = imageByte,
-                upsert = true,
+            val result = supabaseEventService.createEvent(
+                request = params.toDto(),
+                bannerImage = compressedBannerImage
             )
 
-            val imageUrl = Helper.buildImageUrl(imageName = path, bucketName = "event_image_banner")
-            val userId = userPreference.userIdPreference.first()
-                ?: return DataResult.Error("User not logged in")
-            val token = userPreference.authTokenPreference.first()
-                ?: return DataResult.Error("Missing auth token")
-
-            val eventDto = event.copy(
-                organizerId = userId,
-                bannerImageUrl = imageUrl
-            )
-
-            val response = supabaseEventApi.addEvent(
-                token = token,
-                event = eventDto,
-                detailEvent = detailEvent
-            )
-
-            Log.d("EVENT-ADD", "Success: ${response.message}")
-            DataResult.Success(response)
-
-        } catch (e: RestException) {
-            Log.e("EVENT-GET", "Error: ${e.error}")
-            when (e) {
-                is BadRequestRestException -> DataResult.Error(e.error)
-                is NotFoundRestException -> DataResult.Error(e.error)
-                is UnauthorizedRestException -> DataResult.Error(e.error)
-                else -> DataResult.Error("REST error: ${e.message}")
+            if (result.event != null && result.status == "success") {
+                DataResult.Success(result.event.toDomain())
+            } else {
+                DataResult.Error(result.message)
             }
-        } catch (e: ConnectTimeoutException) {
-            DataResult.Error("Connection timed out, please check your network.")
         } catch (e: Exception) {
-            Log.e("EVENT-ADD", "Error: ${e.message}")
-            DataResult.Error("Unexpected error: ${e.message}")
+            DataResult.Error(e.message ?: "Something went wrong")
         }
     }
 
-    override suspend fun editEvent(event: EventDto): DataResult<String> {
-        TODO("Not yet implemented")
+    override suspend fun getEventTypes(): DataResult<List<TEventType>> {
+        return try {
+            val response = supabaseEventService.getEventTypes()
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
     }
 
-    override suspend fun deleteEvent(eventId: String): DataResult<String> {
-        TODO("Not yet implemented")
+    override suspend fun getEventFormats(): DataResult<List<EventFormat>> {
+        return try {
+            val response = supabaseEventService.getEventFormats()
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
     }
 
+    override suspend fun getEventPaintings(eventId: String,
+                                           status: String?): DataResult<List<EventPainting>> {
+        return try {
+            val response = supabaseEventService.getEventPaintings(eventId = eventId,
+                status = status)
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            Log.e("getEventPaintings", e.error)
+            DataResult.Error(e.error)
+        }
+    }
+
+    override suspend fun getRevenueRulesByEventId(eventId: Int): DataResult<List<EventRevenueRules>> {
+        return try {
+            val response = supabaseEventService.getRevenueRulesByEventId(eventId)
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }
+    }
 }

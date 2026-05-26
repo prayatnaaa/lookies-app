@@ -1,79 +1,78 @@
 package com.prayatna.lookiesapp.data.repository
 
-import com.prayatna.lookiesapp.data.local.datastore.UserPreference
-import com.prayatna.lookiesapp.data.remote.dto.ArtistApplicationDto
-import com.prayatna.lookiesapp.data.remote.dto.PaintingDto
-import com.prayatna.lookiesapp.domain.model.ArtistApplication
-import com.prayatna.lookiesapp.domain.model.Painting
+import android.util.Log
+import com.prayatna.lookiesapp.data.mapper.toDomain
+import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseArtistService
+import com.prayatna.lookiesapp.data.remote.dto.ArtistDashboardSummaryDto
+import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.artist.ArtistDashboardSummary
+import com.prayatna.lookiesapp.domain.model.artist.GetArtistBusinessIdOutput
+import com.prayatna.lookiesapp.domain.model.artist.RegisterEventOutput
+import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
 import com.prayatna.lookiesapp.utils.DataResult
-import com.prayatna.lookiesapp.utils.Helper
-import io.github.jan.supabase.exceptions.SupabaseEncodingException
-import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.storage.Storage
-import kotlinx.coroutines.flow.first
+import com.prayatna.lookiesapp.utils.extractSupabaseError
+import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.gotrue.Auth
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class ArtistRepositoryImpl @Inject constructor(
-    private val postgrest: Postgrest,
-    private val storage: Storage,
-    private val userPreference: UserPreference
+    private val supabaseArtistService: SupabaseArtistService,
+    private val auth: Auth
 ): ArtistRepository {
-    override suspend fun artistApplication(artistApplication: ArtistApplication): DataResult<String> {
-        val userId = userPreference.userIdPreference.first()
-        val artistApplicationDto = ArtistApplicationDto(
-            userId = userId as String,
-            portoUrl = artistApplication.portoUrl,
-            motiveLetter = artistApplication.motiveLetter,
-            status = artistApplication.status,
-            reviewerId = artistApplication.reviewerId,
-            reviewNote = artistApplication.reviewNote,
-            businessType = artistApplication.businessType
-        )
-
+    override suspend fun registerEvent(
+        eventId: Int,
+        paintingIds: List<Int>
+    ): DataResult<RegisterEventOutput> {
+        val artistId = auth.currentSessionOrNull()?.user?.id ?: throw Exception("User not logged in")
         return try {
-            postgrest
-                .from("artist_applications")
-                .insert(artistApplicationDto)
+            val response = supabaseArtistService.registerEvent(
+                artistId = artistId,
+                eventId = eventId,
+                paintingIds = paintingIds
+            )
 
-            DataResult.Success("Your application have been submitted!")
+            Log.e("RegisterEvent", "registerEvent: $response")
 
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error("Something went wrong! ${e.localizedMessage}")
-        } catch (e: Exception) {
-            DataResult.Error("Error! ${e.localizedMessage}")
-        }
-    }
-
-    override suspend fun publishPainting(painting: Painting, imageFile: ByteArray): DataResult<String> {
-        return try {
-            if (imageFile.isNotEmpty()) {
-                val imageUrl =
-                    storage.from("painting_urls").upload(
-                        path = "${painting.title}.png",
-                        data = imageFile,
-                        upsert = true
-                    )
-
-                val paintingDto = PaintingDto(
-                    artistId = painting.artistId,
-                    title = painting.title,
-                    thumbnailImageUrl = Helper.buildImageUrl(imageName = imageUrl, bucketName = "painting_urls")
-                )
-
-                postgrest.from("paintings")
-                    .insert(paintingDto)
-
-                DataResult.Success("Your painting have been published!")
-
-            } else {
-                DataResult.Error("Something went wrong! Please check every field")
+            if (response.status == "error") {
+                return DataResult.Error(response.message)
             }
-        } catch (e: SupabaseEncodingException) {
-            DataResult.Error("Something went wrong! ${e.localizedMessage}")
-        } catch (e: Exception) {
-            DataResult.Error("Something went wrong! ${e.localizedMessage}")
+
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            Log.e("RegisterEvent", e.toString())
+            DataResult.Error(e.error)
         }
     }
 
+    override fun getDashboardData(): Flow<ArtistDashboardSummary> =
+        supabaseArtistService
+            .getDashboardSummary()
+            .map { it.toDomain() }
+
+    override suspend fun getArtistEventPaintings(artistId: String, status: String?): DataResult<List<EventPainting>> {
+        return try {
+            val response = supabaseArtistService.getArtistEventPaintings(artistId = artistId, status = status)
+            DataResult.Success(response.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
+
+    override suspend fun getArtistBusinessId(): DataResult<GetArtistBusinessIdOutput> {
+        return try {
+            val response = supabaseArtistService.getArtistBusinessId()
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
 }

@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.prayatna.lookiesapp.domain.model.Profile
+import com.prayatna.lookiesapp.domain.model.user.Profile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,14 +19,13 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
 
     companion object {
         private val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
-        private val AUTH_TOKEN_KEY = stringPreferencesKey("auth_token")
         private val USER_ADDRESS_KEY = stringPreferencesKey("user_address")
         private val USER_ID_KEY = stringPreferencesKey("user_id")
         private val USERNAME_KEY = stringPreferencesKey("username")
         private val USER_URL_KEY = stringPreferencesKey("user_url")
         private val USER_BIO_KEY = stringPreferencesKey("user_bio")
         private val USER_FULL_NAME_KEY = stringPreferencesKey("user_full_name")
-        private val COMPLETE_PROFILE_KEY = booleanPreferencesKey("complete_profile")
+        private val USER_ROLE = stringPreferencesKey("user_role")
     }
 
     suspend fun setDarkMode(isDarkMode: Boolean) {
@@ -40,31 +39,28 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
             preference[DARK_MODE_KEY] ?: false
         }
 
-    suspend fun setAuthToken(token: String) {
-        context.dataStore.edit { preference ->
-            preference[AUTH_TOKEN_KEY] = token
-        }
-    }
-
-    suspend fun setCompleteProfile(isProfileComplete: Boolean) {
+    suspend fun setRole(value: String) {
         context.dataStore.edit { preferences ->
-            preferences[COMPLETE_PROFILE_KEY] = isProfileComplete
+            preferences[USER_ROLE] = value
         }
     }
 
-    val isCompleteProfile: Flow<Boolean> = context.dataStore
-        .data
-        .map { preference ->
-            preference[COMPLETE_PROFILE_KEY] ?: false
-        }
+    fun getRole(): Flow<String> {
+        return context.dataStore.data
+            .map { preference ->
+                preference[USER_ROLE] ?: ""
+            }
+    }
 
     suspend fun setProfile(profile: Profile) {
         context.dataStore.edit { preferences ->
-            preferences[USER_ID_KEY] = profile.id
+            preferences[USER_ID_KEY] = profile.id ?: ""
             preferences[USER_URL_KEY] = profile.profileUrl ?: ""
             preferences[USERNAME_KEY] = profile.username ?: ""
             preferences[USER_ADDRESS_KEY] = profile.address ?: ""
             preferences[USER_BIO_KEY] = profile.bio ?: ""
+            preferences[USER_FULL_NAME_KEY] = profile.fullName ?: ""
+            preferences[USER_ROLE] = profile.role ?: ""
         }
     }
 
@@ -78,25 +74,11 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
                     fullName = preference[USER_FULL_NAME_KEY] ?: "",
                     address = preference[USER_ADDRESS_KEY] ?: "",
                     bio = preference[USER_BIO_KEY] ?: "",
+                    role = preference[USER_ROLE] ?: "",
+                    businessId = null
                 )
             }
     }
-
-    val authTokenPreference: Flow<String?> = context.dataStore.data
-        .map { preference ->
-            preference[AUTH_TOKEN_KEY]
-        }
-
-    suspend fun setUserId(userId: String) {
-        context.dataStore.edit { preference ->
-            preference[USER_ID_KEY] = userId
-        }
-    }
-
-    val userIdPreference: Flow<String?> = context.dataStore.data
-        .map { preference ->
-            preference[USER_ID_KEY]
-        }
 
     suspend fun logout() {
         context.dataStore.edit { preferences ->

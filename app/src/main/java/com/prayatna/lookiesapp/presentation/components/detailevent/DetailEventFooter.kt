@@ -2,13 +2,14 @@ package com.prayatna.lookiesapp.presentation.components.detailevent
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
@@ -18,46 +19,97 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.Grey
-import com.prayatna.lookiesapp.ui.theme.PureWhite
+import com.prayatna.lookiesapp.ui.theme.DarkGreen
+import com.prayatna.lookiesapp.ui.theme.Maroon
+import com.prayatna.lookiesapp.utils.Constants
 
 @Composable
 fun DetailEventFooter(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBuyButtonClick: () -> Unit,
+    showRegisterButton: Boolean = false,
+    onRegisterButtonClick: () -> Unit = {},
+    onSeePaintingsClick: () -> Unit = {},
+    showBuyButton: Boolean = false,
+    isRegisterButtonEnabled: Boolean = true,
+    showDecideButton: Boolean = false,
+    onApproveButtonClick: () -> Unit = {},
+    onRejectButtonClick: () -> Unit = {},
 ) {
     ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = PureWhite,
-            contentColor = BlackCharcoal,
-            disabledContainerColor = Grey,
-            disabledContentColor = PureWhite
+            containerColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         elevation = CardDefaults.cardElevation(16.dp),
-        shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+        shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
     ) {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column {
+            if (showRegisterButton) {
+                Button(
+                    enabled = isRegisterButtonEnabled,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    onClick = onRegisterButtonClick
+                ) {
+                    Text(text = "Register")
+                }
+            }
 
-            AddToCartButton(
-                modifier = modifier.weight(0.5f),
-                onClick = {}
-            )
+            Row(
+                modifier = modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-            Spacer(modifier = Modifier.width(8.dp))
+                SeeArtsButton (
+                    modifier = modifier.weight(0.5f),
+                    onClick = onSeePaintingsClick
+                )
 
-            BuyButton(
-                modifier = modifier.weight(0.5f),
-                onClick = {}
-            )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                if (showBuyButton) {
+                    BuyButton(
+                        modifier = modifier.weight(0.5f),
+                        onClick = onBuyButtonClick
+                    )
+                }
+            }
+
+            if (showDecideButton) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    DecideButton(
+                        text = "Approve",
+                        color = DarkGreen,
+                        modifier = Modifier.weight(1f),
+                        onClick = onApproveButtonClick
+                    )
+
+                    DecideButton(
+                        text = "Reject",
+                        color = Maroon,
+                        modifier = Modifier.weight(1f),
+                        onClick = onRejectButtonClick
+                    )
+                }
+            }
         }
     }
 }
@@ -72,22 +124,21 @@ fun BuyButton(
         modifier = modifier
             .width(150.dp),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = BlackCharcoal,
-            contentColor = PureWhite,
-            disabledContainerColor = Grey,
-            disabledContentColor = PureWhite
+            containerColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
     ) {
         Text(
-            text = "Buy",
-            style = MaterialTheme.typography.bodyLarge
+            text = "Buy ticket",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
 
 @Composable
-fun AddToCartButton(
+fun SeeArtsButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -96,17 +147,16 @@ fun AddToCartButton(
         modifier = modifier
             .width(150.dp),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = PureWhite,
-            contentColor = BlackCharcoal,
-            disabledContainerColor = Grey,
-            disabledContentColor = PureWhite
+            containerColor = MaterialTheme.colorScheme.primary,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(width = 1.dp, color = BlackCharcoal)
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline)
     ) {
         Text(
-            text = "Add to cart",
-            style = MaterialTheme.typography.bodyMedium
+            text = "See all arts",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -114,5 +164,29 @@ fun AddToCartButton(
 @Preview(showBackground = true)
 @Composable
 fun DetailEventFooterPreview() {
-    DetailEventFooter()
+    DetailEventFooter(
+        onBuyButtonClick = {},
+    )
+}
+
+@Composable
+fun DecideButton(
+    text: String,
+    color: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    ElevatedButton(
+        onClick = onClick,
+        modifier = modifier,
+        colors = ButtonDefaults.elevatedButtonColors(
+            containerColor = color
+        ),
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
+    ) {
+        Text(
+            text = text,
+            color = Color.White
+        )
+    }
 }

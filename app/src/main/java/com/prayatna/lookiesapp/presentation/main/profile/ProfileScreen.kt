@@ -1,13 +1,24 @@
 package com.prayatna.lookiesapp.presentation.main.profile
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.filled.Handshake
+import androidx.compose.material.icons.filled.SavedSearch
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -16,14 +27,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.SharedViewModel
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.presentation.components.profile.ProfileCard
+import com.prayatna.lookiesapp.presentation.components.user.profile.ProfileCard
+import com.prayatna.lookiesapp.presentation.components.user.profile.SettingsSection
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -31,77 +46,156 @@ import com.prayatna.lookiesapp.utils.NavigationRoutes
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel(),
+    sharedViewModel: SharedViewModel,
     navController: NavController
-    ) {
-
-    val snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
-    val logoutStatus = viewModel.logoutStatus.collectAsState()
+) {
+    val snackBarHostState = remember { SnackbarHostState() }
+    val logoutStatus by viewModel.logoutStatus.collectAsState()
+    val profileState by sharedViewModel.profileState.collectAsStateWithLifecycle()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(viewModel.isError) {
         if (viewModel.isError) {
-            viewModel.errorMsg.let {
-                snackBarHostState.showSnackbar(
-                    message = it,
-                    duration = SnackbarDuration.Long,
-                    withDismissAction = true
-                )
-            }
-        }
-    }
-
-    LaunchedEffect (logoutStatus.value) {
-        val status = logoutStatus.value
-
-        if (status is DataResult.Success) {
-            navController.navigate(NavigationRoutes.LOGIN)
-        } else if (status is DataResult.Error) {
-            val errorMsg = status.error
             snackBarHostState.showSnackbar(
-                message = errorMsg,
+                message = viewModel.errorMsg,
                 duration = SnackbarDuration.Long,
                 withDismissAction = true
             )
         }
     }
 
-    Scaffold(modifier = modifier.fillMaxSize(),
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
-        },
-        content = {
-            padding ->
-            Column(modifier = modifier
-                .fillMaxSize()
-                .padding(padding),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally) {
-                    if (viewModel.isSuccess) {
-                        val user = viewModel.user
-                        Log.d("PROFILE-TEST", "$user")
-                        ProfileCard(
-                            username = user?.username as String,
-                            onEditProfileClick = {
-                                navController.navigate(
-                                    NavigationRoutes.EDIT_PROFILE
-                                )
-                            }
-                        )
-                    }
-
-                Spacer(modifier = modifier.height(4.dp))
-
-                Button(
-                    onClick = {
-                        viewModel.logout()
-                    }
-                ) {
-                    Text(text = "Logout")
+    LaunchedEffect(logoutStatus) {
+        when (logoutStatus) {
+            is DataResult.Success -> {
+                navController.navigate(NavigationRoutes.LOGIN) {
+                    popUpTo(NavigationRoutes.MAIN) { inclusive = true }
                 }
             }
+            is DataResult.Error -> {
+                snackBarHostState.showSnackbar(
+                    message = (logoutStatus as DataResult.Error).error,
+                    duration = SnackbarDuration.Long,
+                    withDismissAction = true
+                )
+            }
+            else -> Unit
+        }
+    }
 
-            if (viewModel.isLoading || logoutStatus.value is DataResult.Loading) {
-                CircularLoading()
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+    ) { innerPadding ->
+
+        innerPadding.calculateTopPadding()
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(20.dp))
+
+            when (profileState) {
+
+                is DataResult.Success -> {
+                    val profile = (profileState as DataResult.Success).data
+
+                    ProfileCard(
+                        profileImageUrl = profile.profileUrl,
+                        username = profile.username ?: "Unknown",
+                        onEditProfileClick = {
+                            navController.navigate("${NavigationRoutes.EDIT_PROFILE}?isPartnerSignup=false")
+                        }
+                    )
+
+                    Spacer(Modifier.height(24.dp))
+
+                    Text(
+                        text = "Dashboard",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp, start = 4.dp)
+                    )
+
+                    SettingsSection(
+                        title = "Partner",
+                        subtitle = "Join us and expand your reach",
+                        icon = Icons.Default.Handshake,
+                        onClick = {
+                            if (profile.role != "user") {
+                                navController.navigate(NavigationRoutes.MERCHANT_MEMBER_LIST)
+                            } else {
+                                navController.navigate("${NavigationRoutes.PARTNER_APPLICATION}/partner")
+                            }
+                        }
+                    )
+
+                    SettingsSection(
+                        title = "Selling",
+                        subtitle = "Create or see listing",
+                        icon = Icons.Default.SavedSearch,
+                        onClick = {
+                            if (profile.role == "artist") {
+                                navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
+                            } else {
+                                navController.navigate(NavigationRoutes.ARTIST_APPLICATION)
+                            }
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = { viewModel.logout() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.Logout,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Log Out")
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+
+                is DataResult.Loading -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularLoading()
+                    }
+                }
+
+                is DataResult.Error -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Failed to load profile",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+
+                DataResult.Idle -> { }
             }
         }
-    )
+    }
 }

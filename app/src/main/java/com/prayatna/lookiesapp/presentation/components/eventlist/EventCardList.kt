@@ -8,13 +8,15 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.prayatna.lookiesapp.domain.model.Event
+import com.prayatna.lookiesapp.domain.model.event.Event
 
 @Composable
 fun EventCardList(
     events: List<Event>,
     modifier: Modifier = Modifier,
-    onClick: (Event) -> Unit
+    onClick: (Event) -> Unit,
+    showStatus: Boolean = false,
+    showTicketPrice: Boolean = true
 ) {
     LazyColumn(
         modifier = modifier
@@ -24,6 +26,8 @@ fun EventCardList(
     ) {
         itemsIndexed(events) { _, event ->
             EventCard(
+                showTicketPrice = showTicketPrice,
+                showStatus = showStatus,
                 event = event,
                 onClick = { onClick(event) }
             )

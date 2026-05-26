@@ -6,3 +6,12 @@ sealed class DataResult<out R> private constructor(){
     data object Loading : DataResult<Nothing>()
     data object Idle : DataResult<Nothing>()
 }
+
+inline fun <T, R> DataResult<T>.map(transform: (T) -> R): DataResult<R> {
+    return when (this) {
+        is DataResult.Success -> DataResult.Success(transform(data))
+        is DataResult.Error -> DataResult.Error(error)
+        is DataResult.Loading -> DataResult.Loading
+        is DataResult.Idle -> DataResult.Idle
+    }
+}

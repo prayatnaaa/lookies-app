@@ -13,6 +13,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.OutlinedTextField
@@ -30,9 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.ui.theme.BlackCharcoal
-import com.prayatna.lookiesapp.ui.theme.DarkGrey
-import com.prayatna.lookiesapp.ui.theme.LightGrey
 import com.prayatna.lookiesapp.ui.theme.PureWhite
 
 @Composable
@@ -46,7 +44,7 @@ fun ArtistApplicationCard(
     onBusinessTypeChange: (String) -> Unit
 ) {
     ElevatedCard(
-        colors = CardDefaults.cardColors(containerColor = BlackCharcoal),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(
             modifier = modifier
@@ -114,14 +112,24 @@ fun ApplicationTextField(
             value = value,
             onValueChange = onValueChange,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = PureWhite,
-                focusedContainerColor = DarkGrey,
-                focusedLabelColor = PureWhite,
-                cursorColor = PureWhite,
-                focusedTrailingIconColor = PureWhite,
-                focusedTextColor = PureWhite,
-                unfocusedTextColor = PureWhite
+                focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+
+                focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+
+                cursorColor = MaterialTheme.colorScheme.primary,
+
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+
+                focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
         )
 
         Spacer( modifier = modifier.height(4.dp))
@@ -175,32 +183,43 @@ fun ApplicationDropDown(
                     )
                     .fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PureWhite,
-                    focusedContainerColor = DarkGrey,
-                    focusedLabelColor = PureWhite,
-                    cursorColor = PureWhite,
-                    focusedTrailingIconColor = PureWhite,
-                    focusedTextColor = PureWhite,
-                    unfocusedTextColor = PureWhite
+                    focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+
+                    focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+
+                    cursorColor = MaterialTheme.colorScheme.primary,
+
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+
+                    focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
             )
 
             ExposedDropdownMenu(
                 expanded = isDropDownExpanded,
                 onDismissRequest = { isDropDownExpanded = false },
                 modifier = modifier.background(
-                    color = BlackCharcoal
+                    color = MaterialTheme.colorScheme.surface
                 ),
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
                         colors = MenuItemColors(
-                            textColor = PureWhite,
-                            disabledTextColor = PureWhite,
-                            disabledLeadingIconColor = LightGrey,
-                            disabledTrailingIconColor = LightGrey,
-                            leadingIconColor = PureWhite,
-                            trailingIconColor = PureWhite,
+                            textColor = MaterialTheme.colorScheme.onSurface,
+                            leadingIconColor = MaterialTheme.colorScheme.onSurface,
+                            trailingIconColor = MaterialTheme.colorScheme.onSurface,
+
+                            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         text = { Text(option) },
                         onClick = {
