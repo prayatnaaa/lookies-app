@@ -12,6 +12,7 @@ import com.prayatna.lookiesapp.R
 
 object NavigationRoutes {
     const val CREATE_PAINTING_REVIEW = "create_painting_review"
+    const val ADMIN_TRANSACTION_LIST_ROUTE = "admin_transaction_list"
     const val INSERT_EVENT_PAINTINGS_ROUTE = "insert_event_paintings_route"
     const val SHIPMENT_LIST = "shipment_list"
     const val MERCHANT_WITHDRAWAL_REQUEST_LIST = "merchant_withdrawal_request_list"

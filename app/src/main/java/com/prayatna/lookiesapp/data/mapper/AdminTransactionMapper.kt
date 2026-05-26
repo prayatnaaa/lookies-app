@@ -25,7 +25,7 @@ fun AdminTransactionDetailDto.toDomain(): AdminTransactionDetail {
         userFullName = user?.profile?.fullName,
         userPhoneNumber = user?.profile?.phoneNumber,
         items = items.map { it.toDomain() },
-        splits = splits.map { it.toDomain() },
+        splits = splits.map { it.toAdminDomain() },
         paymentAttempts = paymentAttempts.map { it.toDomain() },
         shipments = shipments.map { it.toDomain() },
         refundRequests = refundRequests.map { it.toDomain() }
@@ -44,7 +44,7 @@ fun OrderItemDetailDto.toDomain(): AdminOrderItem {
     )
 }
 
-fun OrderSplitDto.toDomain(): AdminOrderSplit {
+fun OrderSplitDto.toAdminDomain(): AdminOrderSplit {
     return AdminOrderSplit(
         id = id,
         merchantId = merchantId,
