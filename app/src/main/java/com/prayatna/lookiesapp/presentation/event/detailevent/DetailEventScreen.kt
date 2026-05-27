@@ -39,6 +39,7 @@ import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventCo
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventFooter
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.event.detailevent.state.DetailEventUiEvent
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.navigateToEventPaintingGallery
 import com.prayatna.lookiesapp.ui.theme.Maroon
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -126,7 +127,7 @@ fun DetailEventScreen(
                     },
                     onBuy = { isTicketSheetOpen = true },
                     onSeeArts = {
-                        navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/$eventId?eventType=${event.eventType.slug}")
+                        navController.navigateToEventPaintingGallery(eventId)
                     }
                 )
             }

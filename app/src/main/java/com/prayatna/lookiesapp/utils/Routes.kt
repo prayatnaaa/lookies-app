@@ -75,6 +75,7 @@ object NavigationRoutes {
     const val ADMIN_WITHDRAWAL_DETAIL = "admin_withdrawal_detail"
     const val ADMIN_DETAIL_EVENT = "admin_detail_event"
     const val ADMIN_TRANSACTION_DETAIL = "admin_transaction_detail"
+    const val EVENT_PAINTING_GALLERY = "event_painting_gallery"
     const val EDIT_PAINTING = "edit_painting"
     const val REFUND_DETAIL = "refund_detail"
     const val ACCEPT_PARTNER_INVITATION = "accept_partner_invitation"
