@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.UserAddressDto
 import com.prayatna.lookiesapp.data.remote.dto.UserEmailDto
+import com.prayatna.lookiesapp.data.remote.dto.request.user.AcceptInvitationRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.ArtistApplicationRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateUserAddressRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.RoleApplicationRequest
@@ -13,6 +14,7 @@ import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.storage.Storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -32,20 +34,11 @@ class SupabaseUserService @Inject constructor(
 ) {
 
     suspend fun acceptPartnerInvitations(merchantAccountId: String): MerchantMemberDto {
-        val userId = auth.currentSessionOrNull()?.user?.id ?:
-        throw IllegalStateException("User not logged in")
 
-        return postgrest["merchant_members"].update(
-            {
-                MerchantMemberDto::status setTo "active"
-            }
-        ) {
-            select()
-            filter {
-                MerchantMemberDto::userId eq userId
-                MerchantMemberDto::merchantAccountId eq merchantAccountId
-            }
-        }.decodeSingle<MerchantMemberDto>()
+        return postgrest.rpc(
+            function = "accept_partner_invitation",
+            parameters = AcceptInvitationRequest(merchantAccountId = merchantAccountId)
+        ).decodeSingle<MerchantMemberDto>()
     }
 
     suspend fun rejectPartnerInvitations(merchantAccountId: String): MerchantMemberDto {
