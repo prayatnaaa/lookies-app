@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.painting.DetailPainting
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
 fun DetailPaintingSection(
@@ -126,6 +127,15 @@ fun DetailPaintingSection(
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.4f))
+
+                InfoRowItem(
+                    icon = Icons.Default.CalendarToday,
+                    label = "Price",
+                    value = formatRupiah(painting.price)
+                )
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.4f))
+
 
                 val styleInfo = listOfNotNull(painting.mediumName, painting.artStyleName).joinToString(", ")
                 InfoRowItem(
