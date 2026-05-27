@@ -157,7 +157,7 @@ class SupabaseUserService @Inject constructor(
             storage.from("private_documents").upload(
                 path = path,
                 data = kycFile,
-                upsert = true
+//                upsert = true
             )
 
             uploadedPath = path
@@ -226,7 +226,7 @@ class SupabaseUserService @Inject constructor(
             storage.from("private_documents").upload(
                 path = path,
                 data = kycFile,
-                upsert = true
+//                upsert = true
             )
 
             uploadedPath = path

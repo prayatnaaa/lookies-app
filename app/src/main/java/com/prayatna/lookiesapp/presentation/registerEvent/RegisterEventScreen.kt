@@ -21,7 +21,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
-import com.prayatna.lookiesapp.presentation.components.CustomDialog
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.registerEvent.BottomActionBar
 import com.prayatna.lookiesapp.presentation.components.registerEvent.ConfirmPaintingsContent
@@ -65,7 +64,7 @@ fun RegisterEventScreen(
         }
     } else {
         state.errorMessage?.let { message ->
-            CustomDialog(
+            CustomBottomSheet(
                 title = "Error",
                 message = message,
                 onConfirm = {
