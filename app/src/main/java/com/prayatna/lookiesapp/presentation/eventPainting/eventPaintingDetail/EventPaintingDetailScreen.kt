@@ -42,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,7 +62,9 @@ import com.prayatna.lookiesapp.presentation.components.eventPainting.EventOrigin
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.painting.WaterMark
 import com.prayatna.lookiesapp.utils.NavigationRoutes
+import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
+import java.time.OffsetDateTime
 
 @Composable
 fun EventPaintingDetailScreen(
@@ -87,9 +90,12 @@ fun EventPaintingDetailScreen(
         },
         bottomBar = {
             state.data?.let { data ->
+                val event = data.participant.event
                 PaintingPurchaseBottomBar(
                     price = data.finalPrice,
                     isSold = data.status == "sold",
+                    startDate = event.startDate,
+                    endDate = event.endDate,
                     onBuyClick = {
                         Log.d("CHECK-PAINTING", data.id)
                         navController.navigate("${NavigationRoutes.CHECKOUT}/painting/${data.id}/1")
@@ -344,8 +350,33 @@ fun SpecItem(
 fun PaintingPurchaseBottomBar(
     price: Double,
     isSold: Boolean,
+    startDate: String,
+    endDate: String,
     onBuyClick: () -> Unit
 ) {
+    val now = remember { OffsetDateTime.now() }
+    val start = remember(startDate) {
+        try { OffsetDateTime.parse(startDate) } catch (e: Exception) { null }
+    }
+    val end = remember(endDate) {
+        try { OffsetDateTime.parse(endDate) } catch (e: Exception) { null }
+    }
+
+    val isStarted: Boolean = start?.let { now.isAfter(it) || now.isEqual(it) } ?: true
+    val isFinished: Boolean = end?.let { now.isAfter(it) } ?: false
+    val isBuyable: Boolean = isStarted && !isFinished && !isSold
+
+    val statusLabel = when {
+        !isStarted -> "Start on"
+        !isFinished -> "Close on"
+        else -> "Ended on"
+    }
+
+    val statusDate = when {
+        !isStarted -> formatDate(startDate)
+        else -> formatDate(endDate)
+    }
+
     Surface(
         shadowElevation = 16.dp,
         tonalElevation = 4.dp,
@@ -360,11 +391,20 @@ fun PaintingPurchaseBottomBar(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(
-                    text = "Price",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = statusLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = statusDate,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = if (!isBuyable && !isSold) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
+                    )
+                }
                 Text(
                     text = formatRupiah(price),
                     style = MaterialTheme.typography.headlineSmall,
@@ -373,19 +413,26 @@ fun PaintingPurchaseBottomBar(
                 )
             }
 
+            val buttonText = when {
+                isSold -> "Sold Out"
+                !isStarted -> "Buy Now"
+                isFinished -> "Sale Ended"
+                else -> "Buy Now"
+            }
+
             Button(
                 onClick = onBuyClick,
-                enabled = !isSold,
+                enabled = isBuyable,
                 modifier = Modifier
                     .height(48.dp)
                     .width(150.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSold) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary
+                    containerColor = if (!isBuyable) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(
-                    text = if (isSold) "Sold Out" else "Buy Now",
+                    text = buttonText,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )

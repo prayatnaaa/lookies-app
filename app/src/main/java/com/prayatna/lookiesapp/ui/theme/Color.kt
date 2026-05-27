@@ -21,6 +21,9 @@ val MaroonLight = Color(0xFFE53935)
 val MaroonContainer = Color(0xFFFFDAD6)
 val OnMaroonContainer = Color(0xFF410002)
 
+val Gold = Color(0xFFC59D5F)
+val GoldContainer = Color(0xFF3B3120)
+
 val DarkGreen = Color(0xFF006102)
 
 val Error = Color(0xFFBA1A1A)

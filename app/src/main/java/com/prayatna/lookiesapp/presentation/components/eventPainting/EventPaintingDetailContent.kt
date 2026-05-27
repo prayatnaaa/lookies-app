@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,7 +52,8 @@ fun EventPaintingDetailContent(
             .verticalScroll(rememberScrollState())
             .imePadding()
     ) {
-        // Painting image
+
+        // Artwork image
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -59,7 +61,8 @@ fun EventPaintingDetailContent(
         ) {
             AsyncImage(
                 model = painting.painting.paintingUrl.replace(
-                    "http://172.21.179.110", "http://10.0.2.2"
+                    "http://172.21.179.110",
+                    "http://10.0.2.2"
                 ),
                 contentDescription = painting.painting.title,
                 contentScale = ContentScale.Fit,
@@ -69,150 +72,299 @@ fun EventPaintingDetailContent(
             )
         }
 
-        Column(modifier = Modifier.padding(20.dp)) {
-            // Title + status
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+
+            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                Text(
-                    text = painting.painting.title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
+                Column(
                     modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = painting.painting.title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = formatRupiah(painting.finalPrice),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                EventPaintingStatusBadge(
+                    status = painting.status
                 )
-                Spacer(Modifier.width(8.dp))
-                EventPaintingStatusBadge(status = painting.status)
             }
 
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = formatRupiah(painting.finalPrice),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Spacer(modifier = Modifier.height(20.dp))
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-
-            // Rejection reason banner
-            if (painting.status.lowercase() == "rejected" && !painting.rejectionReason.isNullOrBlank()) {
+            // Rejection reason
+            if (
+                painting.status.lowercase() == "rejected" &&
+                !painting.rejectionReason.isNullOrBlank()
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
                             color = Color(0xFFFFEBEE),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(16.dp)
                         )
-                        .padding(12.dp),
+                        .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = null,
                         tint = Color(0xFFC62828),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(22.dp)
                     )
+
                     Column {
                         Text(
                             text = "Rejected by Partner",
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
                             color = Color(0xFFC62828)
                         )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
                         Text(
                             text = painting.rejectionReason,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = Color(0xFFB71C1C)
                         )
                     }
                 }
-                Spacer(Modifier.height(16.dp))
+
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
-            // Event info card
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-                ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+            // Artwork Details
+            InfoSection("Artwork Details") {
+                DetailRow(
+                    "Medium",
+                    painting.painting.medium
+                )
+
+                DetailRow(
+                    "Dimensions",
+                    "${painting.painting.dimensionWidth} × " +
+                            "${painting.painting.dimensionHeight} cm"
+                )
+
+                painting.painting.artStyle?.let {
+                    DetailRow("Style", it)
+                }
+
+                painting.painting.subject?.let {
+                    DetailRow("Subject", it)
+                }
+
+                DetailRow(
+                    "Year Created",
+                    painting.painting.yearCreated.toString()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            InfoSection("Pricing") {
+                DetailRow(
+                    "Event Price",
+                    formatRupiah(painting.finalPrice)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Description
+            if (painting.painting.description.isNotBlank()) {
+                InfoSection("Description") {
                     Text(
-                        text = "Event",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = painting.painting.description,
+                        style = MaterialTheme.typography.bodyMedium
                     )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = painting.participant.event.title,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Event Information
+            InfoSection("Event Information") {
+
+                DetailRow(
+                    "Event",
+                    painting.participant.event.title
+                )
+
+                DetailRow(
+                    "Organizer",
+                    painting.participant.event.organizer.legalName
+                )
+
+                DetailRow(
+                    "Start Date",
+                    painting.participant.event.startDate.take(10)
+                )
+
+                DetailRow(
+                    "End Date",
+                    painting.participant.event.endDate.take(10)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Artist
+            InfoSection("Artist") {
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    AsyncImage(
+                        model =
+                            painting.participant.artist.profileUrl
+                                ?: "https://ui-avatars.com/api/?name=${
+                                    painting.participant.artist.username
+                                }",
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(CircleShape)
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.outlineVariant,
+                                CircleShape
+                            )
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant
+                            )
                     )
-                    Spacer(Modifier.height(2.dp))
-                    Text(
-                        text = "by ${painting.participant.event.organizer.legalName}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        LabelValue("Start", painting.participant.event.startDate.take(10))
-                        LabelValue("End", painting.participant.event.endDate.take(10))
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column {
+
+                        Text(
+                            text = painting.participant.artist.fullName
+                                ?: painting.participant.artist.username
+                                ?: "Unknown Artist",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Text(
+                            text = "Artist",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Artist info
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    model = painting.participant.artist.profileUrl
-                        ?: "https://ui-avatars.com/api/?name=${painting.participant.artist.username}",
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+            // Timeline
+            InfoSection("Timeline") {
+
+                DetailRow(
+                    "Submitted",
+                    painting.createdAt.take(10)
                 )
-                Spacer(Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = painting.participant.artist.fullName
-                            ?: painting.participant.artist.username ?: "Unknown",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        text = "Artist",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+
+                DetailRow(
+                    "Status",
+                    painting.status.replaceFirstChar {
+                        it.uppercase()
+                    }
+                )
             }
 
-            Spacer(Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(120.dp))
         }
     }
 }
 
 @Composable
-private fun LabelValue(label: String, value: String) {
+private fun InfoSection(
+    title: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(
+            containerColor =
+                MaterialTheme.colorScheme.surfaceVariant
+                    .copy(alpha = 0.35f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            content()
+        }
+    }
+}
+
+@Composable
+private fun DetailRow(
+    label: String,
+    value: String
+) {
     Column {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium
-        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement =
+                Arrangement.SpaceBetween
+        ) {
+
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color =
+                    MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        HorizontalDivider()
+
+        Spacer(modifier = Modifier.height(10.dp))
     }
 }
