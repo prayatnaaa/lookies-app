@@ -13,6 +13,7 @@ import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
@@ -195,6 +196,30 @@ class UserRepositoryImpl @Inject constructor(
             } else {
                 DataResult.Error(result.message)
             }
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
+
+    override suspend fun acceptPartnerInvitations(merchantAccountId: String): DataResult<MerchantMember> {
+        return try {
+            val result = supabaseUserService.acceptPartnerInvitations(merchantAccountId)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
+
+    override suspend fun rejectPartnerInvitations(merchantAccountId: String): DataResult<MerchantMember> {
+        return try {
+            val result = supabaseUserService.rejectPartnerInvitations(merchantAccountId)
+            DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)

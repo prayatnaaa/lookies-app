@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.domain.repository
 import android.net.Uri
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
@@ -41,6 +42,8 @@ interface UserRepository {
         kycFile: Uri,
         fileName: String
     ): DataResult<RoleApplicationResponse>
+    suspend fun acceptPartnerInvitations(merchantAccountId: String): DataResult<MerchantMember>
+    suspend fun rejectPartnerInvitations(merchantAccountId: String): DataResult<MerchantMember>
     suspend fun getFcmToken():
             String?
 }

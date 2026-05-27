@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
+import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.UserAddressDto
 import com.prayatna.lookiesapp.data.remote.dto.UserEmailDto
 import com.prayatna.lookiesapp.data.remote.dto.request.user.ArtistApplicationRequest
@@ -29,6 +30,40 @@ class SupabaseUserService @Inject constructor(
     private val storage: Storage,
     private val httpClient: HttpClient
 ) {
+
+    suspend fun acceptPartnerInvitations(merchantAccountId: String): MerchantMemberDto {
+        val userId = auth.currentSessionOrNull()?.user?.id ?:
+        throw IllegalStateException("User not logged in")
+
+        return postgrest["merchant_members"].update(
+            {
+                MerchantMemberDto::status setTo "active"
+            }
+        ) {
+            select()
+            filter {
+                MerchantMemberDto::userId eq userId
+                MerchantMemberDto::merchantAccountId eq merchantAccountId
+            }
+        }.decodeSingle<MerchantMemberDto>()
+    }
+
+    suspend fun rejectPartnerInvitations(merchantAccountId: String): MerchantMemberDto {
+        val userId = auth.currentSessionOrNull()?.user?.id ?:
+        throw IllegalStateException("User not logged in")
+
+        return postgrest["merchant_members"].update(
+            {
+                MerchantMemberDto::status setTo "inactive"
+            }
+        ) {
+            select()
+            filter {
+                MerchantMemberDto::userId eq userId
+                MerchantMemberDto::merchantAccountId eq merchantAccountId
+            }
+        }.decodeSingle<MerchantMemberDto>()
+    }
 
     suspend fun getUsersEmail(query: String? = null): List<UserEmailDto> {
         return postgrest.from("users")
