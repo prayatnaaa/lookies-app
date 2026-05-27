@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.ZoomInMap
 import androidx.compose.material.icons.outlined.Brush
@@ -42,7 +43,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +56,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -77,6 +82,9 @@ fun EventPaintingDetailScreen(
     }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var showFullImage by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -117,6 +125,49 @@ fun EventPaintingDetailScreen(
             val artist = participant.artist
             val event = participant.event
 
+            if (showFullImage) {
+                Dialog(
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    ),
+                    onDismissRequest = {
+                        showFullImage = false
+                    }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Black)
+                    ) {
+
+                        AsyncImage(
+                            model = painting.paintingUrl.replace(
+                                "http://172.21.179.110",
+                                "http://10.0.2.2"
+                            ),
+                            contentDescription = painting.title,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        WaterMark(modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center))
+
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(20.dp)
+                                .clickable {
+                                    showFullImage = false
+                                }
+                        )
+                    }
+                }
+            }
+
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -144,7 +195,13 @@ fun EventPaintingDetailScreen(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(16.dp)
-                            .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                            .background(
+                                Color.Black.copy(alpha = 0.5f),
+                                CircleShape
+                            )
+                            .clickable {
+                                showFullImage = true
+                            }
                             .padding(8.dp)
                     )
 
