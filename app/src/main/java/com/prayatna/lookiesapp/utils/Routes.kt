@@ -77,6 +77,7 @@ object NavigationRoutes {
     const val ADMIN_TRANSACTION_DETAIL = "admin_transaction_detail"
     const val EDIT_PAINTING = "edit_painting"
     const val REFUND_DETAIL = "refund_detail"
+    const val ACCEPT_PARTNER_INVITATION = "accept_partner_invitation"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

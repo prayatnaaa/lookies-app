@@ -106,7 +106,11 @@ fun MerchantMemberListScreen(
                                 showDivider = index != uiState.merchantMembers.lastIndex,
                                 onClick = {
                                     navController.navigate(
-                                        "${NavigationRoutes.PARTNER_MAIN_SCREEN}/${member.businessId}"
+                                        if (member.status == "invited") {
+                                            "${NavigationRoutes.ACCEPT_PARTNER_INVITATION}/${member.merchantAccountId}"
+                                        } else {
+                                            "${NavigationRoutes.PARTNER_MAIN_SCREEN}/${member.businessId}"
+                                        }
                                     )
                                 }
                             )

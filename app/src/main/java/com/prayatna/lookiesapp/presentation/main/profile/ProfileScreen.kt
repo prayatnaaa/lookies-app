@@ -127,11 +127,7 @@ fun ProfileScreen(
                         subtitle = "Join us and expand your reach",
                         icon = Icons.Default.Handshake,
                         onClick = {
-                            if (profile.role != "user") {
-                                navController.navigate(NavigationRoutes.MERCHANT_MEMBER_LIST)
-                            } else {
-                                navController.navigate("${NavigationRoutes.PARTNER_APPLICATION}/partner")
-                            }
+                            navController.navigate(NavigationRoutes.MERCHANT_MEMBER_LIST)
                         }
                     )
 

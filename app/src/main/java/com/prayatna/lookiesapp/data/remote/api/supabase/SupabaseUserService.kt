@@ -38,7 +38,7 @@ class SupabaseUserService @Inject constructor(
         return postgrest.rpc(
             function = "accept_partner_invitation",
             parameters = AcceptInvitationRequest(merchantAccountId = merchantAccountId)
-        ).decodeSingle<MerchantMemberDto>()
+        ).decodeList<MerchantMemberDto>()[0]
     }
 
     suspend fun rejectPartnerInvitations(merchantAccountId: String): MerchantMemberDto {
