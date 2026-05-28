@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBankAccountDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
@@ -116,6 +117,7 @@ class SupabaseMerchantService @Inject constructor(
         merchantId: String,
         status: String? = null
     ): List<ShipmentDto> {
+        Log.d("Shipment-List", merchantId)
         return postgrest
             .from("shipments")
             .select {

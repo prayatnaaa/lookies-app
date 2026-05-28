@@ -43,7 +43,8 @@ class SupabasePaintingService @Inject constructor(
                         eq("event_id", eventId)
                     }
                     if (status != null) {
-                        eq("status", status)
+                        val statuses = status.split(",").map { it.trim() }
+                        isIn("status", statuses)
                     }
                     if (id != null) {
                         eq("id", id)

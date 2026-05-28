@@ -64,7 +64,7 @@ fun DetailEventScreen(
     }
 
     // Load data
-    LaunchedEffect(eventId) {
+    LaunchedEffect(Unit) {
         viewModel.getEvent(eventId)
         viewModel.getEventPaintings(eventId)
     }

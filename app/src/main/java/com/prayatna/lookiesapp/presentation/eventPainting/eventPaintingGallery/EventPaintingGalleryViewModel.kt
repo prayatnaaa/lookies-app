@@ -55,10 +55,9 @@ class EventPaintingGalleryViewModel @Inject constructor(
     }
 
     private fun loadPaintings(id: String) {
-        Log.d("GALLERY", eventId)
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = getPaintingUseCase(eventId = id, status = "on_sale")) {
+            when (val result = getPaintingUseCase(eventId = id, status = "on_sale, sold")) {
                 is DataResult.Success -> {
                     _uiState.update { it.copy(isLoading = false, paintings = result.data) }
                 }

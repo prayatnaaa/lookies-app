@@ -66,7 +66,7 @@ class DetailEventViewModel @Inject constructor(
             when (
                 val result = getPaintingUseCase(
                     eventId = eventId,
-                    status = "on_sale",
+                    status = "on_sale, sold",
                     showSelfPaintings = true
                 )
             ) {
