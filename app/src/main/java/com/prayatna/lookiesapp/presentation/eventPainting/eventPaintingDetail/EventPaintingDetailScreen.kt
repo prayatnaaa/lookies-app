@@ -77,7 +77,7 @@ fun EventPaintingDetailScreen(
     id: String,
     viewModel: EventPaintingDetailViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(id) {
+    LaunchedEffect(Unit) {
         viewModel.getEventPaintingDetail(id)
     }
 
@@ -413,10 +413,10 @@ fun PaintingPurchaseBottomBar(
 ) {
     val now = remember { OffsetDateTime.now() }
     val start = remember(startDate) {
-        try { OffsetDateTime.parse(startDate) } catch (e: Exception) { null }
+        try { OffsetDateTime.parse(startDate) } catch (_: Exception) { null }
     }
     val end = remember(endDate) {
-        try { OffsetDateTime.parse(endDate) } catch (e: Exception) { null }
+        try { OffsetDateTime.parse(endDate) } catch (_: Exception) { null }
     }
 
     val isStarted: Boolean = start?.let { now.isAfter(it) || now.isEqual(it) } ?: true

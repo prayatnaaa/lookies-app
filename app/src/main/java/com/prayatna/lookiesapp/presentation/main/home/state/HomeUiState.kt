@@ -7,6 +7,7 @@ import com.prayatna.lookiesapp.domain.model.user.Profile
 data class HomeUiState(
     val isLoadingEvents: Boolean = false,
     val isLoadingPaintings: Boolean = false,
+    val isRefreshing: Boolean = false,
 
     val events: List<Event> = emptyList(),
     val eventPaintings: List<EventPainting> = emptyList(),

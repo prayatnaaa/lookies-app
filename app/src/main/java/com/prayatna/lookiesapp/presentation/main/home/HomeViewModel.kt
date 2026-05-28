@@ -56,7 +56,7 @@ class HomeViewModel @Inject constructor(
 
             when (val result = getEventsUseCase(
                 limitCount = 5,
-                status = "published, upcoming"
+                status = "published, upcoming, ongoing"
             )) {
                 is DataResult.Success -> {
                     _uiState.update {
@@ -121,7 +121,18 @@ class HomeViewModel @Inject constructor(
     }
 
     fun refreshHome() {
-        loadEvents(forceRefresh = true)
-        loadPaintings(forceRefresh = true)
+        viewModelScope.launch {
+
+            _uiState.update {
+                it.copy(isRefreshing = true)
+            }
+
+            loadEvents(forceRefresh = true)
+            loadPaintings(forceRefresh = true)
+
+            _uiState.update {
+                it.copy(isRefreshing = false)
+            }
+        }
     }
 }
