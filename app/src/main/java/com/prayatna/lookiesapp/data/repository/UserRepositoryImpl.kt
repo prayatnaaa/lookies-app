@@ -24,6 +24,8 @@ import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import com.prayatna.lookiesapp.utils.compressImage
 import com.prayatna.lookiesapp.utils.extractSupabaseError
+import com.prayatna.lookiesapp.utils.getMimeType
+import com.prayatna.lookiesapp.utils.readFileBytes
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
@@ -154,17 +156,25 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun registerBusiness(
         request: RoleApplicationInput,
-        kycFile: Uri,
-        fileName: String
+        kycFiles: List<Pair<String, Uri>>
     ): DataResult<RoleApplicationResponse> {
-        val compressedImage = kycFile.compressImage(context, 500_000L)
-            ?: return DataResult.Error("Image is not selected")
         return try {
+            val fileContents = kycFiles.map { (name, uri) ->
+                val mimeType = uri.getMimeType(context) ?: "application/octet-stream"
+                val content = if (mimeType.startsWith("image/")) {
+                    uri.compressImage(context, 500_000L)
+                } else {
+                    uri.readFileBytes(context)
+                } ?: return DataResult.Error("Failed to process file: $name")
+                
+                name to content
+            }
+
             val result = supabaseUserService.registerBusiness(
                 request = request.toDto(),
-                kycFile = compressedImage,
-                fileName = fileName
+                kycFiles = fileContents
             )
+
             if (result.status == "success") {
                 DataResult.Success(result)
             } else {

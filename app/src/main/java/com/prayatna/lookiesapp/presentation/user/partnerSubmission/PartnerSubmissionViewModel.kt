@@ -78,7 +78,25 @@ class PartnerSubmissionViewModel @Inject constructor(
             is PartnerSubmissionEvent.AccountNumberChanged -> _formState.update { it.copy(accountNumber = event.value) }
             is PartnerSubmissionEvent.AccountHolderNameChanged -> _formState.update { it.copy(accountHolderName = event.value) }
 
-            is PartnerSubmissionEvent.KycFileSelected -> _formState.update { it.copy(kycFileBytes = event.uri) }
+            is PartnerSubmissionEvent.KycFileSelected -> {
+                _formState.update {
+                    val currentList = it.selectedKycDocuments.toMutableList()
+                    val existingIndex = currentList.indexOfFirst { pair -> pair.first == event.type }
+                    if (existingIndex != -1) {
+                        currentList[existingIndex] = event.type to event.uri
+                    } else {
+                        currentList.add(event.type to event.uri)
+                    }
+                    it.copy(selectedKycDocuments = currentList)
+                }
+            }
+
+            is PartnerSubmissionEvent.RemoveKycFile -> {
+                _formState.update {
+                    it.copy(selectedKycDocuments = it.selectedKycDocuments.filter { pair -> pair.first != event.type })
+                }
+            }
+
             is PartnerSubmissionEvent.Submit -> submitRegistration(merchantType = merchantType)
             is PartnerSubmissionEvent.DismissError -> _uiState.value = PartnerSubmissionUiState.Idle
         }
@@ -88,8 +106,9 @@ class PartnerSubmissionViewModel @Inject constructor(
         Log.d("PartnerSubmissionViewModel", merchantType)
         val form = _formState.value
 
-        if (form.kycFileBytes == null) {
-            _uiState.value = PartnerSubmissionUiState.Error("Input KYC file!")
+        val hasRequiredKtp = form.selectedKycDocuments.any { it.first == "AUTHORIZED_PERSON_KTP_DOCUMENT" }
+        if (!hasRequiredKtp) {
+            _uiState.value = PartnerSubmissionUiState.Error("Owner/Director KTP is required!")
             return
         }
 
@@ -103,6 +122,14 @@ class PartnerSubmissionViewModel @Inject constructor(
         _uiState.value = PartnerSubmissionUiState.Loading
 
         viewModelScope.launch {
+            val kycDocuments = form.selectedKycDocuments.map { (type, _) ->
+                KycDocument(
+                    type = type,
+                    country = form.countryOperation,
+                    fileId = "" // Filled in data layer after upload
+                )
+            }
+
             val accountHolderData = CreateAccountHolderInput(
                 businessDetail = BusinessDetail(
                     type = form.businessType,
@@ -129,13 +156,7 @@ class PartnerSubmissionViewModel @Inject constructor(
                         role = form.ownerRole
                     )
                 ),
-                kycDocuments = listOf(
-                    KycDocument(
-                        type = form.kycFileType,
-                        country = form.countryOperation,
-                        fileId = ""
-                    )
-                ),
+                kycDocuments = kycDocuments,
                 email = form.ownerEmail
             )
 
@@ -155,10 +176,14 @@ class PartnerSubmissionViewModel @Inject constructor(
                 bankAccounts = bankAccount
             )
 
+            val kycFiles = form.selectedKycDocuments.map { (type, uri) ->
+                val fileName = "${type.lowercase()}.png"
+                fileName to uri
+            }
+
             val result = registerBusinessUseCase(
                 input = requestInput,
-                kycFile = form.kycFileBytes,
-                fileName = form.kycFileName
+                kycFiles = kycFiles
             )
 
             when (result) {

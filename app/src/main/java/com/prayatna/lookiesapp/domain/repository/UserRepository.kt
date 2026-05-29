@@ -30,8 +30,7 @@ interface UserRepository {
             DataResult<String>
     suspend fun registerBusiness(
         request: RoleApplicationInput,
-        kycFile: Uri,
-        fileName: String
+        kycFiles: List<Pair<String, Uri>> // List of (FileName to Uri)
     ): DataResult<RoleApplicationResponse>
     suspend fun getUserAddresses():
             DataResult<List<UserAddress>>

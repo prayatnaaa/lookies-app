@@ -25,9 +25,7 @@ data class PartnerSubmissionFormState(
     val ownerPhone: String = "",
     val ownerRole: String = "director",
 
-    val kycFileName: String = "ktp.png",
-    val kycFileBytes: Uri? = null,
-    val kycFileType: String = "AUTHORIZED_PERSON_KTP_DOCUMENT",
+    val selectedKycDocuments: List<Pair<String, Uri>> = emptyList(), // Pair of DocumentType to Uri
 
     val bankName: String = "",
     val bankCode: String = "",

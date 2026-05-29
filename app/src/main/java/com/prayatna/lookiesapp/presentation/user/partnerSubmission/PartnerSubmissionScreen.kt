@@ -27,12 +27,15 @@ fun PartnerSubmissionScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     var payoutChannels by remember { mutableStateOf<List<PayoutChannel>>(emptyList()) }
+    var currentPickingType by remember { mutableStateOf<String?>(null) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
-            viewModel.onEvent(PartnerSubmissionEvent.KycFileSelected(it))
+            currentPickingType?.let { type ->
+                viewModel.onEvent(PartnerSubmissionEvent.KycFileSelected(type, it))
+            }
         }
     }
 
@@ -89,7 +92,10 @@ fun PartnerSubmissionScreen(
                 formState = formState,
                 isLoading = uiState is PartnerSubmissionUiState.Loading,
                 onEvent = viewModel::onEvent,
-                onPickFileClick = { launcher.launch("*/*") },
+                onPickFileClick = { type ->
+                    currentPickingType = type
+                    launcher.launch("*/*")
+                },
                 payoutChannels = payoutChannels
             )
         }

@@ -138,8 +138,7 @@ class SupabaseUserService @Inject constructor(
 
     suspend fun registerBusiness(
         request: RoleApplicationRequest,
-        kycFile: ByteArray,
-        fileName: String
+        kycFiles: List<Pair<String, ByteArray>> // Pair of FileName to ByteArray
     ): RoleApplicationResponse {
 
         val session = auth.currentSessionOrNull()
@@ -148,33 +147,32 @@ class SupabaseUserService @Inject constructor(
         val userId = auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not logged in")
 
-        var uploadedPath: String? = null
+        val uploadedPaths = mutableListOf<String>()
 
         try {
-            val safeFileName = fileName.replace(" ", "_")
-            val path = "$userId/$safeFileName"
+            val updatedKycDocuments = request.businessPayload.kycDocuments.toMutableList()
 
-            storage.from("private_documents").upload(
-                path = path,
-                data = kycFile,
-//                upsert = true
-            )
-
-            uploadedPath = path
-            Log.d("Supabase", "File uploaded successfully at: $path")
-
-            val updatedKycList = request.businessPayload.kycDocuments.toMutableList()
-
-            if (updatedKycList.isNotEmpty()) {
-                updatedKycList[0] = updatedKycList[0].copy(
-                    fileId = path
+            // Process files and update request payload
+            kycFiles.forEachIndexed { index, (_, content) ->
+                // Basic cleanup for file naming
+                val safeType = updatedKycDocuments[index].type.lowercase().replace("_", "-")
+                val path = "$userId/${UUID.randomUUID()}_$safeType"
+                
+                storage.from("private_documents").upload(
+                    path = path,
+                    data = content
                 )
-            } else {
-                throw IllegalStateException("List kycDocuments cannot be empty")
+                uploadedPaths.add(path)
+
+                if (index < updatedKycDocuments.size) {
+                    updatedKycDocuments[index] = updatedKycDocuments[index].copy(
+                        fileId = path
+                    )
+                }
             }
 
             val updatedBusinessPayload = request.businessPayload.copy(
-                kycDocuments = updatedKycList,
+                kycDocuments = updatedKycDocuments,
                 userId = userId
             )
 
@@ -191,14 +189,12 @@ class SupabaseUserService @Inject constructor(
             return response.body()
 
         } catch (e: Exception) {
-            Log.e("Supabase", "Error logic, rolling back file...", e)
-
-            uploadedPath?.let { pathToDelete ->
+            Log.e("Supabase", "Error uploading KYC files, rolling back...", e)
+            uploadedPaths.forEach { pathToDelete ->
                 try {
                     storage.from("private_documents").delete(pathToDelete)
-                    Log.d("Supabase", "Rollback: File deleted $pathToDelete")
                 } catch (deleteErr: Exception) {
-                    Log.e("Supabase", "Failed to rollback file", deleteErr)
+                    Log.e("Supabase", "Failed to rollback file $pathToDelete", deleteErr)
                 }
             }
             throw e
