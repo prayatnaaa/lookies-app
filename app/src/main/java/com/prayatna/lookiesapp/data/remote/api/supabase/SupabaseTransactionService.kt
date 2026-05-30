@@ -9,6 +9,7 @@ import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
 import com.prayatna.lookiesapp.data.remote.dto.PendingOrderSplitsDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
+import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOfflineOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.request.order.OrderItemRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateQrisPaymentRequestRequest
@@ -43,6 +44,13 @@ class SupabaseTransactionService @Inject constructor(
     private val postgrest: Postgrest,
     private val httpClient: HttpClient,
 ) {
+
+    suspend fun createOfflineOrder(params: CreateOfflineOrderRpcParams): String {
+        return postgrest.rpc(
+            function = "create_offline_order",
+            parameters = params
+        ).decodeAs<String>()
+    }
 
     suspend fun getPendingOrderSplitByMerchantId(merchantId: String): PendingOrderSplitsDto? {
         return postgrest.rpc(

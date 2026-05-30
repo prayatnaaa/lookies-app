@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseTransactionService
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
+import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOfflineOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteInput
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
@@ -104,6 +105,26 @@ class TransactionRepositoryImpl @Inject constructor(
             DataResult.Success(response)
         } catch (e: RestException) {
             Log.e("OrderService", e.error)
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
+
+    override suspend fun createOfflineOrder(
+        buyerId: String?,
+        currency: String,
+        items: List<OrderItemInput>
+    ): DataResult<String> {
+        return try {
+            val params = CreateOfflineOrderRpcParams(
+                buyerId = buyerId,
+                currency = currency,
+                items = items.map { it.toDto() }
+            )
+            val response = transactionService.createOfflineOrder(params)
+            DataResult.Success(response)
+        } catch (e: RestException) {
             DataResult.Error(e.error)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")

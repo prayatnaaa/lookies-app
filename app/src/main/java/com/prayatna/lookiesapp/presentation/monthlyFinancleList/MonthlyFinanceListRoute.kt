@@ -11,6 +11,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceEffect
+import com.prayatna.lookiesapp.presentation.partner.orderDetail.navigateToPartnerOrderDetail
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -42,7 +43,7 @@ fun MonthlyFinanceListRoute(
                 }
 
                 is MonthlyFinanceEffect.NavigateToOrderDetail -> {
-                    navController.navigate("${NavigationRoutes.PARTNER_ORDER_DETAIL}/${effect.orderId}")
+                    navController.navigateToPartnerOrderDetail(effect.orderId)
                 }
             }
         }

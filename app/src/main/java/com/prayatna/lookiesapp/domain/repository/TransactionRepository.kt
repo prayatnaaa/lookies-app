@@ -38,6 +38,11 @@ interface TransactionRepository {
         postalCode: String
     ):
             DataResult<String>
+    suspend fun createOfflineOrder(
+        buyerId: String?,
+        currency: String,
+        items: List<OrderItemInput>
+    ): DataResult<String>
     suspend fun createQrisPaymentRequest(data: CreateQrisPaymentRequestInput):
             DataResult<CreateQrisPaymentRequestResult>
     suspend fun createVaPaymentRequest(data: CreateVaPaymentRequestInput):
