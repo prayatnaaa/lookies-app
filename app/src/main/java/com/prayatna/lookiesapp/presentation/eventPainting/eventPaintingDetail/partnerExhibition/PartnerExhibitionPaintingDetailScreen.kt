@@ -2,15 +2,20 @@ package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.p
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +34,7 @@ import com.prayatna.lookiesapp.presentation.components.eventPainting.PartnerShip
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEffect
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
+import com.prayatna.lookiesapp.presentation.offlineCheckout.navigateToOfflineCheckout
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -139,7 +145,16 @@ fun PartnerExhibitionPaintingDetailScreen(
                         )
                     }
 
-                    "rejected", "sold", "on_sale" -> {}
+                    "rejected" -> {}
+
+                    "on_sale" -> {
+                        MarkAsSoldButton {
+                            navController.navigateToOfflineCheckout(
+                                itemId = painting.id,
+                                quantity = 1
+                            )
+                        }
+                    }
 
                     else -> {
                         PartnerShipmentActionBar(
@@ -174,34 +189,47 @@ fun PartnerExhibitionPaintingDetailScreen(
 }
 
 @Composable
+fun MarkAsSoldButton(
+    onClick: () -> Unit
+) {
+    Button(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        content = {
+            Text(text = "Mark as Sold")
+        }
+    )
+}
+
+@Composable
 fun PartnerPaintingDecisionActionBar(
     onApprove: () -> Unit,
     onReject: () -> Unit
 ) {
-    androidx.compose.material3.Surface(
+    Surface(
         shadowElevation = 8.dp,
         color = MaterialTheme.colorScheme.surface,
         modifier = Modifier.fillMaxWidth()
     ) {
-        androidx.compose.foundation.layout.Row(
+       Row(
             modifier = Modifier
                 .padding(16.dp)
                 .navigationBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            androidx.compose.material3.OutlinedButton(
+            OutlinedButton(
                 onClick = onReject,
                 modifier = Modifier.weight(1f)
             ) {
-                androidx.compose.material3.Text("Reject")
+                Text("Reject")
             }
 
-            androidx.compose.material3.Button(
+            Button(
                 onClick = onApprove,
                 modifier = Modifier.weight(1f)
             ) {
-                androidx.compose.material3.Text("Approve")
+                Text("Approve")
             }
         }
     }
@@ -225,7 +253,7 @@ fun RejectPaintingBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            androidx.compose.material3.Text(
+            Text(
                 text = "Reject Painting",
                 style = MaterialTheme.typography.titleLarge
             )
@@ -233,28 +261,28 @@ fun RejectPaintingBottomSheet(
             androidx.compose.material3.OutlinedTextField(
                 value = reason,
                 onValueChange = onReasonChange,
-                label = { androidx.compose.material3.Text("Reason") },
+                label = { Text("Reason") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3
             )
 
-            androidx.compose.foundation.layout.Row(
+            Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
-                androidx.compose.material3.OutlinedButton(
+                OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f)
                 ) {
-                    androidx.compose.material3.Text("Cancel")
+                    Text("Cancel")
                 }
 
-                androidx.compose.material3.Button(
+                Button(
                     onClick = onConfirm,
                     enabled = reason.isNotBlank(),
                     modifier = Modifier.weight(1f)
                 ) {
-                    androidx.compose.material3.Text("Reject")
+                    Text("Reject")
                 }
             }
         }
