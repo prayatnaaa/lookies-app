@@ -24,6 +24,7 @@ import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import com.prayatna.lookiesapp.utils.compressImage
 import com.prayatna.lookiesapp.utils.extractSupabaseError
+import com.prayatna.lookiesapp.utils.getExtensionFromMimeType
 import com.prayatna.lookiesapp.utils.getMimeType
 import com.prayatna.lookiesapp.utils.readFileBytes
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -161,13 +162,16 @@ class UserRepositoryImpl @Inject constructor(
         return try {
             val fileContents = kycFiles.map { (name, uri) ->
                 val mimeType = uri.getMimeType(context) ?: "application/octet-stream"
+                val extension = mimeType.getExtensionFromMimeType()
                 val content = if (mimeType.startsWith("image/")) {
                     uri.compressImage(context, 500_000L)
                 } else {
                     uri.readFileBytes(context)
                 } ?: return DataResult.Error("Failed to process file: $name")
-                
-                name to content
+
+                val filename = "$name.$extension"
+
+                filename to content
             }
 
             val result = supabaseUserService.registerBusiness(

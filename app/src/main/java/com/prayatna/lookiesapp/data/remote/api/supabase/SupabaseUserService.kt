@@ -153,10 +153,11 @@ class SupabaseUserService @Inject constructor(
             val updatedKycDocuments = request.businessPayload.kycDocuments.toMutableList()
 
             // Process files and update request payload
-            kycFiles.forEachIndexed { index, (_, content) ->
+            kycFiles.forEachIndexed { index, (filename, content) ->
                 // Basic cleanup for file naming
                 val safeType = updatedKycDocuments[index].type.lowercase().replace("_", "-")
-                val path = "$userId/${UUID.randomUUID()}_$safeType"
+                val extension = filename.substringAfterLast(".", "")
+                val path = "$userId/${UUID.randomUUID()}_$safeType.$extension"
                 
                 storage.from("private_documents").upload(
                     path = path,

@@ -25,10 +25,8 @@ import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.Public
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.outlined.UploadFile
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +44,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
+import com.prayatna.lookiesapp.domain.model.admin.GetKycDocument
 import com.prayatna.lookiesapp.domain.model.merchant.Member
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantAddress
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
@@ -56,7 +55,9 @@ import com.prayatna.lookiesapp.domain.model.merchant.MerchantIndividual
 fun PartnerProfileSection(
     data: MerchantDetail,
     onPortofolioClick: () -> Unit,
-    isAdmin: Boolean = false
+    isAdmin: Boolean = false,
+    kycDocuments: List<GetKycDocument> = emptyList(),
+    onKycDocumentClick: (String) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
@@ -217,7 +218,57 @@ fun PartnerProfileSection(
             }
         }
 
+        // ── KYC DOCUMENTS (ADMIN ONLY) ──
+        if (isAdmin && kycDocuments.isNotEmpty()) {
+            item {
+                SectionCard("KYC Documents") {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        kycDocuments.forEach { doc ->
+                            KycDocumentItem(
+                                doc = doc,
+                                onClick = { onKycDocumentClick(doc.fileId) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         item { Spacer(Modifier.height(20.dp)) }
+    }
+}
+
+@Composable
+fun KycDocumentItem(
+    doc: GetKycDocument,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.UploadFile,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Column {
+            Text(
+                text = doc.type.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() },
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = "Tap to view document",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            )
+        }
     }
 }
 

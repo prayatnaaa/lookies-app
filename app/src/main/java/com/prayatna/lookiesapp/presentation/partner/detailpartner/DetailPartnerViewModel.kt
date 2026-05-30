@@ -4,14 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.domain.usecase.admin.ApprovePartnerUseCase
+import com.prayatna.lookiesapp.domain.usecase.admin.GetKycDocumentUseCase
+import com.prayatna.lookiesapp.domain.usecase.admin.GetPrivateFileUrlUseCase
 import com.prayatna.lookiesapp.domain.usecase.admin.RejectPartnerUseCase
 import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.GetDetailPartnerUseCase
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.state.AdminDecideState
+import com.prayatna.lookiesapp.presentation.partner.detailpartner.state.DetailPartnerEffect
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.state.DetailPartnerState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,7 +27,9 @@ class DetailPartnerViewModel @Inject constructor(
     private val getDetailPartnerUseCase: GetDetailPartnerUseCase,
     private val getRolesUseCase: GetRoleUseCase,
     private val approvePartnerUseCase: ApprovePartnerUseCase,
-    private val rejectPartnerUseCase: RejectPartnerUseCase
+    private val rejectPartnerUseCase: RejectPartnerUseCase,
+    private val getKycDocumentUseCase: GetKycDocumentUseCase,
+    private val getPrivateFileUrlUseCase: GetPrivateFileUrlUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailPartnerState())
@@ -33,6 +40,9 @@ class DetailPartnerViewModel @Inject constructor(
 
     private val _roleState = MutableStateFlow("")
     val roleState = _roleState.asStateFlow()
+
+    private val _effect = MutableSharedFlow<DetailPartnerEffect>()
+    val effect = _effect.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -103,6 +113,9 @@ class DetailPartnerViewModel @Inject constructor(
                                 error = null
                             )
                         }
+                        if (_roleState.value == "admin") {
+                            loadKycDocuments(result.data.id)
+                        }
                     }
 
                     is DataResult.Error -> {
@@ -115,6 +128,34 @@ class DetailPartnerViewModel @Inject constructor(
                     }
                     else -> Unit
                 }
+            }
+        }
+    }
+
+    private fun loadKycDocuments(businessId: String) {
+        viewModelScope.launch {
+            when (val res = getKycDocumentUseCase(businessId)) {
+                is DataResult.Success -> {
+                    _state.update { it.copy(kycDocuments = res.data) }
+                }
+
+                else -> Unit
+            }
+        }
+    }
+
+    fun viewKycDocument(filePath: String) {
+        viewModelScope.launch {
+            when (val res = getPrivateFileUrlUseCase(filePath)) {
+                is DataResult.Success -> {
+                    _effect.emit(DetailPartnerEffect.ViewPrivateFile(res.data))
+                }
+
+                is DataResult.Error -> {
+                    _effect.emit(DetailPartnerEffect.ShowError(res.error))
+                }
+
+                else -> Unit
             }
         }
     }

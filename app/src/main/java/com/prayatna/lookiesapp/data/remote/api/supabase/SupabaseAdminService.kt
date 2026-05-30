@@ -8,15 +8,19 @@ import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.WithdrawalRequestDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecideEventResponseDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecidePartnerApplicationResponseDto
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
+import io.github.jan.supabase.storage.Storage
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.hours
 
 class SupabaseAdminService @Inject constructor(
     private val postgrest: Postgrest,
-    private val auth: Auth
+    private val auth: Auth,
+    private val storage: Storage
 ) {
     suspend fun decidePartnerApplication(status: String, id: String): DecidePartnerApplicationResponseDto {
          val result = postgrest.from("merchant_accounts").update(
@@ -80,6 +84,22 @@ class SupabaseAdminService @Inject constructor(
                 eq("business_id", businessId)
             }
         }.decodeList<GetKycDocumentDto>()
+    }
+
+    suspend fun getPrivateFileUrl(filePath: String): String? {
+        return try {
+            val signedUrl = storage
+                .from("private_documents")
+                .createSignedUrl(
+                    path = filePath,
+                    expiresIn = 1.hours
+                )
+
+            signedUrl
+        } catch (e: RestException) {
+            e.printStackTrace()
+            null
+        }
     }
 
     suspend fun getTicketByCode(code: String): TicketDto {

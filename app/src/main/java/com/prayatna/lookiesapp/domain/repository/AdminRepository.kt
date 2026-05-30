@@ -19,4 +19,5 @@ interface AdminRepository {
     suspend fun updateWithdrawalStatus(id: String, status: String, adminNotes: String?): DataResult<WithdrawalRequest>
     suspend fun getTransactionList(limit: Int, offset: Int, status: String?): DataResult<List<AdminTransaction>>
     suspend fun getTransactionDetail(orderId: String): DataResult<AdminTransactionDetail>
+    suspend fun getPrivateFileUrl(filePath: String): DataResult<String>
 }

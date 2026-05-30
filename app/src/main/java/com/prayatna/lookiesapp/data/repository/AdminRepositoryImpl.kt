@@ -123,4 +123,17 @@ class AdminRepositoryImpl @Inject constructor(
             DataResult.Error(e.error)
         }
     }
+
+    override suspend fun getPrivateFileUrl(filePath: String): DataResult<String> {
+        return try {
+            val res = supabaseAdminService.getPrivateFileUrl(filePath)
+            if (res != null) {
+                DataResult.Success(res)
+            } else {
+                DataResult.Error("Failed to get private file URL")
+            }
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
 }
