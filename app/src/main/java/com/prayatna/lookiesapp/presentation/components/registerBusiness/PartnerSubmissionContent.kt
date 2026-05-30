@@ -6,6 +6,8 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,7 +27,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.domain.model.payment.PayoutChannel
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionFormState
 import com.prayatna.lookiesapp.utils.Constants
@@ -38,7 +39,7 @@ fun PartnerSubmissionContent(
     isLoading: Boolean,
     onEvent: (PartnerSubmissionEvent) -> Unit,
     onPickFileClick: (String) -> Unit,
-    payoutChannels: List<PayoutChannel> = emptyList()
+    onSelectBankClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -297,13 +298,22 @@ fun PartnerSubmissionContent(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
-            PayoutChannelDropdown(
-                selectedCode = formState.bankCode,
-                channels = payoutChannels,
-                onSelect = { channel ->
-                    onEvent(PartnerSubmissionEvent.BankCodeChanged(channel.channelCode))
-                    onEvent(PartnerSubmissionEvent.BankNameChanged(channel.channelName))
-                }
+            OutlinedTextField(
+                value = formState.bankName.ifBlank { "Select Bank" },
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Bank") },
+                trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onSelectBankClick() },
+                enabled = false,
+                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
 
             OutlinedTextField(
@@ -450,49 +460,6 @@ private fun KycUploadItem(
                 ) {
                     Text("Upload", fontSize = 12.sp)
                 }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PayoutChannelDropdown(
-    selectedCode: String,
-    channels: List<PayoutChannel>,
-    onSelect: (PayoutChannel) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val selectedChannel = channels.find { it.channelCode == selectedCode }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedChannel?.channelName ?: "Select Bank",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Bank") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            channels.forEach { channel ->
-                DropdownMenuItem(
-                    text = { Text(channel.channelName) },
-                    onClick = {
-                        onSelect(channel)
-                        expanded = false
-                    }
-                )
             }
         }
     }

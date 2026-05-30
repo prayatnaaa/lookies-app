@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.prayatna.lookiesapp.presentation.refund.createRefund.CreateRefundScreen
+import com.prayatna.lookiesapp.presentation.refund.createRefund.CreateRefundRoute
 import com.prayatna.lookiesapp.presentation.refund.orderRefunds.OrderRefundsScreen
 import com.prayatna.lookiesapp.presentation.refund.refundDetail.RefundDetailRoute
 import com.prayatna.lookiesapp.presentation.refund.refundList.RefundListScreen
@@ -33,9 +33,8 @@ fun NavGraphBuilder.refundNavigation(navController: NavController) {
         route = "${NavigationRoutes.CREATE_REFUND}/{orderId}",
         arguments = listOf(navArgument("orderId") { type = NavType.StringType })
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("orderId")?.let { orderId ->
-            CreateRefundScreen(navController = navController, orderId = orderId)
-        }
+        val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+        CreateRefundRoute(navController = navController, orderId = orderId)
     }
 
     composable(

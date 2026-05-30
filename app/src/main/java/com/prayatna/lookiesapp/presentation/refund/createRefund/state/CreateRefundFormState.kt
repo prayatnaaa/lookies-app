@@ -6,6 +6,7 @@ data class CreateRefundFormState(
     val orderId: String = "",
     val amount: String = "",
     val bankCode: String = "",
+    val bankName: String = "",
     val accountNumber: String = "",
     val accountHolderName: String = "",
     val reason: String = "",

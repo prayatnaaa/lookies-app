@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.payment.PayoutChannel
 import com.prayatna.lookiesapp.presentation.components.registerBusiness.PartnerSubmissionContent
 import com.prayatna.lookiesapp.presentation.components.registerBusiness.SuccessDialog
+import com.prayatna.lookiesapp.presentation.payment.selectPayoutChannel.navigateToSelectPayoutChannel
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionUiState
 
@@ -26,7 +27,6 @@ fun PartnerSubmissionScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var payoutChannels by remember { mutableStateOf<List<PayoutChannel>>(emptyList()) }
     var currentPickingType by remember { mutableStateOf<String?>(null) }
 
     val launcher = rememberLauncherForActivityResult(
@@ -45,10 +45,19 @@ fun PartnerSubmissionScreen(
                 snackbarHostState.showSnackbar((uiState as PartnerSubmissionUiState.Error).message)
                 viewModel.onEvent(PartnerSubmissionEvent.DismissError)
             }
-            is PartnerSubmissionUiState.MetaLoaded -> {
-                payoutChannels = (uiState as PartnerSubmissionUiState.MetaLoaded).payoutChannels
-            }
             else -> Unit
+        }
+    }
+
+    val selectedCode = navController.currentBackStackEntry?.savedStateHandle?.get<String>("selected_payout_channel_code")
+    val selectedName = navController.currentBackStackEntry?.savedStateHandle?.get<String>("selected_payout_channel_name")
+
+    LaunchedEffect(selectedCode, selectedName) {
+        if (selectedCode != null && selectedName != null) {
+            viewModel.onEvent(PartnerSubmissionEvent.BankCodeChanged(selectedCode))
+            viewModel.onEvent(PartnerSubmissionEvent.BankNameChanged(selectedName))
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("selected_payout_channel_code")
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("selected_payout_channel_name")
         }
     }
 
@@ -96,7 +105,9 @@ fun PartnerSubmissionScreen(
                     currentPickingType = type
                     launcher.launch("*/*")
                 },
-                payoutChannels = payoutChannels
+                onSelectBankClick = {
+                    navController.navigateToSelectPayoutChannel()
+                }
             )
         }
     )

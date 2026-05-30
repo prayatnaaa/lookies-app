@@ -65,6 +65,7 @@ class CreateRefundViewModel @Inject constructor(
             is CreateRefundEvent.Submit -> submitRefund()
             is CreateRefundEvent.DismissError -> _uiState.value = CreateRefundUiState.Idle
             is CreateRefundEvent.OnBackClick -> { /* handled in Route */ }
+            is CreateRefundEvent.BankNameChanged -> _formState.update { it.copy(bankName = event.value) }
         }
     }
 

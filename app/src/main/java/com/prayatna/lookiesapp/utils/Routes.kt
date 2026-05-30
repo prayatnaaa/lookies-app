@@ -78,6 +78,7 @@ object NavigationRoutes {
     const val EVENT_PAINTING_GALLERY = "event_painting_gallery"
     const val EDIT_PAINTING = "edit_painting"
     const val REFUND_DETAIL = "refund_detail"
+    const val SELECT_PAYOUT_CHANNEL = "select_payout_channel"
     const val ACCEPT_PARTNER_INVITATION = "accept_partner_invitation"
 }
 

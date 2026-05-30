@@ -64,6 +64,7 @@ import com.prayatna.lookiesapp.presentation.partner.partnerRefund.partnerRefundN
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
+import com.prayatna.lookiesapp.presentation.payment.selectPayoutChannel.selectPayoutChannelNavigation
 import com.prayatna.lookiesapp.presentation.payment.vaPayment.VaPaymentScreen
 import com.prayatna.lookiesapp.presentation.refund.refundNavigation
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
@@ -485,6 +486,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
 
         refundNavigation(navController)
         forumMembersNavigation(navController)
+        selectPayoutChannelNavigation(navController)
 
         composable(NavigationRoutes.BARCODE_SCANNER) {
             ScannerScreen(onNavigateBack = { navController.popBackStack() })

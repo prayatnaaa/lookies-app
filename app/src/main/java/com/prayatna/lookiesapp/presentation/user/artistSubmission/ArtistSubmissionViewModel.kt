@@ -62,6 +62,12 @@ class ArtistSubmissionViewModel @Inject constructor(
 
             is ArtistSubmissionEvent.Submit -> submitRegistration()
 
+            is ArtistSubmissionEvent.OnSelectBankClicked -> {
+                viewModelScope.launch {
+                    _effect.emit(ArtistSubmissionEffect.NavigateToSelectBank)
+                }
+            }
+
             else -> updateForm(event)
         }
     }

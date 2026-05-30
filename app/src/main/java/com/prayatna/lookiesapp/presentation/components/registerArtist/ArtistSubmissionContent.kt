@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.components.registerArtist
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,7 +20,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.domain.model.payment.PayoutChannel
 import com.prayatna.lookiesapp.presentation.components.registerBusiness.FormSectionCard
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionFormState
@@ -32,7 +32,7 @@ fun ArtistSubmissionContent(
     isLoading: Boolean,
     onEvent: (ArtistSubmissionEvent) -> Unit,
     onPickFileClick: () -> Unit,
-    payoutChannels: List<PayoutChannel> = emptyList()
+    onSelectBankClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -207,13 +207,22 @@ fun ArtistSubmissionContent(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
-            PayoutChannelDropdown(
-                selectedCode = formState.bankCode,
-                channels = payoutChannels,
-                onSelect = { channel ->
-                    onEvent(ArtistSubmissionEvent.BankCodeChanged(channel.channelCode))
-                    onEvent(ArtistSubmissionEvent.BankNameChanged(channel.channelName))
-                }
+            OutlinedTextField(
+                value = formState.bankName.ifBlank { "Select Bank" },
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Bank") },
+                trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onSelectBankClick() },
+                enabled = false,
+                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
 
             OutlinedTextField(
@@ -322,48 +331,5 @@ fun ArtistSubmissionContent(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PayoutChannelDropdown(
-    selectedCode: String,
-    channels: List<PayoutChannel>,
-    onSelect: (PayoutChannel) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val selectedChannel = channels.find { it.channelCode == selectedCode }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedChannel?.channelName ?: "Select Bank",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Bank") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            channels.forEach { channel ->
-                DropdownMenuItem(
-                    text = { Text(channel.channelName) },
-                    onClick = {
-                        onSelect(channel)
-                        expanded = false
-                    }
-                )
-            }
-        }
     }
 }

@@ -4,4 +4,5 @@ sealed class ArtistSubmissionEffect {
     data class ShowSnackbar(val message: String) : ArtistSubmissionEffect()
     data object NavigateBack : ArtistSubmissionEffect()
     data object NavigateToSuccess : ArtistSubmissionEffect()
+    data object NavigateToSelectBank: ArtistSubmissionEffect()
 }
