@@ -80,6 +80,7 @@ object NavigationRoutes {
     const val REFUND_DETAIL = "refund_detail"
     const val SELECT_PAYOUT_CHANNEL = "select_payout_channel"
     const val ACCEPT_PARTNER_INVITATION = "accept_partner_invitation"
+    const val PARTNER_ORDER_DETAIL = "partner_order_detail"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

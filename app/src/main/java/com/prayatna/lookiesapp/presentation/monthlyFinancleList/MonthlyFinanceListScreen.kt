@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.monthlyFinancleList
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -122,7 +123,8 @@ fun MonthlyFinanceListScreen(
                                 itemsIndexed(state.orderSplits) { index, split ->
                                     PayoutLogItem(
                                         split = split,
-                                        showDivider = index != state.orderSplits.lastIndex
+                                        showDivider = index != state.orderSplits.lastIndex,
+                                        onClick = { onEvent(MonthlyFinanceEvent.PayoutLogClicked(split.orderId)) }
                                     )
                                 }
                             } else {
@@ -144,11 +146,13 @@ fun MonthlyFinanceListScreen(
 @Composable
 private fun PayoutLogItem(
     split: OrderSplit,
-    showDivider: Boolean = true
+    showDivider: Boolean = true,
+    onClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
 

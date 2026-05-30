@@ -60,6 +60,11 @@ class MonthlyFinanceListViewModel @Inject constructor(
                     _effect.send(MonthlyFinanceEffect.NavigateToWithdrawalList(id))
                 }
             }
+            is MonthlyFinanceEvent.PayoutLogClicked -> {
+                viewModelScope.launch {
+                    _effect.send(MonthlyFinanceEffect.NavigateToOrderDetail(event.orderId))
+                }
+            }
         }
     }
 

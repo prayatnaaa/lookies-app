@@ -5,4 +5,5 @@ sealed class MonthlyFinanceEvent {
     data class TabSelected(val index: Int) : MonthlyFinanceEvent()
     data object NavigateBack : MonthlyFinanceEvent()
     data object WithdrawalListClicked : MonthlyFinanceEvent()
+    data class PayoutLogClicked(val orderId: String) : MonthlyFinanceEvent()
 }

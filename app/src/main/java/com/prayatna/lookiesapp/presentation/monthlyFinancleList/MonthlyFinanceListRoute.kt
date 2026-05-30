@@ -40,6 +40,10 @@ fun MonthlyFinanceListRoute(
                 is MonthlyFinanceEffect.NavigateToWithdrawalList -> {
                     navController.navigate("${NavigationRoutes.MERCHANT_WITHDRAWAL_REQUEST_LIST}/${effect.businessId}")
                 }
+
+                is MonthlyFinanceEffect.NavigateToOrderDetail -> {
+                    navController.navigate("${NavigationRoutes.PARTNER_ORDER_DETAIL}/${effect.orderId}")
+                }
             }
         }
     }
