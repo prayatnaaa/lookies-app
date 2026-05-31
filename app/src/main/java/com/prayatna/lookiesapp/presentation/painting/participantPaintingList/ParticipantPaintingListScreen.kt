@@ -81,12 +81,15 @@ fun ParticipantPaintingListScreen(
     }
 
     Scaffold(
-        bottomBar = {
+        floatingActionButton = {
             if (eventType == "self_exhibition") {
                 Button(onClick = {
-                    navController.navigate("${NavigationRoutes.SELF_EVENT_LIST}/${businessId}")
+                    navController.navigate(
+                        "${
+                            NavigationRoutes.INSERT_EVENT_PAINTINGS_ROUTE
+                        }/${eventId}/${businessId}")
                 }) {
-                    Text("Upload Painting")
+                    Text("Add Event Artworks")
                 }
             }
         },

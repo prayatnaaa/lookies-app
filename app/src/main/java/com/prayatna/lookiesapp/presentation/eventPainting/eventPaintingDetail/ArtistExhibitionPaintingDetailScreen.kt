@@ -28,7 +28,6 @@ import com.prayatna.lookiesapp.presentation.components.eventPainting.EventPainti
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
-/** Statuses where the artist has a shipment action to take. */
 private val SHIPMENT_ACTIONABLE_STATUSES = setOf(
     "accepted",            // artist submits inbound shipment
     "shipping_to_event",   // waiting for organizer confirmation (view only)

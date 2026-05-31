@@ -15,6 +15,7 @@ import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.channel
@@ -24,6 +25,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import java.util.UUID
 import javax.inject.Inject
 
@@ -268,21 +270,23 @@ class SupabasePartnerService @Inject constructor(
         selectedPaintings: List<GetPaintingDto>
     ): List<InsertSelfEventPaintingsResponse> {
 
-
         val insertPayload = selectedPaintings.map { painting ->
             SelfEventPaintingInsertRequest(
-                paintingId = painting.id,
                 eventId = eventId,
+                paintingId = painting.id,
                 finalPrice = painting.price,
-                status = "on_sale",
-                businessId = painting.artistId
+                businessId = painting.artistId,
+                status = "on_sale"
             )
         }
 
-        Log.d("InsertSelfEventPaintings", insertPayload.toString())
 
-        return postgrest.from("event_paintings").insert(insertPayload) {
-            select(Columns.list("id"))
-        }.decodeList<InsertSelfEventPaintingsResponse>()
+        @Serializable
+        class RpcWrapper(val payload: List<SelfEventPaintingInsertRequest>)
+
+        return postgrest.rpc(
+            function = "insert_self_event_paintings",
+            parameters = RpcWrapper(insertPayload)
+        ).decodeList<InsertSelfEventPaintingsResponse>()
     }
 }

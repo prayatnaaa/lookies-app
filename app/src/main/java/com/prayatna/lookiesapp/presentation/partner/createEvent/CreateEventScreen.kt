@@ -332,6 +332,7 @@ fun CreateEventScreen(
                     ) {
                         RevenueShareForm(
                             isSelfExhibition = isSelfExhibition,
+                            isOnline = isOnlineEvent,
                             paintingArtistPercent = formState.paintingArtistPercent,
                             onPaintingArtistPercentChange = {
                                 viewModel.onEvent(
