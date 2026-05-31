@@ -192,13 +192,25 @@ fun PartnerExhibitionPaintingDetailScreen(
 fun MarkAsSoldButton(
     onClick: () -> Unit
 ) {
-    Button(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick,
-        content = {
-            Text(text = "Mark as Sold")
+    Surface(
+        shadowElevation = 8.dp,
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .navigationBarsPadding()
+        ) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onClick
+            ) {
+                Text("Mark as Sold")
+            }
         }
-    )
+    }
 }
 
 @Composable

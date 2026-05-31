@@ -40,6 +40,10 @@ class SupabaseMerchantService @Inject constructor(
         return imageUrl
     }
 
+    suspend fun getMerchantAddress(merchantBusinessId: String) {
+
+    }
+
     suspend fun inviteMerchantMember(request: InviteMerchantMemberRequest): InviteMerchantMemberResponse {
         return postgrest.from("merchant_members").insert(request) {
             select()

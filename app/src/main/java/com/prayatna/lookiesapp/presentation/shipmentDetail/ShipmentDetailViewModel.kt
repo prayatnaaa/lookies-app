@@ -46,28 +46,28 @@ class ShipmentDetailViewModel @Inject constructor(
                 var isOnlineEvent: Boolean
                 var canUpdateShipment = true
 
-                val transactionItem = transactionResult.data.items.firstOrNull()
-                if (transactionItem != null) {
-                    val eventFormat = getEventFormatByEventPaintingIdUseCase(transactionItem.itemRefId)
-                    if (eventFormat.isNotEmpty()) {
-                        isOnlineEvent = (eventFormat == "online")
-                        
-                        try {
-                            val profileResult = getProfileUseCase().first {
-                                it !is DataResult.Loading && it !is DataResult.Idle 
-                            }
-                            if (profileResult is DataResult.Success) {
-                                val profile = profileResult.data
-                                val isArtistOfShipment = profile.businessId != null && 
-                                        profile.businessId == shipmentResult.data.artistId && 
-                                        profile.businessId != shipmentResult.data.merchantId
-                                canUpdateShipment = isOnlineEvent || !isArtistOfShipment
-                            }
-                        } catch (e: Exception) {
-                            // Ignore
-                        }
-                    }
-                }
+//                val transactionItem = transactionResult.data.items.firstOrNull()
+//                if (transactionItem != null) {
+//                    val eventFormat = getEventFormatByEventPaintingIdUseCase(transactionItem.itemRefId)
+//                    if (eventFormat.isNotEmpty()) {
+//                        isOnlineEvent = (eventFormat == "online")
+//
+//                        try {
+//                            val profileResult = getProfileUseCase().first {
+//                                it !is DataResult.Loading && it !is DataResult.Idle
+//                            }
+//                            if (profileResult is DataResult.Success) {
+//                                val profile = profileResult.data
+//                                val isArtistOfShipment = profile.businessId != null &&
+//                                        profile.businessId == shipmentResult.data.artistId &&
+//                                        profile.businessId != shipmentResult.data.merchantId
+//                                canUpdateShipment = isOnlineEvent || !isArtistOfShipment
+//                            }
+//                        } catch (e: Exception) {
+//                            // Ignore
+//                        }
+//                    }
+//                }
 
                 _uiState.update {
                     it.copy(

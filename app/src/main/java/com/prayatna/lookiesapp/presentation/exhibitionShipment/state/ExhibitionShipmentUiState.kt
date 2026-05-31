@@ -18,7 +18,7 @@ data class ExhibitionShipmentUiState(
     val shipment: ExhibitionShipment? = null,
 
     // Form — Inbound phase (Artist submits artwork)
-    val selectedDeliveryMethod: DeliveryMethod = DeliveryMethod.SELF_DROP_OFF,
+    val selectedDeliveryMethod: DeliveryMethod = DeliveryMethod.SELF_DROPOFF,
     val courierNameInput: String = "",
     val trackingNumberInput: String = "",
 

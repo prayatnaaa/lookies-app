@@ -64,7 +64,6 @@ fun ExhibitionShipmentScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Error Bottom Sheet
     uiState.errorMessage?.let { message ->
         CustomBottomSheet(
             title = "Error",
@@ -119,12 +118,10 @@ fun ExhibitionShipmentScreen(
                 .imePadding(),
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            // ── Always-visible context header ─────────────────────────────
             ExhibitionContextCard(uiState = uiState)
 
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
 
-            // ── Phase-specific action section ─────────────────────────────
             Column(
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 20.dp),
@@ -165,7 +162,6 @@ fun ExhibitionShipmentScreen(
     }
 }
 
-// ── Context header card ───────────────────────────────────────────────────────
 @Composable
 private fun ExhibitionContextCard(uiState: ExhibitionShipmentUiState) {
     Card(
@@ -517,12 +513,12 @@ private fun DeliveryMethodSelector(
         Spacer(Modifier.height(4.dp))
         DeliveryMethod.entries.forEach { method ->
             val label = when (method) {
-                DeliveryMethod.SELF_DROP_OFF -> "Self Drop-Off"
+                DeliveryMethod.SELF_DROPOFF -> "Self Drop-Off"
                 DeliveryMethod.COURIER -> "Courier"
                 DeliveryMethod.ARTIST_PICKUP -> "Pick-Up by Organizer"
             }
             val description = when (method) {
-                DeliveryMethod.SELF_DROP_OFF -> "You personally deliver to the venue"
+                DeliveryMethod.SELF_DROPOFF -> "You personally deliver to the venue"
                 DeliveryMethod.COURIER -> "Ship via a courier with tracking"
                 DeliveryMethod.ARTIST_PICKUP -> "Organizer collects from you"
             }
