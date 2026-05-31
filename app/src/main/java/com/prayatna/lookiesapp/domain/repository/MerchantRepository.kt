@@ -7,6 +7,7 @@ import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.user.BusinessAddress
 import com.prayatna.lookiesapp.utils.DataResult
 
 interface MerchantRepository {
@@ -29,4 +30,6 @@ interface MerchantRepository {
             DataResult<List<Shipment>>
     suspend fun uploadShipmentArrivalProof(shipmentId: String, image: Uri):
             DataResult<String>
+    suspend fun getMerchantAddress(merchantBusinessId: String):
+            DataResult<BusinessAddress>
 }

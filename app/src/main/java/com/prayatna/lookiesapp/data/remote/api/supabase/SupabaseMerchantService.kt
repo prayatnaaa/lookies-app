@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.remote.dto.BusinessAddressDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBankAccountDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
@@ -40,8 +41,12 @@ class SupabaseMerchantService @Inject constructor(
         return imageUrl
     }
 
-    suspend fun getMerchantAddress(merchantBusinessId: String) {
-
+    suspend fun getMerchantAddress(merchantBusinessId: String): BusinessAddressDto {
+        return postgrest["business_addresses"].select {
+            filter {
+                BusinessAddressDto::businessId eq merchantBusinessId
+            }
+        }.decodeSingle<BusinessAddressDto>()
     }
 
     suspend fun inviteMerchantMember(request: InviteMerchantMemberRequest): InviteMerchantMemberResponse {

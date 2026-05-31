@@ -11,6 +11,7 @@ import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.user.BusinessAddress
 import com.prayatna.lookiesapp.domain.repository.MerchantRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
@@ -29,6 +30,16 @@ class MerchantRepositoryImpl @Inject constructor(
     override suspend fun inviteMerchantMember(input: InviteMerchantMemberInput): DataResult<InviteMerchantMemberOutput> {
         return try {
             val response = supabaseMerchantService.inviteMerchantMember(input.toData())
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getMerchantAddress(merchantBusinessId: String): DataResult<BusinessAddress> {
+        return try {
+            val response = supabaseMerchantService.getMerchantAddress(merchantBusinessId)
             DataResult.Success(response.toDomain())
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)

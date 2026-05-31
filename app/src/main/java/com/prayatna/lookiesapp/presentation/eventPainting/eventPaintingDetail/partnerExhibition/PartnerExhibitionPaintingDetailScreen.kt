@@ -35,6 +35,7 @@ import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEffect
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
 import com.prayatna.lookiesapp.presentation.offlineCheckout.navigateToOfflineCheckout
+import com.prayatna.lookiesapp.presentation.unsoldArtworkReturn.navigateToUnsoldArtworkReturn
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -154,6 +155,15 @@ fun PartnerExhibitionPaintingDetailScreen(
                                 quantity = 1
                             )
                         }
+                    }
+
+                    "unsold" -> {
+                        PartnerShipmentActionBar(
+                            status = painting.status,
+                            onManageShipment = {
+                                navController.navigateToUnsoldArtworkReturn(painting.id)
+                            }
+                        )
                     }
 
                     else -> {

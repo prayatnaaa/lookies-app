@@ -66,6 +66,7 @@ object NavigationRoutes {
     const val CREATE_REFUND = "create_refund"
     const val ORDER_REFUNDS = "order_refunds"
     const val EXHIBITION_SHIPMENT = "exhibition_shipment"
+    const val UNSOLD_ARTWORK_RETURN = "unsold_artwork_return"
     const val EXHIBITION_HISTORY = "exhibition_history"
     const val ARTIST_EXHIBITION_PAINTING_DETAIL = "artist_exhibition_painting_detail"
     const val PARTNER_EXHIBITION_PAINTING_DETAIL = "partner_exhibition_painting_detail"
