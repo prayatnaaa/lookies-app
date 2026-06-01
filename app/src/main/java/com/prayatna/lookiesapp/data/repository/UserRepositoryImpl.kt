@@ -270,4 +270,12 @@ class UserRepositoryImpl @Inject constructor(
             DataResult.Error(msg)
         }
     }
+
+    override suspend fun setDarkMode(isDarkMode: Boolean) {
+        userPreference.setDarkMode(isDarkMode)
+    }
+
+    override fun isDarkMode(): Flow<Boolean> {
+        return userPreference.darkModePreference
+    }
 }

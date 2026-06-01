@@ -45,4 +45,6 @@ interface UserRepository {
     suspend fun rejectPartnerInvitations(merchantAccountId: String): DataResult<MerchantMember>
     suspend fun getFcmToken():
             String?
+    suspend fun setDarkMode(isDarkMode: Boolean)
+    fun isDarkMode(): Flow<Boolean>
 }
