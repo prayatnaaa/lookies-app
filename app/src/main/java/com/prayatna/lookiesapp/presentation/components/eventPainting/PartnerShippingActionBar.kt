@@ -25,7 +25,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PartnerShipmentActionBar(
     status: String,
-    onManageShipment: () -> Unit
+    onManageShipment: () -> Unit,
+    enableReturningToCreator: Boolean = true
 ) {
     val (label, enabled) = when (status.lowercase()) {
         "approved" -> "Submit Inbound Shipment" to true
@@ -58,7 +59,12 @@ fun PartnerShipmentActionBar(
             )
             Button(
                 onClick = onManageShipment,
-                enabled = enabled,
+                enabled = if (
+                    status.lowercase() == "returning_to_creator" &&
+                    !enableReturningToCreator
+                ) {
+                    false
+                } else enabled,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),

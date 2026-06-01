@@ -15,6 +15,7 @@ import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
 import com.prayatna.lookiesapp.domain.model.transaction.OrderSplit
+import com.prayatna.lookiesapp.domain.model.transaction.PaidOrderItem
 import com.prayatna.lookiesapp.domain.model.transaction.PayoutResult
 import com.prayatna.lookiesapp.domain.model.transaction.PendingOrderSplits
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
@@ -47,6 +48,8 @@ interface TransactionRepository {
             DataResult<CreateQrisPaymentRequestResult>
     suspend fun createVaPaymentRequest(data: CreateVaPaymentRequestInput):
             DataResult<CreateVaPaymentRequestResult>
+    suspend fun getPaidOrderItemsByEventId(eventId: Int):
+            DataResult<List<PaidOrderItem>>
     suspend fun getUserTransactions():
             DataResult<List<Transaction>>
     suspend fun createPaymentRequest(request: CreateXenditPaymentRequestInput):

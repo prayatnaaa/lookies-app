@@ -23,6 +23,7 @@ import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
 import com.prayatna.lookiesapp.domain.model.transaction.OrderSplit
+import com.prayatna.lookiesapp.domain.model.transaction.PaidOrderItem
 import com.prayatna.lookiesapp.domain.model.transaction.PayoutResult
 import com.prayatna.lookiesapp.domain.model.transaction.PendingOrderSplits
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
@@ -160,6 +161,16 @@ class TransactionRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }
+    }
+
+    override suspend fun getPaidOrderItemsByEventId(eventId: Int): DataResult<List<PaidOrderItem>> {
+        return try {
+            val result = transactionService.getPaidOrderItemsByEventId(eventId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
         }
     }
 

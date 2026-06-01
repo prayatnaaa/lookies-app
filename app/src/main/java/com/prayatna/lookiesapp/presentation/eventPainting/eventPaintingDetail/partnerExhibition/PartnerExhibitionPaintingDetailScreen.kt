@@ -149,16 +149,20 @@ fun PartnerExhibitionPaintingDetailScreen(
                     "rejected" -> {}
 
                     "on_sale" -> {
-                        MarkAsSoldButton {
-                            navController.navigateToOfflineCheckout(
-                                itemId = painting.id,
-                                quantity = 1
-                            )
-                        }
+                        MarkAsSoldButton(
+                            enable = state.data?.participant?.event?.status == "ongoing",
+                            onClick =  {
+                                navController.navigateToOfflineCheckout(
+                                    itemId = painting.id,
+                                    quantity = 1
+                                )
+                            }
+                        )
                     }
 
                     "unsold" -> {
                         PartnerShipmentActionBar(
+                            enableReturningToCreator = false,
                             status = painting.status,
                             onManageShipment = {
                                 navController.navigateToUnsoldArtworkReturn(painting.id)
@@ -168,6 +172,7 @@ fun PartnerExhibitionPaintingDetailScreen(
 
                     else -> {
                         PartnerShipmentActionBar(
+                            enableReturningToCreator = false,
                             status = painting.status,
                             onManageShipment = {
                                 navController.navigate(
@@ -200,7 +205,8 @@ fun PartnerExhibitionPaintingDetailScreen(
 
 @Composable
 fun MarkAsSoldButton(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enable: Boolean = true
 ) {
     Surface(
         shadowElevation = 8.dp,
@@ -214,6 +220,7 @@ fun MarkAsSoldButton(
                 .navigationBarsPadding()
         ) {
             Button(
+                enabled = enable,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onClick
             ) {

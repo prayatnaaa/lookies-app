@@ -5,6 +5,7 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBalanceLogDto
 import com.prayatna.lookiesapp.data.remote.dto.MonthlyFinancialReportDto
 import com.prayatna.lookiesapp.data.remote.dto.OrderSplitDto
+import com.prayatna.lookiesapp.data.remote.dto.PaidOrderItemDto
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
 import com.prayatna.lookiesapp.data.remote.dto.PendingOrderSplitsDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
@@ -144,6 +145,14 @@ class SupabaseTransactionService @Inject constructor(
             .decodeList<TransactionDto>()
         Log.d("SupabaseTransactionService", "getUserTransactions: $result")
         return result
+    }
+
+    suspend fun getPaidOrderItemsByEventId(eventId: Int): List<PaidOrderItemDto> {
+        return postgrest.from("paid_order_items_view").select {
+            filter {
+                PaidOrderItemDto::eventId eq eventId
+            }
+        }.decodeList<PaidOrderItemDto>()
     }
 
     suspend fun getUserTransactionByOrderId(orderId: String): TransactionDto {
