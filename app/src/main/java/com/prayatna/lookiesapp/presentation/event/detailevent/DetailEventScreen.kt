@@ -42,6 +42,7 @@ import com.prayatna.lookiesapp.presentation.event.detailevent.state.DetailEventU
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.navigateToEventPaintingGallery
 import com.prayatna.lookiesapp.ui.theme.Maroon
 import com.prayatna.lookiesapp.utils.NavigationRoutes
+import java.time.LocalDateTime
 
 @Composable
 fun DetailEventScreen(
@@ -110,6 +111,12 @@ fun DetailEventScreen(
         bottomBar = {
             detailEventState.info?.let { event ->
                 DetailEventBottomBar(
+                    isRegisterEnabled = try {
+                        val deadline = LocalDateTime.parse(event.paintingSubmissionDeadline)
+                        LocalDateTime.now().isBefore(deadline)
+                    } catch (_: Exception) {
+                        false
+                    },
                     role = role,
                     event = event,
                     isApproveLoading = adminState.isLoading,
@@ -274,6 +281,7 @@ fun RejectEventBottomSheet(
 
 @Composable
 private fun DetailEventBottomBar(
+    isRegisterEnabled: Boolean = true,
     role: String,
     event: Event,
     onApprove: () -> Unit,
@@ -297,7 +305,7 @@ private fun DetailEventBottomBar(
         showRegisterButton = role == "artist" &&
                 event.eventType.slug == "open_call",
 
-        isRegisterButtonEnabled = event.status == "published",
+        isRegisterButtonEnabled = event.status == "published" && isRegisterEnabled,
         onRegisterButtonClick = onRegister,
 
         showBuyButton = role != "admin" &&
