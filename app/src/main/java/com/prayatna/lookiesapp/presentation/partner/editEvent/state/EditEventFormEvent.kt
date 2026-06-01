@@ -13,6 +13,7 @@ sealed interface EditEventFormEvent {
     data class TicketPriceChanged(val value: String?) : EditEventFormEvent
     data class ArtistRegistrationFeeChanged(val value: String?) : EditEventFormEvent
     data class EventTypeChanged(val value: String) : EditEventFormEvent
+    data class PaintingSubmissionDeadline(val value: String): EditEventFormEvent
     data class EventFormatChanged(val value: String) : EditEventFormEvent
     data object LoadEventMeta : EditEventFormEvent
     data object Submit : EditEventFormEvent

@@ -49,7 +49,7 @@ fun EditEventScreen(
     val formState by viewModel.formState.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(eventId) {
+    LaunchedEffect(Unit) {
         viewModel.onEvent(EditEventFormEvent.LoadEventMeta)
         viewModel.loadEvent(eventId)
     }
@@ -172,6 +172,10 @@ fun EditEventScreen(
                     endDate = formState.endDate,
                     onEndDateChange = {
                         viewModel.onEvent(EditEventFormEvent.EndDateChanged(it))
+                    },
+                    paintingSubmissionDeadline = formState.paintingSubmissionDeadline,
+                    onPaintingSubmissionDeadlineChange = {
+                        viewModel.onEvent(EditEventFormEvent.PaintingSubmissionDeadline(it))
                     },
                     eventTypes = formState.eventTypes,
                     selectedEventTypeId = formState.eventType,

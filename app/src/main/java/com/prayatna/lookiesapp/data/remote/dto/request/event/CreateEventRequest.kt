@@ -14,6 +14,8 @@ data class CreateEventRequest(
     val startDate: String,
     @SerialName("end_date")
     val endDate: String,
+    @SerialName("painting_submission_deadline")
+    val paintingSubmissionDeadline: String?,
     val about: String? = null,
     val location: String,
     @SerialName("location_url")

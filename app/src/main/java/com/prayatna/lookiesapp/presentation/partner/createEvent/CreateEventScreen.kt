@@ -248,7 +248,12 @@ fun CreateEventScreen(
                         selectedEventFormatId = formState.eventFormat,
                         onEventFormatChange = {
                             viewModel.onEvent(CreateEventFormEvent.EventFormatChanged(it))
-                        }
+                        },
+                        paintingSubmissionDeadline = formState.paintingSubmissionDeadline,
+                        onPaintingSubmissionDeadlineChange = {
+                            viewModel.onEvent(CreateEventFormEvent.PaintingSubmissionDeadlineChanged(it))
+                        },
+                        isSelfExhibition = isSelfExhibition
                     )
                 }
 

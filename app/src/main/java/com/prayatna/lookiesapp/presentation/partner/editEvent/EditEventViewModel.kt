@@ -75,6 +75,8 @@ class EditEventViewModel @Inject constructor(
             EditEventFormEvent.LoadEventMeta -> loadMeta()
 
             EditEventFormEvent.Submit -> submit()
+            is EditEventFormEvent.PaintingSubmissionDeadline ->
+                update { copy(paintingSubmissionDeadline = event.value) }
         }
     }
 
@@ -149,7 +151,8 @@ class EditEventViewModel @Inject constructor(
                 artistRegistrationFee = event.artistRegistrationFee?.toString(),
                 about = event.about.orEmpty(),
                 eventType = event.eventType.id.toString(),
-                eventFormat = event.eventFormat.id.toString()
+                eventFormat = event.eventFormat.id.toString(),
+                paintingSubmissionDeadline = event.paintingSubmissionDeadline,
             )
         }
     }

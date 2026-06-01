@@ -9,6 +9,7 @@ data class CreateEventFormState(
     val bannerUri: Uri? = null,
     val startDate: String = "",
     val endDate: String = "",
+    val paintingSubmissionDeadline: String? = null,
     val location: String = "",
     val locationUrl: String = "",
     val maxParticipant: String? = null,
@@ -37,5 +38,6 @@ data class CreateEventFormState(
             startDate.isNotBlank() &&
             endDate.isNotBlank() &&
             eventType.toIntOrNull() != null &&
-            eventFormat.toIntOrNull() != null
+            eventFormat.toIntOrNull() != null &&
+            (eventType != "open_call" || !paintingSubmissionDeadline.isNullOrBlank())
 }

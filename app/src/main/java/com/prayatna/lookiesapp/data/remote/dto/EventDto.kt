@@ -49,6 +49,9 @@ data class EventDto(
     @SerialName("registration_fee")
     val registrationFee: Double? = null,
 
+    @SerialName("painting_submission_deadline")
+    val paintingSubmissionDeadline: String? = null,
+
     @SerialName("created_at")
     val createdAt: String,
 

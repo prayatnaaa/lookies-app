@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.event.detailevent
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.admin.ApproveEventUseCase
@@ -71,6 +72,7 @@ class DetailEventViewModel @Inject constructor(
                 )
             ) {
                 is DataResult.Success -> {
+                    Log.d("Detail-Event", result.data.toString())
                     _state.update {
                         it.copy(
                             paintings = result.data,

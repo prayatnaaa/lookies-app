@@ -50,6 +50,9 @@ class CreateEventViewModel @Inject constructor(
             is CreateEventFormEvent.EndDateChanged ->
                 update { copy(endDate = event.value) }
 
+            is CreateEventFormEvent.PaintingSubmissionDeadlineChanged ->
+                update { copy(paintingSubmissionDeadline = event.value) }
+
             is CreateEventFormEvent.LocationChanged ->
                 update { copy(location = event.value) }
 
@@ -170,7 +173,7 @@ class CreateEventViewModel @Inject constructor(
                 ticketArtistPercent = state.ticketArtistPercent,
                 ticketEventPercent = state.ticketEventPercent,
                 ticketPlatformPercent = state.ticketPlatformPercent,
-
+                paintingSubmissionDeadline = state.paintingSubmissionDeadline
             )
 
 

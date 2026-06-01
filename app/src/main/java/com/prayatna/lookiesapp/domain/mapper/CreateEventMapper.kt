@@ -9,6 +9,7 @@ fun CreateEventParams.toDto(): CreateEventRequest {
         bannerImageUrl = this.bannerImageUrl,
         startDate = this.startDate,
         endDate = this.endDate,
+        paintingSubmissionDeadline = this.paintingSubmissionDeadline,
         about = this.about,
         location = this.location,
         locationUrl = this.locationUrl,

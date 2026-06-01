@@ -22,5 +22,6 @@ data class EditEventFormState(
     val eventFormats: List<EventFormat> = emptyList(),
     val isLoadingMeta: Boolean = false,
     val errorMessage: String? = null,
+    val paintingSubmissionDeadline: String? = null,
     val status: String? = null
 )

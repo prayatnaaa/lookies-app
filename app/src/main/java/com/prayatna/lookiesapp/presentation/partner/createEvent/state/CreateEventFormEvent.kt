@@ -7,6 +7,7 @@ sealed interface CreateEventFormEvent {
     data class BannerChanged(val uri: Uri?) : CreateEventFormEvent
     data class StartDateChanged(val value: String) : CreateEventFormEvent
     data class EndDateChanged(val value: String) : CreateEventFormEvent
+    data class PaintingSubmissionDeadlineChanged(val value: String) : CreateEventFormEvent
     data class LocationChanged(val value: String) : CreateEventFormEvent
     data class LocationUrlChanged(val value: String) : CreateEventFormEvent
     data class MaxParticipantChanged(val value: String?) : CreateEventFormEvent

@@ -6,6 +6,7 @@ data class CreateEventParams(
     val bannerImageUrl: String,
     val startDate: String,
     val endDate: String,
+    val paintingSubmissionDeadline: String? = null,
     val about: String? = null,
     val location: String,
     val locationUrl: String,
