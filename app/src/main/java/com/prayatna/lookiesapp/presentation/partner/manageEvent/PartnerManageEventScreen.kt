@@ -54,6 +54,7 @@ import com.prayatna.lookiesapp.data.remote.dto.EventStatisticDto
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.partner.eventTransactions.navigateToEventTransactionList
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 import com.prayatna.lookiesapp.utils.formatRupiah
 
@@ -142,6 +143,17 @@ fun PartnerManageEventScreen(
                             icon = Icons.Default.Edit,
                             onClick = {
                                 navController.navigate("${NavigationRoutes.EDIT_EVENT}/${event.id}")
+                            }
+                        )
+                    }
+
+                    item {
+                        ManagementOptionCard(
+                            title = "Transactions",
+                            description = "See this event's transaction from buyer",
+                            icon = Icons.Default.MonetizationOn,
+                            onClick = {
+                                navController.navigateToEventTransactionList(eventId)
                             }
                         )
                     }

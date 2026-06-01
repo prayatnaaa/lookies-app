@@ -83,6 +83,7 @@ object NavigationRoutes {
     const val OFFLINE_CHECKOUT = "offline_checkout"
     const val ACCEPT_PARTNER_INVITATION = "accept_partner_invitation"
     const val PARTNER_ORDER_DETAIL = "partner_order_detail"
+    const val EVENT_TRANSACTION_LIST = "event_transaction_list"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {
