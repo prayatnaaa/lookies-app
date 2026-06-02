@@ -30,12 +30,12 @@ fun OfflineCheckoutRoute(
                     }
                 }
                 is OfflineCheckoutEffect.NavigateToQrisPayment -> {
-                    navController.navigate("${NavigationRoutes.QRIS_PAYMENT}/${effect.orderId}/${effect.merchantId}/${effect.amount}") {
+                    navController.navigate("${NavigationRoutes.QRIS_PAYMENT}/${effect.orderId}/${effect.merchantId}/${effect.amount}?isOfflinePurchase=true") {
                         popUpTo(NavigationRoutes.OFFLINE_CHECKOUT) { inclusive = true }
                     }
                 }
                 is OfflineCheckoutEffect.NavigateToVaPayment -> {
-                    navController.navigate("${NavigationRoutes.VA_PAYMENT}/${effect.orderId}/${effect.merchantId}/${effect.amount}/${effect.bankCode}/${effect.customerName}") {
+                    navController.navigate("${NavigationRoutes.VA_PAYMENT}/${effect.orderId}/${effect.merchantId}/${effect.amount}/${effect.bankCode}/${effect.customerName}?isOfflinePurchase=true") {
                         popUpTo(NavigationRoutes.OFFLINE_CHECKOUT) { inclusive = true }
                     }
                 }

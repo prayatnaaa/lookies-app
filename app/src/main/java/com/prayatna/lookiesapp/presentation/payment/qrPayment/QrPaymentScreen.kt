@@ -18,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.partner.orderDetail.navigateToPartnerOrderDetail
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 import com.prayatna.lookiesapp.utils.QrCodeGenerator
@@ -31,6 +32,7 @@ fun QrPaymentScreen(
     orderId: String,
     amount: Long,
     description: String? = null,
+    isOfflinePurchase: Boolean = false,
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,11 +71,15 @@ fun QrPaymentScreen(
             showSuccessDialog = true
 
             delay(1000)
-            navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
-                popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}") {
-                    inclusive = true
+            if (isOfflinePurchase) {
+                navController.navigateToPartnerOrderDetail(orderId)
+            } else {
+                navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
+                    popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}") {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
                 }
-                launchSingleTop = true
             }
         }
     }

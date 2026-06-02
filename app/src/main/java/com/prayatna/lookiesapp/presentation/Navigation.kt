@@ -129,33 +129,37 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         exhibitionShipmentNavigation(navController = navController)
         shipmentListNavigation(navController = navController)
         composable(
-            route = "${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}",
+            route = "${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}",
             arguments = listOf(
                 navArgument("orderId") { type = NavType.StringType },
                 navArgument("merchantId") { type = NavType.StringType },
-                navArgument("amount") { type = NavType.LongType }
+                navArgument("amount") { type = NavType.LongType },
+                navArgument("isOfflinePurchase") { type = NavType.BoolType}
             )
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
             val merchantId = backStackEntry.arguments?.getString("merchantId") ?: ""
             val amount = backStackEntry.arguments?.getLong("amount") ?: 0L
+            val isOfflinePurchase = backStackEntry.arguments?.getBoolean("isOfflinePurchase") ?: false
 
             QrPaymentScreen(
                 orderId = orderId,
                 merchantId = merchantId,
                 amount = amount,
+                isOfflinePurchase = isOfflinePurchase,
                 navController = navController
             )
         }
 
         composable(
-            route = "${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}",
+            route = "${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}?isOfflinePurchase={isOfflinePurchase}",
             arguments = listOf(
                 navArgument("orderId") { type = NavType.StringType },
                 navArgument("merchantId") { type = NavType.StringType },
                 navArgument("amount") { type = NavType.LongType },
                 navArgument("bankCode") { type = NavType.StringType },
-                navArgument("customerName") { type = NavType.StringType }
+                navArgument("customerName") { type = NavType.StringType },
+                navArgument("isOfflinePurchase") { type = NavType.BoolType}
             )
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
@@ -163,6 +167,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             val amount = backStackEntry.arguments?.getLong("amount") ?: 0L
             val bankCode = backStackEntry.arguments?.getString("bankCode") ?: "BRI"
             val customerName = backStackEntry.arguments?.getString("customerName") ?: "Customer"
+            val isOfflinePurchase = backStackEntry.arguments?.getBoolean("isOfflinePurchase") ?: false
 
             VaPaymentScreen(
                 orderId = orderId,
@@ -170,6 +175,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 amount = amount,
                 bankCode = bankCode,
                 customerName = customerName,
+                isOfflinePurchase = isOfflinePurchase,
                 navController = navController
             )
         }
