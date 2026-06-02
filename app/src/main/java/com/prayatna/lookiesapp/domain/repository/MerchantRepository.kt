@@ -4,6 +4,7 @@ import android.net.Uri
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberOutput
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
@@ -32,4 +33,6 @@ interface MerchantRepository {
             DataResult<String>
     suspend fun getMerchantAddress(merchantBusinessId: String):
             DataResult<BusinessAddress>
+    suspend fun getPublicMerchantProfile(businessId: String):
+            DataResult<MerchantBusiness>
 }

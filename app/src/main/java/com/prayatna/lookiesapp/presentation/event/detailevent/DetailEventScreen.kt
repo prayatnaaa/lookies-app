@@ -40,6 +40,7 @@ import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventFo
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.event.detailevent.state.DetailEventUiEvent
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.navigateToEventPaintingGallery
+import com.prayatna.lookiesapp.presentation.publicMerchantProfile.navigateToPublicMerchantProfile
 import com.prayatna.lookiesapp.ui.theme.Maroon
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 import java.time.LocalDateTime
@@ -164,9 +165,7 @@ fun DetailEventScreen(
                         navController.navigate("${NavigationRoutes.DETAIL_EVENT_PAINTING}/$id")
                     },
                     onPartnerClick = { id ->
-                        navController.navigate(
-                            "${NavigationRoutes.MESSAGES}/$id/${event.organizer.legalName}"
-                        )
+                        navController.navigateToPublicMerchantProfile(id)
                     }
                 )
             }

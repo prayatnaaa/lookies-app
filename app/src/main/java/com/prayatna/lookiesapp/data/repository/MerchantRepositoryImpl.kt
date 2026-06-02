@@ -5,9 +5,11 @@ import android.net.Uri
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseMerchantService
 import com.prayatna.lookiesapp.domain.mapper.toData
 import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberOutput
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
@@ -40,6 +42,16 @@ class MerchantRepositoryImpl @Inject constructor(
     override suspend fun getMerchantAddress(merchantBusinessId: String): DataResult<BusinessAddress> {
         return try {
             val response = supabaseMerchantService.getMerchantAddress(merchantBusinessId)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }
+    }
+
+    override suspend fun getPublicMerchantProfile(businessId: String): DataResult<MerchantBusiness> {
+        return try {
+            val response = supabaseMerchantService.getPublicMerchantProfile(businessId)
             DataResult.Success(response.toDomain())
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)

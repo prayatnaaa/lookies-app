@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.BusinessAddressDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBankAccountDto
+import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
@@ -18,6 +19,14 @@ class SupabaseMerchantService @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage
 ) {
+
+    suspend fun getPublicMerchantProfile(businessId: String): MerchantBusinessDto {
+        return postgrest["merchant_businesses_views"].select {
+            filter {
+                MerchantBusinessDto::id eq businessId
+            }
+        }.decodeSingle<MerchantBusinessDto>()
+    }
 
     suspend fun uploadArrivalProof(shipmentId: String, image: ByteArray): String {
         val fileName = "${UUID.randomUUID()}.png"

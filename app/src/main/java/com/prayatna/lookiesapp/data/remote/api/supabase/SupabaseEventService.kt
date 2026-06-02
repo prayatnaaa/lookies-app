@@ -142,7 +142,7 @@ class SupabaseEventService @Inject constructor(
                         ilike("title", "%$title%")
                     }
                     if (organizerId != null) {
-                        eq("organizer_id", organizerId)
+                        eq("organizer->>id", organizerId)
                     }
                     if (status != null) {
                         val statuses = status.split(",").map { it.trim() }
