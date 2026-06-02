@@ -9,6 +9,7 @@ import com.prayatna.lookiesapp.data.remote.dto.request.user.AcceptInvitationRequ
 import com.prayatna.lookiesapp.data.remote.dto.request.user.ArtistApplicationRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateUserAddressRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.RoleApplicationRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.user.AcceptPartnerInvitationResponseDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
@@ -33,12 +34,15 @@ class SupabaseUserService @Inject constructor(
     private val httpClient: HttpClient
 ) {
 
-    suspend fun acceptPartnerInvitations(merchantAccountId: String): MerchantMemberDto {
+    suspend fun acceptPartnerInvitations(merchantAccountId: String): AcceptPartnerInvitationResponseDto {
 
-        return postgrest.rpc(
+        val res = postgrest.rpc(
             function = "accept_partner_invitation",
             parameters = AcceptInvitationRequest(merchantAccountId = merchantAccountId)
-        ).decodeList<MerchantMemberDto>()[0]
+        ).decodeAs<AcceptPartnerInvitationResponseDto>()
+
+        Log.d("AcceptPartner", res.toString())
+        return res
     }
 
     suspend fun rejectPartnerInvitations(merchantAccountId: String): MerchantMemberDto {

@@ -13,6 +13,7 @@ import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.merchant.AcceptPartnerInvitationResponse
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
@@ -218,11 +219,13 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun acceptPartnerInvitations(merchantAccountId: String): DataResult<MerchantMember> {
+    override suspend fun acceptPartnerInvitations(merchantAccountId: String): DataResult<AcceptPartnerInvitationResponse> {
         return try {
             val result = supabaseUserService.acceptPartnerInvitations(merchantAccountId)
+            Log.d("AcceptPartner", result.toString())
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
+            Log.e("AcceptPartner", e.toString())
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
         } catch (e: Exception) {

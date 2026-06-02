@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MerchantMemberByMerchantIdViewModel @Inject constructor(
     private val getMerchantMembersByMerchantIdUseCase: GetMerchantMembersByMerchantIdUseCase,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MerchantMemberByMerchantIdUiState())
@@ -34,6 +34,7 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
 
     init {
         businessId?.let { loadMembers(it) }
+        observeRefresh()
     }
 
     fun onEvent(event: MerchantMemberByMerchantIdEvent) {
@@ -86,6 +87,21 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
                 }
                 else -> Unit
             }
+        }
+    }
+
+    private fun observeRefresh() {
+        viewModelScope.launch {
+            savedStateHandle
+                .getStateFlow("refresh", false)
+                .collect { shouldRefresh ->
+
+                    if (shouldRefresh) {
+                        businessId?.let { loadMembers(it) }
+
+                        savedStateHandle["refresh"] = false
+                    }
+                }
         }
     }
 }
