@@ -82,7 +82,13 @@ class UserPreference @Inject constructor(@ApplicationContext private val context
 
     suspend fun logout() {
         context.dataStore.edit { preferences ->
-            preferences.clear()
+            preferences.remove(USER_ID_KEY)
+            preferences.remove(USER_URL_KEY)
+            preferences.remove(USERNAME_KEY)
+            preferences.remove(USER_ADDRESS_KEY)
+            preferences.remove(USER_BIO_KEY)
+            preferences.remove(USER_FULL_NAME_KEY)
+            preferences.remove(USER_ROLE)
         }
     }
 }
