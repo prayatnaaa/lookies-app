@@ -30,8 +30,11 @@ fun NavGraphBuilder.refundNavigation(navController: NavController) {
     }
 
     composable(
-        route = "${NavigationRoutes.CREATE_REFUND}/{orderId}",
-        arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+        route = "${NavigationRoutes.CREATE_REFUND}/{orderId}/{totalAmount}",
+        arguments = listOf(
+            navArgument("orderId") { type = NavType.StringType },
+            navArgument("totalAmount") { type = NavType.FloatType}
+        )
     ) { backStackEntry ->
         val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
         CreateRefundRoute(navController = navController, orderId = orderId)

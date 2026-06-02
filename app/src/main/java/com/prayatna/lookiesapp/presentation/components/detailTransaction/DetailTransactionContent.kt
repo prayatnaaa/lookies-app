@@ -28,10 +28,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -354,58 +352,73 @@ fun DetailTransactionContent(
             }
         }
 
-        if (shipment?.status?.lowercase() in listOf("delivered", "completed")) {
-            item {
-                Button(
-                    onClick = { onCompleteOrder?.invoke() },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    enabled = !isCompleting
-                ) {
-                    if (isCompleting) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text("Complete Order", fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-        }
-
-        if (shipment?.status?.lowercase() in listOf("delivered", "completed")) {
-            item {
+        item {
+            if (shipment?.status == "delivered") {
                 OutlinedButton(
-                    onClick = { onRequestRefund?.invoke() },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    onClick = {
+                        onRatePainting?.invoke()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Request Refund", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
-                }
-            }
-            item {
-                OutlinedButton(
-                    onClick = { onViewRefunds?.invoke() },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("View Refund Requests", fontWeight = FontWeight.Bold)
+                    Text("Rate painting")
                 }
             }
         }
 
         item {
-            if (shipment != null && shipment.status == "delivered") {
-                OutlinedButton(
-                    onClick = {
-                        onRatePainting?.invoke()
-                    },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(8.dp)
+            if (shipment?.status?.lowercase() in listOf("delivered", "completed")) {
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 ) {
-                    Text("Rate painting")
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+
+                        Text(
+                            text = "Refund & Support",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Having issues with your order? You can request a refund or review existing requests.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedButton(
+                            onClick = { onRequestRefund?.invoke() },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                "Request Refund",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+
+                        Text(
+                            text = "View refund requests",
+                            modifier = Modifier
+                                .padding(top = 12.dp)
+                                .clickable {
+                                    onViewRefunds?.invoke()
+                                },
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
         }

@@ -75,7 +75,7 @@ fun QrPaymentScreen(
                 navController.navigateToPartnerOrderDetail(orderId)
             } else {
                 navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
-                    popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}") {
+                    popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}") {
                         inclusive = true
                     }
                     launchSingleTop = true

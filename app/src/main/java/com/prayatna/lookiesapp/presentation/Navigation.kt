@@ -135,7 +135,10 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 navArgument("orderId") { type = NavType.StringType },
                 navArgument("merchantId") { type = NavType.StringType },
                 navArgument("amount") { type = NavType.LongType },
-                navArgument("isOfflinePurchase") { type = NavType.BoolType}
+                navArgument("isOfflinePurchase") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
             )
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
@@ -160,7 +163,10 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 navArgument("amount") { type = NavType.LongType },
                 navArgument("bankCode") { type = NavType.StringType },
                 navArgument("customerName") { type = NavType.StringType },
-                navArgument("isOfflinePurchase") { type = NavType.BoolType}
+                navArgument("isOfflinePurchase") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
             )
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId") ?: ""

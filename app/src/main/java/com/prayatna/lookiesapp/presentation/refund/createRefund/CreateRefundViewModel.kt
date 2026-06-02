@@ -25,7 +25,7 @@ import javax.inject.Inject
 class CreateRefundViewModel @Inject constructor(
     private val createRefundRequestUseCase: CreateRefundRequestUseCase,
     private val getPayoutChannelsUseCase: GetPayoutChannelsUseCase,
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 

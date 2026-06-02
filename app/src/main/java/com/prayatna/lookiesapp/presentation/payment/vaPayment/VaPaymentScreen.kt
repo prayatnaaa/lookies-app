@@ -97,7 +97,7 @@ fun VaPaymentScreen(
                 navController.navigateToPartnerOrderDetail(orderId)
             } else {
                 navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
-                    popUpTo("${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}") {
+                    popUpTo("${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}?isOfflinePurchase={isOfflinePurchase}") {
                         inclusive = true
                     }
                     launchSingleTop = true

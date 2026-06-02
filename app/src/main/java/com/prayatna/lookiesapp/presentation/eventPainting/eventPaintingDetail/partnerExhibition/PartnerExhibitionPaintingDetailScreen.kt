@@ -149,15 +149,17 @@ fun PartnerExhibitionPaintingDetailScreen(
                     "rejected" -> {}
 
                     "on_sale" -> {
-                        MarkAsSoldButton(
-                            enable = state.data?.participant?.event?.status == "ongoing",
-                            onClick =  {
-                                navController.navigateToOfflineCheckout(
-                                    itemId = painting.id,
-                                    quantity = 1
-                                )
-                            }
-                        )
+                        if (state.data?.participant?.event?.eventFormat?.slug == "offline") {
+                            MarkAsSoldButton(
+                                enable = state.data?.participant?.event?.status == "ongoing",
+                                onClick = {
+                                    navController.navigateToOfflineCheckout(
+                                        itemId = painting.id,
+                                        quantity = 1
+                                    )
+                                }
+                            )
+                        }
                     }
 
                     "unsold" -> {
