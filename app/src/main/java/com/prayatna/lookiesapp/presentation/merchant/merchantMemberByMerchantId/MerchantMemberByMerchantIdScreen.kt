@@ -85,20 +85,21 @@ fun MerchantMemberByMerchantIdScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(
                             top = 8.dp,
-                            bottom = 24.dp
+                            bottom = 8.dp
                         )
                     ) {
                         itemsIndexed(
                             items = uiState.merchantMembers,
-                            key = { _, item -> item.businessId }
+                            key = { _, item -> item.id }
                         ) { index, member ->
 
                             MerchantMemberItem(
+                                showKycStatus = false,
                                 member = member,
                                 isShowMemberName = true,
                                 showDivider = index != uiState.merchantMembers.lastIndex,
                                 onClick = {
-
+//                                    onEvent(MerchantMemberByMerchantIdEvent.MemberClicked(member.id))
                                 }
                             )
                         }

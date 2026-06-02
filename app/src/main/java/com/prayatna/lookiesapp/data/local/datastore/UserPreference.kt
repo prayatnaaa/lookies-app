@@ -15,7 +15,7 @@ import javax.inject.Singleton
 private val Context.dataStore by preferencesDataStore(name = "user_preference")
 
 @Singleton
-class UserPreference @Inject constructor(@ApplicationContext private val context: Context) {
+class UserPreference @Inject constructor(@param:ApplicationContext private val context: Context) {
 
     companion object {
         private val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")

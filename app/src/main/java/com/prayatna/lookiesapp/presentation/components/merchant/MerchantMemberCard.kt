@@ -78,6 +78,7 @@ fun MerchantMemberItem(
     isShowMemberName: Boolean = false,
     member: MerchantMember,
     showDivider: Boolean = true,
+    showKycStatus: Boolean = true,
     onClick: () -> Unit = {}
 ) {
     Column(
@@ -127,14 +128,16 @@ fun MerchantMemberItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                member.kycStatus?.let {
-                    Text(
-                        text = "KYC: ${
-                            it.replaceFirstChar { char -> char.uppercase() }
-                        }",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                if (showKycStatus) {
+                    member.kycStatus?.let {
+                        Text(
+                            text = "KYC: ${
+                                it.replaceFirstChar { char -> char.uppercase() }
+                            }",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
@@ -143,7 +146,7 @@ fun MerchantMemberItem(
             Spacer(modifier = Modifier.height(16.dp))
 
             HorizontalDivider(
-                color = MaterialTheme.colorScheme.outline
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
             )
         }
     }

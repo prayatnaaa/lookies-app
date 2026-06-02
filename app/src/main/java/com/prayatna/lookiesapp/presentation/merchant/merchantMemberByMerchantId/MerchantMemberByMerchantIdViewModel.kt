@@ -30,6 +30,7 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     private val businessId: String? = savedStateHandle["businessId"]
+    private var accountId: String? = null
 
     init {
         businessId?.let { loadMembers(it) }
@@ -48,7 +49,7 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
 
             MerchantMemberByMerchantIdEvent.InviteMemberClicked -> {
                 viewModelScope.launch {
-                    businessId?.let { id ->
+                    accountId?.let { id ->
                         _effect.send(
                             MerchantMemberByMerchantIdEffect.NavigateInviteMember(
                                 id
@@ -66,6 +67,7 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
             
             when (val result = getMerchantMembersByMerchantIdUseCase(businessId)) {
                 is DataResult.Success -> {
+                    accountId = result.data[0].merchantAccountId
                     _uiState.update { 
                         it.copy(
                             isLoading = false,
