@@ -80,4 +80,19 @@ class ChatRepositoryImpl @Inject constructor(
     override fun listenToForumPresence(forumId: String): Flow<PresenceAction> {
         return supabaseChatService.listenToForumPresence(forumId)
     }
+
+    override suspend fun createForumChannel(
+        forumId: String,
+        name: String,
+        isReadOnlyForMember: Boolean
+    ): DataResult<com.prayatna.lookiesapp.domain.model.message.CreateForumChannelResult> {
+        return try {
+            val result = supabaseChatService.createForumChannel(forumId, name, isReadOnlyForMember)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error creating forum channel")
+        }
+    }
 }

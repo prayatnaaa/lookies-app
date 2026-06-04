@@ -93,7 +93,7 @@ fun ForumListScreen(
                         items(state.forums) { forum ->
                             ForumItem(
                                 forum = forum,
-                                onClick = { onEvent(ForumListEvent.OnForumClick(forum.id)) }
+                                onClick = { onEvent(ForumListEvent.OnForumClick(forum.id, forum.role)) }
                             )
                         }
                     }

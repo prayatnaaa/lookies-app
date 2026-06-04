@@ -476,8 +476,11 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         shipmentDetailNavigation(navController)
         
         composable(
-            route = "${NavigationRoutes.FORUM_CHANNEL_LIST}/{forumId}",
-            arguments = listOf(navArgument("forumId") { type = NavType.StringType })
+            route = "${NavigationRoutes.FORUM_CHANNEL_LIST}/{forumId}/{role}",
+            arguments = listOf(
+                navArgument("forumId") { type = NavType.StringType },
+                navArgument("role") { type = NavType.StringType}
+            )
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("forumId")?.let { forumId ->
                 ForumChannelListRoute(

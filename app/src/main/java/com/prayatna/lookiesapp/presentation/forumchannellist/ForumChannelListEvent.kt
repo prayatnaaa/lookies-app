@@ -4,4 +4,5 @@ sealed interface ForumChannelListEvent {
     data class OnChannelClick(val channelId: String) : ForumChannelListEvent
     data object Refresh : ForumChannelListEvent
     data object ClearError : ForumChannelListEvent
+    data class CreateChannel(val name: String, val isReadOnly: Boolean) : ForumChannelListEvent
 }

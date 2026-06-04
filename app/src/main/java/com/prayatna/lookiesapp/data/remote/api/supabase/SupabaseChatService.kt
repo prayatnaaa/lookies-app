@@ -6,7 +6,9 @@ import com.prayatna.lookiesapp.data.remote.dto.ForumChannelViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumMessageDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumsViewDto
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumChannelRequestDto
 import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumMessageRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.chat.CreateForumChannelResponseDto
 import com.prayatna.lookiesapp.domain.model.message.PresenceData
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -37,6 +39,17 @@ class SupabaseChatService @Inject constructor(
         return postgrest.from("forum_messages").insert(finalRequest) {
             select()
         }.decodeSingle<ForumMessageDto>()
+    }
+
+    suspend fun createForumChannel(forumId: String, name: String, isReadOnlyForMember: Boolean = false): CreateForumChannelResponseDto {
+        val request = CreateForumChannelRequestDto(
+            forumId = forumId,
+            name = name,
+            isReadOnlyForMember = isReadOnlyForMember
+        )
+        return postgrest.from("forum_channels").insert(request) {
+            select()
+        }.decodeSingle<CreateForumChannelResponseDto>()
     }
 
     @Suppress("DEPRECATION")
