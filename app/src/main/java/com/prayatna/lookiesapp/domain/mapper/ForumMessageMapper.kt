@@ -8,5 +8,7 @@ fun ForumMessageDto.toDomain() = ForumMessage (
     channelId = channelId,
     senderId = senderId,
     content = content,
-    createdAt = createdAt
+    createdAt = createdAt,
+    isPinned = isPinned,
+    editedAt = editedAt
 )

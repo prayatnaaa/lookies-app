@@ -19,4 +19,7 @@ interface ChatRepository {
     suspend fun getForumMembers(forumId: String): DataResult<List<ForumMember>>
     fun listenToForumPresence(forumId: String): Flow<PresenceAction>
     suspend fun createForumChannel(forumId: String, name: String, isReadOnlyForMember: Boolean = false): DataResult<CreateForumChannelResult>
+    suspend fun updateForumMessage(messageId: String, content: String): DataResult<ForumMessage>
+    suspend fun deleteForumMessage(messageId: String): DataResult<Unit>
+    suspend fun pinForumMessage(messageId: String, isPinned: Boolean): DataResult<ForumMessage>
 }

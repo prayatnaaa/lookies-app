@@ -41,6 +41,41 @@ class SupabaseChatService @Inject constructor(
         }.decodeSingle<ForumMessageDto>()
     }
 
+    suspend fun updateForumMessage(messageId: String, content: String): ForumMessageDto {
+        return postgrest.from("forum_messages").update(
+            {
+                set("content", content)
+                set("edited_at", "now()")
+            }
+        ) {
+            filter {
+                eq("id", messageId)
+            }
+            select()
+        }.decodeSingle<ForumMessageDto>()
+    }
+
+    suspend fun deleteForumMessage(messageId: String) {
+        postgrest.from("forum_messages").delete {
+            filter {
+                eq("id", messageId)
+            }
+        }
+    }
+
+    suspend fun pinForumMessage(messageId: String, isPinned: Boolean): ForumMessageDto {
+        return postgrest.from("forum_messages").update(
+            {
+                set("is_pinned", isPinned)
+            }
+        ) {
+            filter {
+                eq("id", messageId)
+            }
+            select()
+        }.decodeSingle<ForumMessageDto>()
+    }
+
     suspend fun createForumChannel(forumId: String, name: String, isReadOnlyForMember: Boolean = false): CreateForumChannelResponseDto {
         val request = CreateForumChannelRequestDto(
             forumId = forumId,

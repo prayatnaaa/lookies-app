@@ -95,4 +95,43 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Error(e.message ?: "Error creating forum channel")
         }
     }
+
+    override suspend fun updateForumMessage(
+        messageId: String,
+        content: String
+    ): DataResult<ForumMessage> {
+        return try {
+            val result = supabaseChatService.updateForumMessage(messageId, content)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error updating forum message")
+        }
+    }
+
+    override suspend fun deleteForumMessage(messageId: String): DataResult<Unit> {
+        return try {
+            supabaseChatService.deleteForumMessage(messageId)
+            DataResult.Success(Unit)
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error deleting forum message")
+        }
+    }
+
+    override suspend fun pinForumMessage(
+        messageId: String,
+        isPinned: Boolean
+    ): DataResult<ForumMessage> {
+        return try {
+            val result = supabaseChatService.pinForumMessage(messageId, isPinned)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error pinning forum message")
+        }
+    }
 }
