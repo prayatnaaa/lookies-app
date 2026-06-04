@@ -1,11 +1,14 @@
 package com.prayatna.lookiesapp.presentation.forum
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,9 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView
@@ -29,6 +34,7 @@ import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.forum.state.ForumEvent
 import com.prayatna.lookiesapp.presentation.forum.state.ForumUiState
 import com.prayatna.lookiesapp.utils.formatChatTime
+import kotlinx.coroutines.launch
 
 @Composable
 fun ForumScreen(
@@ -37,6 +43,12 @@ fun ForumScreen(
     onBackClick: () -> Unit
 ) {
     val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    
+    // Find all pinned messages, newest first
+    val pinnedMessages = remember(state.messages) {
+        state.messages.filter { it.isPinned }.sortedByDescending { it.createdAt }
+    }
 
     LaunchedEffect(state.messages.size) {
         if (state.messages.isNotEmpty()) {
@@ -58,6 +70,25 @@ fun ForumScreen(
                 .padding(paddingValues)
                 .imePadding()
         ) {
+            // ── Multi-Pinned Message Header (Carousel) ──────────────────────
+            AnimatedVisibility(
+                visible = pinnedMessages.isNotEmpty(),
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                MultiPinnedMessageHeader(
+                    messages = pinnedMessages,
+                    onClick = { msg ->
+                        val index = state.messages.indexOfFirst { it.id == msg.id }
+                        if (index != -1) {
+                            coroutineScope.launch {
+                                listState.animateScrollToItem(index)
+                            }
+                        }
+                    }
+                )
+            }
+
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -97,6 +128,82 @@ fun ForumScreen(
                 isEditing = state.editingMessage != null,
                 onCancelEdit = { onEvent(ForumEvent.CancelEditing) }
             )
+        }
+    }
+}
+
+@Composable
+private fun MultiPinnedMessageHeader(
+    messages: List<ForumChannelMessagesView>,
+    onClick: (ForumChannelMessagesView) -> Unit
+) {
+    val pagerState = rememberPagerState(pageCount = { messages.size })
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 2.dp,
+        shadowElevation = 1.dp
+    ) {
+        Column {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxWidth()
+            ) { page ->
+                val message = messages[page]
+                Row(
+                    modifier = Modifier
+                        .clickable { onClick(message) }
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PushPin,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.width(12.dp))
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (messages.size > 1) "Pinned Message (${page + 1}/${messages.size})" else "Pinned Message",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = message.content,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.outlineVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            
+            // Minimal pagination indicator
+            if (messages.size > 1) {
+                LinearProgressIndicator(
+                    progress = { (pagerState.currentPage + 1).toFloat() / messages.size },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                    strokeCap = StrokeCap.Butt
+                )
+            }
         }
     }
 }
@@ -153,7 +260,7 @@ fun DiscordStyleMessageItem(
                                     text = message.fullName.ifEmpty { "Unknown User" },
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.sp,
-                                    color = if (isMine) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.weight(1f)
                                 )
                             } else {
