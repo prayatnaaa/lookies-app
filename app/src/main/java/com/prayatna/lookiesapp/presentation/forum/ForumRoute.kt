@@ -21,12 +21,7 @@ fun ForumRoute(
 
     ForumScreen(
         state = state,
-        onInputChanged = {
-            viewModel.onEvent(ForumEvent.InputChanged(it))
-        },
-        onSendMessage = {
-            viewModel.onEvent(ForumEvent.SendMessage)
-        },
+        onEvent = viewModel::onEvent,
         onBackClick = onBackClick
     )
 }

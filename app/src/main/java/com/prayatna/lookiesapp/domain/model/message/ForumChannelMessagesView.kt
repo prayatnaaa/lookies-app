@@ -9,5 +9,7 @@ data class ForumChannelMessagesView(
     val email: String,
     val createdAt: String,
     val fullName: String,
-    val profilePictureUrl: String? = null
+    val profilePictureUrl: String? = null,
+    val isPinned: Boolean = false,
+    val editedAt: String? = null
 )

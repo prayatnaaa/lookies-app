@@ -97,7 +97,7 @@ class SupabaseChatService @Inject constructor(
             filter = "channel_id=eq.$channelId"
         }
 
-        channel.subscribe()
+        channel.subscribe(blockUntilSubscribed = true)
 
         trySend(getForumChannelMessages(channelId))
 
