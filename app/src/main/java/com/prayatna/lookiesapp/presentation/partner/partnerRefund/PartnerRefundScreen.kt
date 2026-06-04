@@ -42,9 +42,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.domain.model.transaction.Refund
+import com.prayatna.lookiesapp.domain.model.transaction.DetailRefund
 import com.prayatna.lookiesapp.presentation.partner.partnerRefund.state.PartnerRefundEvent
 import com.prayatna.lookiesapp.presentation.partner.partnerRefund.state.PartnerRefundUiState
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,18 +54,7 @@ fun PartnerRefundScreen(
     onEvent: (PartnerRefundEvent) -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
-    val refund = state.updatedData ?: state.data
-
-//    val statusOptions = listOf(
-//        "pending",
-//        "waiting_for_return",
-//        "returning",
-//        "return_received",
-//        "rejected",
-//        "completed"
-//    )
-//
-//    var expanded by remember { mutableStateOf(false) }
+    val refund = state.data
 
     Scaffold(
         snackbarHost = {
@@ -117,121 +107,19 @@ fun PartnerRefundScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                refund?.let { refund ->
+                refund?.let { r ->
 
-                    HeaderSection(refund)
+                    HeaderSection(r)
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if (!refund.proofImageUrl.isNullOrBlank()) {
-                        ProofImageSection(refund.proofImageUrl)
+                    if (!r.proofImageUrl.isNullOrBlank()) {
+                        ProofImageSection(r.proofImageUrl)
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-//                    Card(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        colors = CardDefaults.cardColors(
-//                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-//                        )
-//                    ) {
-//                        Column(
-//                            modifier = Modifier.padding(16.dp)
-//                        ) {
-//
-//                            Text(
-//                                text = "Update Refund",
-//                                style = MaterialTheme.typography.titleMedium,
-//                                fontWeight = FontWeight.Bold
-//                            )
-//
-//                            Spacer(modifier = Modifier.height(16.dp))
-//
-//                            ExposedDropdownMenuBox(
-//                                expanded = expanded,
-//                                onExpandedChange = {
-//                                    expanded = !expanded
-//                                }
-//                            ) {
-//
-//                                OutlinedTextField(
-//                                    value = state.status,
-//                                    onValueChange = {},
-//                                    readOnly = true,
-//                                    label = { Text("Status") },
-//                                    trailingIcon = {
-//                                        ExposedDropdownMenuDefaults.TrailingIcon(
-//                                            expanded = expanded
-//                                        )
-//                                    },
-//                                    modifier = Modifier
-//                                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-//                                        .fillMaxWidth()
-//                                )
-//
-//                                ExposedDropdownMenu(
-//                                    expanded = expanded,
-//                                    onDismissRequest = {
-//                                        expanded = false
-//                                    }
-//                                ) {
-//                                    statusOptions.forEach { item ->
-//                                        DropdownMenuItem(
-//                                            text = { Text(item) },
-//                                            onClick = {
-//                                                onEvent(
-//                                                    PartnerRefundEvent.StatusChanged(item)
-//                                                )
-//                                                expanded = false
-//                                            }
-//                                        )
-//                                    }
-//                                }
-//                            }
-//
-//                            Spacer(modifier = Modifier.height(12.dp))
-//
-//                            OutlinedTextField(
-//                                value = state.notes.orEmpty(),
-//                                onValueChange = {
-//                                    onEvent(
-//                                        PartnerRefundEvent.NotesChanged(it)
-//                                    )
-//                                },
-//                                modifier = Modifier.fillMaxWidth(),
-//                                minLines = 4,
-//                                label = { Text("Notes") }
-//                            )
-//
-//                            Spacer(modifier = Modifier.height(16.dp))
-//
-//                            Button(
-//                                onClick = {
-//                                    onEvent(
-//                                        PartnerRefundEvent.UpdateClicked
-//                                    )
-//                                },
-//                                modifier = Modifier.fillMaxWidth(),
-//                                enabled = !state.isLoading
-//                            ) {
-//                                Text("Save Changes")
-//                            }
-//                            Button(
-//                                onClick = {
-//                                    onEvent(
-//                                        PartnerRefundEvent.ProcessClicked
-//                                    )
-//                                },
-//                                modifier = Modifier.fillMaxWidth(),
-//                                enabled = !state.isLoading
-//                            ) {
-//                                Text("Accept and Process")
-//                            }
-//                        }
-//                    }
-
-
                     ActionSection(
-                        refund = refund,
+                        refund = r,
                         notes = state.notes,
                         isLoading = state.isLoading,
                         onNotesChanged = { onEvent(PartnerRefundEvent.NotesChanged(it)) },
@@ -246,11 +134,9 @@ fun PartnerRefundScreen(
                         }
                     )
 
-// ... kode DetailCard ...
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    DetailCard(refund)
+                    DetailCard(r)
                 }
 
                 state.error?.let {
@@ -267,7 +153,7 @@ fun PartnerRefundScreen(
 
 @Composable
 private fun HeaderSection(
-    refund: Refund
+    refund: DetailRefund
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -287,7 +173,7 @@ private fun HeaderSection(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "Amount: ${refund.amount}",
+                text = "Amount: ${formatRupiah(refund.amount)}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -331,7 +217,7 @@ private fun ProofImageSection(
 
 @Composable
 private fun DetailCard(
-    refund: Refund
+    refund: DetailRefund
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -355,8 +241,8 @@ private fun DetailCard(
             InfoRow("Account Name", refund.accountHolderName)
             InfoRow("Reason", refund.reason)
             InfoRow("Admin Notes", refund.adminNotes ?: "-")
-            InfoRow("Created", refund.createdAt)
-            InfoRow("Updated", refund.updatedAt)
+            InfoRow("Created", refund.createdAt ?: "-")
+            InfoRow("Updated", refund.updatedAt ?: "-")
         }
     }
 }
@@ -393,7 +279,7 @@ private fun InfoRow(
 
 @Composable
 private fun ActionSection(
-    refund: Refund,
+    refund: DetailRefund,
     notes: String?,
     isLoading: Boolean,
     onNotesChanged: (String) -> Unit,

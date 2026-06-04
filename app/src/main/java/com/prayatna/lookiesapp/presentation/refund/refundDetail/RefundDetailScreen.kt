@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -44,7 +45,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.prayatna.lookiesapp.domain.model.transaction.Refund
+import com.prayatna.lookiesapp.domain.model.transaction.DetailRefund
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.refund.refundDetail.state.RefundDetailEvent
@@ -101,7 +102,7 @@ fun RefundDetailScreen(
 
 @Composable
 private fun RefundContent(
-    refund: Refund,
+    refund: DetailRefund,
     trackingNumber: String,
     isSubmitting: Boolean,
     onEvent: (RefundDetailEvent) -> Unit
@@ -124,10 +125,35 @@ private fun RefundContent(
             title = "Refund Information",
             icon = Icons.Default.Receipt
         ) {
-            InfoRow(label = "Amount", value = formatRupiah(refund.amount.toDouble()))
+            InfoRow(label = "Amount", value = formatRupiah(refund.amount))
             InfoRow(label = "Reason", value = refund.reason)
             InfoRow(label = "Bank", value = "${refund.bankCode} - ${refund.accountNumber}")
             InfoRow(label = "Account Holder", value = refund.accountHolderName)
+        }
+
+        // Address Card
+        if (!refund.streetLine1.isNullOrBlank()) {
+            InfoCard(
+                title = "Return Address",
+                icon = Icons.Default.LocationOn
+            ) {
+                Text(
+                    text = listOfNotNull(refund.streetLine1, refund.streetLine2).joinToString(", "),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = listOfNotNull(refund.city, refund.provinceState, refund.postalCode).joinToString(", "),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                refund.country?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
         }
 
         // Proof Section
@@ -208,7 +234,7 @@ private fun StatusCard(status: String) {
 
 @Composable
 private fun TrackingSection(
-    refund: Refund,
+    refund: DetailRefund,
     trackingNumber: String,
     isSubmitting: Boolean,
     onEvent: (RefundDetailEvent) -> Unit

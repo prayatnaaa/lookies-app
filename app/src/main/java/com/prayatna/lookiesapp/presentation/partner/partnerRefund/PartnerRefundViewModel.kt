@@ -67,8 +67,9 @@ class PartnerRefundViewModel @Inject constructor(
                     _effect.emit(PartnerRefundEffect.ShowToast(result.error))
                 }
                 is DataResult.Success -> {
-                    _state.update { it.copy(isLoading = false, processRefundData = result.data) }
+                    _state.update { it.copy(isLoading = false) }
                     _effect.emit(PartnerRefundEffect.ShowToast("Refund processed successfully!"))
+                    getRefund(refundId)
                 }
                 else -> Unit
             }
@@ -88,8 +89,9 @@ class PartnerRefundViewModel @Inject constructor(
                     _effect.emit(PartnerRefundEffect.ShowToast(result.error))
                 }
                 is DataResult.Success -> {
-                    _state.update { it.copy(isLoading = false, updatedData = result.data) }
+                    _state.update { it.copy(isLoading = false) }
                     _effect.emit(PartnerRefundEffect.ShowToast("Refund updated successfully!"))
+                    getRefund(refundId)
                 }
                 else -> Unit
             }

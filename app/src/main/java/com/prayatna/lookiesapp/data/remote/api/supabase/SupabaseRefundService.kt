@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
+import com.prayatna.lookiesapp.data.remote.dto.DetailRefundDto
 import com.prayatna.lookiesapp.data.remote.dto.RefundDto
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateRefundRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.SetRefundAsCompleteRequest
@@ -98,12 +99,12 @@ class SupabaseRefundService @Inject constructor(
         }.decodeList<RefundDto>()
     }
 
-    suspend fun getRefundById(id: String): RefundDto {
-        return postgrest.from("refund_requests").select {
+    suspend fun getRefundById(id: String): DetailRefundDto {
+        return postgrest.from("detail_refund_view").select {
             filter {
                 eq("id", id)
             }
-        }.decodeSingle<RefundDto>()
+        }.decodeSingle<DetailRefundDto>()
     }
 
     suspend fun setRefundAsComplete(refundRequestId: String): SetRefundAsCompleteResponse {
