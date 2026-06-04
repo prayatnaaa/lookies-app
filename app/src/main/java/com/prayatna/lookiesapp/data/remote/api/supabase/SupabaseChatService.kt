@@ -20,9 +20,11 @@ import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.presenceChangeFlow
 import io.github.jan.supabase.realtime.track
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 class SupabaseChatService @Inject constructor(
@@ -161,29 +163,48 @@ class SupabaseChatService @Inject constructor(
     }
 
     fun listenToForumPresence(forumId: String): Flow<PresenceAction> = callbackFlow {
-        val channel = realtime.channel("forum_presence_$forumId")
+        val channelId = "forum_presence_$forumId"
+        val channel = realtime.channel(channelId)
         val userId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
 
-        // 1. Setup flow first
+        Log.d("PRESENCE", "Connecting to channel: $channelId for user: $userId")
+
         val presenceFlow = channel.presenceChangeFlow()
+        
         val job = launch {
             presenceFlow.collect {
+                Log.d("PRESENCE", "Event in $channelId: $it")
                 trySend(it)
             }
         }
 
-        // 2. Subscribe and wait then track
         launch {
-            channel.subscribe(blockUntilSubscribed = true)
-            channel.track(PresenceData(userId = userId))
+            try {
+                // Ensure fresh state by unsubscribing first if somehow still active
+                runCatching { channel.unsubscribe() }
+                
+                channel.subscribe(blockUntilSubscribed = true)
+                // Small delay to ensure join is fully processed
+                // Small delay to ensure join is fully processed
+                delay(500)
+                Log.d("PRESENCE", "Subscribed to $channelId, now tracking user")
+                channel.track(PresenceData(userId = userId, onlineAt = Clock.System.now().toEpochMilliseconds()))
+            } catch (e: Exception) {
+                Log.e("PRESENCE", "Error subscribing to $channelId", e)
+            }
         }
 
         awaitClose {
+            Log.d("PRESENCE", "Closing presence flow for $channelId")
             job.cancel()
             launch {
-                channel.untrack()
-                channel.unsubscribe()
-                realtime.removeChannel(channel)
+                try {
+                    channel.untrack()
+                    channel.unsubscribe()
+                    realtime.removeChannel(channel)
+                } catch (e: Exception) {
+                    Log.e("PRESENCE", "Error during channel cleanup for $channelId", e)
+                }
             }
         }
     }

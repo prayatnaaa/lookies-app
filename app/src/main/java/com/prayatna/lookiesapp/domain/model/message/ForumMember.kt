@@ -6,5 +6,6 @@ data class ForumMember(
     val role: String,
     val fullName: String?,
     val profilePictureUrl: String?,
-    val isOnline: Boolean = false
+    val isOnline: Boolean = false,
+    val onlineAt: Long?
 )
