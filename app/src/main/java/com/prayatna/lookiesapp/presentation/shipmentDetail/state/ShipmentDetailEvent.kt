@@ -9,6 +9,7 @@ sealed class ShipmentDetailEvent {
     data object SubmitTrackingNumberUpdate : ShipmentDetailEvent()
     data class OnArrivalProofSelected(val image: Uri) : ShipmentDetailEvent()
     data object SubmitArrivalProof : ShipmentDetailEvent()
+    data object SubmitAllUpdates : ShipmentDetailEvent()
     data object OnErrorConfirmed : ShipmentDetailEvent()
     data object OnSuccessConfirmed : ShipmentDetailEvent()
     data object OnBackClick : ShipmentDetailEvent()

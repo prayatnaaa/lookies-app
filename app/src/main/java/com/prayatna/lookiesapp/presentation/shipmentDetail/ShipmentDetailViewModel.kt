@@ -110,6 +110,9 @@ class ShipmentDetailViewModel @Inject constructor(
             ShipmentDetailEvent.SubmitArrivalProof -> {
                 uploadArrivalProof()
             }
+            ShipmentDetailEvent.SubmitAllUpdates -> {
+                submitAllUpdates()
+            }
             ShipmentDetailEvent.OnErrorConfirmed -> {
                 _uiState.update { it.copy(errorMessage = null) }
             }
@@ -200,6 +203,67 @@ class ShipmentDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(isUploadingProof = false, errorMessage = result.error) }
                 }
                 else -> Unit
+            }
+        }
+    }
+
+    private fun submitAllUpdates() {
+        val state = _uiState.value
+        val shipmentId = state.shipment?.id ?: return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isUpdating = true, errorMessage = null) }
+
+            // 1. Update Status if changed
+            if (state.selectedStatus != state.shipment.status) {
+                when (val result = updateShipmentStatusUseCase(shipmentId, state.selectedStatus)) {
+                    is DataResult.Error -> {
+                        _uiState.update { it.copy(isUpdating = false, errorMessage = result.error) }
+                        return@launch
+                    }
+                    is DataResult.Success -> {
+                         _uiState.update { it.copy(shipment = result.data) }
+                    }
+                    else -> {}
+                }
+            }
+
+            // 2. Update Tracking Number if changed
+            if (state.trackingNumberInput != state.shipment.trackingNumber && !state.trackingNumberInput.isNullOrBlank()) {
+                when (val result = createTrackingNumberShipmentUseCase(shipmentId, state.trackingNumberInput)) {
+                    is DataResult.Error -> {
+                        _uiState.update { it.copy(isUpdating = false, errorMessage = result.error) }
+                        return@launch
+                    }
+                    is DataResult.Success -> {
+                        _uiState.update { it.copy(shipment = result.data) }
+                    }
+                    else -> {}
+                }
+            }
+
+            // 3. Upload Arrival Proof if selected
+            if (state.selectedArrivalProof != null) {
+                _uiState.update { it.copy(isUploadingProof = true) }
+                when (val result = uploadShipmentArrivalProofUseCase(shipmentId, state.selectedArrivalProof)) {
+                    is DataResult.Error -> {
+                        _uiState.update { it.copy(isUpdating = false, isUploadingProof = false, errorMessage = result.error) }
+                        return@launch
+                    }
+                    is DataResult.Success -> {
+                        _uiState.update { it.copy(isUploadingProof = false, shipment = it.shipment?.copy(arrivalProofUrl = result.data)) }
+                    }
+                    else -> {}
+                }
+            }
+
+            _uiState.update { 
+                it.copy(
+                    isUpdating = false, 
+                    isUploadingProof = false,
+                    updateSuccessMessage = "Shipment updated successfully",
+                    selectedArrivalProof = null
+                )
             }
         }
     }
