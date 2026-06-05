@@ -5,9 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateMessageRequest(
-    @SerialName("sender_id")
-    val senderId: String = "",
-    @SerialName("receiver_id")
-    val receiverId: String,
+    @SerialName("conversation_id")
+    val conversationId: String,
+    @SerialName("sender_type")
+    val senderType: String,
+    @SerialName("sender_user_id")
+    val senderUserId: String = "",
+    @SerialName("content")
     val content: String
 )

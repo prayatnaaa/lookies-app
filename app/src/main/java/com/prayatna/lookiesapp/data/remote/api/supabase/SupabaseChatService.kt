@@ -1,7 +1,8 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
-import com.prayatna.lookiesapp.data.remote.dto.ConversationDto
+import com.prayatna.lookiesapp.data.remote.dto.ChatMessageViewDto
+import com.prayatna.lookiesapp.data.remote.dto.ConversationViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelMessagesViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumMemberDto
@@ -10,6 +11,7 @@ import com.prayatna.lookiesapp.data.remote.dto.ForumsViewDto
 import com.prayatna.lookiesapp.data.remote.dto.MessageDto
 import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumChannelRequestDto
 import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumMessageRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.chat.CreateForumChannelResponseDto
 import com.prayatna.lookiesapp.domain.model.message.PresenceData
 import io.github.jan.supabase.gotrue.Auth
@@ -36,30 +38,35 @@ class SupabaseChatService @Inject constructor(
     private val realtime: Realtime
 ) {
 
-    suspend fun getConversations(userId: String): List<ConversationDto> {
-        return postgrest["conversations"]
+    suspend fun getConversations(): List<ConversationViewDto> {
+        val userId = auth.currentSessionOrNull()?.user?.id ?: throw IllegalStateException("User not logged in")
+        return postgrest["conversation_view"]
             .select {
                 filter { eq("user_id", userId) }
                 order("updated_at", Order.DESCENDING)
             }.decodeList()
     }
 
-    private suspend fun getMessageHistory(conversationId: String): List<MessageDto> {
-        return postgrest["messages"]
+    private suspend fun getMessageHistory(conversationId: String): List<ChatMessageViewDto> {
+        return postgrest["chat_message_view"]
             .select {
                 filter { eq("conversation_id", conversationId) }
                 order("sent_at", Order.ASCENDING)
             }.decodeList()
     }
 
-    suspend fun sendMessage(message: MessageDto): MessageDto {
-        return postgrest["messages"].insert(message) {
+    suspend fun sendMessage(request: CreateMessageRequest): MessageDto {
+        val userId = auth.currentSessionOrNull()?.user?.id ?:
+        throw IllegalStateException("User not logged in")
+
+        val finalRequest = request.copy(senderUserId = userId)
+        return postgrest["messages"].insert(finalRequest) {
             select()
         }.decodeSingle()
     }
 
     @Suppress("DEPRECATION")
-    fun listenToMessages(conversationId: String): Flow<List<MessageDto>> = callbackFlow {
+    fun listenToMessages(conversationId: String): Flow<List<ChatMessageViewDto>> = callbackFlow {
 
         val channel = realtime.channel("messages$conversationId")
 

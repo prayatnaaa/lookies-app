@@ -16,10 +16,14 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.chat.conversationList.navigateToConversationList
 import com.prayatna.lookiesapp.presentation.components.EmptyState
 import com.prayatna.lookiesapp.presentation.components.SearchBar
 import com.prayatna.lookiesapp.presentation.components.home.FeaturedEventBanner
@@ -65,6 +70,9 @@ fun HomeScreen(
                     val user = state.user
                     user?.let { data ->
                         HomeTopBar(
+                            onChatClick = {
+                                navController.navigateToConversationList()
+                            },
                             userName = data.username!!,
                         )
                     }
@@ -193,6 +201,8 @@ fun HomeScreen(
 @Composable
 fun HomeTopBar(
     userName: String,
+    onNotifClick: () -> Unit = {},
+    onChatClick: () -> Unit = {}
 ) {
     TopAppBar(
         title = {
@@ -209,14 +219,14 @@ fun HomeTopBar(
                 )
             }
         },
-//        actions = {
-//            IconButton(onClick = onNotifClick) {
-//                Icon(Icons.Default.Notifications, contentDescription = "Notification")
-//            }
-//            IconButton(onClick = onCartClick) {
-//                Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
-//            }
-//        },
+        actions = {
+            IconButton(onClick = onNotifClick) {
+                Icon(Icons.Default.Notifications, contentDescription = "Notification")
+            }
+            IconButton(onClick = onChatClick) {
+                Icon(Icons.AutoMirrored.Filled.Message, contentDescription = "Cart")
+            }
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
             scrolledContainerColor = MaterialTheme.colorScheme.surface

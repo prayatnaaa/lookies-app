@@ -12,13 +12,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.prayatna.lookiesapp.presentation.admin.detailEvent.adminDetailEventNavigation
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
-import com.prayatna.lookiesapp.presentation.admin.detailEvent.adminDetailEventNavigation
 import com.prayatna.lookiesapp.presentation.admin.transactionDetail.adminTransactionDetailNavigation
 import com.prayatna.lookiesapp.presentation.admin.transactionList.adminTransactionListNavigation
 import com.prayatna.lookiesapp.presentation.admin.withdrawal.state.adminWithdrawalNavigation
 import com.prayatna.lookiesapp.presentation.artistDashboard.ArtistDashboardScreen
+import com.prayatna.lookiesapp.presentation.chat.conversationList.conversationListNavigation
+import com.prayatna.lookiesapp.presentation.chat.privateChat.privateChatNavigation
 import com.prayatna.lookiesapp.presentation.checkout.state.checkoutNavigation
 import com.prayatna.lookiesapp.presentation.createPaintingReview.createPaintingReviewNavigation
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
@@ -29,9 +31,9 @@ import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.pa
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.eventPaintingGalleryNavigation
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListRoute
 import com.prayatna.lookiesapp.presentation.exhibitionHistory.ExhibitionHistoryScreen
-import com.prayatna.lookiesapp.presentation.forum.members.forumMembersNavigation
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.exhibitionShipmentNavigation
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
+import com.prayatna.lookiesapp.presentation.forum.members.forumMembersNavigation
 import com.prayatna.lookiesapp.presentation.forum.members.navigateToForumMembers
 import com.prayatna.lookiesapp.presentation.forumchannellist.ForumChannelListRoute
 import com.prayatna.lookiesapp.presentation.forumlist.ForumListRoute
@@ -42,10 +44,11 @@ import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
-import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.createWithdrawalRequestNavigation
 import com.prayatna.lookiesapp.presentation.merchant.acceptPartnerInvitation.acceptPartnerInvitationNavigation
+import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.createWithdrawalRequestNavigation
 import com.prayatna.lookiesapp.presentation.merchant.inviteMerchantMember.inviteMerchantMemberNavigation
 import com.prayatna.lookiesapp.presentation.merchant.merchantMember.MerchantMemberListScreen
+import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.merchantMemberByMerchantIdNavigation
 import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.merchantWithdrawalRequestListNavigation
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.monthlyFinanceListScreen
 import com.prayatna.lookiesapp.presentation.offlineCheckout.offlineCheckoutNavigation
@@ -56,13 +59,11 @@ import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.Par
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
 import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScreen
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
-import com.prayatna.lookiesapp.presentation.publicMerchantProfile.publicMerchantProfileNavigation
-import com.prayatna.lookiesapp.presentation.partner.eventTransactions.eventTransactionListNavigation
-import com.prayatna.lookiesapp.presentation.partner.orderDetail.partnerOrderDetailNavigation
 import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
+import com.prayatna.lookiesapp.presentation.partner.eventTransactions.eventTransactionListNavigation
 import com.prayatna.lookiesapp.presentation.partner.main.home.partnerHomeScreenNavigation
 import com.prayatna.lookiesapp.presentation.partner.manageEvent.PartnerManageEventScreen
-import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.merchantMemberByMerchantIdNavigation
+import com.prayatna.lookiesapp.presentation.partner.orderDetail.partnerOrderDetailNavigation
 import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerRefund.partnerRefundNavigation
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
@@ -70,19 +71,20 @@ import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListS
 import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
 import com.prayatna.lookiesapp.presentation.payment.selectPayoutChannel.selectPayoutChannelNavigation
 import com.prayatna.lookiesapp.presentation.payment.vaPayment.VaPaymentScreen
+import com.prayatna.lookiesapp.presentation.publicMerchantProfile.publicMerchantProfileNavigation
 import com.prayatna.lookiesapp.presentation.refund.refundNavigation
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
-import com.prayatna.lookiesapp.presentation.scanner.ScannerScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
+import com.prayatna.lookiesapp.presentation.scanner.ScannerScreen
 import com.prayatna.lookiesapp.presentation.shipment.shipmentListNavigation
 import com.prayatna.lookiesapp.presentation.shipmentDetail.shipmentDetailNavigation
 import com.prayatna.lookiesapp.presentation.transaction.detailTransaction.DetailTransactionScreen
 import com.prayatna.lookiesapp.presentation.transaction.payment.PaymentScreen
+import com.prayatna.lookiesapp.presentation.unsoldArtworkReturn.unsoldArtworkReturnNavigation
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.artistSubmissionNavigation
 import com.prayatna.lookiesapp.presentation.user.createUserAddress.createUserAddressNavigation
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.PartnerSubmissionScreen
-import com.prayatna.lookiesapp.presentation.unsoldArtworkReturn.unsoldArtworkReturnNavigation
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -469,6 +471,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
         createUserAddressNavigation(navController = navController)
         
+        conversationListNavigation(navController)
+        privateChatNavigation(navController)
+
         composable(NavigationRoutes.FORUM_LIST) {
             ForumListRoute(navController)
         }

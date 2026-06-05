@@ -1,11 +1,15 @@
 package com.prayatna.lookiesapp.domain.model.message
 
+import kotlinx.datetime.Instant
+
 data class Message(
-    val id: String?,
+    val messageId: String,
     val conversationId: String,
     val senderType: String,
-    val senderUserId: String,
+    val senderUserId: String?,
     val content: String,
-    val sentAt: String?,
-    val isRead: Boolean
+    val sentAt: Instant,
+    val isRead: Boolean,
+    val senderName: String?,
+    val senderAvatarUrl: String?
 )

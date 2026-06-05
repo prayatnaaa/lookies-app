@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.domain.repository
 import com.prayatna.lookiesapp.domain.model.message.Conversation
 import com.prayatna.lookiesapp.domain.model.message.CreateForumChannelResult
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
+import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelView
 import com.prayatna.lookiesapp.domain.model.message.ForumMember
@@ -15,8 +16,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
     fun listenToMessages(conversationId: String): Flow<List<Message>>
-    suspend fun sendMessage(message: Message): DataResult<Message>
-    suspend fun getConversations(userId: String): DataResult<List<Conversation>>
+    suspend fun sendMessage(data: CreateMessageInput): DataResult<Message>
+    suspend fun getConversations(): DataResult<List<Conversation>>
 
     fun listenToForumMessages(channelId: String): Flow<List<ForumChannelMessagesView>>
     suspend fun insertForumsMessage(data: CreateForumMessageInput): DataResult<ForumMessage>

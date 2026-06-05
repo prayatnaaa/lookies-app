@@ -2,10 +2,12 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseChatService
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.message.Conversation
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
+import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView
 import com.prayatna.lookiesapp.domain.model.message.ForumMember
 import com.prayatna.lookiesapp.domain.model.message.ForumMessage
@@ -29,9 +31,14 @@ class ChatRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun sendMessage(message: Message): DataResult<Message> {
+    override suspend fun sendMessage(data: CreateMessageInput): DataResult<Message> {
         return try {
-            val result = supabaseChatService.sendMessage(message.toDto())
+            val request = CreateMessageRequest(
+                conversationId = data.conversationId,
+                senderType = data.senderType,
+                content = data.content
+            )
+            val result = supabaseChatService.sendMessage(request)
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
@@ -40,9 +47,9 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getConversations(userId: String): DataResult<List<Conversation>> {
+    override suspend fun getConversations(): DataResult<List<Conversation>> {
         return try {
-            val result = supabaseChatService.getConversations(userId)
+            val result = supabaseChatService.getConversations()
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)

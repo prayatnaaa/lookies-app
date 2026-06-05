@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetConversationsUseCase @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
-    suspend operator fun invoke(userId: String): DataResult<List<Conversation>> {
-        return chatRepository.getConversations(userId)
+    suspend operator fun invoke(): DataResult<List<Conversation>> {
+        return chatRepository.getConversations()
     }
 }

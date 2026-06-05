@@ -85,6 +85,8 @@ object NavigationRoutes {
     const val PARTNER_ORDER_DETAIL = "partner_order_detail"
     const val EVENT_TRANSACTION_LIST = "event_transaction_list"
     const val PUBLIC_MERCHANT_PROFILE = "public_merchant_profile"
+    const val CONVERSATION_LIST = "conversation_list"
+    const val PRIVATE_CHAT = "private_chat"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {
