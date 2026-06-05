@@ -4,10 +4,12 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseChatService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.message.Conversation
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView
 import com.prayatna.lookiesapp.domain.model.message.ForumMember
 import com.prayatna.lookiesapp.domain.model.message.ForumMessage
+import com.prayatna.lookiesapp.domain.model.message.Message
 import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import io.github.jan.supabase.exceptions.RestException
@@ -19,6 +21,35 @@ import javax.inject.Inject
 class ChatRepositoryImpl @Inject constructor(
     private val supabaseChatService: SupabaseChatService
 ): ChatRepository {
+
+    override fun listenToMessages(conversationId: String): Flow<List<Message>> {
+        return supabaseChatService.listenToMessages(conversationId)
+            .map { dtoList ->
+                dtoList.map { it.toDomain() }
+            }
+    }
+
+    override suspend fun sendMessage(message: Message): DataResult<Message> {
+        return try {
+            val result = supabaseChatService.sendMessage(message.toDto())
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error sending message")
+        }
+    }
+
+    override suspend fun getConversations(userId: String): DataResult<List<Conversation>> {
+        return try {
+            val result = supabaseChatService.getConversations(userId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error fetching conversations")
+        }
+    }
 
     override fun listenToForumMessages(
         channelId: String

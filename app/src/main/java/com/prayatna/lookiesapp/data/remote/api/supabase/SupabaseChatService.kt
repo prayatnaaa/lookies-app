@@ -1,17 +1,20 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.remote.dto.ConversationDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelMessagesViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumMessageDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumsViewDto
+import com.prayatna.lookiesapp.data.remote.dto.MessageDto
 import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumChannelRequestDto
 import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumMessageRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.chat.CreateForumChannelResponseDto
 import com.prayatna.lookiesapp.domain.model.message.PresenceData
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.PresenceAction
 import io.github.jan.supabase.realtime.Realtime
@@ -32,6 +35,59 @@ class SupabaseChatService @Inject constructor(
     private val postgrest: Postgrest,
     private val realtime: Realtime
 ) {
+
+    suspend fun getConversations(userId: String): List<ConversationDto> {
+        return postgrest["conversations"]
+            .select {
+                filter { eq("user_id", userId) }
+                order("updated_at", Order.DESCENDING)
+            }.decodeList()
+    }
+
+    private suspend fun getMessageHistory(conversationId: String): List<MessageDto> {
+        return postgrest["messages"]
+            .select {
+                filter { eq("conversation_id", conversationId) }
+                order("sent_at", Order.ASCENDING)
+            }.decodeList()
+    }
+
+    suspend fun sendMessage(message: MessageDto): MessageDto {
+        return postgrest["messages"].insert(message) {
+            select()
+        }.decodeSingle()
+    }
+
+    @Suppress("DEPRECATION")
+    fun listenToMessages(conversationId: String): Flow<List<MessageDto>> = callbackFlow {
+
+        val channel = realtime.channel("messages$conversationId")
+
+        val flow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "messages"
+            filter = "conversation_id=eq.$conversationId"
+        }
+
+        channel.subscribe(blockUntilSubscribed = true)
+
+        trySend(getMessageHistory(conversationId))
+
+        val job = launch {
+            flow.collect {
+                Log.d("CHAT", "EVENT IN: $it")
+                trySend(getMessageHistory(conversationId))
+            }
+        }
+
+        awaitClose {
+            Log.d("CHAT", "UNSUBSCRIBE CHANNEL")
+            job.cancel()
+            launch {
+                realtime.removeChannel(channel)
+                channel.unsubscribe()
+            }
+        }
+    }
 
     suspend fun insertForumsMessage(request: CreateForumMessageRequest): ForumMessageDto {
         val userId = auth.currentSessionOrNull()?.user?.id ?:
