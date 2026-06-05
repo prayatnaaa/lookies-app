@@ -2,15 +2,16 @@ package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.repository.PaintingRepository
+import com.prayatna.lookiesapp.domain.usecase.chat.GetOrCreateConversationUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
-import com.prayatna.lookiesapp.domain.usecase.partner.ApprovePaintingUseCase
-import com.prayatna.lookiesapp.domain.usecase.partner.RejectPaintingUseCase
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,14 +19,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EventPaintingDetailViewModel @Inject constructor(
+    private val getOrCreateConversationUseCase: GetOrCreateConversationUseCase,
     private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
-    private val approvePaintingUseCase: ApprovePaintingUseCase,
-    private val rejectPaintingUseCase: RejectPaintingUseCase
 ): ViewModel() {
 
     private val _state = MutableStateFlow(EventPaintingDetailUiState())
     val state: StateFlow<EventPaintingDetailUiState> = _state.asStateFlow()
 
+    private val _uiEvent = MutableSharedFlow<EventPaintingDetailEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
     fun getEventPaintingDetail(id: String) {
         viewModelScope.launch {
             _state.update { it.copy(
@@ -53,6 +55,27 @@ class EventPaintingDetailViewModel @Inject constructor(
                     }
                 }
                 else -> Unit
+            }
+        }
+    }
+
+    fun onChatArtistClicked(merchantId: String) {
+        _state.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            when (val result = getOrCreateConversationUseCase(merchantId)) {
+                is DataResult.Error -> {
+                    _state.update {
+                        it.copy(isLoading = false, errorMessage = result.error)
+                    }
+                }
+                is DataResult.Success -> {
+                    _state.update { it.copy(isLoading = false) }
+                    _uiEvent.emit(EventPaintingDetailEvent.NavigateToChat(result.data.conversationId))
+                }
+                else -> {
+                    _state.update { it.copy(isLoading = false) }
+                }
             }
         }
     }

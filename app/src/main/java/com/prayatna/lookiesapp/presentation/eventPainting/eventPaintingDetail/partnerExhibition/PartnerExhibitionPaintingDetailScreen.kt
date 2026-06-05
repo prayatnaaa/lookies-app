@@ -32,8 +32,8 @@ import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventPainting.EventPaintingDetailContent
 import com.prayatna.lookiesapp.presentation.components.eventPainting.PartnerShipmentActionBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEffect
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.state.PartnerExhibitionPaintingEffect
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.state.PartnerExhibitionPaintingEvent
 import com.prayatna.lookiesapp.presentation.offlineCheckout.navigateToOfflineCheckout
 import com.prayatna.lookiesapp.presentation.unsoldArtworkReturn.navigateToUnsoldArtworkReturn
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -60,7 +60,7 @@ fun PartnerExhibitionPaintingDetailScreen(
     // LOAD
     LaunchedEffect(eventPaintingId) {
         viewModel.onEvent(
-            EventPaintingDetailEvent.Load(eventPaintingId)
+            PartnerExhibitionPaintingEvent.Load(eventPaintingId)
         )
     }
 
@@ -68,7 +68,7 @@ fun PartnerExhibitionPaintingDetailScreen(
         viewModel.event.collect { event ->
             when (event) {
 
-                is EventPaintingDetailEffect.ShowResult -> {
+                is PartnerExhibitionPaintingEffect.ShowResult -> {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("snackbar_message", event.message)
@@ -83,7 +83,7 @@ fun PartnerExhibitionPaintingDetailScreen(
                     navController.popBackStack()
                 }
 
-                is EventPaintingDetailEffect.ShowError -> {
+                is PartnerExhibitionPaintingEffect.ShowError -> {
                     snackbarHostState.showSnackbar(
                         event.message,
                         withDismissAction = true
@@ -105,7 +105,7 @@ fun PartnerExhibitionPaintingDetailScreen(
             onConfirm = {
                 selectedPaintingId?.let { id ->
                     viewModel.onEvent(
-                        EventPaintingDetailEvent.Reject(
+                        PartnerExhibitionPaintingEvent.Reject(
                             id = id,
                             reason = rejectReason
                         )
@@ -136,7 +136,7 @@ fun PartnerExhibitionPaintingDetailScreen(
                         PartnerPaintingDecisionActionBar(
                             onApprove = {
                                 viewModel.onEvent(
-                                    EventPaintingDetailEvent.Approve(painting.id)
+                                    PartnerExhibitionPaintingEvent.Approve(painting.id)
                                 )
                             },
                             onReject = {

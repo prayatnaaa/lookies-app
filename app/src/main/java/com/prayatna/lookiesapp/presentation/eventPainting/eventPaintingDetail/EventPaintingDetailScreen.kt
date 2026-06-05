@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
@@ -33,6 +34,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -62,10 +64,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.prayatna.lookiesapp.presentation.chat.privateChat.navigateToPrivateChat
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventPainting.EventOriginCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.painting.WaterMark
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
@@ -86,7 +90,36 @@ fun EventPaintingDetailScreen(
         mutableStateOf(false)
     }
 
+    LaunchedEffect(viewModel.uiEvent) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is EventPaintingDetailEvent.NavigateToChat -> {
+                    navController.navigateToPrivateChat(
+                        conversationId = event.conversationId,
+                        partyName = state.data?.participant?.artist?.username ?: "Store"
+                    )
+                }
+            }
+        }
+    }
+
     Scaffold(
+        floatingActionButton = {
+            state.data?.let { event ->
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.onChatArtistClicked(event.artistId)
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Chat,
+                        contentDescription = "Chat Artist"
+                    )
+                }
+            }
+        },
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BackTopBar(
