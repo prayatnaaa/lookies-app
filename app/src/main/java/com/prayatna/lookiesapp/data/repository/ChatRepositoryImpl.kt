@@ -1,16 +1,15 @@
 package com.prayatna.lookiesapp.data.repository
 
-import android.util.Log
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseChatService
 import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
 import com.prayatna.lookiesapp.domain.mapper.toDomain
-import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.message.Conversation
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
 import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView
 import com.prayatna.lookiesapp.domain.model.message.ForumMember
 import com.prayatna.lookiesapp.domain.model.message.ForumMessage
+import com.prayatna.lookiesapp.domain.model.message.InitiatedConversation
 import com.prayatna.lookiesapp.domain.model.message.Message
 import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.utils.DataResult
@@ -69,6 +68,17 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getOrCreateConversation(merchantId: String): DataResult<InitiatedConversation> {
+        return try {
+            val id = supabaseChatService.getOrCreateConversation(merchantId)
+            DataResult.Success(InitiatedConversation(id))
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error initiating conversation")
+        }
+    }
+
     override fun listenToForumMessages(
         channelId: String
     ): Flow<List<ForumChannelMessagesView>> {
@@ -81,9 +91,12 @@ class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun insertForumsMessage(data: CreateForumMessageInput): DataResult<ForumMessage> {
         return try {
-            val requestDto = data.toDto()
+            val requestDto = com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumMessageRequest(
+                channelId = data.channelId,
+                content = data.content,
+                senderId = data.senderId
+            )
             val result = supabaseChatService.insertForumsMessage(requestDto)
-            Log.d("INSERT_MESSAGE", result.toString())
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)

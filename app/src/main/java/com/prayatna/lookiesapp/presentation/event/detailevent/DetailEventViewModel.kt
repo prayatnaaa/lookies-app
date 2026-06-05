@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.admin.ApproveEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.admin.RejectEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.auth.GetRoleUseCase
+import com.prayatna.lookiesapp.domain.usecase.chat.GetOrCreateConversationUseCase
 import com.prayatna.lookiesapp.domain.usecase.event.GetDetailEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetPaintingUseCase
 import com.prayatna.lookiesapp.presentation.event.detailevent.state.DecideEventState
@@ -28,7 +29,8 @@ class DetailEventViewModel @Inject constructor(
     private val getRoleUseCase: GetRoleUseCase,
     private val getPaintingUseCase: GetPaintingUseCase,
     private val approveEventUseCase: ApproveEventUseCase,
-    private val rejectEventUseCase: RejectEventUseCase
+    private val rejectEventUseCase: RejectEventUseCase,
+    private val getOrCreateConversationUseCase: GetOrCreateConversationUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailEventUiState())
@@ -58,6 +60,23 @@ class DetailEventViewModel @Inject constructor(
 
     fun setQuantityValue(value: Int) {
         _quantityValue.value = value
+    }
+
+    fun onChatMerchantClicked(merchantId: String) {
+        _state.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            when (val result = getOrCreateConversationUseCase(merchantId)) {
+                is DataResult.Error -> {
+                    _state.update{ it.copy(isLoading = false, detailEventError = result.error) }
+                }
+                is DataResult.Success -> {
+                    _uiEvent.emit(
+                        DetailEventUiEvent.NavigateToChat(conversationId = result.data.conversationId)
+                    )
+                }
+                else -> {}
+            }
+        }
     }
 
     fun getEventPaintings(eventId: String) {

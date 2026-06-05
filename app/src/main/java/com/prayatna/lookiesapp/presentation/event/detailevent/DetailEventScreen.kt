@@ -7,9 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -32,6 +36,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.presentation.chat.privateChat.navigateToPrivateChat
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventBottomModal
@@ -76,6 +81,11 @@ fun DetailEventScreen(
         viewModel.uiEvent.collect { event ->
             if (event is DetailEventUiEvent.ShowResult) {
                 resultState = event
+            } else if (event is DetailEventUiEvent.NavigateToChat) {
+                navController.navigateToPrivateChat(
+                    conversationId = event.conversationId,
+                    partyName = detailEventState.info?.organizer?.legalName ?: "Store"
+                )
             }
         }
     }
@@ -100,6 +110,24 @@ fun DetailEventScreen(
     }
 
     Scaffold(
+        floatingActionButton = {
+            detailEventState.info?.let { event ->
+                if (role != "admin") {
+                    FloatingActionButton(
+                        onClick = {
+                            viewModel.onChatMerchantClicked(event.organizer.id)
+                        },
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Chat,
+                            contentDescription = "Chat Organizer"
+                        )
+                    }
+                }
+            }
+        },
         containerColor = MaterialTheme.colorScheme.background,
 
         topBar = {

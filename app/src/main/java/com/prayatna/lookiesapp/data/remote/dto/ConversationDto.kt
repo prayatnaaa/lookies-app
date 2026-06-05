@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class ConversationDto(
 
     @SerialName("id")
-    val id: String? = null,
+    val id: String,
 
     @SerialName("user_id")
     val userId: String,

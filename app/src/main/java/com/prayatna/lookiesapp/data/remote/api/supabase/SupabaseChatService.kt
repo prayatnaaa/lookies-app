@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.ChatMessageViewDto
+import com.prayatna.lookiesapp.data.remote.dto.ConversationDto
 import com.prayatna.lookiesapp.data.remote.dto.ConversationViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelMessagesViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelViewDto
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import java.util.UUID
 import javax.inject.Inject
 
 class SupabaseChatService @Inject constructor(
@@ -37,6 +39,39 @@ class SupabaseChatService @Inject constructor(
     private val postgrest: Postgrest,
     private val realtime: Realtime
 ) {
+
+    suspend fun getOrCreateConversation(merchantId: String): String {
+        val userId = auth.currentSessionOrNull()?.user?.id ?:
+        throw IllegalStateException("no logged in")
+        try {
+            val existingRoom = postgrest["conversations"]
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                        eq("merchant_id", merchantId)
+                    }
+                }.decodeSingleOrNull<ConversationDto>()
+
+            if (existingRoom != null) {
+                return existingRoom.id
+            }
+
+            val newRoomId = UUID.randomUUID().toString()
+            val newConversation = ConversationDto(
+                id = newRoomId,
+                userId = userId,
+                merchantId = merchantId,
+            )
+
+            postgrest["conversations"].insert(newConversation)
+
+            return newRoomId
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
 
     suspend fun getConversations(): List<ConversationViewDto> {
         val userId = auth.currentSessionOrNull()?.user?.id ?: throw IllegalStateException("User not logged in")
