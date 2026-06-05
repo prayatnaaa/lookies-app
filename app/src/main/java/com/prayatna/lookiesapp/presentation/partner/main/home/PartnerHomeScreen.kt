@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Event
@@ -71,6 +72,9 @@ fun PartnerHomeScreen(
             TopAppBar(
                 title = {
                     DashboardHeader(
+                        onChatClick = {
+                            onEvent(PartnerHomeEvent.ChatClick)
+                        },
                         onMemberClick = {
                             onEvent(PartnerHomeEvent.MemberListClicked)
                         },
@@ -183,7 +187,8 @@ fun PartnerHomeScreen(
 @Composable
 private fun DashboardHeader(
     title: String,
-    onMemberClick: () -> Unit
+    onMemberClick: () -> Unit,
+    onChatClick: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -204,13 +209,23 @@ private fun DashboardHeader(
             )
         }
 
-        IconButton(
-            onClick = onMemberClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.People,
-                contentDescription = "Member"
-            )
+        Row {
+            IconButton(
+                onClick = onMemberClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.People,
+                    contentDescription = "Member"
+                )
+            }
+            IconButton(
+                onClick = onChatClick
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Message,
+                    contentDescription = "Chat"
+                )
+            }
         }
     }
 }

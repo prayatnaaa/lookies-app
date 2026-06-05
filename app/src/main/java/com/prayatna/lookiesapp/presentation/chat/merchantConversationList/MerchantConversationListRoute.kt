@@ -1,4 +1,4 @@
-package com.prayatna.lookiesapp.presentation.chat.conversationList
+package com.prayatna.lookiesapp.presentation.chat.merchantConversationList
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -6,13 +6,15 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.chat.conversationList.ConversationListScreen
 import com.prayatna.lookiesapp.presentation.chat.conversationList.state.ConversationListEffect
 import com.prayatna.lookiesapp.presentation.chat.privateChat.navigateToPrivateChat
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
-fun ConversationListRoute(
+fun MerchantConversationListRoute(
     navController: NavController,
-    viewModel: ConversationListViewModel = hiltViewModel()
+    viewModel: MerchantConversationListViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -21,7 +23,8 @@ fun ConversationListRoute(
             when (effect) {
                 ConversationListEffect.NavigateBack -> navController.popBackStack()
                 is ConversationListEffect.NavigateToChat -> {
-                    navController.navigateToPrivateChat(effect.conversationId, effect.otherPartyName)
+                    navController.navigateToPrivateChat(effect.conversationId, effect.otherPartyName, isMerchant = true)
+//                    navController.navigate("${NavigationRoutes.PRIVATE_CHAT}/${effect.conversationId}/${effect.otherPartyName}?isMerchant=true")
                 }
             }
         }
@@ -30,6 +33,6 @@ fun ConversationListRoute(
     ConversationListScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        isMerchant = false
+        isMerchant = true,
     )
 }

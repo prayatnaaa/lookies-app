@@ -13,6 +13,7 @@ import com.prayatna.lookiesapp.presentation.chat.privateChat.state.PrivateChatEv
 fun PrivateChatRoute(
     conversationId: String,
     otherPartyName: String,
+    isMerchant: Boolean = false,
     navController: NavController,
     viewModel: PrivateChatViewModel = hiltViewModel()
 ) {
@@ -32,6 +33,7 @@ fun PrivateChatRoute(
 
     PrivateChatScreen(
         state = state,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        isMerchant = isMerchant
     )
 }

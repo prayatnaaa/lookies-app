@@ -47,6 +47,14 @@ class SupabaseChatService @Inject constructor(
             }.decodeList()
     }
 
+    suspend fun getMerchantConversations(merchantId: String): List<ConversationViewDto> {
+        return postgrest["conversation_view"]
+            .select {
+                filter { eq("merchant_id", merchantId) }
+                order("updated_at", Order.DESCENDING)
+            }.decodeList()
+    }
+
     private suspend fun getMessageHistory(conversationId: String): List<ChatMessageViewDto> {
         return postgrest["chat_message_view"]
             .select {
@@ -81,13 +89,13 @@ class SupabaseChatService @Inject constructor(
 
         val job = launch {
             flow.collect {
-                Log.d("CHAT", "EVENT IN: $it")
+                Log.d("PRIVATE-CHAT", "EVENT IN: $it")
                 trySend(getMessageHistory(conversationId))
             }
         }
 
         awaitClose {
-            Log.d("CHAT", "UNSUBSCRIBE CHANNEL")
+            Log.d("PRIVATE-CHAT", "UNSUBSCRIBE CHANNEL")
             job.cancel()
             launch {
                 realtime.removeChannel(channel)

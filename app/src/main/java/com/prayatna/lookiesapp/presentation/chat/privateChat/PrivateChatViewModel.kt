@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.chat.privateChat
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
@@ -20,9 +21,11 @@ import javax.inject.Inject
 class PrivateChatViewModel @Inject constructor(
     private val listenToMessagesUseCase: ListenToMessagesUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
-    private val getProfileUseCase: GetProfileUseCase
+    private val getProfileUseCase: GetProfileUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    private val isMerchant = savedStateHandle.get<Boolean>("isMerchant") ?: false
     private val _uiState = MutableStateFlow(PrivateChatUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -80,7 +83,7 @@ class PrivateChatViewModel @Inject constructor(
 
         val input = CreateMessageInput(
             conversationId = state.conversationId,
-            senderType = "user", // TODO: determine dynamically
+            senderType = if (isMerchant) "merchant" else "user",
             content = content
         )
 

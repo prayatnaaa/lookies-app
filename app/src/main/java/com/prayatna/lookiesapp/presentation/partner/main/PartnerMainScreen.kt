@@ -23,7 +23,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.prayatna.lookiesapp.presentation.SharedViewModel
-import com.prayatna.lookiesapp.presentation.partner.main.home.PartnerHomeScreen
 import com.prayatna.lookiesapp.presentation.partner.main.settings.PartnerSettingsScreen
 import com.prayatna.lookiesapp.utils.PartnerBottomNavItem
 

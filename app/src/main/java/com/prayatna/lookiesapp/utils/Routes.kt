@@ -86,6 +86,7 @@ object NavigationRoutes {
     const val EVENT_TRANSACTION_LIST = "event_transaction_list"
     const val PUBLIC_MERCHANT_PROFILE = "public_merchant_profile"
     const val CONVERSATION_LIST = "conversation_list"
+    const val MERCHANT_CONVERSATION_LIST = "merchant_conversation_list"
     const val PRIVATE_CHAT = "private_chat"
 }
 

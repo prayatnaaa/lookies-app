@@ -58,6 +58,17 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getMerchantConversations(merchantId: String): DataResult<List<Conversation>> {
+        return try {
+            val result = supabaseChatService.getMerchantConversations(merchantId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error fetching merchant conversations")
+        }
+    }
+
     override fun listenToForumMessages(
         channelId: String
     ): Flow<List<ForumChannelMessagesView>> {

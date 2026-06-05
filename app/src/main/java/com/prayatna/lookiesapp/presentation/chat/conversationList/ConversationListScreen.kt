@@ -23,6 +23,7 @@ import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 
 @Composable
 fun ConversationListScreen(
+    isMerchant: Boolean,
     state: ConversationListUiState,
     onEvent: (ConversationListEvent) -> Unit
 ) {
@@ -52,6 +53,7 @@ fun ConversationListScreen(
                     items(state.conversations) { item ->
                         ConversationItemRow(
                             item = item,
+                            isMerchant = isMerchant,
                             onClick = {
                                 onEvent(
                                     ConversationListEvent.OnConversationClicked(
@@ -75,7 +77,8 @@ fun ConversationListScreen(
 @Composable
 private fun ConversationItemRow(
     item: Conversation,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isMerchant: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -85,7 +88,7 @@ private fun ConversationItemRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         CustomAsyncImage(
-            model = item.merchantPictureUrl,
+            model = if (!isMerchant) item.merchantPictureUrl else item.buyerPictureUrl,
             contentDescription = item.merchantName,
             modifier = Modifier
                 .size(56.dp)
@@ -102,7 +105,7 @@ private fun ConversationItemRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = item.merchantName ?: "Store",
+                    text =  if (!isMerchant) item.merchantName ?: "Store" else item.buyerName ?: "Buyer",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,

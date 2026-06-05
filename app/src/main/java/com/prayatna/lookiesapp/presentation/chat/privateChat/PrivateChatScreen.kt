@@ -34,7 +34,8 @@ import com.prayatna.lookiesapp.utils.formatChatTime
 @Composable
 fun PrivateChatScreen(
     state: PrivateChatUiState,
-    onEvent: (PrivateChatEvent) -> Unit
+    onEvent: (PrivateChatEvent) -> Unit,
+    isMerchant: Boolean
 ) {
     val listState = rememberLazyListState()
 
@@ -72,10 +73,17 @@ fun PrivateChatScreen(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+
                         items(state.messages) { message ->
+                            val isMine =
+                                if (isMerchant) {
+                                    message.senderType == "merchant"
+                                } else {
+                                    message.senderType == "user"
+                                }
                             PrivateMessageItem(
                                 message = message,
-                                isMine = message.senderUserId == state.currentUserId
+                                isMine = isMine && message.senderUserId == state.currentUserId
                             )
                         }
                     }

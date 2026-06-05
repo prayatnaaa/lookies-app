@@ -18,6 +18,7 @@ interface ChatRepository {
     fun listenToMessages(conversationId: String): Flow<List<Message>>
     suspend fun sendMessage(data: CreateMessageInput): DataResult<Message>
     suspend fun getConversations(): DataResult<List<Conversation>>
+    suspend fun getMerchantConversations(merchantId: String): DataResult<List<Conversation>>
 
     fun listenToForumMessages(channelId: String): Flow<List<ForumChannelMessagesView>>
     suspend fun insertForumsMessage(data: CreateForumMessageInput): DataResult<ForumMessage>

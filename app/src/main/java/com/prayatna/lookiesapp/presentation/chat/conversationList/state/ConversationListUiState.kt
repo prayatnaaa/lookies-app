@@ -6,4 +6,5 @@ data class ConversationListUiState(
     val isLoading: Boolean = false,
     val conversations: List<Conversation> = emptyList(),
     val errorMessage: String? = null,
+    val currentUserId: String = ""
 )

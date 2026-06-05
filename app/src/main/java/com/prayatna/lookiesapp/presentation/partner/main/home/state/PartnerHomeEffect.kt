@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.partner.main.home.state
 
 sealed interface PartnerHomeEffect {
+    data class NavigateToChat(val merchantId: String): PartnerHomeEffect
     data object NavigateBack : PartnerHomeEffect
     data object NavigateCreateEvent : PartnerHomeEffect
     data object NavigateMyEvents : PartnerHomeEffect
