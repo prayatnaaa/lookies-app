@@ -16,7 +16,7 @@ sealed interface ScannerUiEvent {
 }
 
 sealed interface ScannerUiEffect {
-    data class ShowToast(val message: String) : ScannerUiEffect
-    data class OnTicketVerified(val ticket: Ticket) : ScannerUiEffect
+    data class ShowSnackbar(val message: String) : ScannerUiEffect
+    data class OnTicketVerified(val message: String) : ScannerUiEffect
     data object NavigateBack : ScannerUiEffect
 }

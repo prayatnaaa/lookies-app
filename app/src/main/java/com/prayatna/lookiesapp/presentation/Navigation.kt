@@ -547,7 +547,10 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         forumMembersNavigation(navController)
         selectPayoutChannelNavigation(navController)
 
-        composable(NavigationRoutes.BARCODE_SCANNER) {
+        composable(
+            "${NavigationRoutes.BARCODE_SCANNER}/{eventId}",
+            listOf(navArgument("eventId") { type = NavType.IntType })
+            ) {
             ScannerScreen(onNavigateBack = { navController.popBackStack() })
         }
 

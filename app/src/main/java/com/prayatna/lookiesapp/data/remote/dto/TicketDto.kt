@@ -16,4 +16,8 @@ data class TicketDto(
     val ticketCode: String,
     @SerialName("created_at")
     val createdAt: String,
+    @SerialName("is_used")
+    val isUsed: Boolean,
+    @SerialName("scanned_at")
+    val scannedAt: String? = null
 )

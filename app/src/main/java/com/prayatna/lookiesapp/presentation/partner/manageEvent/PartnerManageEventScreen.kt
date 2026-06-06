@@ -163,7 +163,7 @@ fun PartnerManageEventScreen(
                             description = "Scan barcodes for event.",
                             icon = Icons.Default.QrCodeScanner,
                             onClick = {
-                                navController.navigate(NavigationRoutes.BARCODE_SCANNER)
+                                navController.navigate("${NavigationRoutes.BARCODE_SCANNER}/${uiState.event?.id}")
                             }
                         )
                     }
