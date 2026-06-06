@@ -81,9 +81,27 @@ fun TransactionListScreen(
                                 transaction = transaction,
                                 showDivider = index != currentState.data.lastIndex,
                                 onClick = {
-                                    navController.navigate(
-                                        "${NavigationRoutes.DETAIL_TRANSACTION}/${transaction.id}"
-                                    )
+                                    val status = transaction.status.lowercase()
+                                    if (status == "awaiting_payment" || status == "pending") {
+                                        val channel = transaction.paymentInfo?.channel?.lowercase()
+                                        if (channel == "virtual_account") {
+                                            navController.navigate(
+                                                "${NavigationRoutes.EXISTING_VA_PAYMENT}/${transaction.id}"
+                                            )
+                                        } else if (channel == "qris") {
+                                            navController.navigate(
+                                                "${NavigationRoutes.EXISTING_QRIS_PAYMENT}/${transaction.id}"
+                                            )
+                                        } else {
+                                            navController.navigate(
+                                                "${NavigationRoutes.DETAIL_TRANSACTION}/${transaction.id}"
+                                            )
+                                        }
+                                    } else {
+                                        navController.navigate(
+                                            "${NavigationRoutes.DETAIL_TRANSACTION}/${transaction.id}"
+                                        )
+                                    }
                                 }
                             )
                         }

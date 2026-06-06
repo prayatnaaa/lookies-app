@@ -54,6 +54,8 @@ interface TransactionRepository {
             DataResult<List<Transaction>>
     suspend fun createPaymentRequest(request: CreateXenditPaymentRequestInput):
             DataResult<CreateXenditPaymentRequestResult>
+    suspend fun getPaymentAttemptByOrderId(orderId: String):
+            DataResult<PaymentAttempt?>
     fun getPaymentAttempt(orderId: String):
             Flow<DataResult<PaymentAttempt>>
     suspend fun getTicketsByOrderId(orderId: String):

@@ -192,6 +192,17 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getPaymentAttemptByOrderId(orderId: String): DataResult<PaymentAttempt?> {
+        return try {
+            val result = transactionService.getPaymentAttemptByOrderId(orderId)
+            DataResult.Success(result.firstOrNull()?.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(extractSupabaseError(e.error))
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Failed to get payment attempt")
+        }
+    }
+
     override fun getPaymentAttempt(orderId: String): Flow<DataResult<PaymentAttempt>> {
         return transactionService.getPaymentAttempt(orderId)
             .map<PaymentAttemptDto, DataResult<PaymentAttempt>> { dto ->

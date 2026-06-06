@@ -58,6 +58,8 @@ import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPainti
 import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.ParticipantPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
 import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScreen
+import com.prayatna.lookiesapp.presentation.payment.existingQrPayment.ExistingQrPaymentRoute
+import com.prayatna.lookiesapp.presentation.payment.existingVaPayment.ExistingVaPaymentRoute
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
 import com.prayatna.lookiesapp.presentation.partner.eventTransactions.eventTransactionListNavigation
@@ -131,6 +133,33 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         adminTransactionDetailNavigation(navController)
         exhibitionShipmentNavigation(navController = navController)
         shipmentListNavigation(navController = navController)
+
+        composable(
+            route = "${NavigationRoutes.EXISTING_QRIS_PAYMENT}/{orderId}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            ExistingQrPaymentRoute(
+                orderId = orderId,
+                navController = navController
+            )
+        }
+
+        composable(
+            route = "${NavigationRoutes.EXISTING_VA_PAYMENT}/{orderId}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            ExistingVaPaymentRoute(
+                orderId = orderId,
+                navController = navController
+            )
+        }
+
         composable(
             route = "${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}",
             arguments = listOf(

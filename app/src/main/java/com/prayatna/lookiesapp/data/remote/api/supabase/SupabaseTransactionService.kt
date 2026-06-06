@@ -130,6 +130,14 @@ class SupabaseTransactionService @Inject constructor(
         return orderId
     }
 
+    suspend fun getPaymentAttemptByOrderId(orderId: String): List<PaymentAttemptDto> {
+        return postgrest["payment_attempts"]
+            .select {
+                filter { eq("order_id", orderId) }
+                order("created_at", Order.DESCENDING)
+            }.decodeList()
+    }
+
     suspend fun getUserTransactions(): List<TransactionDto> {
         val user = auth.currentUserOrNull() ?: throw IllegalStateException("User not logged in")
 
@@ -138,7 +146,7 @@ class SupabaseTransactionService @Inject constructor(
             .select {
                 filter {
                     eq("buyer_id", user.id)
-                    neq("status", "awaiting_payment")
+//                    neq("status", "awaiting_payment")
                     neq("status", "cancelled")
                 }
                 order("created_at", order = Order.DESCENDING)
