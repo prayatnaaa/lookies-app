@@ -55,7 +55,11 @@ fun RegisterEventScreen(
                 onConfirm = {
                     navController.navigate(
                         "${NavigationRoutes.CHECKOUT}/event_registration/${state.data?.data?.orderId}/1"
-                    )
+                    ) {
+                        popUpTo(navController.currentBackStackEntry?.destination?.route ?: "") {
+                            inclusive = true
+                        }
+                    }
                 },
                 onDismiss = {
                     navController.popBackStack()

@@ -326,6 +326,12 @@ fun ArtistRestrictedSection(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Registration Deadline: ${formatDate(event.paintingSubmissionDeadline ?: "2022-18-02")}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             if (!isSelfExhibition && event.artistRegistrationFee != null) {

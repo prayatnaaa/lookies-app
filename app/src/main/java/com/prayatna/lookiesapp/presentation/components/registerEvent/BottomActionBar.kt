@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.components.registerEvent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
@@ -18,7 +19,8 @@ fun BottomActionBar(state: RegisterEventUiState, onEvent: (RegisterEventEvent) -
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .navigationBarsPadding(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (state.currentStep == 2) {

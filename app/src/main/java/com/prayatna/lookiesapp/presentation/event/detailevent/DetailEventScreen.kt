@@ -48,7 +48,7 @@ import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.n
 import com.prayatna.lookiesapp.presentation.publicMerchantProfile.navigateToPublicMerchantProfile
 import com.prayatna.lookiesapp.ui.theme.Maroon
 import com.prayatna.lookiesapp.utils.NavigationRoutes
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 @Composable
 fun DetailEventScreen(
@@ -139,13 +139,16 @@ fun DetailEventScreen(
 
         bottomBar = {
             detailEventState.info?.let { event ->
-                DetailEventBottomBar(
-                    isRegisterEnabled = try {
-                        val deadline = LocalDateTime.parse(event.paintingSubmissionDeadline)
-                        LocalDateTime.now().isBefore(deadline)
+                val isRegisterEnabled = event.paintingSubmissionDeadline?.let { deadlineString ->
+                    try {
+                        val deadline = OffsetDateTime.parse(deadlineString)
+                        OffsetDateTime.now().isBefore(deadline)
                     } catch (_: Exception) {
                         false
-                    },
+                    }
+                } ?: false
+                DetailEventBottomBar(
+                    isRegisterEnabled = isRegisterEnabled,
                     role = role,
                     event = event,
                     isApproveLoading = adminState.isLoading,

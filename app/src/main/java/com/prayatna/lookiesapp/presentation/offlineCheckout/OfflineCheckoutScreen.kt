@@ -1,6 +1,8 @@
 package com.prayatna.lookiesapp.presentation.offlineCheckout
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutUiState
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.checkout.CheckoutContent
@@ -13,6 +15,8 @@ fun OfflineCheckoutScreen(
     uiState: OfflineCheckoutUiState,
     onEvent: (OfflineCheckoutEvent) -> Unit
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
     // Map OfflineCheckoutUiState to CheckoutUiState for CheckoutContent compatibility
     val mappedUiState = CheckoutUiState(
         isLoading = uiState.isLoading,
@@ -41,7 +45,8 @@ fun OfflineCheckoutScreen(
         onRefresh = { onEvent(OfflineCheckoutEvent.OnRefresh) },
         onShipmentFeeSelected = {}, 
         onAddressSelected = {}, 
-        onAddAddressClick = {}, 
+        onAddAddressClick = {},
+        snackbarHostState = snackbarHostState,
         children = {
             CheckoutPaymentMethodContent(
                 selectedMethod = uiState.selectedMethod,

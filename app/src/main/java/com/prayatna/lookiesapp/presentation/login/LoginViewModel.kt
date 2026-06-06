@@ -51,7 +51,8 @@ class LoginViewModel @Inject constructor(
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<AuthEvent>(
-        replay = 1
+        replay = 0,
+        extraBufferCapacity = 1
     )
     val eventFlow = _eventFlow.asSharedFlow()
 

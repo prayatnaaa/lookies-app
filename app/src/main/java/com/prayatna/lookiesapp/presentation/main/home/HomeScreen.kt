@@ -174,20 +174,26 @@ fun HomeScreen(
                             CircularProgressIndicator()
                         }
                     }
-                } else if (state.eventPaintings.isEmpty()) {
-                    item(span = StaggeredGridItemSpan.FullLine) {
-                        EmptyState(
-                            modifier = Modifier.height(200.dp),
-                            title = "No Paintings",
-                            description = "No curated paintings available at the moment.",
-                            icon = Icons.Default.Palette
-                        )
-                    }
                 } else {
-                    items(state.eventPaintings) { painting ->
-                        HomePaintingCard(data = painting, onClick = {
-                            navController.navigate("${NavigationRoutes.DETAIL_EVENT_PAINTING}/${painting.id}")
-                        })
+                    val visiblePaintings = state.eventPaintings.filter {
+                        it.participant.event.status in listOf("published", "upcoming", "ongoing")
+                    }
+
+                    if (visiblePaintings.isEmpty()) {
+                        item(span = StaggeredGridItemSpan.FullLine) {
+                            EmptyState(
+                                modifier = Modifier.height(200.dp),
+                                title = "No Paintings",
+                                description = "No curated paintings available at the moment.",
+                                icon = Icons.Default.Palette
+                            )
+                        }
+                    } else {
+                        items(visiblePaintings) { painting ->
+                            HomePaintingCard(data = painting, onClick = {
+                                navController.navigate("${NavigationRoutes.DETAIL_EVENT_PAINTING}/${painting.id}")
+                            })
+                        }
                     }
                 }
             }

@@ -6,10 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.order.OrderItemInput
 import com.prayatna.lookiesapp.domain.usecase.event.GetEventByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
+import com.prayatna.lookiesapp.domain.usecase.shipment.GetShipmentFeeUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.CreateOrderUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
-import com.prayatna.lookiesapp.domain.usecase.shipment.GetShipmentFeeUseCase
-import com.prayatna.lookiesapp.domain.usecase.transaction.CreateVaPaymentUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.GetUserAddressesUseCase
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutEffect
 import com.prayatna.lookiesapp.presentation.checkout.state.CheckoutEvent
@@ -35,7 +34,6 @@ class CheckoutViewModel @Inject constructor(
     private val getDetailTransactionUseCase: GetDetailTransactionUseCase,
     private val getShipmentFeeUseCase: GetShipmentFeeUseCase,
     private val getUserAddressesUseCase: GetUserAddressesUseCase,
-    private val createVaPaymentUseCase: CreateVaPaymentUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CheckoutUiState())

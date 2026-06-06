@@ -127,10 +127,12 @@ fun LoginScreen(modifier: Modifier = Modifier,
                     title = if (isErrorDialog) "Error" else "Success",
                     onDismiss = {
                         showDialog = false
+                        dialogMessage = ""
                     },
                     message = dialogMessage,
                     onConfirm = {
                         showDialog = false
+                        dialogMessage = ""
                         if (isErrorDialog) {
                             viewModel.resetLoginState()
                         }
