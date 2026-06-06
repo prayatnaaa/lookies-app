@@ -4,11 +4,14 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePartnerService
+import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateRevenueRulesRequest
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.EventParticipant
 import com.prayatna.lookiesapp.domain.model.event.DefaultEvent
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.domain.model.event.EventRevenueRules
+import com.prayatna.lookiesapp.domain.model.event.UpdateRevenueRulesInput
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantDetail
 import com.prayatna.lookiesapp.domain.model.painting.InsertSelfEventPaintingsResult
@@ -98,6 +101,29 @@ class PartnerRepositoryImpl @Inject constructor(
             Log.e("UpdateEvent", e.toString())
 
             DataResult.Error(mapUpdateErrorToMessage(e))
+        }
+    }
+
+    override suspend fun updateRevenueRules(id: String, input: UpdateRevenueRulesInput): DataResult<EventRevenueRules> {
+        return try {
+            // Note: UpdateRevenueRulesRequest requires eventId, but for an update record call
+            // we are usually only sending columns to change.
+            // Since DO NOT CHANGE service was requested, I'll pass 0 as dummy if not provided or 
+            // map it properly if I had the eventId context.
+            // However, the service signature is: updateRevenueRules(id: String, request: UpdateRevenueRulesRequest)
+            val requestDto = UpdateRevenueRulesRequest(
+                eventId = input.eventId,
+                itemType = input.itemType,
+                artistPercent = input.artistPercent,
+                eventPercent = input.eventPercent,
+                platformPercent = input.platformPercent
+            )
+            val response = supabasePartnerService.updateRevenueRules(id, requestDto)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(extractSupabaseError(e.error))
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
         }
     }
 

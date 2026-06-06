@@ -4,10 +4,12 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.DefaultEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventParticipantDto
+import com.prayatna.lookiesapp.data.remote.dto.EventRevenueRulesDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantDetailDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDashboardDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateRevenueRulesRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.SelfEventPaintingInsertRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.InsertSelfEventPaintingsResponse
@@ -35,6 +37,15 @@ class SupabasePartnerService @Inject constructor(
     private val storage: Storage,
     private val realtime: Realtime
 ) {
+
+    suspend fun updateRevenueRules(id: String, request: UpdateRevenueRulesRequest): EventRevenueRulesDto {
+        return postgrest["event_revenue_rules"].update(request) {
+            select()
+            filter {
+                eq("id", id)
+            }
+        }.decodeSingle<EventRevenueRulesDto>()
+    }
     private suspend fun uploadPartnerLogo(image: ByteArray): String {
         if (image.isEmpty()) throw Exception("Image is empty")
 

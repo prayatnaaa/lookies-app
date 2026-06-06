@@ -3,10 +3,15 @@ package com.prayatna.lookiesapp.presentation.partner.editEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
@@ -35,6 +40,7 @@ import com.prayatna.lookiesapp.presentation.components.createEvent.EventAboutFor
 import com.prayatna.lookiesapp.presentation.components.createEvent.EventLocationForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.ParticipationRulesForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.PricingForm
+import com.prayatna.lookiesapp.presentation.components.createEvent.RevenueShareForm
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.partner.editEvent.state.EditEventFormEvent
 import com.prayatna.lookiesapp.utils.Constants
@@ -117,8 +123,10 @@ fun EditEventScreen(
 
         LazyColumn(
             modifier = Modifier
+                .imePadding()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
             val event = uiState.data
@@ -267,6 +275,37 @@ fun EditEventScreen(
                 )
             }
 
+            item {
+                RevenueShareForm(
+                    isSelfExhibition = isSelfExhibition,
+                    isOnline = isOnlineEvent,
+                    paintingArtistPercent = formState.paintingArtistPercent,
+                    onPaintingArtistPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.PaintingArtistPercentChanged(it))
+                    },
+                    paintingEventPercent = formState.paintingEventPercent,
+                    onPaintingEventPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.PaintingEventPercentChanged(it))
+                    },
+                    paintingPlatformPercent = formState.paintingPlatformPercent,
+                    onPaintingPlatformPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.PaintingPlatformPercentChanged(it))
+                    },
+                    ticketArtistPercent = formState.ticketArtistPercent,
+                    onTicketArtistPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.TicketArtistPercentChanged(it))
+                    },
+                    ticketEventPercent = formState.ticketEventPercent,
+                    onTicketEventPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.TicketEventPercentChanged(it))
+                    },
+                    ticketPlatformPercent = formState.ticketPlatformPercent,
+                    onTicketPlatformPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.TicketPlatformPercentChanged(it))
+                    }
+                )
+            }
+
             if (uiState.data != null) {
                 val event = uiState.data
                 item {
@@ -315,6 +354,10 @@ fun EditEventScreen(
                         }
                     }
                 }
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }

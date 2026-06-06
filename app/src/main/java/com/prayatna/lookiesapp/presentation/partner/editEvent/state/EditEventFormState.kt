@@ -23,5 +23,22 @@ data class EditEventFormState(
     val isLoadingMeta: Boolean = false,
     val errorMessage: String? = null,
     val paintingSubmissionDeadline: String? = null,
-    val status: String? = null
-)
+    val status: String? = null,
+
+    // Revenue Rules
+    val paintingArtistPercent: Int = 0,
+    val paintingEventPercent: Int = 0,
+    val paintingPlatformPercent: Int = 0,
+    val paintingRuleId: String? = null,
+
+    val ticketArtistPercent: Int = 0,
+    val ticketEventPercent: Int = 0,
+    val ticketPlatformPercent: Int = 0,
+    val ticketRuleId: String? = null
+) {
+    val isPaintingRevenueValid: Boolean
+        get() = (paintingArtistPercent + paintingEventPercent + paintingPlatformPercent) == 100
+
+    val isTicketRevenueValid: Boolean
+        get() = (ticketArtistPercent + ticketEventPercent + ticketPlatformPercent) == 100
+}
