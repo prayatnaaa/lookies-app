@@ -11,5 +11,6 @@ data class Message(
     val sentAt: Instant,
     val isRead: Boolean,
     val senderName: String?,
-    val senderAvatarUrl: String?
+    val senderAvatarUrl: String?,
+    val metadata: MessageMetadata? = null,
 )

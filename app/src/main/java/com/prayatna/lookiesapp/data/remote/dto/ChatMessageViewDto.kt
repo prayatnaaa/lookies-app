@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.dto
 
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.MessageMetadataDto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.datetime.Instant
@@ -32,5 +33,6 @@ data class ChatMessageViewDto(
     val senderName: String? = null,
 
     @SerialName("sender_avatar_url")
-    val senderAvatarUrl: String? = null
+    val senderAvatarUrl: String? = null,
+    val metadata: MessageMetadataDto? = null
 )

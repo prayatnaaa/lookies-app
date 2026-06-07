@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.remote.dto
 
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.MessageMetadataDto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -25,5 +26,8 @@ data class MessageDto(
     val sentAt: String? = null,
 
     @SerialName("is_read")
-    val isRead: Boolean = false
+    val isRead: Boolean = false,
+
+    @SerialName("metadata")
+    val metadataDto: MessageMetadataDto? = null
 )

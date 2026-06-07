@@ -9,6 +9,7 @@ import com.prayatna.lookiesapp.domain.model.message.Conversation
 import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
 import com.prayatna.lookiesapp.domain.model.message.Message
 import com.prayatna.lookiesapp.domain.model.message.MessageMetadata
+import kotlinx.datetime.Clock
 import kotlinx.datetime.toInstant
 
 fun ChatMessageViewDto.toDomain(): Message {
@@ -21,7 +22,8 @@ fun ChatMessageViewDto.toDomain(): Message {
         sentAt = sentAt,
         isRead = isRead,
         senderName = senderName,
-        senderAvatarUrl = senderAvatarUrl
+        senderAvatarUrl = senderAvatarUrl,
+        metadata = metadata?.toDomain()
     )
 }
 
@@ -32,7 +34,7 @@ fun MessageDto.toDomain(): Message {
         senderType = senderType,
         senderUserId = senderUserId,
         content = content,
-        sentAt = sentAt?.toInstant() ?: kotlinx.datetime.Clock.System.now(),
+        sentAt = sentAt?.toInstant() ?: Clock.System.now(),
         isRead = isRead,
         senderName = null,
         senderAvatarUrl = null
@@ -80,13 +82,17 @@ fun CreateMessageInput.toDto(): CreateMessageRequest {
 fun MessageMetadata.toDto(): MessageMetadataDto {
     return MessageMetadataDto(
         type = type,
-        id = id
+        id = id,
+        imageUrl = imageUrl,
+        title = title
     )
 }
 
 fun MessageMetadataDto.toDomain(): MessageMetadata {
     return MessageMetadata(
         type = type,
-        id = id
+        id = id,
+        imageUrl = imageUrl,
+        title = title
     )
 }

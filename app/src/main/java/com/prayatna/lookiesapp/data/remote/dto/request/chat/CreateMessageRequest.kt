@@ -21,4 +21,7 @@ data class CreateMessageRequest(
 data class MessageMetadataDto(
     val type: String,
     val id: String,
+    @SerialName("image_url")
+    val imageUrl: String,
+    val title: String
 )
