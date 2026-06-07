@@ -9,6 +9,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.chat.merchantConversationList.navigateToMerchantConversationList
+import com.prayatna.lookiesapp.presentation.merchant.editMerchantProfile.navigation.navigateToEditMerchantProfile
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEffect
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEvent
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -87,6 +88,10 @@ fun PartnerHomeRoute(
 
                 is PartnerHomeEffect.NavigateToChat -> {
                     navController.navigateToMerchantConversationList(merchantId = effect.merchantId)
+                }
+
+                is PartnerHomeEffect.NavigateEditProfile -> {
+                    navController.navigateToEditMerchantProfile(effect.businessId)
                 }
             }
         }

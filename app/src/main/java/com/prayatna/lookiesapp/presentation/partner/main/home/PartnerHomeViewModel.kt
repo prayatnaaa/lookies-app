@@ -109,6 +109,12 @@ class PartnerHomeViewModel @Inject constructor(
                     NavigateToChat(businessId)
                 )
             }
+
+            PartnerHomeEvent.EditProfileClicked -> {
+                sendEffect(
+                    NavigateEditProfile(businessId)
+                )
+            }
         }
     }
 

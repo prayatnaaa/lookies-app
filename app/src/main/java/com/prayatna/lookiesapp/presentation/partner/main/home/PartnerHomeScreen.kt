@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -76,6 +77,9 @@ fun PartnerHomeScreen(
                         },
                         onMemberClick = {
                             onEvent(PartnerHomeEvent.MemberListClicked)
+                        },
+                        onEditProfileClick = {
+                            onEvent(PartnerHomeEvent.EditProfileClicked)
                         },
                         title = state.profile?.tradingName
                             ?: state.profile?.legalName
@@ -187,7 +191,8 @@ fun PartnerHomeScreen(
 private fun DashboardHeader(
     title: String,
     onMemberClick: () -> Unit,
-    onChatClick: () -> Unit
+    onChatClick: () -> Unit,
+    onEditProfileClick: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -209,6 +214,14 @@ private fun DashboardHeader(
         }
 
         Row {
+            IconButton(
+                onClick = onEditProfileClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Edit"
+                )
+            }
             IconButton(
                 onClick = onMemberClick
             ) {

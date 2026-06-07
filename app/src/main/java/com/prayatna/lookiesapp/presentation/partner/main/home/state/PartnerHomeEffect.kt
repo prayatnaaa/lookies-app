@@ -12,4 +12,5 @@ sealed interface PartnerHomeEffect {
     data class NavigateMemberList(val merchantBusinessId: String): PartnerHomeEffect
 
     data class ShowMessage(val message: String) : PartnerHomeEffect
+    data class NavigateEditProfile(val businessId: String): PartnerHomeEffect
 }

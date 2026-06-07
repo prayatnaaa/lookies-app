@@ -90,6 +90,7 @@ object NavigationRoutes {
     const val CONVERSATION_LIST = "conversation_list"
     const val MERCHANT_CONVERSATION_LIST = "merchant_conversation_list"
     const val PRIVATE_CHAT = "private_chat"
+    const val EDIT_MERCHANT_PROFILE = "edit_merchant_profile"
 }
 
 sealed class BottomNavItem(val route: String, val label: String) {

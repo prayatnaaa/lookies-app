@@ -32,6 +32,7 @@ import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.e
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListRoute
 import com.prayatna.lookiesapp.presentation.exhibitionHistory.ExhibitionHistoryScreen
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.exhibitionShipmentNavigation
+import com.prayatna.lookiesapp.presentation.merchant.editMerchantProfile.navigation.editMerchantProfileNavigation
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
 import com.prayatna.lookiesapp.presentation.forum.members.forumMembersNavigation
 import com.prayatna.lookiesapp.presentation.forum.members.navigateToForumMembers
@@ -128,6 +129,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         startDestination = NavigationRoutes.MAIN_LOADING
     ) {
 
+        editMerchantProfileNavigation(navController)
         createPaintingReviewNavigation(navController)
         adminTransactionListNavigation(navController)
         adminTransactionDetailNavigation(navController)

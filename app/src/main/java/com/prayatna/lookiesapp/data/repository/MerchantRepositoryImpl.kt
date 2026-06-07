@@ -2,10 +2,13 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.content.Context
 import android.net.Uri
+import com.prayatna.lookiesapp.data.mapper.toDomain
+import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseMerchantService
 import com.prayatna.lookiesapp.domain.mapper.toData
 import com.prayatna.lookiesapp.domain.mapper.toDomain
-import com.prayatna.lookiesapp.data.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.merchant.EditMerchantBankAccountInput
+import com.prayatna.lookiesapp.domain.model.merchant.EditMerchantInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberOutput
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
@@ -23,7 +26,6 @@ import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import javax.inject.Inject
-import kotlin.collections.map
 
 class MerchantRepositoryImpl @Inject constructor(
     private val supabaseMerchantService: SupabaseMerchantService,
@@ -147,6 +149,34 @@ class MerchantRepositoryImpl @Inject constructor(
             DataResult.Success(result)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
+
+    override suspend fun updateMerchantBusiness(
+        id: String,
+        input: EditMerchantInput
+    ): DataResult<MerchantBusiness> {
+        return try {
+            val response = supabaseMerchantService.updateMerchantBusiness(id, input.toDto())
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(extractSupabaseError(e.error))
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun updateMerchantBankAccount(
+        id: String,
+        input: EditMerchantBankAccountInput
+    ): DataResult<MerchantBankAccount> {
+        return try {
+            val response = supabaseMerchantService.updateMerchantBankAccount(id, input.toDto())
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(extractSupabaseError(e.error))
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 }

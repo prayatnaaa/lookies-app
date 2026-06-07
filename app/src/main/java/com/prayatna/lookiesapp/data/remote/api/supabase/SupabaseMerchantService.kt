@@ -7,6 +7,8 @@ import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
+import com.prayatna.lookiesapp.data.remote.dto.request.merchant.EditMerchantBankAccountRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.merchant.EditMerchantBusinessRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.merchant.InviteMerchantMemberRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.merchant.InviteMerchantMemberResponse
 import com.prayatna.lookiesapp.utils.Helper
@@ -103,6 +105,20 @@ class SupabaseMerchantService @Inject constructor(
                     eq("merchant_account_id", merchantAccountId)
                 }
             }.decodeList<MerchantBankAccountDto>()
+    }
+
+    suspend fun updateMerchantBusiness(id: String, request: EditMerchantBusinessRequest): MerchantBusinessDto {
+        return postgrest.from("merchant_businesses").update(request) {
+            filter { eq("id", id) }
+            select()
+        }.decodeSingle<MerchantBusinessDto>()
+    }
+
+    suspend fun updateMerchantBankAccount(id: String, request: EditMerchantBankAccountRequest): MerchantBankAccountDto {
+        return postgrest.from("merchant_bank_accounts").update(request) {
+            filter { eq("id", id) }
+            select()
+        }.decodeSingle<MerchantBankAccountDto>()
     }
 
     suspend fun updateShipmentStatus(shipmentId: String, status: String): ShipmentDto {
