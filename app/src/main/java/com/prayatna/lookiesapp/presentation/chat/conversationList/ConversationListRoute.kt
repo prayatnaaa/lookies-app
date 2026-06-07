@@ -21,7 +21,10 @@ fun ConversationListRoute(
             when (effect) {
                 ConversationListEffect.NavigateBack -> navController.popBackStack()
                 is ConversationListEffect.NavigateToChat -> {
-                    navController.navigateToPrivateChat(effect.conversationId, effect.otherPartyName)
+                    navController.navigateToPrivateChat(
+                        partyName = effect.otherPartyName,
+                        conversationId = effect.conversationId
+                    )
                 }
             }
         }

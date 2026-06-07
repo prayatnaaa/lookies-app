@@ -95,8 +95,9 @@ fun EventPaintingDetailScreen(
             when (event) {
                 is EventPaintingDetailEvent.NavigateToChat -> {
                     navController.navigateToPrivateChat(
+                        partyName = event.otherPartyName,
                         conversationId = event.conversationId,
-                        partyName = state.data?.participant?.artist?.username ?: "Store"
+                        merchantId = event.merchantId
                     )
                 }
             }
@@ -105,10 +106,13 @@ fun EventPaintingDetailScreen(
 
     Scaffold(
         floatingActionButton = {
-            state.data?.let { event ->
+            state.data?.let { data ->
                 FloatingActionButton(
                     onClick = {
-                        viewModel.onChatArtistClicked(event.artistId)
+                        viewModel.onChatArtistClicked(
+                            artistId = data.artistId,
+                            artistName = data.participant.artist.fullName ?: data.participant.artist.username ?: "Artist"
+                        )
                     },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -264,9 +268,10 @@ fun EventPaintingDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                artist.id?.let {
-                                    navController.navigate("${NavigationRoutes.MESSAGES}/$it/${artist.username}")
-                                }
+                                viewModel.onChatArtistClicked(
+                                    artistId = item.artistId,
+                                    artistName = artist.fullName ?: artist.username ?: "Artist"
+                                )
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {

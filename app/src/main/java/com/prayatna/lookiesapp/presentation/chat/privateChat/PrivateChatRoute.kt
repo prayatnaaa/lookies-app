@@ -11,7 +11,8 @@ import com.prayatna.lookiesapp.presentation.chat.privateChat.state.PrivateChatEv
 
 @Composable
 fun PrivateChatRoute(
-    conversationId: String,
+    conversationId: String?,
+    merchantId: String?,
     otherPartyName: String,
     isMerchant: Boolean = false,
     navController: NavController,
@@ -19,8 +20,12 @@ fun PrivateChatRoute(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(conversationId, otherPartyName) {
-        viewModel.onEvent(PrivateChatEvent.InitChat(conversationId, otherPartyName))
+    LaunchedEffect(conversationId, merchantId, otherPartyName) {
+        viewModel.onEvent(PrivateChatEvent.InitChat(
+            conversationId = conversationId,
+            merchantId = merchantId,
+            otherPartyName = otherPartyName
+        ))
     }
 
     LaunchedEffect(Unit) {

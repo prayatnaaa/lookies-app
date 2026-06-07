@@ -20,6 +20,7 @@ import com.prayatna.lookiesapp.presentation.chat.conversationList.state.Conversa
 import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.utils.formatChatTime
 
 @Composable
 fun ConversationListScreen(
@@ -114,7 +115,7 @@ private fun ConversationItemRow(
                 
                 item.lastMessageTime?.let {
                     Text(
-                        text = it,
+                        text = formatChatTime(it),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

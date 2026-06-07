@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
@@ -46,6 +47,7 @@ fun DetailEventContent(
     showStatus: Boolean = false,
     isUserArtist: Boolean = false,
     onPartnerClick: (String) -> Unit = {},
+    onChatClick: (String, String) -> Unit = { _, _ -> },
     onPaintingClick: (String) -> Unit = {},
     extraContent: @Composable (() -> Unit)? = null
 ) {
@@ -120,9 +122,6 @@ fun DetailEventContent(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clickable {
-                            onPartnerClick(event.organizer.id)
-                        }
                         .fillMaxWidth()
                         .border(
                             width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant,
@@ -130,28 +129,51 @@ fun DetailEventContent(
                         )
                         .padding(12.dp)
                 ) {
-                    AsyncImage(
-                        model = event.organizer.pictureUrl
-                            ?.replace("http://172.21.179.110", "http://10.0.2.2"),
-                        contentDescription = null,
+                    Row(
                         modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
-                            .background(MaterialTheme.colorScheme.secondary),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            text = "Organized by",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.outline
+                            .weight(1f)
+                            .clickable {
+                                onPartnerClick(event.organizer.id)
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = event.organizer.pictureUrl
+                                ?.replace("http://172.21.179.110", "http://10.0.2.2"),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+                                .background(MaterialTheme.colorScheme.secondary),
+                            contentScale = ContentScale.Crop
                         )
-                        Text(
-                            text = event.organizer.legalName,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = "Organized by",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                            Text(
+                                text = event.organizer.legalName,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = { onChatClick(event.organizer.id, event.organizer.legalName) },
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                            .size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Chat,
+                            contentDescription = "Chat with organizer",
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                 }

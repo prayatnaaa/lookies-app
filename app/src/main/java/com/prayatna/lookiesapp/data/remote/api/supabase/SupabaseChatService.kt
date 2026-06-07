@@ -86,6 +86,17 @@ class SupabaseChatService @Inject constructor(
             }.decodeList()
     }
 
+    suspend fun getConversationByMerchantId(merchantId: String): ConversationViewDto? {
+        val userId = auth.currentSessionOrNull()?.user?.id ?: throw IllegalStateException("User not logged in")
+        return postgrest["conversation_view"]
+            .select {
+                filter { 
+                    eq("user_id", userId) 
+                    eq("merchant_id", merchantId)
+                }
+            }.decodeSingleOrNull()
+    }
+
     suspend fun getMerchantConversations(merchantId: String): List<ConversationViewDto> {
         return postgrest["conversation_view"]
             .select {

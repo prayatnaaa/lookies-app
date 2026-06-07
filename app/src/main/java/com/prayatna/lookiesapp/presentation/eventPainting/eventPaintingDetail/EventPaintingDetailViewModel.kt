@@ -2,7 +2,6 @@ package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.usecase.chat.GetOrCreateConversationUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailUiState
@@ -19,7 +18,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EventPaintingDetailViewModel @Inject constructor(
-    private val getOrCreateConversationUseCase: GetOrCreateConversationUseCase,
     private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
 ): ViewModel() {
 
@@ -28,6 +26,7 @@ class EventPaintingDetailViewModel @Inject constructor(
 
     private val _uiEvent = MutableSharedFlow<EventPaintingDetailEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
+
     fun getEventPaintingDetail(id: String) {
         viewModelScope.launch {
             _state.update { it.copy(
@@ -59,24 +58,14 @@ class EventPaintingDetailViewModel @Inject constructor(
         }
     }
 
-    fun onChatArtistClicked(merchantId: String) {
-        _state.update { it.copy(isLoading = true) }
-
+    fun onChatArtistClicked(artistId: String, artistName: String) {
         viewModelScope.launch {
-            when (val result = getOrCreateConversationUseCase(merchantId)) {
-                is DataResult.Error -> {
-                    _state.update {
-                        it.copy(isLoading = false, errorMessage = result.error)
-                    }
-                }
-                is DataResult.Success -> {
-                    _state.update { it.copy(isLoading = false) }
-                    _uiEvent.emit(EventPaintingDetailEvent.NavigateToChat(result.data.conversationId))
-                }
-                else -> {
-                    _state.update { it.copy(isLoading = false) }
-                }
-            }
+            _uiEvent.emit(
+                EventPaintingDetailEvent.NavigateToChat(
+                    merchantId = artistId,
+                    otherPartyName = artistName
+                )
+            )
         }
     }
 }

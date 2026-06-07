@@ -12,5 +12,13 @@ data class CreateMessageRequest(
     @SerialName("sender_user_id")
     val senderUserId: String = "",
     @SerialName("content")
-    val content: String
+    val content: String,
+    @SerialName("metadata")
+    val metadata: MessageMetadataDto? = null
+)
+
+@Serializable
+data class MessageMetadataDto(
+    val type: String,
+    val id: String,
 )

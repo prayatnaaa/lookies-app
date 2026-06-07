@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
+import com.prayatna.lookiesapp.domain.usecase.chat.GetConversationByMerchantIdUseCase
+import com.prayatna.lookiesapp.domain.usecase.chat.GetOrCreateConversationUseCase
 import com.prayatna.lookiesapp.domain.usecase.chat.ListenToMessagesUseCase
 import com.prayatna.lookiesapp.domain.usecase.chat.SendMessageUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.GetProfileUseCase
@@ -22,10 +24,14 @@ class PrivateChatViewModel @Inject constructor(
     private val listenToMessagesUseCase: ListenToMessagesUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val getProfileUseCase: GetProfileUseCase,
+    private val getOrCreateConversationUseCase: GetOrCreateConversationUseCase,
+    private val getConversationByMerchantIdUseCase: GetConversationByMerchantIdUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val isMerchant = savedStateHandle.get<Boolean>("isMerchant") ?: false
+    private var merchantId: String? = null
+    
     private val _uiState = MutableStateFlow(PrivateChatUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -51,8 +57,18 @@ class PrivateChatViewModel @Inject constructor(
     fun onEvent(event: PrivateChatEvent) {
         when (event) {
             is PrivateChatEvent.InitChat -> {
-                _uiState.update { it.copy(conversationId = event.conversationId, otherPartyName = event.otherPartyName) }
-                startListening(event.conversationId)
+                this.merchantId = event.merchantId
+                
+                if (event.conversationId != null) {
+                    _uiState.update { it.copy(
+                        conversationId = event.conversationId, 
+                        otherPartyName = event.otherPartyName 
+                    ) }
+                    startListening(event.conversationId)
+                } else if (event.merchantId != null) {
+                    _uiState.update { it.copy(otherPartyName = event.otherPartyName) }
+                    checkExistingConversation(event.merchantId)
+                }
             }
             is PrivateChatEvent.InputChanged -> {
                 _uiState.update { it.copy(currentInputString = event.text) }
@@ -64,7 +80,30 @@ class PrivateChatViewModel @Inject constructor(
         }
     }
 
+    private fun checkExistingConversation(merchantId: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            when (val result = getConversationByMerchantIdUseCase(merchantId)) {
+                is DataResult.Success -> {
+                    val conversationId = result.data?.conversationId
+                    if (conversationId != null) {
+                        _uiState.update { it.copy(conversationId = conversationId, isLoading = false) }
+                        startListening(conversationId)
+                    } else {
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
+                }
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+                else -> {}
+            }
+        }
+    }
+
     private fun startListening(conversationId: String) {
+        if (conversationId.isBlank()) return
+        
         listenJob?.cancel()
         listenJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -81,14 +120,38 @@ class PrivateChatViewModel @Inject constructor(
         val content = state.currentInputString.trim()
         if (content.isEmpty()) return
 
-        val input = CreateMessageInput(
-            conversationId = state.conversationId,
-            senderType = if (isMerchant) "merchant" else "user",
-            content = content
-        )
-
         viewModelScope.launch {
             _uiState.update { it.copy(isSending = true, currentInputString = "") }
+            
+            var currentConvId = state.conversationId
+            
+            if (currentConvId.isBlank()) {
+                val mid = merchantId
+                if (mid == null) {
+                    _uiState.update { it.copy(isSending = false, errorMessage = "Merchant information missing") }
+                    return@launch
+                }
+                
+                when (val convResult = getOrCreateConversationUseCase(mid)) {
+                    is DataResult.Success -> {
+                        currentConvId = convResult.data.conversationId
+                        _uiState.update { it.copy(conversationId = currentConvId) }
+                        startListening(currentConvId)
+                    }
+                    is DataResult.Error -> {
+                        _uiState.update { it.copy(isSending = false, errorMessage = convResult.error) }
+                        return@launch
+                    }
+                    else -> return@launch
+                }
+            }
+
+            val input = CreateMessageInput(
+                conversationId = currentConvId,
+                senderType = if (isMerchant) "merchant" else "user",
+                content = content
+            )
+
             when (val result = sendMessageUseCase(input)) {
                 is DataResult.Error -> {
                     _uiState.update { it.copy(isSending = false, errorMessage = result.error) }

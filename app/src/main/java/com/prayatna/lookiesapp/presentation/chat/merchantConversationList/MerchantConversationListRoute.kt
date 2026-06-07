@@ -23,8 +23,11 @@ fun MerchantConversationListRoute(
             when (effect) {
                 ConversationListEffect.NavigateBack -> navController.popBackStack()
                 is ConversationListEffect.NavigateToChat -> {
-                    navController.navigateToPrivateChat(effect.conversationId, effect.otherPartyName, isMerchant = true)
-//                    navController.navigate("${NavigationRoutes.PRIVATE_CHAT}/${effect.conversationId}/${effect.otherPartyName}?isMerchant=true")
+                    navController.navigateToPrivateChat(
+                        partyName = effect.otherPartyName,
+                        conversationId = effect.conversationId,
+                        isMerchant = true
+                    )
                 }
             }
         }

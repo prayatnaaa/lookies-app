@@ -1,8 +1,8 @@
 package com.prayatna.lookiesapp.data.repository
 
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseChatService
-import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
 import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.mapper.toDto
 import com.prayatna.lookiesapp.domain.model.message.Conversation
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
 import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
@@ -32,12 +32,7 @@ class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun sendMessage(data: CreateMessageInput): DataResult<Message> {
         return try {
-            val request = CreateMessageRequest(
-                conversationId = data.conversationId,
-                senderType = data.senderType,
-                content = data.content
-            )
-            val result = supabaseChatService.sendMessage(request)
+            val result = supabaseChatService.sendMessage(data.toDto())
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
@@ -65,6 +60,17 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Error(e.error)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Error fetching merchant conversations")
+        }
+    }
+
+    override suspend fun getConversationByMerchantId(merchantId: String): DataResult<Conversation?> {
+        return try {
+            val result = supabaseChatService.getConversationByMerchantId(merchantId)
+            DataResult.Success(result?.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error checking existing conversation")
         }
     }
 

@@ -76,16 +76,20 @@ fun DetailEventScreen(
         viewModel.getEventPaintings(eventId)
     }
 
-    // Collect UI Event (FIXED)
+    // Collect UI Event
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
-            if (event is DetailEventUiEvent.ShowResult) {
-                resultState = event
-            } else if (event is DetailEventUiEvent.NavigateToChat) {
-                navController.navigateToPrivateChat(
-                    conversationId = event.conversationId,
-                    partyName = detailEventState.info?.organizer?.legalName ?: "Store"
-                )
+            when (event) {
+                is DetailEventUiEvent.ShowResult -> {
+                    resultState = event
+                }
+                is DetailEventUiEvent.NavigateToChat -> {
+                    navController.navigateToPrivateChat(
+                        partyName = event.merchantName,
+                        conversationId = event.conversationId,
+                        merchantId = event.merchantId
+                    )
+                }
             }
         }
     }
@@ -115,7 +119,10 @@ fun DetailEventScreen(
                 if (role != "admin") {
                     FloatingActionButton(
                         onClick = {
-                            viewModel.onChatMerchantClicked(event.organizer.id)
+                            viewModel.onChatMerchantClicked(
+                                merchantId = event.organizer.id,
+                                merchantName = event.organizer.legalName
+                            )
                         },
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -197,6 +204,9 @@ fun DetailEventScreen(
                     },
                     onPartnerClick = { id ->
                         navController.navigateToPublicMerchantProfile(id)
+                    },
+                    onChatClick = { merchantId, merchantName ->
+                        viewModel.onChatMerchantClicked(merchantId, merchantName)
                     }
                 )
             }

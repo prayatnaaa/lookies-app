@@ -3,9 +3,12 @@ package com.prayatna.lookiesapp.domain.mapper
 import com.prayatna.lookiesapp.data.remote.dto.ChatMessageViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ConversationViewDto
 import com.prayatna.lookiesapp.data.remote.dto.MessageDto
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.MessageMetadataDto
 import com.prayatna.lookiesapp.domain.model.message.Conversation
+import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
 import com.prayatna.lookiesapp.domain.model.message.Message
-import kotlinx.datetime.Instant
+import com.prayatna.lookiesapp.domain.model.message.MessageMetadata
 import kotlinx.datetime.toInstant
 
 fun ChatMessageViewDto.toDomain(): Message {
@@ -62,5 +65,28 @@ fun ConversationViewDto.toDomain(): Conversation {
         lastMessageTime = lastMessageTime,
         lastMessageSender = lastMessageSender,
         lastMessageIsRead = lastMessageIsRead
+    )
+}
+
+fun CreateMessageInput.toDto(): CreateMessageRequest {
+    return CreateMessageRequest(
+        conversationId = conversationId,
+        senderType = senderType,
+        content = content,
+        metadata = metadata?.toDto()
+    )
+}
+
+fun MessageMetadata.toDto(): MessageMetadataDto {
+    return MessageMetadataDto(
+        type = type,
+        id = id
+    )
+}
+
+fun MessageMetadataDto.toDomain(): MessageMetadata {
+    return MessageMetadata(
+        type = type,
+        id = id
     )
 }
