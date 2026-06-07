@@ -25,11 +25,15 @@ import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.presenceChangeFlow
 import io.github.jan.supabase.realtime.track
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import java.util.UUID
 import javax.inject.Inject
@@ -129,12 +133,28 @@ class SupabaseChatService @Inject constructor(
             }
         }
 
+//        awaitClose {
+//            Log.d("PRIVATE-CHAT", "UNSUBSCRIBE CHANNEL")
+//            job.cancel()
+//            launch {
+//                realtime.removeChannel(channel)
+//                channel.unsubscribe()
+//            }
+//        }
         awaitClose {
-            Log.d("PRIVATE-CHAT", "UNSUBSCRIBE CHANNEL")
+            Log.d("CHAT", "UNSUBSCRIBE CHANNEL")
             job.cancel()
-            launch {
-                realtime.removeChannel(channel)
-                channel.unsubscribe()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(NonCancellable) {
+                    try {
+                        channel.unsubscribe()
+                        realtime.removeChannel(channel)
+                        Log.d("CHAT", "CHANNEL CLOSED")
+                    } catch (e: Exception) {
+                        Log.e("CHAT", "Failed to close channel", e)
+                    }
+                }
             }
         }
     }
@@ -216,12 +236,30 @@ class SupabaseChatService @Inject constructor(
             }
         }
 
+//        awaitClose {
+//            Log.d("CHAT", "UNSUBSCRIBE CHANNEL")
+//            job.cancel()
+//            launch {
+//                realtime.removeChannel(channel)
+//                channel.unsubscribe()
+//            }
+//        }
         awaitClose {
             Log.d("CHAT", "UNSUBSCRIBE CHANNEL")
             job.cancel()
-            launch {
-                realtime.removeChannel(channel)
-                channel.unsubscribe()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(NonCancellable) {
+                    try {
+                        // 1. Unsubscribe dari server Supabase
+                        channel.unsubscribe()
+                        // 2. Hapus dari cache local realtime client
+                        realtime.removeChannel(channel)
+                        Log.d("CHAT", "CHANNEL CLOSED")
+                    } catch (e: Exception) {
+                        Log.e("CHAT", "Failed to close channel", e)
+                    }
+                }
             }
         }
     }
