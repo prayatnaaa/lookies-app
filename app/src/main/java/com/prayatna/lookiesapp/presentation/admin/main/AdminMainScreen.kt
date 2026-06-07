@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Money
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -109,6 +110,17 @@ fun AdminMainScreen(
                 subtitle = "Manage event applications",
                 onClick = {
                     navController.navigate(NavigationRoutes.ADMIN_EVENT)
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            AdminDashboardCard(
+                icon = Icons.Default.Payments,
+                title = "Refunds",
+                subtitle = "Manage refunds request and others",
+                onClick = {
+                    navController.navigate(NavigationRoutes.REFUND_LIST)
                 }
             )
 

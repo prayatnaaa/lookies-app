@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.ApprovePaintingUseCase
+import com.prayatna.lookiesapp.domain.usecase.partner.DeleteEventPaintingUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.RejectPaintingUseCase
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.state.PartnerExhibitionPaintingEffect
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.state.PartnerExhibitionPaintingEvent
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
     private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
     private val approvePaintingUseCase: ApprovePaintingUseCase,
-    private val rejectPaintingUseCase: RejectPaintingUseCase
+    private val rejectPaintingUseCase: RejectPaintingUseCase,
+    private val deleteEventPaintingUseCase: DeleteEventPaintingUseCase
 ): ViewModel() {
 
     private val _state = MutableStateFlow(EventPaintingDetailUiState())
@@ -37,6 +39,7 @@ class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
             is PartnerExhibitionPaintingEvent.Load -> load(intent.id)
             is PartnerExhibitionPaintingEvent.Approve -> approve(intent.id)
             is PartnerExhibitionPaintingEvent.Reject -> reject(intent.id, intent.reason)
+            is PartnerExhibitionPaintingEvent.Delete -> delete(intent.id)
         }
     }
 
@@ -117,6 +120,26 @@ class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
                 }
 
                 else -> Unit
+            }
+        }
+    }
+
+    private fun delete(id: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(actionLoading = true) }
+
+            when (val result = deleteEventPaintingUseCase(id)) {
+                is DataResult.Success -> {
+                    _state.update { it.copy(actionLoading = false) }
+                    _event.send(PartnerExhibitionPaintingEffect.ShowResult("Painting Deleted Successfully"))
+                }
+                is DataResult.Error -> {
+                    _state.update { it.copy(actionLoading = false) }
+                    _event.send(PartnerExhibitionPaintingEffect.ShowError(result.error))
+                }
+                else -> {
+                    _state.update { it.copy(actionLoading = false) }
+                }
             }
         }
     }

@@ -38,6 +38,15 @@ class SupabasePartnerService @Inject constructor(
     private val realtime: Realtime
 ) {
 
+    suspend fun deleteEventPainting(eventPaintingId: String): String {
+        postgrest.from("event_paintings").delete {
+            filter {
+                eq("id", eventPaintingId)
+            }
+        }
+
+        return "Event painting deleted successfully"
+    }
     suspend fun updateRevenueRules(id: String, request: UpdateRevenueRulesRequest): EventRevenueRulesDto {
         return postgrest["event_revenue_rules"].update(request) {
             select()

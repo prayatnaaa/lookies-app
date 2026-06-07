@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocalShipping
-import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.CardDefaults
@@ -468,19 +467,19 @@ private fun ActionGrid(
                 modifier = Modifier.weight(1f)
             )
 
-            ActionCircle(
-                title = "Refund",
-                icon = {
-                    Icon(Icons.Default.Payments, null)
-                },
-                onClick = {
-                    onEvent(
-                        PartnerHomeEvent.RefundClicked
-                    )
-                },
-                modifier = Modifier.weight(1f),
-                enabled = enabled
-            )
+//            ActionCircle(
+//                title = "Refund",
+//                icon = {
+//                    Icon(Icons.Default.Payments, null)
+//                },
+//                onClick = {
+//                    onEvent(
+//                        PartnerHomeEvent.RefundClicked
+//                    )
+//                },
+//                modifier = Modifier.weight(1f),
+//                enabled = enabled
+//            )
         }
 
         Row(

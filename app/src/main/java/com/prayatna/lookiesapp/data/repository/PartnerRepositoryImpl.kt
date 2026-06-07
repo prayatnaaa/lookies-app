@@ -157,6 +157,17 @@ class PartnerRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteEventPainting(id: String): DataResult<String> {
+        return try {
+            val response = supabasePartnerService.deleteEventPainting(eventPaintingId = id)
+            DataResult.Success(response)
+        } catch (e: RestException) {
+            DataResult.Error(extractSupabaseError(e.error))
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Failed to delete event painting")
+        }
+    }
+
     override fun getDashboardSummary(merchantId: String): Flow<PartnerDashboard> =
         supabasePartnerService.getDashboardSummary(merchantId)
             .map { it.toDomain() }

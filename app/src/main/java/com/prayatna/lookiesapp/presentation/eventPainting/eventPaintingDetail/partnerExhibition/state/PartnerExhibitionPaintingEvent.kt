@@ -10,4 +10,6 @@ sealed class PartnerExhibitionPaintingEvent {
         val id: String,
         val reason: String
     ) : PartnerExhibitionPaintingEvent()
+
+    data class Delete(val id: String) : PartnerExhibitionPaintingEvent()
 }
