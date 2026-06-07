@@ -15,6 +15,10 @@ fun PrivateChatRoute(
     merchantId: String?,
     otherPartyName: String,
     isMerchant: Boolean = false,
+    metadataType: String? = null,
+    metadataId: String? = null,
+    metadataImageUrl: String? = null,
+    metadataTitle: String? = null,
     navController: NavController,
     viewModel: PrivateChatViewModel = hiltViewModel()
 ) {
@@ -24,7 +28,11 @@ fun PrivateChatRoute(
         viewModel.onEvent(PrivateChatEvent.InitChat(
             conversationId = conversationId,
             merchantId = merchantId,
-            otherPartyName = otherPartyName
+            otherPartyName = otherPartyName,
+            metadataType = metadataType,
+            metadataId = metadataId,
+            metadataImageUrl = metadataImageUrl,
+            metadataTitle = metadataTitle
         ))
     }
 

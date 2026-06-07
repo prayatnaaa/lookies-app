@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
+import com.prayatna.lookiesapp.domain.model.message.MessageMetadata
 import com.prayatna.lookiesapp.domain.usecase.chat.GetConversationByMerchantIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.chat.GetOrCreateConversationUseCase
 import com.prayatna.lookiesapp.domain.usecase.chat.ListenToMessagesUseCase
@@ -59,14 +60,27 @@ class PrivateChatViewModel @Inject constructor(
             is PrivateChatEvent.InitChat -> {
                 this.merchantId = event.merchantId
                 
+                val metadata = if (event.metadataType != null && event.metadataId != null && event.metadataImageUrl != null && event.metadataTitle != null) {
+                    MessageMetadata(
+                        type = event.metadataType,
+                        id = event.metadataId,
+                        imageUrl = event.metadataImageUrl,
+                        title = event.metadataTitle
+                    )
+                } else null
+
                 if (event.conversationId != null) {
                     _uiState.update { it.copy(
                         conversationId = event.conversationId, 
-                        otherPartyName = event.otherPartyName 
+                        otherPartyName = event.otherPartyName,
+                        pendingMetadata = metadata
                     ) }
                     startListening(event.conversationId)
                 } else if (event.merchantId != null) {
-                    _uiState.update { it.copy(otherPartyName = event.otherPartyName) }
+                    _uiState.update { it.copy(
+                        otherPartyName = event.otherPartyName,
+                        pendingMetadata = metadata
+                    ) }
                     checkExistingConversation(event.merchantId)
                 }
             }
@@ -76,6 +90,10 @@ class PrivateChatViewModel @Inject constructor(
             PrivateChatEvent.SendMessage -> handleSendMessage()
             PrivateChatEvent.OnBackClicked -> {
                 viewModelScope.launch { _effect.emit(PrivateChatEffect.NavigateBack) }
+            }
+
+            PrivateChatEvent.OnClearMetadata -> {
+                _uiState.update { it.copy(pendingMetadata = null) }
             }
         }
     }
@@ -149,7 +167,8 @@ class PrivateChatViewModel @Inject constructor(
             val input = CreateMessageInput(
                 conversationId = currentConvId,
                 senderType = if (isMerchant) "merchant" else "user",
-                content = content
+                content = content,
+                metadata = state.pendingMetadata
             )
 
             when (val result = sendMessageUseCase(input)) {
@@ -157,7 +176,7 @@ class PrivateChatViewModel @Inject constructor(
                     _uiState.update { it.copy(isSending = false, errorMessage = result.error) }
                 }
                 is DataResult.Success -> {
-                    _uiState.update { it.copy(isSending = false) }
+                    _uiState.update { it.copy(isSending = false, pendingMetadata = null) }
                 }
                 else -> _uiState.update { it.copy(isSending = false) }
             }

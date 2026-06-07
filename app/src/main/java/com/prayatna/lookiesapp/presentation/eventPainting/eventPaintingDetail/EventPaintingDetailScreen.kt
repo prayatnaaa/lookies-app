@@ -97,7 +97,11 @@ fun EventPaintingDetailScreen(
                     navController.navigateToPrivateChat(
                         partyName = event.otherPartyName,
                         conversationId = event.conversationId,
-                        merchantId = event.merchantId
+                        merchantId = event.merchantId,
+                        metadataType = "painting",
+                        metadataId = id,
+                        metadataImageUrl = state.data?.painting?.paintingUrl,
+                        metadataTitle = state.data?.painting?.title
                     )
                 }
             }

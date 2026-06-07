@@ -87,7 +87,11 @@ fun DetailEventScreen(
                     navController.navigateToPrivateChat(
                         partyName = event.merchantName,
                         conversationId = event.conversationId,
-                        merchantId = event.merchantId
+                        merchantId = event.merchantId,
+                        metadataType = "event",
+                        metadataId = eventId,
+                        metadataImageUrl = detailEventState.info?.bannerImageUrl,
+                        metadataTitle = detailEventState.info?.title
                     )
                 }
             }
