@@ -13,6 +13,7 @@ data class ExhibitionShipmentUiState(
     val errorMessage: String? = null,
     val successMessage: String? = null,
     val selectedArrivalProof: Uri? = null,
+    val isPartner: Boolean = false,
 
     // Existing shipment (if any)
     val shipment: ExhibitionShipment? = null,

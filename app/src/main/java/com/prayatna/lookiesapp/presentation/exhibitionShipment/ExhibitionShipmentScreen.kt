@@ -127,11 +127,15 @@ fun ExhibitionShipmentScreen(
                     .padding(horizontal = 20.dp, vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                ShipmentRoleInfoCard(
+                    isPartner = uiState.isPartner,
+                    status = uiState.eventPaintingStatus
+                )
                 when (uiState.eventPaintingStatus) {
 
-                    "approved", "accepted" -> InboundSubmitSection(uiState, onEvent)
+                    "approved", "accepted" -> if (!uiState.isPartner) { InboundSubmitSection(uiState, onEvent) }
 
-                    "shipping_to_event" -> OrganizerConfirmReceivedSection(uiState, onEvent)
+                    "shipping_to_event" ->  if (uiState.isPartner) { OrganizerConfirmReceivedSection(uiState, onEvent) }
 
                     "exhibited" -> StatusInfoSection(
                         title = "Artwork is Being Exhibited",
@@ -139,9 +143,9 @@ fun ExhibitionShipmentScreen(
                         isPositive = true
                     )
 
-                    "unsold" -> ReturnShipmentSection(uiState, onEvent)
+                    "unsold" ->  if(uiState.isPartner) { ReturnShipmentSection(uiState, onEvent) }
 
-                    "returning_to_creator" -> ArtistConfirmReturnSection(uiState, onEvent)
+                    "returning_to_creator" -> if (!uiState.isPartner) { ArtistConfirmReturnSection(uiState, onEvent) }
 
                     "returned" -> StatusInfoSection(
                         title = "Artwork Returned",
@@ -159,6 +163,43 @@ fun ExhibitionShipmentScreen(
                 Spacer(Modifier.height(32.dp))
             }
         }
+    }
+}
+
+@Composable
+private fun ShipmentRoleInfoCard(
+    isPartner: Boolean,
+    status: String
+) {
+    val message = when {
+        !isPartner && status in listOf("approved", "accepted") ->
+            "Your artwork has been accepted. Please arrange delivery to the exhibition venue."
+
+        isPartner && status in listOf("approved", "accepted") ->
+            "Waiting for the artist to ship the artwork to the venue."
+
+        isPartner && status == "shipping_to_event" ->
+            "The artist has shipped the artwork. Verify its arrival and condition."
+
+        !isPartner && status == "shipping_to_event" ->
+            "Your artwork is on its way to the venue. We'll notify you once it's received."
+
+        isPartner && status == "unsold" ->
+            "The exhibition has ended without a sale. Arrange return shipment to the artist."
+
+        !isPartner && status == "returning_to_creator" ->
+            "Your artwork is currently being returned. Confirm receipt once it arrives."
+
+        else ->
+            null
+    }
+
+    if (message != null) {
+        StatusInfoSection(
+            title = "Information",
+            body = message,
+            isPositive = true
+        )
     }
 }
 
@@ -276,7 +317,7 @@ private fun InboundSubmitSection(
             value = uiState.courierNameInput,
             onValueChange = { onEvent(ExhibitionShipmentEvent.OnCourierNameChanged(it)) },
             label = { Text("Courier Name") },
-            placeholder = { Text("e.g. JNE, SiCepat, Anteraja") },
+            placeholder = { Text("e.g. JNE, ExpressJE") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -423,7 +464,7 @@ private fun ReturnShipmentSection(
         value = uiState.courierNameInput,
         onValueChange = { onEvent(ExhibitionShipmentEvent.OnCourierNameChanged(it)) },
         label = { Text("Courier Name") },
-        placeholder = { Text("e.g. JNE, SiCepat") },
+        placeholder = { Text("e.g. JNE, JNT") },
         singleLine = true,
         modifier = Modifier.fillMaxWidth()
     )

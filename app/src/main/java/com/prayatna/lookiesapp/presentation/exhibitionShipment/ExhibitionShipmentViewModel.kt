@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.exhibitionShipment
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.shipment.CreateExhibitionShipmentInput
@@ -28,11 +29,25 @@ class ExhibitionShipmentViewModel @Inject constructor(
     private val createExhibitionShipmentUseCase: CreateExhibitionShipmentUseCase,
     private val updateExhibitionShipmentStatusUseCase: UpdateExhibitionShipmentStatusUseCase,
     private val uploadExhibitionArrivalProofUseCase: UploadExhibitionArrivalProofUseCase,
-    private val getExhibitionShipmentByEventPaintingIdUseCase: GetExhibitionShipmentByEventPaintingIdUseCase
+    private val getExhibitionShipmentByEventPaintingIdUseCase: GetExhibitionShipmentByEventPaintingIdUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+
+    private val eventPaintingId: String = checkNotNull(savedStateHandle["eventPaintingId"])
+    private val isPartner: Boolean = savedStateHandle["isPartner"] ?: false
     private val _uiState = MutableStateFlow(ExhibitionShipmentUiState())
     val uiState: StateFlow<ExhibitionShipmentUiState> = _uiState.asStateFlow()
+
+    init {
+        checkPartner()
+    }
+
+    private fun checkPartner() {
+        if (isPartner) {
+            _uiState.update { it.copy(isPartner = true) }
+        }
+    }
 
     fun init(eventPaintingId: String) {
         viewModelScope.launch {
@@ -142,7 +157,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
             when (val shipmentResult = createExhibitionShipmentUseCase(input)) {
                 is DataResult.Success -> {
                     _uiState.update { it.copy(isLoading = false, isSubmitting = false, successMessage = "Inbound shipment created successfully") }
-
+                    init(eventPaintingId)
                 }
                 is DataResult.Error -> _uiState.update {
                     it.copy(isSubmitting = false, errorMessage = shipmentResult.error)
