@@ -3,8 +3,10 @@ package com.prayatna.lookiesapp.presentation.partner.partnerlist
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -99,7 +101,7 @@ fun PartnerListScreen(
                             onValueChange = viewModel::onTitleChanged,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
+                                .padding(horizontal = 4.dp),
                             placeholder = { Text("Search event...") },
                             singleLine = true,
                             shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
@@ -139,6 +141,8 @@ fun PartnerListScreen(
                             )
                         )
 
+                        Spacer(modifier = Modifier.height(12.dp))
+
 
                         // Top header
                         Row(
@@ -151,7 +155,10 @@ fun PartnerListScreen(
                             FilterItem(
                                 title = "All",
                                 selected = filterState.selectedStatus == null,
-                                onClick = { viewModel.onFilterSelected(null) }
+                                onClick = {
+                                    viewModel.onFilterSelected(null)
+                                    viewModel.loadPartners()
+                                }
                             )
 
                             FilterItem(
