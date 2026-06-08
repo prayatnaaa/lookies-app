@@ -7,14 +7,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +56,31 @@ fun ArtistExhibitionPaintingDetailScreen(
     }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var showUnsoldConfirmDialog by remember { mutableStateOf(false) }
+
+    if (showUnsoldConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showUnsoldConfirmDialog = false },
+            title = { Text("Mark as Unsold") },
+            text = { Text("Are you sure you want to mark this artwork as unsold? This action is useful if you sold the painting through another channel. This will remove it from the event sales.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showUnsoldConfirmDialog = false
+                        viewModel.markAsUnsold(eventPaintingId)
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showUnsoldConfirmDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -68,6 +102,12 @@ fun ArtistExhibitionPaintingDetailScreen(
                                     "${NavigationRoutes.INSERT_EVENT_PAINTINGS_ROUTE}/$eventId/$merchantId"
                                 )
                             }
+                        )
+                    }
+                    painting.status.lowercase() == "on_sale" && painting.participant.event.eventFormat.slug == "online" -> {
+                        ArtistMarkAsUnsoldActionBar(
+                            isLoading = state.actionLoading,
+                            onMarkAsUnsold = { showUnsoldConfirmDialog = true }
                         )
                     }
                     painting.status in SHIPMENT_ACTIONABLE_STATUSES -> {
@@ -96,6 +136,43 @@ fun ArtistExhibitionPaintingDetailScreen(
                 painting = painting,
                 modifier = Modifier.padding(innerPadding)
             )
+        }
+    }
+}
+
+@Composable
+fun ArtistMarkAsUnsoldActionBar(
+    isLoading: Boolean,
+    onMarkAsUnsold: () -> Unit
+) {
+    Surface(
+        shadowElevation = 8.dp,
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .navigationBarsPadding()
+        ) {
+            OutlinedButton(
+                onClick = onMarkAsUnsold,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
+                ),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                } else {
+                    Text(
+                        text = "Mark as Unsold",
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
         }
     }
 }

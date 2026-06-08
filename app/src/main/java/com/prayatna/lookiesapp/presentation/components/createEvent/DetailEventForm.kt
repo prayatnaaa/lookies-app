@@ -35,7 +35,12 @@ fun DetailEventForm(
     onEventFormatChange: (String) -> Unit,
     paintingSubmissionDeadline: String? = null,
     onPaintingSubmissionDeadlineChange: (String) -> Unit = {},
-    isSelfExhibition: Boolean = false
+    registrationStartDate: String? = null,
+    onRegistrationStartDateChange: (String) -> Unit = {},
+    registrationEndDate: String? = null,
+    onRegistrationEndDateChange: (String) -> Unit = {},
+    isSelfExhibition: Boolean = false,
+    isOpenCall: Boolean = false
 ) {
     FormSectionCard(
         title = "Event Details",
@@ -91,6 +96,17 @@ fun DetailEventForm(
             onStartDateChange = onStartDateChange,
             onEndDateChange = onEndDateChange
         )
+
+        if (isOpenCall) {
+            Spacer(modifier = Modifier.height(8.dp))
+            EventDateRangeField(
+                label = "Registration Timeline",
+                startDate = registrationStartDate ?: "",
+                endDate = registrationEndDate ?: "",
+                onStartDateChange = onRegistrationStartDateChange,
+                onEndDateChange = onRegistrationEndDateChange
+            )
+        }
 
         if (!isSelfExhibition) {
             Spacer(modifier = Modifier.height(8.dp))

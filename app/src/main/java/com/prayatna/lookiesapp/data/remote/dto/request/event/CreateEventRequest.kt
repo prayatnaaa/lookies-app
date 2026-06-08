@@ -46,5 +46,9 @@ data class CreateEventRequest(
     val ticketEventPercent: Int? = null,
     @SerialName("ticket_platform_percent")
     val ticketPlatformPercent: Int? = null,
+    @SerialName("registration_start_date")
+    val registrationStartDate: String?,
+    @SerialName("registration_end_date")
+    val registrationEndDate: String?
 )
 

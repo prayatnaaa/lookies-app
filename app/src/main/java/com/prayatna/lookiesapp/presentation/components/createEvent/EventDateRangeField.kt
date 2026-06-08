@@ -38,7 +38,8 @@ fun EventDateRangeField(
     startDate: String,
     endDate: String,
     onStartDateChange: (String) -> Unit,
-    onEndDateChange: (String) -> Unit
+    onEndDateChange: (String) -> Unit,
+    label: String? = null
 ) {
     var showStartPicker by remember { mutableStateOf(false) }
     var showEndPicker by remember { mutableStateOf(false) }
@@ -53,6 +54,14 @@ fun EventDateRangeField(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
+        if (label != null) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         OutlinedTextField(
             shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),

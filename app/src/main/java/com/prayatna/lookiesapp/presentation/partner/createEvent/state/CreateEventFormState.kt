@@ -10,9 +10,10 @@ data class CreateEventFormState(
     val startDate: String = "",
     val endDate: String = "",
     val paintingSubmissionDeadline: String? = null,
+    val registrationStartDate: String? = null,
+    val registrationEndDate: String? = null,
     val location: String = "",
     val locationUrl: String = "",
-    val maxParticipant: String? = null,
     val maxPainting: String? = null,
     val maxPaintingPerArtist: String? = null,
     val about: String = "",
@@ -32,12 +33,20 @@ data class CreateEventFormState(
     val errorMessage: String? = null,
 ) {
     val isValid: Boolean
-        get() =
-            title.isNotBlank() &&
+        get() {
+            val selectedType = eventTypes.find { it.id.toString() == eventType }
+            val isOpenCall = selectedType?.slug == "open_call"
+            
+            return title.isNotBlank() &&
             bannerUri != null &&
             startDate.isNotBlank() &&
             endDate.isNotBlank() &&
             eventType.toIntOrNull() != null &&
             eventFormat.toIntOrNull() != null &&
-            (eventType != "open_call" || !paintingSubmissionDeadline.isNullOrBlank())
+            (!isOpenCall || (
+                !paintingSubmissionDeadline.isNullOrBlank() && 
+                !registrationStartDate.isNullOrBlank() && 
+                !registrationEndDate.isNullOrBlank()
+            ))
+        }
 }

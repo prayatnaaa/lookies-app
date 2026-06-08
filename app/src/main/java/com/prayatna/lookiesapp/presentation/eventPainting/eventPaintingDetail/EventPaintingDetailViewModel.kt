@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
+import com.prayatna.lookiesapp.domain.usecase.painting.MarkEventPaintingAsUnsoldUseCase
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailUiState
 import com.prayatna.lookiesapp.utils.DataResult
@@ -19,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EventPaintingDetailViewModel @Inject constructor(
     private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
+    private val markEventPaintingAsUnsoldUseCase: MarkEventPaintingAsUnsoldUseCase
 ): ViewModel() {
 
     private val _state = MutableStateFlow(EventPaintingDetailUiState())
@@ -66,6 +68,25 @@ class EventPaintingDetailViewModel @Inject constructor(
                     otherPartyName = artistName
                 )
             )
+        }
+    }
+
+    fun markAsUnsold(id: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(actionLoading = true) }
+            when (val result = markEventPaintingAsUnsoldUseCase(id)) {
+                is DataResult.Success -> {
+                    _state.update { it.copy(actionLoading = false) }
+                    // Reload data to reflect changes
+                    getEventPaintingDetail(id)
+                }
+                is DataResult.Error -> {
+                    _state.update { it.copy(actionLoading = false, errorMessage = result.error) }
+                }
+                else -> {
+                    _state.update { it.copy(actionLoading = false) }
+                }
+            }
         }
     }
 }

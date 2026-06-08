@@ -16,36 +16,22 @@ import com.prayatna.lookiesapp.presentation.components.registerBusiness.FormSect
 @Composable
 fun ParticipationRulesForm(
     isSelfExhibition: Boolean,
-    maxParticipants: String?,
-    onMaxParticipantsChange: (String) -> Unit,
     maxPainting: String?,
     onMaxPaintingChange: (String?) -> Unit,
     maxPaintingPerArtist: String?,
     onMaxPaintingPerArtistChange: (String?) -> Unit
 ) {
     FormSectionCard(
-        title = "Participants & Artworks",
+        title = "Artworks Capacity",
         icon = Icons.Default.Groups
     ) {
         Text(
-            text = "Set limits for artists and paintings",
+            text = "Set limits for artwork contributions",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(4.dp))
-
-        if (!isSelfExhibition) {
-            CustomTextField(
-                value = maxParticipants ?: "",
-                onValueChange = { input ->
-                    if (input.all { it.isDigit() }) onMaxParticipantsChange(input)
-                },
-                label = "Maximum Ticket Purchased",
-                keyboardType = KeyboardType.Number
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
 
         CustomTextField(
             value = maxPainting ?: "",
