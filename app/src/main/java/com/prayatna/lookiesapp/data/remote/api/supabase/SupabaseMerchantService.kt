@@ -71,6 +71,7 @@ class SupabaseMerchantService @Inject constructor(
             .select {
                 filter {
                     eq("business_id", merchantBusinessId)
+                    neq("status", "inactive")
                 }
             }.decodeList<MerchantMemberDto>()
     }

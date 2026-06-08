@@ -61,11 +61,11 @@ fun EventListScreen(
 ) {
     val focusManager = LocalFocusManager.current
 
-    val statusFilters = listOf(
-        "published" to "Published",
-        "pending_validation" to "Pending",
-        "completed" to "Ended"
-    )
+//    val statusFilters = listOf(
+//        "published" to "Published",
+//        "pending_validation" to "Pending",
+//        "completed" to "Ended"
+//    )
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -153,44 +153,44 @@ fun EventListScreen(
                 }
 
                 // Status filter chips
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 4.dp)
-                ) {
-                    item {
-                        FilterChip(
-                            selected = uiState.selectedStatus == null,
-                            onClick = { onEvent(EventListEvent.OnStatusSelected(null)) },
-                            label = { Text("All") },
-                            leadingIcon = if (uiState.selectedStatus == null) {
-                                {
-                                    Icon(
-                                        imageVector = Icons.Default.Done,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                    )
-                                }
-                            } else null
-                        )
-                    }
-                    items(statusFilters) { (slug, label) ->
-                        val isSelected = uiState.selectedStatus == slug
-                        FilterChip(
-                            selected = isSelected,
-                            onClick = { onEvent(EventListEvent.OnStatusSelected(slug)) },
-                            label = { Text(label) },
-                            leadingIcon = if (isSelected) {
-                                {
-                                    Icon(
-                                        imageVector = Icons.Default.Done,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                    )
-                                }
-                            } else null
-                        )
-                    }
-                }
+//                LazyRow(
+//                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+//                    contentPadding = PaddingValues(horizontal = 4.dp)
+//                ) {
+//                    item {
+//                        FilterChip(
+//                            selected = uiState.selectedStatus == null,
+//                            onClick = { onEvent(EventListEvent.OnStatusSelected(null)) },
+//                            label = { Text("All") },
+//                            leadingIcon = if (uiState.selectedStatus == null) {
+//                                {
+//                                    Icon(
+//                                        imageVector = Icons.Default.Done,
+//                                        contentDescription = null,
+//                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+//                                    )
+//                                }
+//                            } else null
+//                        )
+//                    }
+//                    items(statusFilters) { (slug, label) ->
+//                        val isSelected = uiState.selectedStatus == slug
+//                        FilterChip(
+//                            selected = isSelected,
+//                            onClick = { onEvent(EventListEvent.OnStatusSelected(slug)) },
+//                            label = { Text(label) },
+//                            leadingIcon = if (isSelected) {
+//                                {
+//                                    Icon(
+//                                        imageVector = Icons.Default.Done,
+//                                        contentDescription = null,
+//                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+//                                    )
+//                                }
+//                            } else null
+//                        )
+//                    }
+//                }
 
                 // Sort toggle
                 Row(
