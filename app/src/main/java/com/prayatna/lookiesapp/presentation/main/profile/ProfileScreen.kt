@@ -60,6 +60,22 @@ fun ProfileScreen(
     val profileState by sharedViewModel.profileState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
+    LaunchedEffect(Unit) {
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow("refresh", false)
+            ?.collect { shouldRefresh ->
+                if (shouldRefresh) {
+
+                    sharedViewModel.refreshProfile()
+
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("refresh", false)
+                }
+            }
+    }
+
     LaunchedEffect(viewModel.isError) {
         if (viewModel.isError) {
             snackBarHostState.showSnackbar(

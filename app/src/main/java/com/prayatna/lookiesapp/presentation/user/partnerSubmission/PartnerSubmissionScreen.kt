@@ -65,6 +65,9 @@ fun PartnerSubmissionScreen(
         SuccessDialog(
             message = "Your partner application has been submitted. We'll review it and get back to you.",
             onConfirm = {
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("refresh", true)
                 navController.popBackStack()
             }
         )

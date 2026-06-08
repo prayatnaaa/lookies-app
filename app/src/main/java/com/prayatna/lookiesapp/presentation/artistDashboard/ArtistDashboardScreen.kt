@@ -182,6 +182,10 @@ fun ArtistDashboardScreen(
                 }
             } else {
                 state.summary?.let { summary ->
+                    when(summary.status) {
+                        "pending" -> TODO()
+                        "accepted" -> TODO()
+                    }
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(24.dp),

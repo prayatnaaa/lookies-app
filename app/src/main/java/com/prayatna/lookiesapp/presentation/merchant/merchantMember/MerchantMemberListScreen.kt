@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +42,22 @@ fun MerchantMemberListScreen(
     viewModel: MerchantMemberListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow("refresh", false)
+            ?.collect { shouldRefresh ->
+                if (shouldRefresh) {
+
+                    viewModel.loadMerchantMembers()
+
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("refresh", false)
+                }
+            }
+    }
 
     Scaffold(
         floatingActionButton = {

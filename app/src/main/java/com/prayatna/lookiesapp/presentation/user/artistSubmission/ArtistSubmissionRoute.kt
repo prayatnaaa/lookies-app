@@ -46,6 +46,9 @@ fun ArtistSubmissionRoute(
                 }
 
                 ArtistSubmissionEffect.NavigateToSuccess -> {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("refresh", true)
                     navController.popBackStack()
                 }
 
