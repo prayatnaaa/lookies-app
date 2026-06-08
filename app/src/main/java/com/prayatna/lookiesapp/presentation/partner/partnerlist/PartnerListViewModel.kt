@@ -43,11 +43,12 @@ class PartnerListViewModel @Inject constructor(
 
     fun loadPartners() {
         val merchantType = _uiState.value.selectedStatus
+        val title = _uiState.value.title.ifBlank { null }
         viewModelScope.launch {
             getPartnersUseCase(
                 merchantType = merchantType?.type,
                 status = null,
-                name = null,
+                name = title,
                 kycStatus = null
             ).collect { result ->
                 _partnerState.value = result
@@ -59,6 +60,10 @@ class PartnerListViewModel @Inject constructor(
         val newStatus = if (_uiState.value.selectedStatus == status) null else status
         _uiState.update { it.copy(selectedStatus = newStatus) }
         loadPartners()
+    }
+
+    fun onTitleChanged(title: String) {
+        _uiState.update { it.copy(title = title) }
     }
 
 //    fun approvePartner(partnerId: String) {

@@ -6,7 +6,7 @@ data class AdminEventUiState(
     val isLoading: Boolean = false,
     val events: List<Event> = emptyList(),
     val errorMessage: String? = null,
-    val title: String? = null,
+    val title: String = "",
     val status: EventStatus? = null,
 )
 

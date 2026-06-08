@@ -40,7 +40,7 @@ class AdminEventViewModel @Inject constructor(
 
     fun getEvents() {
         val status = _uiState.value.status?.type
-        val title = _uiState.value.title
+        val title = _uiState.value.title.ifBlank { null }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
@@ -58,6 +58,11 @@ class AdminEventViewModel @Inject constructor(
                 else -> _uiState.update { it.copy(isLoading = false) }
             }
         }
+    }
+
+    fun onTitleChanged(title: String) {
+        _uiState.update { it.copy(title = title) }
+//        getEvents()
     }
 
     fun onStatusSelected(status: EventStatus?) {
