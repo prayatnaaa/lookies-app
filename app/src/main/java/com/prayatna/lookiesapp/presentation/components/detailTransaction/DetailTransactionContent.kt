@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -43,14 +44,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
 import com.prayatna.lookiesapp.domain.model.shipment.isPendingMoreThan3Days
 import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
+import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionStatusChip
 import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
@@ -69,6 +75,14 @@ fun DetailTransactionContent(
     val transaction = data.transaction
     val clipboardManager = LocalClipboardManager.current
     var isShipmentExpanded by remember { mutableStateOf(false) }
+    var showImagePreview by remember { mutableStateOf<String?>(null) }
+
+    if (showImagePreview != null) {
+        ImagePreviewDialog(
+            imageUrl = showImagePreview!!,
+            onDismiss = { showImagePreview = null }
+        )
+    }
 
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
@@ -206,6 +220,25 @@ fun DetailTransactionContent(
                             }
                             
                             ShipmentTimeline(shipment)
+
+                            shipment.arrivalProofUrl?.let { url ->
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Arrival Proof",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                CustomAsyncImage(
+                                    model = url,
+                                    contentDescription = "Shipment Proof",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable { showImagePreview = url }
+                                )
+                            }
                         }
                     }
                 }
@@ -490,6 +523,42 @@ fun ShipmentTimeline(shipment: Shipment) {
                         Text(text = formatDate(shipment.shippedAt), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun ImagePreviewDialog(
+    imageUrl: String,
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.9f))
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column {
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+                }
+
+                CustomAsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Full Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                )
             }
         }
     }
