@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.repository
 
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseChatService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
@@ -22,6 +23,16 @@ import javax.inject.Inject
 class ChatRepositoryImpl @Inject constructor(
     private val supabaseChatService: SupabaseChatService
 ): ChatRepository {
+    override suspend fun getForumChannelMessages(channelId: String): DataResult<List<ForumChannelMessagesView>> {
+        return try {
+            val res = supabaseChatService.getForumChannelMessages(channelId)
+            DataResult.Success(res.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            DataResult.Error(e.message ?: "Please check your internet connection!")
+        }
+    }
 
     override fun listenToMessages(conversationId: String): Flow<List<Message>> {
         return supabaseChatService.listenToMessages(conversationId)

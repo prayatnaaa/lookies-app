@@ -124,16 +124,16 @@ fun AdminMainScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            AdminDashboardCard(
-                icon = Icons.Filled.People,
-                title = "Withdrawal Requests",
-                subtitle = "Manage merchant withdrawals",
-                onClick = {
-                    navController.navigateToAdminWithdrawalList()
-                }
-            )
+//            Spacer(modifier = Modifier.height(12.dp))
+//
+//            AdminDashboardCard(
+//                icon = Icons.Filled.People,
+//                title = "Withdrawal Requests",
+//                subtitle = "Manage merchant withdrawals",
+//                onClick = {
+//                    navController.navigateToAdminWithdrawalList()
+//                }
+//            )
 
             Spacer(modifier = Modifier.height(12.dp))
 

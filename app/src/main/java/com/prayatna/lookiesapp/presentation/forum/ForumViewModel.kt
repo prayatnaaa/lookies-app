@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.forum
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
+import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.domain.usecase.chat.*
 import com.prayatna.lookiesapp.domain.usecase.user.GetProfileUseCase
 import com.prayatna.lookiesapp.presentation.forum.state.ForumEvent
@@ -10,6 +11,7 @@ import com.prayatna.lookiesapp.presentation.forum.state.ForumUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +25,8 @@ class ForumViewModel @Inject constructor(
     private val pinForumMessageUseCase: PinForumMessageUseCase,
     private val getForumChannelsUseCase: GetForumChannelsUseCase,
     private val getForumsUseCase: GetForumsUseCase,
-    private val getProfileUseCase: GetProfileUseCase
+    private val getProfileUseCase: GetProfileUseCase,
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ForumUiState())
@@ -54,6 +57,30 @@ class ForumViewModel @Inject constructor(
         }
     }
 
+    private fun fetchMessages() {
+        viewModelScope.launch {
+            when (val result = chatRepository.getForumChannelMessages(_uiState.value.channelId)) {
+                is DataResult.Error -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, errorMessage = result.error)
+                    }
+                }
+                DataResult.Loading -> {
+                    _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+                }
+                is DataResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            messages = result.data.sortedBy { msg -> msg.createdAt }
+                        )
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
     private fun observeCurrentUser() {
         viewModelScope.launch {
             getProfileUseCase().collect { result ->
@@ -78,11 +105,9 @@ class ForumViewModel @Inject constructor(
             )
         }
 
-        // Fetch all forums to find the one that has this channel
         viewModelScope.launch {
             val forumsResult = getForumsUseCase(title = null)
             if (forumsResult is DataResult.Success) {
-                // Iterate through forums to find the channel and the user's role
                 for (forum in forumsResult.data) {
                     val channelsResult = getForumChannelsUseCase(forum.id)
                     if (channelsResult is DataResult.Success) {
@@ -183,7 +208,9 @@ class ForumViewModel @Inject constructor(
     private fun handleDeleteMessage(id: String) {
         viewModelScope.launch {
             when (val result = deleteForumMessageUseCase(id)) {
-                is DataResult.Success -> { /* Realtime will handle update */ }
+                is DataResult.Success -> {
+                    fetchMessages()
+                }
                 is DataResult.Error -> {
                     _uiState.update { it.copy(errorMessage = result.error) }
                 }

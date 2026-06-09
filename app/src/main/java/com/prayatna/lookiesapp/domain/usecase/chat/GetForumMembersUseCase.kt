@@ -20,7 +20,6 @@ class GetForumMembersUseCase @Inject constructor(
         val membersResult = repository.getForumMembers(forumId)
         val initialMembers = (membersResult as? DataResult.Success)?.data ?: emptyList()
 
-        // State to keep track of current online user IDs
         val onlineUsers =
             MutableStateFlow<Map<String, Long>>(emptyMap())
 
@@ -52,7 +51,6 @@ class GetForumMembersUseCase @Inject constructor(
                 }
             }
             .onStart {
-                // Immediately emit the initial list so UI doesn't stick on loading
                 emit(initialMembers)
             }
     }

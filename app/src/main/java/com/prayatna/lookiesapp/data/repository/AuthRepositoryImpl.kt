@@ -16,11 +16,13 @@ import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.SessionStatus
+import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val auth: Auth,
+    private val postgrest: Postgrest,
     private val supabaseAuthService: SupabaseAuthService,
     private val userPreference: UserPreference
 ): AuthRepository {
@@ -95,6 +97,15 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun logout(): DataResult<Any> {
         return try {
+            val userId = auth.currentSessionOrNull()?.user?.id ?: DataResult.Error("Something went wrong!")
+            postgrest["user_profiles"]
+                .update({
+                    set("fcm_token", "")
+                }) {
+                    filter {
+                        eq("user_id", userId)
+                    }
+                }
             auth.signOut()
             userPreference.logout()
             DataResult.Success(Any())

@@ -16,6 +16,7 @@ import io.github.jan.supabase.realtime.PresenceAction
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
+    suspend fun getForumChannelMessages(channelId: String): DataResult<List<ForumChannelMessagesView>>
     fun listenToMessages(conversationId: String): Flow<List<Message>>
     suspend fun sendMessage(data: CreateMessageInput): DataResult<Message>
     suspend fun getConversations(): DataResult<List<Conversation>>

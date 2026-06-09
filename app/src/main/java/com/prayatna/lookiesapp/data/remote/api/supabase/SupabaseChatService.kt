@@ -275,7 +275,7 @@ class SupabaseChatService @Inject constructor(
         }
     }
 
-    private suspend fun getForumChannelMessages(channelId: String): List<ForumChannelMessagesViewDto> {
+    suspend fun getForumChannelMessages(channelId: String): List<ForumChannelMessagesViewDto> {
         val result = postgrest.from("forum_channel_messages_view")
             .select {
                 filter {
