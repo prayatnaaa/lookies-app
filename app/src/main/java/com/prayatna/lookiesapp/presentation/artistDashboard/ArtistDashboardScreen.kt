@@ -515,7 +515,7 @@ fun ArtistDashboardContent(
                     )
                     DashboardStatCard(
                         modifier = Modifier.weight(1f),
-                        title = "On Sale",
+                        title = "Paintings",
                         textColor = MaterialTheme.colorScheme.primary,
                         value = state.summary?.totalPaintings?.toString() ?: "0",
                         icon = Icons.Outlined.Inventory2,

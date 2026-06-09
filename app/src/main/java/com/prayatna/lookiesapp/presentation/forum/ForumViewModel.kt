@@ -80,7 +80,7 @@ class ForumViewModel @Inject constructor(
 
         // Fetch all forums to find the one that has this channel
         viewModelScope.launch {
-            val forumsResult = getForumsUseCase()
+            val forumsResult = getForumsUseCase(title = null)
             if (forumsResult is DataResult.Success) {
                 // Iterate through forums to find the channel and the user's role
                 for (forum in forumsResult.data) {

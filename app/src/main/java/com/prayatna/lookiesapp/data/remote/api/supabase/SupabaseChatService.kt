@@ -287,12 +287,15 @@ class SupabaseChatService @Inject constructor(
         return result
     }
 
-    suspend fun getForums(): List<ForumsViewDto> {
+    suspend fun getForums(title: String?): List<ForumsViewDto> {
         val userId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
         return postgrest.from("user_forums_view")
             .select {
                 filter {
                     eq("user_id", userId)
+                    if (title != null) {
+                        ilike("title", "%$title%")
+                    }
                 }
             }.decodeList<ForumsViewDto>()
     }

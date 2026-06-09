@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetForumsUseCase @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
-    suspend operator fun invoke(): DataResult<List<ForumsView>> {
-        return chatRepository.getForums()
+    suspend operator fun invoke(title: String?): DataResult<List<ForumsView>> {
+        return chatRepository.getForums(title = title)
     }
 }

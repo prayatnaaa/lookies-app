@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.chat.GetForumsUseCase
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +22,8 @@ class ForumListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ForumListUiState())
     val uiState: StateFlow<ForumListUiState> = _uiState.asStateFlow()
 
+    private var searchJob: Job? = null
+
     init {
         loadForums()
     }
@@ -27,10 +31,18 @@ class ForumListViewModel @Inject constructor(
     fun onEvent(event: ForumListEvent) {
         when (event) {
             is ForumListEvent.Refresh -> {
-                loadForums()
+                loadForums(_uiState.value.searchQuery)
             }
             is ForumListEvent.ClearError -> {
                 _uiState.update { it.copy(errorMessage = null) }
+            }
+            is ForumListEvent.OnSearchQueryChanged -> {
+                _uiState.update { it.copy(searchQuery = event.query) }
+                searchJob?.cancel()
+                searchJob = viewModelScope.launch {
+                    delay(500)
+                    loadForums(event.query)
+                }
             }
             is ForumListEvent.OnForumClick -> {
                 // Handled in UI
@@ -38,10 +50,10 @@ class ForumListViewModel @Inject constructor(
         }
     }
 
-    private fun loadForums() {
+    private fun loadForums(title: String? = null) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = getForumsUseCase()) {
+            when (val result = getForumsUseCase(title = title?.takeIf { it.isNotBlank() })) {
                 is DataResult.Success -> {
                     _uiState.update {
                         it.copy(

@@ -111,9 +111,9 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getForums(): DataResult<List<com.prayatna.lookiesapp.domain.model.message.ForumsView>> {
+    override suspend fun getForums(title: String?): DataResult<List<com.prayatna.lookiesapp.domain.model.message.ForumsView>> {
         return try {
-            val result = supabaseChatService.getForums()
+            val result = supabaseChatService.getForums(title)
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)

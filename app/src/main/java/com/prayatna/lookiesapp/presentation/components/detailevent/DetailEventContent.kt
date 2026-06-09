@@ -163,19 +163,19 @@ fun DetailEventContent(
                         }
                     }
 
-                    IconButton(
-                        onClick = { onChatClick(event.organizer.id, event.organizer.legalName) },
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
-                            .size(36.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Chat,
-                            contentDescription = "Chat with organizer",
-                            modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
+//                    IconButton(
+//                        onClick = { onChatClick(event.organizer.id, event.organizer.legalName) },
+//                        modifier = Modifier
+//                            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+//                            .size(36.dp)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.AutoMirrored.Filled.Chat,
+//                            contentDescription = "Chat with organizer",
+//                            modifier = Modifier.size(18.dp),
+//                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+//                        )
+//                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

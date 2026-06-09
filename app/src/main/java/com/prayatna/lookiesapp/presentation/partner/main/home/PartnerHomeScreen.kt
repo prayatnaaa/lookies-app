@@ -383,7 +383,7 @@ private fun QuickStatsSection(
     ) {
 
         SmallStatCard(
-            title = "Events",
+            title = "Active events",
             value = dashboard?.activeEvents?.toString(),
             isLoading = state.isLoading && dashboard == null,
             modifier = Modifier.weight(1f)
