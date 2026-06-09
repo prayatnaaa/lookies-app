@@ -49,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.shipment.isPendingMoreThan3Days
 import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionStatusChip
 import com.prayatna.lookiesapp.utils.formatDate
@@ -59,6 +60,7 @@ fun DetailTransactionContent(
     data: DetailTransaction,
     shipment: Shipment? = null,
     isCompleting: Boolean = false,
+    existingRefundId: String? = null,
     onCompleteOrder: (() -> Unit)? = null,
     onRequestRefund: (() -> Unit)? = null,
     onRatePainting: (() -> Unit)? = null,
@@ -322,13 +324,6 @@ fun DetailTransactionContent(
             }
         }
 
-//        if(transaction.status == "awaiting_payment") {
-//            CheckoutPaymentMethodContent(
-//                selectedMethod = transaction.paymentMethod,
-//                onPaymentMethodSelected = {}
-//            )
-//        }
-
         if (data.tickets.isNotEmpty()) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -368,8 +363,12 @@ fun DetailTransactionContent(
             }
         }
 
+        val canRequestRefund =
+            shipment?.status?.lowercase() in listOf("delivered", "completed") ||
+                    shipment?.isPendingMoreThan3Days() == true
+
         item {
-            if (shipment?.status?.lowercase() in listOf("delivered", "completed")) {
+            if (canRequestRefund) {
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -391,7 +390,9 @@ fun DetailTransactionContent(
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Text(
-                            text = "Having issues with your order? You can request a refund or review existing requests.",
+                            text = if (existingRefundId != null) 
+                                "You have already requested a refund for this order. You can view the status below." 
+                                else "Having issues with your order? You can request a refund or review existing requests.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -403,21 +404,23 @@ fun DetailTransactionContent(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                "Request Refund",
-                                color = MaterialTheme.colorScheme.error
+                                text = if (existingRefundId != null) "View Refund Detail" else "Request Refund",
+                                color = if (existingRefundId != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                             )
                         }
 
-                        Text(
-                            text = "View refund requests",
-                            modifier = Modifier
-                                .padding(top = 12.dp)
-                                .clickable {
-                                    onViewRefunds?.invoke()
-                                },
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+//                        if (existingRefundId == null) {
+//                            Text(
+//                                text = "View refund requests",
+//                                modifier = Modifier
+//                                    .padding(top = 12.dp)
+//                                    .clickable {
+//                                        onViewRefunds?.invoke()
+//                                    },
+//                                color = MaterialTheme.colorScheme.primary,
+//                                style = MaterialTheme.typography.bodyMedium
+//                            )
+//                        }
                     }
                 }
             }

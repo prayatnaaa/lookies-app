@@ -8,5 +8,6 @@ data class DetailTransactionUiState(
     val shipment: Shipment? = null,
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
-    val isCompleting: Boolean = false
+    val isCompleting: Boolean = false,
+    val existingRefundId: String? = null
 )

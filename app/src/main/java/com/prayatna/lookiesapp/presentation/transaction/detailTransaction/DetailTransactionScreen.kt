@@ -119,9 +119,14 @@ fun DetailTransactionScreen(
                         data = transactionData,
                         shipment = state.shipment,
                         isCompleting = state.isCompleting,
+                        existingRefundId = state.existingRefundId,
                         onCompleteOrder = { viewModel.setOrderToComplete(orderId) },
                         onRequestRefund = {
-                            navController.navigate("${NavigationRoutes.CREATE_REFUND}/$orderId/${state.data?.transaction?.totalAmount}")
+                            if (state.existingRefundId != null) {
+                                navController.navigate("${NavigationRoutes.REFUND_DETAIL}/${state.existingRefundId}")
+                            } else {
+                                navController.navigate("${NavigationRoutes.CREATE_REFUND}/$orderId/${state.data?.transaction?.items}")
+                            }
                         },
                         onViewRefunds = {
                             navController.navigate("${NavigationRoutes.ORDER_REFUNDS}/$orderId")
