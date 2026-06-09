@@ -14,6 +14,7 @@ import com.prayatna.lookiesapp.domain.model.message.InitiatedConversation
 import com.prayatna.lookiesapp.domain.model.message.Message
 import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.realtime.PresenceAction
 import kotlinx.coroutines.flow.Flow
@@ -29,8 +30,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(res.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
-        } catch (e: HttpException) {
-            DataResult.Error(e.message ?: "Please check your internet connection!")
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -47,8 +51,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error sending message")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -57,9 +64,12 @@ class ChatRepositoryImpl @Inject constructor(
             val result = supabaseChatService.getConversations()
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
-            DataResult.Error(e.error)
+            DataResult.Error(extractSupabaseError( e.error))
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error fetching conversations")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -69,8 +79,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error fetching merchant conversations")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -80,8 +93,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result?.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error checking existing conversation")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -91,8 +107,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(InitiatedConversation(id))
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error initiating conversation")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -102,8 +121,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(Unit)
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error marking messages as read")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -139,8 +161,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error fetching forums")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -150,8 +175,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error fetching forum channels")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -161,8 +189,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error fetching forum members")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -180,8 +211,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error creating forum channel")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -194,8 +228,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error updating forum message")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -205,8 +242,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(Unit)
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error deleting forum message")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -219,8 +259,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error pinning forum message")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 }

@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.content.Context
 import android.net.Uri
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseMerchantService
@@ -48,6 +49,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -58,6 +64,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -68,6 +79,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -78,6 +94,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -88,6 +109,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -98,6 +124,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -108,6 +139,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -118,6 +154,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -138,6 +179,11 @@ class MerchantRepositoryImpl @Inject constructor(
                     DataResult.Error(eMessage)
                 }
             }
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -147,7 +193,10 @@ class MerchantRepositoryImpl @Inject constructor(
                 ?: return DataResult.Error("Failed to compress image")
             val result = supabaseMerchantService.uploadArrivalProof(shipmentId, compressedBytes)
             DataResult.Success(result)
-        } catch (e: Exception) {
+        } catch (e: RestException) {
+            val eMsg = extractSupabaseError(e.error)
+            DataResult.Error(eMsg)
+        }catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
         }
     }

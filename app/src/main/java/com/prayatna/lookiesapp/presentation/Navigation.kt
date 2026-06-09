@@ -114,6 +114,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                     else -> NavigationRoutes.LOGIN
                 }
             }
+
+            is AuthState.Error ->
+                NavigationRoutes.LOGIN
         }
 
         navController.navigate(destination) {

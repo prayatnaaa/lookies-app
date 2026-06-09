@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.data.repository
 
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseRefundService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
@@ -27,6 +28,9 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "An unexpected error occurred")
         }
@@ -39,6 +43,11 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -49,6 +58,11 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -59,6 +73,11 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -69,6 +88,11 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -79,6 +103,11 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -92,6 +121,11 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -104,6 +138,11 @@ class RefundRepositoryImpl @Inject constructor(
             DataResult.Error(eMessage)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 }

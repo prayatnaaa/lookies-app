@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthService
@@ -53,7 +54,7 @@ class AuthRepositoryImpl @Inject constructor(
             DataResult.Error(msg)
         } catch (e: HttpRequestException) {
             DataResult.Error(e.message ?: "Network error")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DataResult.Error("Something went wrong! Please check your connection")
         }
     }
@@ -69,6 +70,11 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -83,7 +89,7 @@ class AuthRepositoryImpl @Inject constructor(
             return try {
                 auth.refreshCurrentSession()
                 DataResult.Success(true)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 userPreference.logout()
                 DataResult.Success(false)
             }
@@ -114,7 +120,7 @@ class AuthRepositoryImpl @Inject constructor(
             DataResult.Error(msg)
         } catch (e: HttpRequestException) {
             DataResult.Error(e.message ?: "Network error")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DataResult.Error("Something went wrong! Please check your connection")
         }
     }
@@ -123,10 +129,13 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val response = supabaseAuthService.getRole()
             response
-        } catch (e: Exception) {
-            e.message.toString()
         } catch (e: RestException) {
             e.message.toString()
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            errorMsg
+        } catch (e: Exception) {
+            e.message ?: "Something went wrong"
         }
     }
 }

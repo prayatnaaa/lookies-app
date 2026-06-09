@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePartnerService
@@ -90,6 +91,11 @@ class PartnerRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -101,16 +107,16 @@ class PartnerRepositoryImpl @Inject constructor(
             Log.e("UpdateEvent", e.toString())
 
             DataResult.Error(mapUpdateErrorToMessage(e))
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
     override suspend fun updateRevenueRules(id: String, input: UpdateRevenueRulesInput): DataResult<EventRevenueRules> {
         return try {
-            // Note: UpdateRevenueRulesRequest requires eventId, but for an update record call
-            // we are usually only sending columns to change.
-            // Since DO NOT CHANGE service was requested, I'll pass 0 as dummy if not provided or 
-            // map it properly if I had the eventId context.
-            // However, the service signature is: updateRevenueRules(id: String, request: UpdateRevenueRulesRequest)
             val requestDto = UpdateRevenueRulesRequest(
                 eventId = input.eventId,
                 itemType = input.itemType,
@@ -136,6 +142,11 @@ class PartnerRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -145,6 +156,11 @@ class PartnerRepositoryImpl @Inject constructor(
             DataResult.Success(response)
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -154,6 +170,11 @@ class PartnerRepositoryImpl @Inject constructor(
             DataResult.Success(response)
         } catch (e: RestException) {
             DataResult.Error(e.message.toString())
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -186,6 +207,11 @@ class PartnerRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             Log.e("InsertSelfEventPaintings", e.toString())
             DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 }

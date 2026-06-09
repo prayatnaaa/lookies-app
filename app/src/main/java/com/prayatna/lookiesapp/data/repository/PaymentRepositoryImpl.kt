@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.mapper.asDomainModel
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePaymentService
 import com.prayatna.lookiesapp.data.remote.api.xendit.XenditService
@@ -65,7 +66,10 @@ class PaymentRepositoryImpl @Inject constructor(
             val response = xenditService.getPayoutChannels()
             Log.d("XenditService", response.toString())
             DataResult.Success(response.map { it.toDomain() })
-        } catch (e: Exception) {
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        }  catch (e: Exception) {
             Log.e("XenditService", e.message.toString())
             DataResult.Error(e.message ?: "Failed to fetch payout channels")
         }

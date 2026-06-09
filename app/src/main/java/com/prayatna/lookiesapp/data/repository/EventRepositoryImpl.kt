@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.repository
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseEventService
@@ -17,6 +18,7 @@ import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
+import com.prayatna.lookiesapp.utils.extractSupabaseError
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.flow.Flow
@@ -63,6 +65,11 @@ class EventRepositoryImpl @Inject constructor(
             DataResult.Success(response.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -78,8 +85,11 @@ class EventRepositoryImpl @Inject constructor(
             val result = supabaseEventService.getEventStatistics(eventId)
             emit(DataResult.Success(result))
 
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            emit(DataResult.Error(e.message ?: "Failed to load statistics"))
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
     override suspend fun createEvent(
@@ -98,6 +108,9 @@ class EventRepositoryImpl @Inject constructor(
             } else {
                 DataResult.Error(result.message)
             }
+        } catch (e: RestException) {
+            val eMsg = extractSupabaseError(e.error)
+            DataResult.Error(eMsg)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
         }
@@ -109,6 +122,11 @@ class EventRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -118,6 +136,11 @@ class EventRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -130,6 +153,11 @@ class EventRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             Log.e("getEventPaintings", e.error)
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -139,6 +167,11 @@ class EventRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 }

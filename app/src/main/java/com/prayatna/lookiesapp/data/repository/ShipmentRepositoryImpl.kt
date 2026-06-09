@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.repository
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseShipmentService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
@@ -29,6 +30,11 @@ class ShipmentRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -36,9 +42,14 @@ class ShipmentRepositoryImpl @Inject constructor(
         return try {
             val result = supabaseShipmentService.getShipmentFees()
             DataResult.Success(result.map { it.toDomain() })
-        }catch (e: RestException) {
+        } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -49,6 +60,11 @@ class ShipmentRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -65,6 +81,11 @@ class ShipmentRepositoryImpl @Inject constructor(
             Log.e("ShipmentRepositoryImpl", "updateExhibitionShipmentStatus: ${e.error}")
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -77,6 +98,11 @@ class ShipmentRepositoryImpl @Inject constructor(
             Log.e("ShipmentRepositoryImpl", "getExhibitionShipmentByEventPaintingId: ${e.error}")
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -86,6 +112,9 @@ class ShipmentRepositoryImpl @Inject constructor(
                 ?: return DataResult.Error("Failed to compress image")
             val result = supabaseShipmentService.uploadArrivalProof(shipmentId, compressedBytes)
             DataResult.Success(result)
+        } catch (e: RestException) {
+            val eMsg = extractSupabaseError(e.error)
+            DataResult.Error(eMsg)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
         }

@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.repository
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import coil.network.HttpException
 import com.google.firebase.FirebaseException
 import com.google.firebase.messaging.FirebaseMessaging
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
@@ -69,6 +70,11 @@ class UserRepositoryImpl @Inject constructor(
             val msg = extractSupabaseError(e.error)
             Log.e("UserRepositoryImpl", "updateFcmToken: $msg")
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -261,6 +267,11 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -271,6 +282,11 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
