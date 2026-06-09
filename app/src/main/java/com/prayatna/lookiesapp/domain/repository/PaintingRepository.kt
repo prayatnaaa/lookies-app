@@ -30,4 +30,5 @@ interface PaintingRepository {
     suspend fun getPaintingMediums(): DataResult<List<PaintingAttribute>>
     suspend fun updateEventPaintingStatus(eventPaintingId: String, status: String): DataResult<Unit>
     suspend fun createPaintingReview(paintingReview: CreatePaintingReviewInput): DataResult<PaintingReview>
+    suspend fun getPaintingReviewByEventPaintingId(eventPaintingId: String): DataResult<PaintingReview?>
 }

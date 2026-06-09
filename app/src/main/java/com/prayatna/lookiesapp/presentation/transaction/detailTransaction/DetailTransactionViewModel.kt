@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.presentation.transaction.detailTransaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteInput
+import com.prayatna.lookiesapp.domain.usecase.painting.GetPaintingReviewByEventPaintingIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.refund.GetRefundsByOrderIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailPaintingOrderUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
@@ -24,7 +25,8 @@ class DetailTransactionViewModel @Inject constructor(
     private val getDetailTransactionUseCase: GetDetailTransactionUseCase,
     private val getDetailPaintingOrderUseCase: GetDetailPaintingOrderUseCase,
     private val setOrderToCompleteUseCase: SetOrderToCompleteUseCase,
-    private val getRefundsByOrderIdUseCase: GetRefundsByOrderIdUseCase
+    private val getRefundsByOrderIdUseCase: GetRefundsByOrderIdUseCase,
+    private val getPaintingReviewByEventPaintingIdUseCase: GetPaintingReviewByEventPaintingIdUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(DetailTransactionUiState())
@@ -53,35 +55,39 @@ class DetailTransactionViewModel @Inject constructor(
 
                 if (detailResult is DataResult.Success) {
                     val detailTx = detailResult.data
-                    val isPainting = detailTx.transaction.items.any { it.itemType == "painting" }
+                    val paintingItem = detailTx.transaction.items.find { it.itemType == "painting" }
                     
                     val existingRefundId = if (refundResult is DataResult.Success) {
                         refundResult.data.firstOrNull()?.id
                     } else null
 
-                    if (isPainting) {
-                        when (val paintingResult = getDetailPaintingOrderUseCase(orderId)) {
-                            is DataResult.Success -> {
-                                _uiState.update {
-                                    it.copy(
-                                        errorMessage = null,
-                                        isLoading = false,
-                                        data = detailTx,
-                                        shipment = paintingResult.data.shipment,
-                                        existingRefundId = existingRefundId
-                                    )
-                                }
+                    if (paintingItem != null) {
+                        val paintingOrderDeferred = async { getDetailPaintingOrderUseCase(orderId) }
+                        val reviewDeferred = async { getPaintingReviewByEventPaintingIdUseCase(paintingItem.itemRefId) }
+
+                        val paintingResult = paintingOrderDeferred.await()
+                        val reviewResult = reviewDeferred.await()
+
+                        if (paintingResult is DataResult.Success) {
+                            val review = if (reviewResult is DataResult.Success) reviewResult.data else null
+                            _uiState.update {
+                                it.copy(
+                                    errorMessage = null,
+                                    isLoading = false,
+                                    data = detailTx,
+                                    shipment = paintingResult.data.shipment,
+                                    existingRefundId = existingRefundId,
+                                    paintingReview = review
+                                )
                             }
-                            is DataResult.Error -> {
-                                _uiState.update {
-                                    it.copy(
-                                        errorMessage = paintingResult.error,
-                                        isLoading = false,
-                                        existingRefundId = existingRefundId
-                                    )
-                                }
+                        } else if (paintingResult is DataResult.Error) {
+                            _uiState.update {
+                                it.copy(
+                                    errorMessage = paintingResult.error,
+                                    isLoading = false,
+                                    existingRefundId = existingRefundId
+                                )
                             }
-                            else -> Unit
                         }
                     } else {
                         _uiState.update {

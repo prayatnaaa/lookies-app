@@ -24,6 +24,14 @@ class SupabasePaintingService @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage,
 ) {
+
+    suspend fun getPaintingReviewByEventPaintingId(eventPaintingId: String): PaintingReviewDto? {
+        return postgrest["painting_reviews"].select {
+            filter {
+                eq("event_painting_id", eventPaintingId)
+            }
+        }.decodeSingleOrNull()
+    }
     suspend fun getPaintings(
         id: String?,
         status: String?,

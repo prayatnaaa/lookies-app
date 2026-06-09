@@ -163,4 +163,15 @@ class PaintingRepositoryImpl @Inject constructor(
             DataResult.Error(e.message ?: "Something went wrong!")
         }
     }
+
+    override suspend fun getPaintingReviewByEventPaintingId(eventPaintingId: String): DataResult<PaintingReview?> {
+        return try {
+            val response = paintingService.getPaintingReviewByEventPaintingId(eventPaintingId)
+            DataResult.Success(response?.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong!")
+        }
+    }
 }

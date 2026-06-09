@@ -53,10 +53,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.prayatna.lookiesapp.domain.model.painting.PaintingReview
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
 import com.prayatna.lookiesapp.domain.model.shipment.isPendingMoreThan3Days
 import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
 import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
+import com.prayatna.lookiesapp.presentation.components.painting.PaintingReviewCard
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionStatusChip
 import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
@@ -67,6 +69,7 @@ fun DetailTransactionContent(
     shipment: Shipment? = null,
     isCompleting: Boolean = false,
     existingRefundId: String? = null,
+    paintingReview: PaintingReview? = null,
     onCompleteOrder: (() -> Unit)? = null,
     onRequestRefund: (() -> Unit)? = null,
     onRatePainting: (() -> Unit)? = null,
@@ -160,7 +163,7 @@ fun DetailTransactionContent(
                             modifier = Modifier.size(14.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(6.6.dp))
                         Text(
                             text = formatDate(transaction.createdAt),
                             style = MaterialTheme.typography.bodySmall,
@@ -380,8 +383,20 @@ fun DetailTransactionContent(
             }
         }
 
+        if (paintingReview != null) {
+            item {
+                Text(
+                    text = "My Review",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                PaintingReviewCard(review = paintingReview)
+            }
+        }
+
         item {
-            if (shipment?.status == "delivered") {
+            if (shipment?.status == "delivered" && paintingReview == null) {
                 OutlinedButton(
                     onClick = {
                         onRatePainting?.invoke()
@@ -441,19 +456,6 @@ fun DetailTransactionContent(
                                 color = if (existingRefundId != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                             )
                         }
-
-//                        if (existingRefundId == null) {
-//                            Text(
-//                                text = "View refund requests",
-//                                modifier = Modifier
-//                                    .padding(top = 12.dp)
-//                                    .clickable {
-//                                        onViewRefunds?.invoke()
-//                                    },
-//                                color = MaterialTheme.colorScheme.primary,
-//                                style = MaterialTheme.typography.bodyMedium
-//                            )
-//                        }
                     }
                 }
             }

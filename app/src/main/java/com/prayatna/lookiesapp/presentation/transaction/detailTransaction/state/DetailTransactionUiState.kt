@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.transaction.detailTransaction.state
 
 import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.painting.PaintingReview
 
 data class DetailTransactionUiState(
     val data: DetailTransaction? = null,
@@ -9,5 +10,6 @@ data class DetailTransactionUiState(
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
     val isCompleting: Boolean = false,
-    val existingRefundId: String? = null
+    val existingRefundId: String? = null,
+    val paintingReview: PaintingReview? = null
 )

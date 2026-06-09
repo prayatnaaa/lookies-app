@@ -68,6 +68,7 @@ import com.prayatna.lookiesapp.presentation.chat.privateChat.navigateToPrivateCh
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventPainting.EventOriginCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.components.painting.PaintingReviewCard
 import com.prayatna.lookiesapp.presentation.components.painting.WaterMark
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -395,6 +396,11 @@ fun EventPaintingDetailScreen(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                         lineHeight = 24.sp
                     )
+
+                    state.paintingReview?.let { review ->
+                        Spacer(modifier = Modifier.height(24.dp))
+                        PaintingReviewCard(review = review)
+                    }
 
                     Spacer(modifier = Modifier.height(100.dp))
                 }

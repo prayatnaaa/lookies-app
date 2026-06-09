@@ -108,6 +108,7 @@ fun DetailTransactionScreen(
                 state.data != null -> {
                     val transactionData = state.data!!
                     DetailTransactionContent(
+                        paintingReview = state.paintingReview,
                         onRatePainting = {
                             val eventPaintingId = transactionData.transaction.items.firstOrNull()?.itemRefId
                             val transactionId = transactionData.transaction.id
