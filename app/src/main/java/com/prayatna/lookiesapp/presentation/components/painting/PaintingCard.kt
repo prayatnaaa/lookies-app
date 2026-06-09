@@ -67,6 +67,7 @@ fun PaintingCard(
     price: Double? = null,
     status: String? = null,
     isSelected: Boolean = false,
+    showWaterMark: Boolean = false,
     onClick: () -> Unit,
 ) {
     val highlightColor = MaterialTheme.colorScheme.primary
@@ -106,17 +107,11 @@ fun PaintingCard(
             )
 
             // WATERMARK
-            Text(
-                text = "LOOKIES",
-                color = Color.White.copy(alpha = 0.15f),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 4.sp,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .rotate(-35f)
-                    .semantics { hideFromAccessibility() }
-            )
+            if (showWaterMark) {
+                WaterMark(modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center))
+            }
 
             // SOLD OVERLAY
             if (isSold) {

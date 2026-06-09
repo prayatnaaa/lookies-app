@@ -244,7 +244,8 @@ fun DetailEventContent(
                                 price = painting.finalPrice,
                                 onClick = { onPaintingClick(painting.id) },
                                 artistName = painting.participant.artist.fullName,
-                                status = painting.status
+                                showWaterMark = true
+//                                status = painting.status
                             )
                         }
                     }
