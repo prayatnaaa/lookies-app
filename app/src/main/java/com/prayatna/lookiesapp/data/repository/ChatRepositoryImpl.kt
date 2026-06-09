@@ -85,6 +85,17 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun markMessagesAsRead(conversationId: String, isMerchant: Boolean): DataResult<Unit> {
+        return try {
+            supabaseChatService.markMessagesAsRead(conversationId, isMerchant)
+            DataResult.Success(Unit)
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Error marking messages as read")
+        }
+    }
+
     override fun listenToForumMessages(
         channelId: String
     ): Flow<List<ForumChannelMessagesView>> {

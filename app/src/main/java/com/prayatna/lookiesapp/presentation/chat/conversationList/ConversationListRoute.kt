@@ -17,6 +17,10 @@ fun ConversationListRoute(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
+
+    LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 ConversationListEffect.NavigateBack -> navController.popBackStack()

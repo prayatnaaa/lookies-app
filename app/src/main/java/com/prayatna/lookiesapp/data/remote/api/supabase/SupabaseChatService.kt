@@ -366,4 +366,21 @@ class SupabaseChatService @Inject constructor(
             }
         }
     }
+
+    suspend fun markMessagesAsRead(conversationId: String, isMerchant: Boolean = false) {
+        val userId = auth.currentSessionOrNull()?.user?.id ?: throw IllegalStateException("User not logged in")
+        postgrest.from("messages").update(
+            {
+                set("is_read", true)
+            }
+        ) {
+            filter {
+                eq("conversation_id", conversationId)
+                if (!isMerchant) {
+                    neq("sender_user_id", userId)
+                }
+                eq("is_read", false)
+            }
+        }
+    }
 }

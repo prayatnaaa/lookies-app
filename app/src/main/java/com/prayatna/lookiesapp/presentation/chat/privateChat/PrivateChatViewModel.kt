@@ -8,6 +8,7 @@ import com.prayatna.lookiesapp.domain.model.message.MessageMetadata
 import com.prayatna.lookiesapp.domain.usecase.chat.GetConversationByMerchantIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.chat.GetOrCreateConversationUseCase
 import com.prayatna.lookiesapp.domain.usecase.chat.ListenToMessagesUseCase
+import com.prayatna.lookiesapp.domain.usecase.chat.MarkMessagesAsReadUseCase
 import com.prayatna.lookiesapp.domain.usecase.chat.SendMessageUseCase
 import com.prayatna.lookiesapp.domain.usecase.user.GetProfileUseCase
 import com.prayatna.lookiesapp.presentation.chat.privateChat.state.PrivateChatEffect
@@ -27,6 +28,7 @@ class PrivateChatViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val getOrCreateConversationUseCase: GetOrCreateConversationUseCase,
     private val getConversationByMerchantIdUseCase: GetConversationByMerchantIdUseCase,
+    private val markMessagesAsReadUseCase: MarkMessagesAsReadUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -129,7 +131,14 @@ class PrivateChatViewModel @Inject constructor(
                 .catch { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }
                 .collect { messages ->
                     _uiState.update { it.copy(isLoading = false, messages = messages) }
+                    markAsRead(conversationId)
                 }
+        }
+    }
+
+    private fun markAsRead(conversationId: String) {
+        viewModelScope.launch {
+            markMessagesAsReadUseCase(conversationId, isMerchant)
         }
     }
 

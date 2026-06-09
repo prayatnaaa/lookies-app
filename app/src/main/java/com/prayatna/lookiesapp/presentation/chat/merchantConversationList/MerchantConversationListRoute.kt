@@ -9,7 +9,6 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.chat.conversationList.ConversationListScreen
 import com.prayatna.lookiesapp.presentation.chat.conversationList.state.ConversationListEffect
 import com.prayatna.lookiesapp.presentation.chat.privateChat.navigateToPrivateChat
-import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun MerchantConversationListRoute(
@@ -17,6 +16,10 @@ fun MerchantConversationListRoute(
     viewModel: MerchantConversationListViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->

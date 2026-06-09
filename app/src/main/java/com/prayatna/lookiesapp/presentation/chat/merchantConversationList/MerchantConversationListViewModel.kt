@@ -31,10 +31,6 @@ class MerchantConversationListViewModel @Inject constructor(
     private val _effect = MutableSharedFlow<ConversationListEffect>()
     val effect = _effect.asSharedFlow()
 
-    init {
-        loadData()
-    }
-
     fun onEvent(event: ConversationListEvent) {
         when (event) {
             ConversationListEvent.LoadConversations -> loadData()
@@ -51,7 +47,7 @@ class MerchantConversationListViewModel @Inject constructor(
         }
     }
 
-    private fun loadData() {
+    fun loadData() {
         viewModelScope.launch {
             getMerchantConversationsUseCase(merchantId).collect { result ->
                 when (result) {

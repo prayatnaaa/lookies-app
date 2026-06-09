@@ -22,6 +22,7 @@ interface ChatRepository {
     suspend fun getMerchantConversations(merchantId: String): DataResult<List<Conversation>>
     suspend fun getConversationByMerchantId(merchantId: String): DataResult<Conversation?>
     suspend fun getOrCreateConversation(merchantId: String): DataResult<InitiatedConversation>
+    suspend fun markMessagesAsRead(conversationId: String, isMerchant: Boolean = false): DataResult<Unit>
 
     fun listenToForumMessages(channelId: String): Flow<List<ForumChannelMessagesView>>
     suspend fun insertForumsMessage(data: CreateForumMessageInput): DataResult<ForumMessage>

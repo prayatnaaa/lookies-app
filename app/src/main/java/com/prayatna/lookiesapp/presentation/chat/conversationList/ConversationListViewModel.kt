@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConversationListViewModel @Inject constructor(
-    private val getConversationsUseCase: GetConversationsUseCase
+    private val getConversationsUseCase: GetConversationsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ConversationListUiState())
@@ -27,9 +27,10 @@ class ConversationListViewModel @Inject constructor(
     private val _effect = MutableSharedFlow<ConversationListEffect>()
     val effect = _effect.asSharedFlow()
 
-    init {
-        loadData()
-    }
+//    init {
+//        loadData()
+//        getRole()
+//    }
 
     fun onEvent(event: ConversationListEvent) {
         when (event) {
@@ -47,7 +48,7 @@ class ConversationListViewModel @Inject constructor(
         }
     }
 
-    private fun loadData() {
+    fun loadData() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             when( val result = getConversationsUseCase()) {

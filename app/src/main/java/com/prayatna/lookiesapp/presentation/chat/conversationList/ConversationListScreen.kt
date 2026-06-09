@@ -2,11 +2,26 @@ package com.prayatna.lookiesapp.presentation.chat.conversationList
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,10 +32,8 @@ import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.message.Conversation
 import com.prayatna.lookiesapp.presentation.chat.conversationList.state.ConversationListEvent
 import com.prayatna.lookiesapp.presentation.chat.conversationList.state.ConversationListUiState
-import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.utils.formatChatTime
 
 @Composable
 fun ConversationListScreen(
@@ -55,6 +68,7 @@ fun ConversationListScreen(
                         ConversationItemRow(
                             item = item,
                             isMerchant = isMerchant,
+//                            currentUserId = state.currentUserId,
                             onClick = {
                                 onEvent(
                                     ConversationListEvent.OnConversationClicked(
@@ -79,8 +93,11 @@ fun ConversationListScreen(
 private fun ConversationItemRow(
     item: Conversation,
     onClick: () -> Unit,
-    isMerchant: Boolean
+    isMerchant: Boolean,
 ) {
+    val lastSender = if (isMerchant) "merchant" else "user"
+    val isUnread = item.lastMessageIsRead == false && item.lastMessageSender != lastSender
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,17 +105,9 @@ private fun ConversationItemRow(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CustomAsyncImage(
-            model = if (!isMerchant) item.merchantPictureUrl else item.buyerPictureUrl,
-            contentDescription = item.merchantName,
-            modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-        )
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
+
         Column(modifier = Modifier.weight(1f)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -106,28 +115,31 @@ private fun ConversationItemRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text =  if (!isMerchant) item.merchantName ?: "Store" else item.buyerName ?: "Buyer",
+                    text = if (!isMerchant) item.merchantName ?: "Store" else item.buyerName ?: "Buyer",
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = if (isUnread) FontWeight.Bold else FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                
-                item.lastMessageTime?.let {
-                    Text(
-                        text = formatChatTime(it),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+
+                if (isUnread) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             Text(
                 text = item.lastMessageContent ?: "Tap to start conversation",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (isUnread) MaterialTheme.colorScheme.onSurface
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = if (isUnread) FontWeight.Medium else FontWeight.Normal,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
