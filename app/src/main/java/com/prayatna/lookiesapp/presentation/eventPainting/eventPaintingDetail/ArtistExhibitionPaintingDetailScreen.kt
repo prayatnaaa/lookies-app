@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -93,17 +95,6 @@ fun ArtistExhibitionPaintingDetailScreen(
         bottomBar = {
             state.data?.let { painting ->
                 when {
-                    painting.status.lowercase() == "rejected" -> {
-                        ArtistResubmitActionBar(
-                            onResubmit = {
-                                val eventId = painting.participant.event.id
-                                val merchantId = painting.participant.event.organizer.id
-                                navController.navigate(
-                                    "${NavigationRoutes.INSERT_EVENT_PAINTINGS_ROUTE}/$eventId/$merchantId"
-                                )
-                            }
-                        )
-                    }
                     painting.status.lowercase() == "on_sale" && painting.participant.event.eventFormat.slug == "online" -> {
                         ArtistMarkAsUnsoldActionBar(
                             isLoading = state.actionLoading,
@@ -132,6 +123,26 @@ fun ArtistExhibitionPaintingDetailScreen(
         }
 
         state.data?.let { painting ->
+            if (painting.status.lowercase() == "rejected") {
+                painting.rejectionReason?.let { reason ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text(
+                                text = "Rejection Reason",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+
+                            Text(
+                                text = reason
+                            )
+                        }
+                    }
+                }
+            }
             EventPaintingDetailContent(
                 painting = painting,
                 modifier = Modifier.padding(innerPadding)
@@ -179,7 +190,7 @@ fun ArtistMarkAsUnsoldActionBar(
 
 @Composable
 fun ArtistResubmitActionBar(
-    onResubmit: () -> Unit
+    rejectReason: String
 ) {
     Surface(
         shadowElevation = 8.dp,
@@ -194,17 +205,11 @@ fun ArtistResubmitActionBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Your painting was rejected.",
+                text = rejectReason,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f)
             )
-            Button(onClick = onResubmit) {
-                Text(
-                    text = "Edit & Resubmit",
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
         }
     }
 }

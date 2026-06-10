@@ -22,5 +22,5 @@ data class UploadPaintingRequest (
     val subject: String? = null,
     @SerialName("year_created")
     val yearCreated: Int,
-    val price: Double
+    val price: Long
 )

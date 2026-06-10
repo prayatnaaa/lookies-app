@@ -179,10 +179,19 @@ private fun PayoutLogItem(
                 text = split.payoutStatus.formatStatus(),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = if (split.payoutStatus == "on_hold") {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.error
+                color = when (split.payoutStatus) {
+                    "on_hold" -> {
+                        MaterialTheme.colorScheme.primary
+                    }
+                    "pending" -> {
+                        MaterialTheme.colorScheme.secondary
+                    }
+                    "completed", "settled" -> {
+                        MaterialTheme.colorScheme.tertiary
+                    }
+                    else -> {
+                        MaterialTheme.colorScheme.error
+                    }
                 }
             )
         }

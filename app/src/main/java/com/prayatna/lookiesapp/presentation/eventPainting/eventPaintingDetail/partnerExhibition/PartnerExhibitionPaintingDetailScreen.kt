@@ -64,6 +64,8 @@ fun PartnerExhibitionPaintingDetailScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var rejectReason by remember { mutableStateOf("") }
     var selectedPaintingId by remember { mutableStateOf<String?>(null) }
+    var showApproveSheet by remember { mutableStateOf(false) }
+
 
     // LOAD
     LaunchedEffect(eventPaintingId) {
@@ -99,6 +101,25 @@ fun PartnerExhibitionPaintingDetailScreen(
                 }
             }
         }
+    }
+
+    if (showApproveSheet) {
+        ApprovePaintingBottomSheet(
+            onDismiss = {
+                showApproveSheet = false
+                selectedPaintingId = null
+            },
+            onConfirm = {
+                selectedPaintingId?.let {
+                    viewModel.onEvent(
+                        PartnerExhibitionPaintingEvent.Approve(it)
+                    )
+                }
+
+                showApproveSheet = false
+                selectedPaintingId = null
+            }
+        )
     }
 
     if (showRejectSheet) {
@@ -202,9 +223,8 @@ fun PartnerExhibitionPaintingDetailScreen(
                         "pending" -> {
                             PartnerPaintingDecisionActionBar(
                                 onApprove = {
-                                    viewModel.onEvent(
-                                        PartnerExhibitionPaintingEvent.Approve(painting.id)
-                                    )
+                                    selectedPaintingId = painting.id
+                                    showApproveSheet = true
                                 },
                                 onReject = {
                                     selectedPaintingId = painting.id
@@ -380,6 +400,53 @@ fun RejectPaintingBottomSheet(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Reject")
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ApprovePaintingBottomSheet(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Text(
+                text = "Approve Artwork",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Text(
+                text = "Are you sure you want to approve this artwork for the exhibition?"
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+
+                OutlinedButton(
+                    modifier = Modifier.weight(1f),
+                    onClick = onDismiss
+                ) {
+                    Text("Cancel")
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = onConfirm
+                ) {
+                    Text("Approve")
                 }
             }
         }

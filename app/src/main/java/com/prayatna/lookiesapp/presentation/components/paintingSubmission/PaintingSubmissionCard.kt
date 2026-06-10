@@ -18,19 +18,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.outlined.AspectRatio
 import androidx.compose.material.icons.outlined.Brush
 import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -116,64 +110,64 @@ fun PaintingSubmissionItem(
 
                     StatusPill(text = item.status)
 
-                    Box {
-                        IconButton(
-                            enabled = !isLoading,
-                            onClick = {
-                                menuExpanded = true
-                            }
-                        ) {
-                            Icon(
-                                imageVector =
-                                    Icons.Outlined.MoreVert,
-                                contentDescription = null
-                            )
-                        }
-
-                        DropdownMenu(
-                            expanded = menuExpanded,
-                            onDismissRequest = {
-                                menuExpanded = false
-                            }
-                        ) {
-
-                            if (!isAccepted) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text("Approve")
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Outlined.CheckCircle,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onApprove()
-                                    }
-                                )
-                            }
-
-                            if (!isRejected) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text("Reject")
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Cancel,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onReject()
-                                    }
-                                )
-                            }
-                        }
-                    }
+//                    Box {
+//                        IconButton(
+//                            enabled = !isLoading,
+//                            onClick = {
+//                                menuExpanded = true
+//                            }
+//                        ) {
+//                            Icon(
+//                                imageVector =
+//                                    Icons.Outlined.MoreVert,
+//                                contentDescription = null
+//                            )
+//                        }
+//
+//                        DropdownMenu(
+//                            expanded = menuExpanded,
+//                            onDismissRequest = {
+//                                menuExpanded = false
+//                            }
+//                        ) {
+//
+//                            if (!isAccepted) {
+//                                DropdownMenuItem(
+//                                    text = {
+//                                        Text("Approve")
+//                                    },
+//                                    leadingIcon = {
+//                                        Icon(
+//                                            Icons.Outlined.CheckCircle,
+//                                            contentDescription = null
+//                                        )
+//                                    },
+//                                    onClick = {
+//                                        menuExpanded = false
+//                                        onApprove()
+//                                    }
+//                                )
+//                            }
+//
+//                            if (!isRejected) {
+//                                DropdownMenuItem(
+//                                    text = {
+//                                        Text("Reject")
+//                                    },
+//                                    leadingIcon = {
+//                                        Icon(
+//                                            Icons.Default.Cancel,
+//                                            contentDescription = null
+//                                        )
+//                                    },
+//                                    onClick = {
+//                                        menuExpanded = false
+//                                        onReject()
+//                                    }
+//                                )
+//                            }
+//                        }
+//                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

@@ -29,7 +29,7 @@ fun ArtistShipmentActionBar(
 ) {
     val (label, enabled) = when (status.lowercase()) {
         "approved" -> "Submit Inbound Shipment" to true
-        "shipping_to_event" -> "Shipment In Progress…" to false
+        "shipping_to_event" -> "Shipment In Progress…" to true
         "exhibited" -> "Artwork Exhibited" to false
         "unsold" -> "Return Being Arranged" to false
         "returning_to_creator" -> "Confirm Artwork Received" to true

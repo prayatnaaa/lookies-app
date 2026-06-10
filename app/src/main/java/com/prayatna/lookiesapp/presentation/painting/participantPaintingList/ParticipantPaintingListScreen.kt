@@ -50,15 +50,15 @@ fun ParticipantPaintingListScreen(
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it, withDismissAction = true)
         }
     }
 
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
-            snackbarHostState.showSnackbar("Action success")
-        }
-    }
+//    LaunchedEffect(uiState.isSuccess) {
+//        if (uiState.isSuccess) {
+//            snackbarHostState.showSnackbar("Action success", withDismissAction = true)
+//        }
+//    }
 
     LaunchedEffect(Unit) {
         navController.currentBackStackEntry
@@ -71,7 +71,7 @@ fun ParticipantPaintingListScreen(
 
                 if (message != null) {
 
-                    snackbarHostState.showSnackbar(message)
+                    snackbarHostState.showSnackbar(message, withDismissAction = true)
 
                     navController.currentBackStackEntry
                         ?.savedStateHandle

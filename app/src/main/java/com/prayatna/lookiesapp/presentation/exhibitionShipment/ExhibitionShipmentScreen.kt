@@ -50,6 +50,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
+import com.prayatna.lookiesapp.domain.model.shipment.ExhibitionShipment
 import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
@@ -131,6 +132,9 @@ fun ExhibitionShipmentScreen(
                     isPartner = uiState.isPartner,
                     status = uiState.eventPaintingStatus
                 )
+                uiState.shipment?.let {
+                    ShipmentInfoCard(it)
+                }
                 when (uiState.eventPaintingStatus) {
 
                     "approved", "accepted" -> if (!uiState.isPartner) { InboundSubmitSection(uiState, onEvent) }
@@ -182,7 +186,7 @@ private fun ShipmentRoleInfoCard(
             "The artist has shipped the artwork. Verify its arrival and condition."
 
         !isPartner && status == "shipping_to_event" ->
-            "Your artwork is on its way to the venue. We'll notify you once it's received."
+            "Your artwork is on its way to the venue."
 
         isPartner && status == "unsold" ->
             "The exhibition has ended without a sale. Arrange return shipment to the artist."
@@ -607,6 +611,102 @@ private fun DeliveryMethodSelector(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(
+    label: String,
+    value: String
+) {
+    Column {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun ShipmentInfoCard(
+    shipment: ExhibitionShipment
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Text(
+                text = "Shipment Information",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+
+            InfoRow(
+                label = "Type",
+                value = shipment.shipmentType.name
+            )
+
+            InfoRow(
+                label = "Status",
+                value = shipment.status.name.replace("_", " ")
+            )
+
+            shipment.courierName?.let {
+                InfoRow(
+                    label = "Courier",
+                    value = it
+                )
+            }
+
+            shipment.trackingNumber?.let {
+                InfoRow(
+                    label = "Tracking Number",
+                    value = it
+                )
+            }
+
+            shipment.dispatchedAt?.let {
+                InfoRow(
+                    label = "Dispatched",
+                    value = it.toString()
+                )
+            }
+
+            shipment.receivedAt?.let {
+                InfoRow(
+                    label = "Received",
+                    value = it.toString()
+                )
+            }
+
+            shipment.galleryConditionNotes?.let {
+                InfoRow(
+                    label = "Gallery Notes",
+                    value = it
+                )
+            }
+
+            shipment.artistConditionNotes?.let {
+                InfoRow(
+                    label = "Artist Notes",
+                    value = it
+                )
             }
         }
     }

@@ -236,12 +236,12 @@ fun EventStatisticsDashboard(
                 }
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    StatBoxSimple(
-                        label = "Total Artworks",
-                        value = stats.totalPaintings.toString(),
-                        icon = Icons.Default.Palette,
-                        modifier = Modifier.weight(1f)
-                    )
+//                    StatBoxSimple(
+//                        label = "Total Artworks",
+//                        value = stats.totalPaintings.toString(),
+//                        icon = Icons.Default.Palette,
+//                        modifier = Modifier.weight(1f)
+//                    )
 
 //                    if (!isSelfExhibition) {
 //                        StatBoxSimple(

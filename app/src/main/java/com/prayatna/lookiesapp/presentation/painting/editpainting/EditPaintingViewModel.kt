@@ -125,7 +125,7 @@ class EditPaintingViewModel @Inject constructor(
                 yearCreated = state.yearCreated.toInt(),
                 artStyle = state.selectedArtStyleId.ifBlank { null },
                 medium = state.selectedMediumId,
-                price = state.price.toDouble()
+                price = state.price.toLongOrNull() ?: 0
             )
 
             when (val result = editPaintingUseCase(params, paintingId, state.bannerUri)) {

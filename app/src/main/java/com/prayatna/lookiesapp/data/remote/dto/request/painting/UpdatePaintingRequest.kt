@@ -20,5 +20,5 @@ data class UpdatePaintingRequest (
     val subject: String? = null,
     @SerialName("year_created")
     val yearCreated: Int? = null,
-    val price: Double? = null
+    val price: Long? = null
 )
