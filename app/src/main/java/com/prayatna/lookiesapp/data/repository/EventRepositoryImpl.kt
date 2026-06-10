@@ -37,7 +37,9 @@ class EventRepositoryImpl @Inject constructor(
         startDate: String?,
         endDate: String? ,
         isTicketPriceAscending: Boolean,
-        limitCount: Long?
+        limitCount: Long?,
+        eventType: String?,
+        eventFormat: String?
     ): DataResult<List<Event>> {
         return try {
             val response = supabaseEventService.getEvents(
@@ -48,7 +50,9 @@ class EventRepositoryImpl @Inject constructor(
                 location = location,
                 startDate = startDate,
                 endDate = endDate,
-                isTicketPriceAscending = isTicketPriceAscending
+                isTicketPriceAscending = isTicketPriceAscending,
+                eventType = eventType,
+                eventFormat = eventFormat
             )
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {

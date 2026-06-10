@@ -20,12 +20,22 @@ object NetworkModule {
     fun provideHttpClient(): HttpClient {
         return HttpClient(OkHttp) {
 
+            engine {
+                config {
+                    retryOnConnectionFailure(true)
+
+                    connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+                    readTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+                    writeTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+                }
+            }
+
             install(ContentNegotiation) {
                 json(
                     Json {
                         ignoreUnknownKeys = true
-                        prettyPrint = true
                         isLenient = true
+                        prettyPrint = true
                     }
                 )
             }

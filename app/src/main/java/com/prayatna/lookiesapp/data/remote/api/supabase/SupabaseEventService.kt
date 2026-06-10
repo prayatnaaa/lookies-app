@@ -128,7 +128,9 @@ class SupabaseEventService @Inject constructor(
         startDate: String? = null,
         endDate: String? = null,
         limitCount: Long? = null,
-        isTicketPriceAscending: Boolean = true
+        isTicketPriceAscending: Boolean = true,
+        eventType: String? = null,
+        eventFormat: String? = null
     ): List<EventDto> {
 
         val query = postgrest
@@ -156,6 +158,12 @@ class SupabaseEventService @Inject constructor(
                     }
                     if (endDate != null) {
                         lte("end_date", endDate)
+                    }
+                    if (eventType != null) {
+                        eq("event_type->>name", eventType)
+                    }
+                    if (eventFormat != null) {
+                        eq("event_format->>name", eventFormat)
                     }
                 }
                 order("ticket_price", if (isTicketPriceAscending) Order.ASCENDING else Order.DESCENDING)

@@ -2,13 +2,16 @@ package com.prayatna.lookiesapp.presentation.event.eventlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.usecase.event.GetEventsUseCase
 import com.prayatna.lookiesapp.presentation.event.eventlist.state.EventListEffect
 import com.prayatna.lookiesapp.presentation.event.eventlist.state.EventListEvent
 import com.prayatna.lookiesapp.presentation.event.eventlist.state.EventListUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EventListViewModel @Inject constructor(
-    private val getEventsUseCase: GetEventsUseCase
+    private val getEventsUseCase: GetEventsUseCase,
+    private val eventRepository: EventRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EventListUiState())
@@ -29,7 +33,31 @@ class EventListViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
+        loadMeta()
         loadEvents()
+    }
+
+    private fun loadMeta() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingMeta = true) }
+            coroutineScope {
+                val typesDeferred = async { eventRepository.getEventTypes() }
+                val formatsDeferred = async { eventRepository.getEventFormats() }
+
+                val typesResult = typesDeferred.await()
+                val formatsResult = formatsDeferred.await()
+
+                if (typesResult is DataResult.Success && formatsResult is DataResult.Success) {
+                    _uiState.update { it.copy(
+                        eventTypes = typesResult.data,
+                        eventFormats = formatsResult.data,
+                        isLoadingMeta = false
+                    ) }
+                } else {
+                    _uiState.update { it.copy(isLoadingMeta = false) }
+                }
+            }
+        }
     }
 
     private fun loadEvents() {
@@ -44,7 +72,9 @@ class EventListViewModel @Inject constructor(
                 location = state.selectedLocation?.ifBlank { null },
                 startDate = state.startDate,
                 endDate = state.endDate,
-                isTicketPriceAscending = state.isTicketPriceAscending
+                isTicketPriceAscending = state.isTicketPriceAscending,
+                eventType = state.selectedEventType,
+                eventFormat = state.selectedEventFormat
             )) {
                 is DataResult.Success -> {
                     _uiState.update { 
@@ -78,6 +108,12 @@ class EventListViewModel @Inject constructor(
                 _uiState.update { it.copy(selectedStatus = newStatus) }
                 loadEvents()
             }
+            is EventListEvent.OnEventTypeSelected -> {
+                _uiState.update { it.copy(selectedEventType = event.type) }
+            }
+            is EventListEvent.OnEventFormatSelected -> {
+                _uiState.update { it.copy(selectedEventFormat = event.format) }
+            }
             is EventListEvent.OnLocationChange -> {
                 _uiState.update { it.copy(selectedLocation = event.location) }
             }
@@ -103,6 +139,8 @@ class EventListViewModel @Inject constructor(
                     it.copy(
                         selectedStatus = null,
                         selectedLocation = null,
+                        selectedEventType = null,
+                        selectedEventFormat = null,
                         startDate = null,
                         endDate = null,
                         isFilterSheetOpen = false

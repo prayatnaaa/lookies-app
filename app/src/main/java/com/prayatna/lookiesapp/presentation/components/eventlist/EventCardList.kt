@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.components.eventlist
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,12 +17,12 @@ fun EventCardList(
     modifier: Modifier = Modifier,
     onClick: (Event) -> Unit,
     showStatus: Boolean = false,
-    showTicketPrice: Boolean = true
+    showTicketPrice: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(8.dp)
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp),
+        modifier = modifier.fillMaxSize(),
+        contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         itemsIndexed(events) { _, event ->

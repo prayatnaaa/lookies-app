@@ -1,35 +1,24 @@
 package com.prayatna.lookiesapp.presentation.components.eventlist
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.prayatna.lookiesapp.presentation.components.partner.FilterItem
 import com.prayatna.lookiesapp.presentation.event.eventlist.state.EventListEvent
 import com.prayatna.lookiesapp.presentation.event.eventlist.state.EventListUiState
 import java.time.Instant
@@ -57,7 +46,7 @@ fun EventFilterBottomSheet(
         ) {
 
             Text(
-                text = "Filters",
+                text = "Advanced Filters",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -75,6 +64,62 @@ fun EventFilterBottomSheet(
                 },
                 shape = RoundedCornerShape(12.dp)
             )
+
+            // Event Type Filter
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Event Type",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    item {
+                        FilterItem(
+                            title = "All",
+                            selected = uiState.selectedEventType == null,
+                            onClick = { onEvent(EventListEvent.OnEventTypeSelected(null)) }
+                        )
+                    }
+                    items(uiState.eventTypes) { type ->
+                        FilterItem(
+                            title = type.name,
+                            selected = uiState.selectedEventType == type.name,
+                            onClick = { onEvent(EventListEvent.OnEventTypeSelected(type.name)) }
+                        )
+                    }
+                }
+            }
+
+            // Event Format Filter
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Event Format",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    item {
+                        FilterItem(
+                            title = "All",
+                            selected = uiState.selectedEventFormat == null,
+                            onClick = { onEvent(EventListEvent.OnEventFormatSelected(null)) }
+                        )
+                    }
+                    items(uiState.eventFormats) { format ->
+                        FilterItem(
+                            title = format.name,
+                            selected = uiState.selectedEventFormat == format.name,
+                            onClick = { onEvent(EventListEvent.OnEventFormatSelected(format.name)) }
+                        )
+                    }
+                }
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
