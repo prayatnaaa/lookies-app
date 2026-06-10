@@ -94,7 +94,7 @@ class SupabasePartnerService @Inject constructor(
             .select {
                 filter {
                     if (status != null) {
-                        eq("status", status)
+                        eq("kyc_status", status)
                     }
 
                     if (name != null) {
