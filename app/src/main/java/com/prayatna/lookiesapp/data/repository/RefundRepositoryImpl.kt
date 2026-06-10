@@ -36,9 +36,9 @@ class RefundRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRefunds(): DataResult<List<Refund>> {
+    override suspend fun getRefunds(status: String?): DataResult<List<Refund>> {
         return try {
-            val result = refundService.getRefunds()
+            val result = refundService.getRefunds(status)
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)

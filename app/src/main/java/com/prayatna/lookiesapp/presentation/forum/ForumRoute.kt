@@ -9,6 +9,7 @@ import com.prayatna.lookiesapp.presentation.forum.state.ForumEvent
 
 @Composable
 fun ForumRoute(
+    isMemberReadOnly: Boolean,
     channelId: String,
     onBackClick: () -> Unit,
     viewModel: ForumViewModel = hiltViewModel()
@@ -22,6 +23,7 @@ fun ForumRoute(
     ForumScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        isMemberReadOnly = isMemberReadOnly
     )
 }

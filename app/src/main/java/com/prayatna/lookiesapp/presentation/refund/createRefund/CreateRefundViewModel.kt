@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,7 +36,13 @@ class CreateRefundViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<CreateRefundUiState>(CreateRefundUiState.Idle)
     val uiState: StateFlow<CreateRefundUiState> = _uiState.asStateFlow()
 
-    private val _formState = MutableStateFlow(CreateRefundFormState(orderId = orderId, amount = totalAmount.toString()))
+    // Adapted to use String for editing to prevent scientific notation in UI
+    private val _formState = MutableStateFlow(
+        CreateRefundFormState(
+            orderId = orderId, 
+            amount = BigDecimal.valueOf(totalAmount.toDouble()).toPlainString()
+        )
+    )
     val formState: StateFlow<CreateRefundFormState> = _formState.asStateFlow()
 
     init {
@@ -82,10 +89,17 @@ class CreateRefundViewModel @Inject constructor(
         viewModelScope.launch {
             val proofImageBytes = readUriBytes(form.proofImageUri)
 
+            // Best Practice: Ensure plain string for API payload using BigDecimal
+            val apiAmount = try {
+                BigDecimal(form.amount).toPlainString()
+            } catch (e: Exception) {
+                form.amount
+            }
+
             val input = CreateRefundRequestInput(
                 orderId = form.orderId,
                 userId = "",
-                amount = form.amount,
+                amount = apiAmount,
                 bankCode = form.bankCode,
                 accountNumber = form.accountNumber,
                 accountHolderName = form.accountHolderName,

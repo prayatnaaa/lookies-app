@@ -117,7 +117,7 @@ fun ForumChannelListScreen(
                                 onClick = {
                                     onEvent(
                                         ForumChannelListEvent.OnChannelClick(
-                                            channel.id
+                                            channel.id, channel.isReadOnlyForMembers
                                         )
                                     )
                                 }

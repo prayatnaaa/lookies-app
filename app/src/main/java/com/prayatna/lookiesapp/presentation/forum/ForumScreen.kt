@@ -38,6 +38,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ForumScreen(
+    isMemberReadOnly: Boolean,
     state: ForumUiState,
     onEvent: (ForumEvent) -> Unit,
     onBackClick: () -> Unit
@@ -59,7 +60,7 @@ fun ForumScreen(
     Scaffold(
         topBar = {
             BackTopBar(
-                title = "Channel Chat",
+                title = "Channel Chat ${isMemberReadOnly}",
                 onBackClick = onBackClick
             )
         }
@@ -126,7 +127,8 @@ fun ForumScreen(
                 onSendClick = { onEvent(ForumEvent.SendMessage) },
                 isSending = state.isSending,
                 isEditing = state.editingMessage != null,
-                onCancelEdit = { onEvent(ForumEvent.CancelEditing) }
+                onCancelEdit = { onEvent(ForumEvent.CancelEditing) },
+                isMemberReadOnly = isMemberReadOnly
             )
         }
     }
@@ -348,6 +350,7 @@ fun DiscordStyleMessageItem(
 
 @Composable
 fun ChatInputBar(
+    isMemberReadOnly: Boolean,
     text: String,
     onTextChanged: (String) -> Unit,
     onSendClick: () -> Unit,
@@ -387,9 +390,10 @@ fun ChatInputBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
+                enabled = !isMemberReadOnly && text.isNotBlank() && !isSending,
                 value = text,
                 onValueChange = onTextChanged,
-                placeholder = { Text("Message...") },
+                placeholder = { Text(if (!isMemberReadOnly) "Message..." else "This is read only") },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(24.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -408,7 +412,7 @@ fun ChatInputBar(
             
             IconButton(
                 onClick = onSendClick,
-                enabled = text.isNotBlank() && !isSending,
+                enabled = text.isNotBlank() && !isSending || !isMemberReadOnly,
                 modifier = Modifier
                     .size(48.dp)
                     .background(

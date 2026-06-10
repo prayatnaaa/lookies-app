@@ -13,7 +13,7 @@ interface RefundRepository {
         proofImage: ByteArray?
     ): DataResult<Refund>
 
-    suspend fun getRefunds():
+    suspend fun getRefunds(status: String? = null):
             DataResult<List<Refund>>
 
     suspend fun getRefundsByOrderId(orderId: String):

@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetRefundsUseCase @Inject constructor(
     private val refundRepository: RefundRepository
 ) {
-    suspend operator fun invoke(): DataResult<List<Refund>> {
-        return refundRepository.getRefunds()
+    suspend operator fun invoke(status: String? = null): DataResult<List<Refund>> {
+        return refundRepository.getRefunds(status)
     }
 }

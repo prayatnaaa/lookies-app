@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.forumchannellist
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -65,6 +66,7 @@ class ForumChannelListViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             when (val result = getForumChannelsUseCase(forumId)) {
                 is DataResult.Success -> {
+                    Log.d("DATA-FORUM", result.data.toString())
                     _uiState.update {
                         it.copy(
                             isLoading = false,

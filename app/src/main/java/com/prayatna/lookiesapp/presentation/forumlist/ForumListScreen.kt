@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -35,13 +34,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.message.ForumsView
+import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,9 +90,7 @@ fun ForumListScreen(
             Box(modifier = Modifier.weight(1f)) {
                 when {
                     state.isLoading && state.forums.isEmpty() -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        CircularLoading()
                     }
                     state.errorMessage != null -> {
                         Column(
@@ -113,11 +110,13 @@ fun ForumListScreen(
                         }
                     }
                     state.forums.isEmpty() -> {
-                        Text(
-                            text = if (state.searchQuery.isEmpty()) "No forums available." else "No forums matching \"${state.searchQuery}\"",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            Text(
+                                text = if (state.searchQuery.isEmpty()) "No forums available." else "No forums matching \"${state.searchQuery}\"",
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
                     else -> {
                         LazyColumn(

@@ -8,5 +8,6 @@ data class ForumChannelListUiState(
     val channels: List<ForumChannelView> = emptyList(),
     val errorMessage: String? = null,
     val userRole: String = "",
-    val isCreatingChannel: Boolean = false
+    val isCreatingChannel: Boolean = false,
+    val isMemberReadOnly: Boolean = false
 )

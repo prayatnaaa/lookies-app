@@ -320,6 +320,13 @@ private fun ActionSection(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Button(
+                            onClick = { onActionClicked("waiting_for_return") },
+                            modifier = Modifier.weight(1f),
+                            enabled = !isLoading
+                        ) {
+                            Text("Accept")
+                        }
+                        Button(
                             onClick = { onActionClicked("rejected") },
                             modifier = Modifier.weight(1f),
                             enabled = !isLoading,
@@ -328,14 +335,6 @@ private fun ActionSection(
                             )
                         ) {
                             Text("Refuse")
-                        }
-
-                        Button(
-                            onClick = { onActionClicked("waiting_for_return") },
-                            modifier = Modifier.weight(1f),
-                            enabled = !isLoading
-                        ) {
-                            Text("Accept and return")
                         }
                     }
                 }

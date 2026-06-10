@@ -24,10 +24,10 @@ class RefundListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(RefundListUiState())
     val uiState: StateFlow<RefundListUiState> = _uiState.asStateFlow()
 
-    fun loadRefunds() {
+    fun loadRefunds(status: String? = null) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = getRefundsUseCase()) {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null, selectedStatus = status) }
+            when (val result = getRefundsUseCase(status)) {
                 is DataResult.Success -> {
                     _uiState.update { it.copy(isLoading = false, refunds = result.data) }
                 }
@@ -45,6 +45,10 @@ class RefundListViewModel @Inject constructor(
             is RefundListEvent.DismissError -> _uiState.update { it.copy(errorMessage = null) }
             is RefundListEvent.DismissSuccess -> _uiState.update { it.copy(successMessage = null) }
             is RefundListEvent.OnBackClick -> { /* handled in Route */ }
+            is RefundListEvent.FilterByStatus -> {
+                _uiState.update { it.copy(selectedStatus = event.status) }
+                loadRefunds(event.status)
+            }
             RefundListEvent.LoadData -> loadRefunds()
         }
     }

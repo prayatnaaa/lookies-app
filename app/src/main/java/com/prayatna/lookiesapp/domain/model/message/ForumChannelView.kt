@@ -9,5 +9,6 @@ data class ForumChannelView(
     val forumId: String,
     val name: String,
     val userId: String,
-    val role: String
+    val role: String,
+    val isReadOnlyForMembers: Boolean
 )

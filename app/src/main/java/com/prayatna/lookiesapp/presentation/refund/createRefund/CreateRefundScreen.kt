@@ -53,6 +53,7 @@ import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.refund.createRefund.state.CreateRefundEvent
 import com.prayatna.lookiesapp.presentation.refund.createRefund.state.CreateRefundFormState
 import com.prayatna.lookiesapp.presentation.refund.createRefund.state.CreateRefundUiState
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,14 +136,15 @@ fun CreateRefundScreen(
 
             item {
                 OutlinedTextField(
-                    value = formState.amount,
-                    enabled = false,
+                    value = formatRupiah(formState.amount.toDouble()),
+                    readOnly = true,
                     onValueChange = { onEvent(CreateRefundEvent.AmountChanged(it)) },
                     label = { Text("Refund Amount (IDR)") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
+//                Text(text = formatRupiah(formState.amount.toDouble()))
             }
 
             item { Spacer(modifier = Modifier.height(4.dp)) }

@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.presentation.refund.refundList.state
 
 sealed class RefundListEvent {
     data class SetRefundComplete(val refundId: String) : RefundListEvent()
+    data class FilterByStatus(val status: String?) : RefundListEvent()
     data object LoadData : RefundListEvent()
     data object DismissError : RefundListEvent()
     data object DismissSuccess : RefundListEvent()

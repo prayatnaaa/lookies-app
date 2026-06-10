@@ -99,7 +99,8 @@ fun PrivateChatScreen(
                 onSendClick = { onEvent(PrivateChatEvent.SendMessage) },
                 isSending = state.isSending,
                 isEditing = false,
-                onCancelEdit = {}
+                onCancelEdit = {},
+                isMemberReadOnly = false
             )
         }
     }

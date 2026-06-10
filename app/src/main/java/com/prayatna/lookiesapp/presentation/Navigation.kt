@@ -524,8 +524,8 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             backStackEntry.arguments?.getString("forumId")?.let { forumId ->
                 ForumChannelListRoute(
                     forumId = forumId,
-                    onNavigateToChat = { channelId ->
-                        navController.navigate("${NavigationRoutes.FORUM_MESSAGES}/$channelId")
+                    onNavigateToChat = { channelId, isMemberReadOnly ->
+                        navController.navigate("${NavigationRoutes.FORUM_MESSAGES}/$channelId?isMemberReadOnly=${isMemberReadOnly}")
                     },
                     onNavigateToMembers = { id ->
                         navController.navigateToForumMembers(id)
@@ -534,17 +534,29 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 )
             }
         }
-        
+
         composable(
-            route = "${NavigationRoutes.FORUM_MESSAGES}/{channelId}",
-            arguments = listOf(navArgument("channelId") { type = NavType.StringType })
+            route = "${NavigationRoutes.FORUM_MESSAGES}/{channelId}?isMemberReadOnly={isMemberReadOnly}",
+            arguments = listOf(
+                navArgument("channelId") {
+                    type = NavType.StringType
+                },
+                navArgument("isMemberReadOnly") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
         ) { backStackEntry ->
-            backStackEntry.arguments?.getString("channelId")?.let { channelId ->
-                ForumRoute(
-                    channelId = channelId,
-                    onBackClick = { navController.popBackStack() }
-                )
-            }
+
+            val channelId = backStackEntry.arguments?.getString("channelId") ?: return@composable
+            val isMemberReadOnly =
+                backStackEntry.arguments?.getBoolean("isMemberReadOnly") ?: false
+
+            ForumRoute(
+                channelId = channelId,
+                isMemberReadOnly = isMemberReadOnly,
+                onBackClick = { navController.popBackStack() }
+            )
         }
 
         refundNavigation(navController)

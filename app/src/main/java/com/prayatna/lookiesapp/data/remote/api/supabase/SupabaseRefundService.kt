@@ -86,8 +86,14 @@ class SupabaseRefundService @Inject constructor(
         }
     }
 
-    suspend fun getRefunds(): List<RefundDto> {
-        return postgrest.from("refund_requests").select().decodeList<RefundDto>()
+    suspend fun getRefunds(status: String? = null): List<RefundDto> {
+        return postgrest.from("refund_requests").select{
+            filter {
+                if (status!= null) {
+                    RefundDto::status eq status
+                }
+            }
+        }.decodeList<RefundDto>()
     }
 
     suspend fun getRefundsByOrderId(orderId: String): List<RefundDto> {

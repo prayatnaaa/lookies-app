@@ -12,5 +12,7 @@ data class ForumChannelViewDto(
     val name: String,
     @SerialName("user_id")
     val userId: String,
-    val role: String
+    val role: String,
+    @SerialName("is_read_only_for_members")
+ val isReadOnlyForMembers: Boolean
 )
