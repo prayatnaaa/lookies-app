@@ -38,9 +38,7 @@ fun WithdrawalConfirmationScreen(
             when (effect) {
                 WithdrawalConfirmationEffect.NavigateBack -> navController.popBackStack()
                 WithdrawalConfirmationEffect.NavigateToDashboard -> {
-                    navController.navigate(NavigationRoutes.ARTIST_DASHBOARD) {
-                        popUpTo(NavigationRoutes.MAIN)
-                    }
+                    navController.popBackStack()
                 }
                 is WithdrawalConfirmationEffect.ShowMessage -> {
                     snackbarHostState.showSnackbar(effect.message)

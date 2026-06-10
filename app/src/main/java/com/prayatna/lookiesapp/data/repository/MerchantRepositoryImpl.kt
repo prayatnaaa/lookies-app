@@ -162,9 +162,13 @@ class MerchantRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getShipmentsByMerchantId(merchantId: String, status: String?): DataResult<List<Shipment>> {
+    override suspend fun getShipmentsByMerchantId(
+        merchantId: String,
+        status: String?,
+        trackingNumber: String?
+    ): DataResult<List<Shipment>> {
         return try {
-            val result = supabaseMerchantService.getShipmentsByMerchantId(merchantId, status)
+            val result = supabaseMerchantService.getShipmentsByMerchantId(merchantId, status, trackingNumber)
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
              when(e) {

@@ -7,6 +7,8 @@ import com.prayatna.lookiesapp.presentation.shipment.state.ShipmentListUiEvent
 import com.prayatna.lookiesapp.presentation.shipment.state.ShipmentListUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +25,7 @@ class ShipmentListViewModel @Inject constructor(
     val uiState: StateFlow<ShipmentListUiState> = _uiState.asStateFlow()
     
     private var currentMerchantId: String = ""
+    private var searchJob: Job? = null
 
     fun onEvent(event: ShipmentListUiEvent) {
         when (event) {
@@ -33,6 +36,14 @@ class ShipmentListViewModel @Inject constructor(
             is ShipmentListUiEvent.FilterByStatus -> {
                 _uiState.update { it.copy(selectedStatus = event.status) }
                 getShipments()
+            }
+            is ShipmentListUiEvent.SearchQueryChanged -> {
+                _uiState.update { it.copy(searchQuery = event.query) }
+                searchJob?.cancel()
+                searchJob = viewModelScope.launch {
+                    delay(500)
+                    getShipments()
+                }
             }
             ShipmentListUiEvent.Refresh -> {
                 getShipments()
@@ -46,7 +57,13 @@ class ShipmentListViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            when (val result = getShipmentsByMerchantIdUseCase(currentMerchantId, _uiState.value.selectedStatus)) {
+            val result = getShipmentsByMerchantIdUseCase(
+                merchantId = currentMerchantId, 
+                status = _uiState.value.selectedStatus,
+                trackingNumber = _uiState.value.searchQuery.takeIf { it.isNotBlank() }
+            )
+            
+            when (result) {
                 is DataResult.Error -> {
                     _uiState.update { it.copy(
                         errorMessage = result.error,

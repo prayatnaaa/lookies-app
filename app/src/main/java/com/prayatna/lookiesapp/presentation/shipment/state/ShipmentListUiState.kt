@@ -6,5 +6,6 @@ data class ShipmentListUiState(
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
     val data: List<Shipment> = emptyList(),
-    val selectedStatus: String? = null
+    val selectedStatus: String? = null,
+    val searchQuery: String = ""
 )

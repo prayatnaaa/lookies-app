@@ -29,8 +29,11 @@ interface MerchantRepository {
             DataResult<Shipment>
     suspend fun createTrackingNumberShipment(shipmentId: String, trackingNumber: String):
             DataResult<Shipment>
-    suspend fun getShipmentsByMerchantId(merchantId: String, status: String? = null):
-            DataResult<List<Shipment>>
+    suspend fun getShipmentsByMerchantId(
+        merchantId: String,
+        status: String? = null,
+        trackingNumber: String? = null
+    ): DataResult<List<Shipment>>
     suspend fun uploadShipmentArrivalProof(shipmentId: String, image: Uri):
             DataResult<String>
     suspend fun getMerchantAddress(merchantBusinessId: String):

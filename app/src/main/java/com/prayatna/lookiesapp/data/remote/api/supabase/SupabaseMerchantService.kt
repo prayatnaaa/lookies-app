@@ -150,7 +150,8 @@ class SupabaseMerchantService @Inject constructor(
 
     suspend fun getShipmentsByMerchantId(
         merchantId: String,
-        status: String? = null
+        status: String? = null,
+        trackingNumber: String? = null
     ): List<ShipmentDto> {
         Log.d("Shipment-List", merchantId)
         return postgrest
@@ -162,6 +163,9 @@ class SupabaseMerchantService @Inject constructor(
                         ShipmentDto::artistId eq merchantId
                     }
 
+                    if (!trackingNumber.isNullOrBlank()) {
+                        ShipmentDto::trackingNumber ilike "%$trackingNumber%"
+                    }
                     if (status != null) {
                         ShipmentDto::status eq status
                     } else {
