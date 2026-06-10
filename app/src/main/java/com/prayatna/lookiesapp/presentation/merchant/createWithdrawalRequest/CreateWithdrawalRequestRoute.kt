@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.state.CreateWithdrawalRequestEffect
 import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.state.CreateWithdrawalRequestEvent
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun CreateWithdrawalRequestRoute(
@@ -22,29 +23,17 @@ fun CreateWithdrawalRequestRoute(
             when (effect) {
                 CreateWithdrawalRequestEffect.NavigateBack -> navController.popBackStack()
                 is CreateWithdrawalRequestEffect.ShowMessage -> {
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("withdrawal_created", true)
-
-                    navController.popBackStack()
+                    // Handled if needed
+                }
+                is CreateWithdrawalRequestEffect.NavigateToConfirmation -> {
+                    navController.navigate("${NavigationRoutes.WITHDRAWAL_CONFIRMATION}/${effect.withdrawalId}") {
+                        popUpTo(navController.currentDestination?.id ?: return@navigate) {
+                            inclusive = true
+                        }
+                    }
                 }
             }
         }
-    }
-
-    if (uiState.successMessage != null) {
-        CustomBottomSheet(
-            title = "Success",
-            message = uiState.successMessage!!,
-            onConfirm = {
-                viewModel.onEvent(CreateWithdrawalRequestEvent.DismissDialog)
-                navController.popBackStack()
-            },
-            onDismiss = {
-                viewModel.onEvent(CreateWithdrawalRequestEvent.DismissDialog)
-                navController.popBackStack()
-            }
-        )
     }
 
     if (uiState.errorMessage != null) {

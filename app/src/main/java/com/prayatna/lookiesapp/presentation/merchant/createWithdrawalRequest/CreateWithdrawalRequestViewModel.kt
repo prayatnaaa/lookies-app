@@ -105,8 +105,8 @@ class CreateWithdrawalRequestViewModel @Inject constructor(
             )
             when (val result = createWithdrawalRequestUseCase(input)) {
                 is DataResult.Success -> {
-                    _uiState.update { it.copy(isLoading = false, successMessage = "Withdrawal request submitted successfully") }
-                    _effect.send(CreateWithdrawalRequestEffect.ShowMessage("Withdrawal request submitted successfully"))
+                    _uiState.update { it.copy(isLoading = false) }
+                    _effect.send(CreateWithdrawalRequestEffect.NavigateToConfirmation(result.data.id))
                 }
                 is DataResult.Error -> {
                     _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }

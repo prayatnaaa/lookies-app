@@ -3,4 +3,5 @@ package com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.st
 sealed interface CreateWithdrawalRequestEffect {
     data object NavigateBack : CreateWithdrawalRequestEffect
     data class ShowMessage(val message: String) : CreateWithdrawalRequestEffect
+    data class NavigateToConfirmation(val withdrawalId: String) : CreateWithdrawalRequestEffect
 }

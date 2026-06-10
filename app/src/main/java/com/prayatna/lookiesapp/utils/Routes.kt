@@ -17,6 +17,7 @@ object NavigationRoutes {
     const val SHIPMENT_LIST = "shipment_list"
     const val MERCHANT_WITHDRAWAL_REQUEST_LIST = "merchant_withdrawal_request_list"
     const val CREATE_WITHDRAWAL_REQUEST = "create_withdrawal_request"
+    const val WITHDRAWAL_CONFIRMATION = "withdrawal_confirmation"
     const val QRIS_PAYMENT = "qris_payment"
     const val VA_PAYMENT = "va_payment"
     const val EXISTING_VA_PAYMENT = "existing_va_payment"

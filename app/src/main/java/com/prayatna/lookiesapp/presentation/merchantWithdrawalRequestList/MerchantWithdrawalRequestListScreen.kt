@@ -110,11 +110,13 @@ fun MerchantWithdrawalRequestListScreen(
                                 request = request,
                                 showDivider = index != uiState.withdrawalRequests.lastIndex,
                                 onClick = {
-                                    onEvent(
-                                        MerchantWithdrawalRequestListEvent.DetailClicked(
-                                            request.id
+                                    if (request.status == "pending") {
+                                        onEvent(
+                                            MerchantWithdrawalRequestListEvent.DetailClicked(
+                                                request.id
+                                            )
                                         )
-                                    )
+                                    }
                                 }
                             )
                         }
