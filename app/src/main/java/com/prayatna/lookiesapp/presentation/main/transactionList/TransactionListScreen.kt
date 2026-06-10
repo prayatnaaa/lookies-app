@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,75 +36,96 @@ fun TransactionListScreen(
     viewModel: TransactionListViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isRefreshing =
+        (state as? TransactionListUiState.Success)
+            ?.isRefreshing ?: false
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("My Orders", fontWeight = FontWeight.SemiBold) },
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            when (val currentState = state) {
-                is TransactionListUiState.Loading -> {
-                    CircularLoading(modifier = Modifier.align(Alignment.Center))
-                }
-                is TransactionListUiState.Error -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(text = "Error: ${currentState.message}", color = MaterialTheme.colorScheme.error)
-                        Button(onClick = { viewModel.getTransactions() }) {
-                            Text("Retry")
+    PullToRefreshBox(
+        isRefreshing =isRefreshing,
+        onRefresh = {
+            viewModel.refresh()
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("My Orders", fontWeight = FontWeight.SemiBold) },
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.background
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                when (val currentState = state) {
+                    is TransactionListUiState.Loading -> {
+                        CircularLoading(modifier = Modifier.align(Alignment.Center))
+                    }
+
+                    is TransactionListUiState.Error -> {
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Error: ${currentState.message}",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Button(onClick = { viewModel.getTransactions() }) {
+                                Text("Retry")
+                            }
                         }
                     }
-                }
-                is TransactionListUiState.Empty -> {
-                    EmptyTransactionState()
-                }
-                is TransactionListUiState.Success -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(vertical = 8.dp)
-                    ) {
-                        itemsIndexed(
-                            items = currentState.data,
-                            key = { _, transaction -> transaction.id }
-                        ) { index, transaction ->
 
-                            TransactionItemItem(
-                                transaction = transaction,
-                                showDivider = index != currentState.data.lastIndex,
-                                onClick = {
-                                    val status = transaction.status.lowercase()
-                                    if (status == "awaiting_payment" || status == "pending") {
-                                        val channel = transaction.paymentInfo?.channel?.lowercase()
-                                        if (channel == "virtual_account") {
-                                            navController.navigate(
-                                                "${NavigationRoutes.EXISTING_VA_PAYMENT}/${transaction.id}"
-                                            )
-                                        } else if (channel == "qris") {
-                                            navController.navigate(
-                                                "${NavigationRoutes.EXISTING_QRIS_PAYMENT}/${transaction.id}"
-                                            )
+                    is TransactionListUiState.Empty -> {
+                        EmptyTransactionState()
+                    }
+
+                    is TransactionListUiState.Success -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(vertical = 8.dp)
+                        ) {
+                            itemsIndexed(
+                                items = currentState.data,
+                                key = { _, transaction -> transaction.id }
+                            ) { index, transaction ->
+
+                                TransactionItemItem(
+                                    transaction = transaction,
+                                    showDivider = index != currentState.data.lastIndex,
+                                    onClick = {
+                                        val status = transaction.status.lowercase()
+                                        if (status == "awaiting_payment" || status == "pending") {
+                                            val channel =
+                                                transaction.paymentInfo?.channel?.lowercase()
+                                            when (channel) {
+                                                "virtual_account" -> {
+                                                    navController.navigate(
+                                                        "${NavigationRoutes.EXISTING_VA_PAYMENT}/${transaction.id}"
+                                                    )
+                                                }
+                                                "qris" -> {
+                                                    navController.navigate(
+                                                        "${NavigationRoutes.EXISTING_QRIS_PAYMENT}/${transaction.id}"
+                                                    )
+                                                }
+                                                else -> {
+                                                    navController.navigate(
+                                                        "${NavigationRoutes.DETAIL_TRANSACTION}/${transaction.id}"
+                                                    )
+                                                }
+                                            }
                                         } else {
                                             navController.navigate(
                                                 "${NavigationRoutes.DETAIL_TRANSACTION}/${transaction.id}"
                                             )
                                         }
-                                    } else {
-                                        navController.navigate(
-                                            "${NavigationRoutes.DETAIL_TRANSACTION}/${transaction.id}"
-                                        )
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
                     }
                 }

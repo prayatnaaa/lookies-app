@@ -178,6 +178,11 @@ class ExhibitionShipmentViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true, errorMessage = null) }
 
+            if(_uiState.value.shipment?.arrivalProofUrl == null) {
+                _uiState.update { it.copy(isLoading = false, isSubmitting = false, errorMessage = "Add proof image first") }
+                return@launch
+            }
+
             val shipmentResult = updateExhibitionShipmentStatusUseCase(
                 shipmentId = shipmentId,
                 notes = state.notesInput.takeIf { it.isNotBlank() },
@@ -185,7 +190,7 @@ class ExhibitionShipmentViewModel @Inject constructor(
             )
             when (shipmentResult) {
                 is DataResult.Success -> {
-                    _uiState.update { it.copy(successMessage = "Artwork received successfully", isLoading = true, isSubmitting = false) }
+                    _uiState.update { it.copy(successMessage = "Artwork received successfully", isLoading = false, isSubmitting = false) }
                 }
                 is DataResult.Error -> _uiState.update {
                     it.copy(isSubmitting = false, errorMessage = shipmentResult.error)

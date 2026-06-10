@@ -137,7 +137,7 @@ fun ShipmentDetailContent(
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(text = "Name: ${shipment.reciepentName}", style = MaterialTheme.typography.bodyMedium)
                     Text(text = "Phone: ${shipment.phoneNumber}", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "Address: ${shipment.addressLine}\n${shipment.province}", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = "Address: ${shipment.addressLine}\n${shipment.province}\n${shipment.postalCode}", style = MaterialTheme.typography.bodyMedium)
                 }
             }
 

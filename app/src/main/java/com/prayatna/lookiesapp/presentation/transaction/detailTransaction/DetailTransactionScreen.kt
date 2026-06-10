@@ -126,7 +126,7 @@ fun DetailTransactionScreen(
                             if (state.existingRefundId != null) {
                                 navController.navigate("${NavigationRoutes.REFUND_DETAIL}/${state.existingRefundId}")
                             } else {
-                                navController.navigate("${NavigationRoutes.CREATE_REFUND}/$orderId/${state.data?.transaction?.items}")
+                                navController.navigate("${NavigationRoutes.CREATE_REFUND}/$orderId/${state.data?.transaction?.totalAmount}")
                             }
                         },
                         onViewRefunds = {

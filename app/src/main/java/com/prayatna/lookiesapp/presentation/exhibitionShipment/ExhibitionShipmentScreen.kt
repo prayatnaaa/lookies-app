@@ -72,11 +72,11 @@ fun ExhibitionShipmentScreen(
             confirmText = "OK",
             onConfirm = {
                 onEvent(ExhibitionShipmentEvent.DismissError)
-                backAction()
+//                backAction()
             },
             onDismiss = {
                 onEvent(ExhibitionShipmentEvent.DismissError)
-                backAction()
+//                backAction()
             }
         )
     }
@@ -433,7 +433,7 @@ private fun OrganizerConfirmReceivedSection(
 
     Button(
         onClick = { onEvent(ExhibitionShipmentEvent.ConfirmArtworkReceived) },
-        enabled = !uiState.isSubmitting,
+        enabled = !uiState.isSubmitting || uiState.shipment?.arrivalProofUrl != null,
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .fillMaxWidth()
