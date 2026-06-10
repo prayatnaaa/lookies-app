@@ -27,6 +27,10 @@ fun MonthlyFinanceListRoute(
     var isSuccessStatus by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
+
+    LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 MonthlyFinanceEffect.NavigateBack -> {

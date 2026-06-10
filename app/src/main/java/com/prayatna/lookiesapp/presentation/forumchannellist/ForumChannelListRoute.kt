@@ -25,7 +25,7 @@ fun ForumChannelListRoute(
         onEvent = { event ->
             when (event) {
                 is ForumChannelListEvent.OnChannelClick -> {
-                    onNavigateToChat(event.channelId, state.isMemberReadOnly)
+                    onNavigateToChat(event.channelId, event.isReadOnly)
                 }
                 else -> viewModel.onEvent(event)
             }

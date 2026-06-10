@@ -60,7 +60,7 @@ fun ForumScreen(
     Scaffold(
         topBar = {
             BackTopBar(
-                title = "Channel Chat ${isMemberReadOnly}",
+                title = "Channel Chat",
                 onBackClick = onBackClick
             )
         }
@@ -390,7 +390,7 @@ fun ChatInputBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                enabled = !isMemberReadOnly && text.isNotBlank() && !isSending,
+                enabled = !isMemberReadOnly,
                 value = text,
                 onValueChange = onTextChanged,
                 placeholder = { Text(if (!isMemberReadOnly) "Message..." else "This is read only") },
