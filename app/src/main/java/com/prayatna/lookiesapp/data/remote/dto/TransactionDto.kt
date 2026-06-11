@@ -12,7 +12,7 @@ data class TransactionDto(
     val merchantId: String,
 
     @SerialName("buyer_id")
-    val buyerId: String,
+    val buyerId: String? = null,
 
     @SerialName("total_amount")
     val totalAmount: Double,

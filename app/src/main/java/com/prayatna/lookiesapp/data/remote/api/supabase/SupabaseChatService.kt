@@ -344,7 +344,7 @@ class SupabaseChatService @Inject constructor(
                 channel.subscribe(blockUntilSubscribed = true)
                 // Small delay to ensure join is fully processed
                 // Small delay to ensure join is fully processed
-                delay(500)
+//                delay(500)
                 Log.d("PRESENCE", "Subscribed to $channelId, now tracking user")
                 channel.track(PresenceData(userId = userId, onlineAt = Clock.System.now().toEpochMilliseconds()))
             } catch (e: Exception) {

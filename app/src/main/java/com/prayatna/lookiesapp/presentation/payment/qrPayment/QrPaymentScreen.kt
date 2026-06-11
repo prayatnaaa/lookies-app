@@ -21,6 +21,7 @@ import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.partner.orderDetail.navigateToPartnerOrderDetail
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.NavigationRoutes
+import com.prayatna.lookiesapp.utils.NavigationRoutes.VA_PAYMENT
 import com.prayatna.lookiesapp.utils.QrCodeGenerator
 import com.prayatna.lookiesapp.utils.formatRupiah
 import kotlinx.coroutines.delay
@@ -68,11 +69,17 @@ fun QrPaymentScreen(
 
     LaunchedEffect(uiState.isPaid) {
         if (uiState.isPaid) {
-            showSuccessDialog = true
+//            showSuccessDialog = true
 
-            delay(1000)
+//            delay(1000)
             if (isOfflinePurchase) {
-                navController.navigateToPartnerOrderDetail(orderId)
+                navController.navigate("${NavigationRoutes.PARTNER_ORDER_DETAIL}/$orderId") {
+//                    popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}") {
+//                        inclusive = true
+//                    }
+//                    launchSingleTop = true
+                    popUpTo(navController.graph.startDestinationId)
+                }
             } else {
                 navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
                     popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}") {
