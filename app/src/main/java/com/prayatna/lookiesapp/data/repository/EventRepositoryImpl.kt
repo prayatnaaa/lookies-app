@@ -178,4 +178,17 @@ class EventRepositoryImpl @Inject constructor(
             DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
+
+    override suspend fun deleteEvent(eventId: String): DataResult<Unit> {
+        return try {
+            supabaseEventService.deleteEvent(eventId)
+            DataResult.Success(Unit)
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            DataResult.Error(e.response.message)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Failed to delete event")
+        }
+    }
 }

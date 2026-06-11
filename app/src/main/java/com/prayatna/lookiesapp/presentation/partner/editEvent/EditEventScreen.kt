@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -61,11 +64,18 @@ fun EditEventScreen(
     var showDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
     var dialogTitle by remember { mutableStateOf("") }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     LaunchedEffect(uiState) {
         when {
             uiState.isSuccess -> {
                 dialogTitle = "Success"
                 dialogMessage = "Event updated successfully"
+                showDialog = true
+            }
+
+            uiState.isDeleteSuccess -> {
+                dialogTitle = "Deleted"
+                dialogMessage = "Event has been deleted successfully"
                 showDialog = true
             }
 
@@ -87,7 +97,7 @@ fun EditEventScreen(
                 dialogMessage = ""
                 dialogTitle = ""
 
-                if (uiState.isSuccess) {
+                if (uiState.isSuccess || uiState.isDeleteSuccess) {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("shouldRefresh", true)
@@ -100,6 +110,18 @@ fun EditEventScreen(
                 dialogMessage = ""
                 dialogTitle = ""
             }
+        )
+    }
+
+    if (showDeleteConfirmDialog) {
+        CustomDialog(
+            title = "Delete Event",
+            message = "Are you sure you want to delete this event? This action cannot be undone.",
+            onConfirm = {
+                showDeleteConfirmDialog = false
+                viewModel.onEvent(EditEventFormEvent.DeleteEvent)
+            },
+            onDismiss = { showDeleteConfirmDialog = false }
         )
     }
 
@@ -347,6 +369,32 @@ fun EditEventScreen(
                         ) {
                             Text(
                                 text = "Add Paintings",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                    }
+
+                    // Delete button – only shown when event is pending validation
+                    if (event?.status == "pending_validation") {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            ),
+                            enabled = !uiState.isLoading,
+                            onClick = { showDeleteConfirmDialog = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Delete Event",
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }

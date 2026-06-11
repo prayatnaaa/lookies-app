@@ -184,6 +184,14 @@ class SupabaseEventService @Inject constructor(
         return event
     }
 
+    suspend fun deleteEvent(eventId: String) {
+        postgrest.from("events").delete {
+            filter {
+                eq("id", eventId)
+            }
+        }
+    }
+
     suspend fun getEventPaintings(eventId: String, status: String? = null): List<EventPaintingDto> {
         val response = postgrest
             .from("event_paintings_view")

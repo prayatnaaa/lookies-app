@@ -31,4 +31,5 @@ interface EventRepository {
     suspend fun getEventFormats(): DataResult<List<EventFormat>>
     suspend fun getEventPaintings(eventId: String, status: String? = null): DataResult<List<EventPainting>>
     suspend fun getRevenueRulesByEventId(eventId: Int): DataResult<List<EventRevenueRules>>
+    suspend fun deleteEvent(eventId: String): DataResult<Unit>
 }

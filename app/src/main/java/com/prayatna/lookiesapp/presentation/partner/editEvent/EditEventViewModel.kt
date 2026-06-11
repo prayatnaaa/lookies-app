@@ -7,6 +7,7 @@ import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.event.EventRevenueRules
 import com.prayatna.lookiesapp.domain.model.event.UpdateRevenueRulesInput
 import com.prayatna.lookiesapp.domain.repository.EventRepository
+import com.prayatna.lookiesapp.domain.usecase.event.DeleteEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.event.EditEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.event.GetRevenueRulesByEventIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.event.UpdateEventRevenueRulesUseCase
@@ -28,7 +29,8 @@ class EditEventViewModel @Inject constructor(
     private val eventRepository: EventRepository,
     private val editEventUseCase: EditEventUseCase,
     private val getRevenueRulesByEventIdUseCase: GetRevenueRulesByEventIdUseCase,
-    private val updateEventRevenueRulesUseCase: UpdateEventRevenueRulesUseCase
+    private val updateEventRevenueRulesUseCase: UpdateEventRevenueRulesUseCase,
+    private val deleteEventUseCase: DeleteEventUseCase
 ) : ViewModel() {
 
     private val _formState = MutableStateFlow(EditEventFormState())
@@ -83,6 +85,7 @@ class EditEventViewModel @Inject constructor(
             EditEventFormEvent.LoadEventMeta -> loadMeta()
 
             EditEventFormEvent.Submit -> submit()
+            EditEventFormEvent.DeleteEvent -> deleteEvent()
             is EditEventFormEvent.PaintingSubmissionDeadline ->
                 update { copy(paintingSubmissionDeadline = event.value) }
 
@@ -278,4 +281,19 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
+    private fun deleteEvent() = viewModelScope.launch {
+        val id = eventId ?: return@launch
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        when (val result = deleteEventUseCase(id)) {
+            is DataResult.Success -> {
+                _uiState.update { it.copy(isLoading = false, isDeleteSuccess = true) }
+            }
+            is DataResult.Error -> {
+                _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+            }
+            else -> Unit
+        }
+    }
+
 }
+

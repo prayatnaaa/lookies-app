@@ -17,6 +17,7 @@ sealed interface EditEventFormEvent {
     data class EventFormatChanged(val value: String) : EditEventFormEvent
     data object LoadEventMeta : EditEventFormEvent
     data object Submit : EditEventFormEvent
+    data object DeleteEvent : EditEventFormEvent
 
     // Revenue Splits
     data class PaintingArtistPercentChanged(val value: Int) : EditEventFormEvent
