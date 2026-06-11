@@ -51,7 +51,7 @@ fun DashboardStatCard(
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = textColor ?: Color.Black.copy(alpha = 0.8f)
             )

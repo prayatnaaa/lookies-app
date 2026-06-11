@@ -5,7 +5,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Cancel
@@ -607,31 +605,31 @@ fun ArtistDashboardContent(
             }
         }
 
-        item {
-            DashboardSection(title = "Overview") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    DashboardStatCard(
-                        modifier = Modifier.weight(1f),
-                        title = "This Month",
-                        value = formatRupiah(state.summary?.currentMonthRevenue ?: 0.0),
-                        icon = Icons.AutoMirrored.Outlined.TrendingUp,
-                        iconTint = Color(0xFF2196F3),
-                        containerColor = Color(0xFFE3F2FD)
-                    )
-                    DashboardStatCard(
-                        modifier = Modifier.weight(1f),
-                        title = "To Ship",
-                        value = state.summary?.ordersToShip?.toString() ?: "0",
-                        icon = Icons.Filled.LocalShipping,
-                        iconTint = Color(0xFFFF7043),
-                        containerColor = Color(0xFFFBE9E7)
-                    )
-                }
-            }
-        }
+//        item {
+//            DashboardSection(title = "Overview") {
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+//                ) {
+//                    DashboardStatCard(
+//                        modifier = Modifier.weight(1f),
+//                        title = "This Month",
+//                        value = formatRupiah(state.summary?.currentMonthRevenue ?: 0.0),
+//                        icon = Icons.AutoMirrored.Outlined.TrendingUp,
+//                        iconTint = Color(0xFF2196F3),
+//                        containerColor = Color(0xFFE3F2FD)
+//                    )
+//                    DashboardStatCard(
+//                        modifier = Modifier.weight(1f),
+//                        title = "To Ship",
+//                        value = state.summary?.ordersToShip?.toString() ?: "0",
+//                        icon = Icons.Filled.LocalShipping,
+//                        iconTint = Color(0xFFFF7043),
+//                        containerColor = Color(0xFFFBE9E7)
+//                    )
+//                }
+//            }
+//        }
 
         if (state.balanceLogs.isNotEmpty()) {
             item {

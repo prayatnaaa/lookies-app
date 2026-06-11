@@ -150,7 +150,7 @@ fun DetailEventScreen(
 
         bottomBar = {
             detailEventState.info?.let { event ->
-                val isRegisterEnabled = event.paintingSubmissionDeadline?.let { deadlineString ->
+                val isRegisterEnabled = event.artistRegistrationEndDate?.let { deadlineString ->
                     try {
                         val deadline = OffsetDateTime.parse(deadlineString)
                         OffsetDateTime.now().isBefore(deadline)
@@ -346,10 +346,10 @@ private fun DetailEventBottomBar(
             if (!isRejectLoading) onReject()
         },
 
-        showRegisterButton = role == "artist" &&
+        showRegisterButton = role != "user" &&
                 event.eventType.slug == "open_call",
 
-        isRegisterButtonEnabled = event.status == "published" && isRegisterEnabled,
+        isRegisterButtonEnabled = event.status == "published" || event.status == "upcoming" && isRegisterEnabled,
         onRegisterButtonClick = onRegister,
 
         showBuyButton = role != "admin" &&

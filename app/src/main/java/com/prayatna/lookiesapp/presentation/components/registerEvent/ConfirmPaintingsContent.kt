@@ -41,6 +41,7 @@ fun ConfirmPaintingsContent(
     fee: Double = 0.0
 ) {
     val selectedPaintings = state.allPaintings.filter { it.id in state.selectedIds }
+    val totalFee = fee * selectedPaintings.size
 
     LazyColumn(contentPadding = PaddingValues(16.dp)) {
         item {
@@ -148,8 +149,13 @@ fun ConfirmPaintingsContent(
                     )
 
                     PaymentSummaryItem(
-                        label = "Registration Fee",
+                        label = "Fee per Painting",
                         value = if (fee == 0.0) "Free" else formatRupiah(fee)
+                    )
+
+                    PaymentSummaryItem(
+                        label = "Registration Fee",
+                        value = if (totalFee == 0.0) "Free" else "${selectedPaintings.size} × ${formatRupiah(fee)}"
                     )
 
                     HorizontalDivider(
@@ -167,7 +173,7 @@ fun ConfirmPaintingsContent(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (fee == 0.0) "Free" else formatRupiah(fee),
+                            text = if (totalFee == 0.0) "Free" else formatRupiah(totalFee),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

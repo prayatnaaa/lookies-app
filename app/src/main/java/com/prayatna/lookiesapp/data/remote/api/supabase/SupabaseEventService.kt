@@ -174,7 +174,7 @@ class SupabaseEventService @Inject constructor(
 
 
     suspend fun getDetailEvent(id: String): EventDto {
-        val event = postgrest.from("events_view").select {
+        val event = postgrest.from("v2_event_view").select {
             filter {
                 eq("id", id)
             }
