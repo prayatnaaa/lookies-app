@@ -158,11 +158,12 @@ fun ProfileScreen(
                         subtitle = "Create or see listing",
                         icon = Icons.Default.SavedSearch,
                         onClick = {
-                            if (profile.role == "artist") {
-                                navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
-                            } else {
-                                navController.navigate(NavigationRoutes.ARTIST_APPLICATION)
-                            }
+//                            if (profile.role == "artist") {
+//                                navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
+//                            } else {
+//                                navController.navigate(NavigationRoutes.ARTIST_APPLICATION)
+//                            }
+                            navController.navigate(NavigationRoutes.ARTIST_DASHBOARD)
                         }
                     )
 

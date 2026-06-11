@@ -230,6 +230,7 @@ fun CreateEventScreen(
                 // ── 1. Event Details ────────────────────────────
                 item {
                     DetailEventForm(
+                        isOnline = isOnlineEvent,
                         eventName = formState.title,
                         onEventNameChange = {
                             viewModel.onEvent(CreateEventFormEvent.TitleChanged(it))

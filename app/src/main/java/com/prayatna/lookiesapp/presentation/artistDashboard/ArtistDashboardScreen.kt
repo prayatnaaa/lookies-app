@@ -160,10 +160,24 @@ fun ArtistDashboardScreen(
         ) {
             when {
                 state.isLoading && state.summary == null -> {
-                    DashboardLoadingState(modifier = Modifier.align(Alignment.Center))
+                    DashboardLoadingState(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
-                state.errorMessage != null && state.summary == null -> {
+                state.errorMessage?.contains("empty", ignoreCase = true) == true -> {
+                    BecomeArtistState(
+                        modifier = Modifier.align(Alignment.Center),
+                        onBecomeArtist = {
+                            navController.navigate(NavigationRoutes.ARTIST_APPLICATION)
+                        }
+                    )
+                }
+
+                state.errorMessage != null &&
+                        state.summary == null &&
+                        !state.errorMessage!!.contains("empty", ignoreCase = true) -> {
+
                     DashboardErrorState(
                         message = state.errorMessage!!,
                         modifier = Modifier
@@ -183,14 +197,20 @@ fun ArtistDashboardScreen(
                                 "pending" -> PendingReviewScreen(
                                     onBackClick = { navController.popBackStack() }
                                 )
+
                                 "rejected" -> RejectedApplicationScreen(
                                     onBackClick = { navController.popBackStack() },
                                     onReapplyClick = {
-                                        navController.navigate(NavigationRoutes.ARTIST_DASHBOARD) {
-                                            popUpTo(NavigationRoutes.ARTIST_DASHBOARD) { inclusive = true }
+                                        navController.navigate(
+                                            NavigationRoutes.ARTIST_DASHBOARD
+                                        ) {
+                                            popUpTo(
+                                                NavigationRoutes.ARTIST_DASHBOARD
+                                            ) { inclusive = true }
                                         }
                                     }
                                 )
+
                                 else -> ArtistDashboardContent(
                                     state = state,
                                     navController = navController,
@@ -201,6 +221,67 @@ fun ArtistDashboardScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun BecomeArtistState(
+    modifier: Modifier = Modifier,
+    onBecomeArtist: () -> Unit
+) {
+    Column(
+        modifier = modifier.padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.primaryContainer,
+            modifier = Modifier.size(100.dp)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Brush,
+                    contentDescription = null,
+                    modifier = Modifier.size(52.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = "Become an Artist",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = "Start selling your artwork, join exhibitions, and manage your art business from one place.",
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onBecomeArtist,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.Brush,
+                contentDescription = null
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text("Apply as Artist")
         }
     }
 }

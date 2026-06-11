@@ -52,6 +52,12 @@ data class EventDto(
     @SerialName("painting_submission_deadline")
     val paintingSubmissionDeadline: String? = null,
 
+    @SerialName("registration_start_date")
+    val artistRegistrationStartDate: String? = null,
+
+    @SerialName("registration_end_date")
+    val artistRegistrationEndDate: String? = null,
+
     @SerialName("created_at")
     val createdAt: String,
 

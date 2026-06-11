@@ -40,7 +40,8 @@ fun DetailEventForm(
     registrationEndDate: String? = null,
     onRegistrationEndDateChange: (String) -> Unit = {},
     isSelfExhibition: Boolean = false,
-    isOpenCall: Boolean = false
+    isOpenCall: Boolean = false,
+    isOnline: Boolean = false
 ) {
     FormSectionCard(
         title = "Event Details",
@@ -108,7 +109,7 @@ fun DetailEventForm(
             )
         }
 
-        if (!isSelfExhibition) {
+        if (!isSelfExhibition || !isOnline) {
             Spacer(modifier = Modifier.height(8.dp))
             EventDateField(
                 label = "Artwork Submission Deadline",

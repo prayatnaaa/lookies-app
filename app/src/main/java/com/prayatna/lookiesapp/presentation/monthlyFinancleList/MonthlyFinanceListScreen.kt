@@ -186,7 +186,7 @@ private fun PayoutLogItem(
                     "pending" -> {
                         MaterialTheme.colorScheme.secondary
                     }
-                    "completed", "settled" -> {
+                    "completed", "settled", "paid" -> {
                         MaterialTheme.colorScheme.tertiary
                     }
                     else -> {
