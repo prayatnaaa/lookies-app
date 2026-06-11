@@ -29,10 +29,20 @@ class TransactionListViewModel @Inject constructor(
     }
 
     fun refresh() {
-        val current = _state.value
+        when (val current = _state.value) {
+            is TransactionListUiState.Success -> {
+                _state.value = current.copy(isRefreshing = true)
+            }
 
-        if (current is TransactionListUiState.Success) {
-            _state.value = current.copy(isRefreshing = true)
+            is TransactionListUiState.Empty -> {
+                _state.value = current.copy(isRefreshing = true)
+            }
+
+            is TransactionListUiState.Error -> {
+                _state.value = TransactionListUiState.Empty(isRefreshing = true)
+            }
+
+            else -> Unit
         }
 
         getTransactions(isRefresh = true)
@@ -56,6 +66,9 @@ class TransactionListViewModel @Inject constructor(
         isRefresh: Boolean = false
     ) {
         viewModelScope.launch {
+            if (!isRefresh) {
+                _state.value = TransactionListUiState.Loading
+            }
 
             when (val result = getUserTransactionsUseCase()) {
 
@@ -65,7 +78,7 @@ class TransactionListViewModel @Inject constructor(
 
                 is DataResult.Success -> {
                     if (result.data.isEmpty()) {
-                        _state.value = TransactionListUiState.Empty
+                        _state.value = TransactionListUiState.Empty(isRefreshing = false)
                     } else {
                         _state.value = TransactionListUiState.Success(
                             data = result.data,

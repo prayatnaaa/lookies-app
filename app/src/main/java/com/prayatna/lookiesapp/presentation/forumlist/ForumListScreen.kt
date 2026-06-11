@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,48 +88,54 @@ fun ForumListScreen(
                 )
             )
 
-            Box(modifier = Modifier.weight(1f)) {
-                when {
-                    state.isLoading && state.forums.isEmpty() -> {
-                        CircularLoading()
-                    }
-                    state.errorMessage != null -> {
-                        Column(
-                            modifier = Modifier.align(Alignment.Center),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = state.errorMessage,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Retry",
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.clickable { onEvent(ForumListEvent.Refresh) }
-                            )
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onEvent(ForumListEvent.Refresh) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    when {
+                        state.isLoading && state.forums.isEmpty() -> {
+                            CircularLoading()
                         }
-                    }
-                    state.forums.isEmpty() -> {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Text(
-                                text = if (state.searchQuery.isEmpty()) "No forums available." else "No forums matching \"${state.searchQuery}\"",
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    }
-                    else -> {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(14.dp)
-                        ) {
-                            items(state.forums) { forum ->
-                                ForumItem(
-                                    forum = forum,
-                                    onClick = { onEvent(ForumListEvent.OnForumClick(forum.id, forum.role)) }
+                        state.errorMessage != null -> {
+                            Column(
+                                modifier = Modifier.align(Alignment.Center),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = state.errorMessage,
+                                    color = MaterialTheme.colorScheme.error
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Retry",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.clickable { onEvent(ForumListEvent.Refresh) }
+                                )
+                            }
+                        }
+                        state.forums.isEmpty() -> {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                Text(
+                                    text = if (state.searchQuery.isEmpty()) "No forums available." else "No forums matching \"${state.searchQuery}\"",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
+                        }
+                        else -> {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(14.dp)
+                            ) {
+                                items(state.forums) { forum ->
+                                    ForumItem(
+                                        forum = forum,
+                                        onClick = { onEvent(ForumListEvent.OnForumClick(forum.id, forum.role)) }
+                                    )
+                                }
                             }
                         }
                     }

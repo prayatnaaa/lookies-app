@@ -36,9 +36,11 @@ fun TransactionListScreen(
     viewModel: TransactionListViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val isRefreshing =
-        (state as? TransactionListUiState.Success)
-            ?.isRefreshing ?: false
+    val isRefreshing = when (val current = state) {
+        is TransactionListUiState.Success -> current.isRefreshing
+        is TransactionListUiState.Empty -> current.isRefreshing
+        else -> false
+    }
 
     PullToRefreshBox(
         isRefreshing =isRefreshing,

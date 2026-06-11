@@ -31,7 +31,7 @@ class ForumListViewModel @Inject constructor(
     fun onEvent(event: ForumListEvent) {
         when (event) {
             is ForumListEvent.Refresh -> {
-                loadForums(_uiState.value.searchQuery)
+                loadForums(_uiState.value.searchQuery, isRefreshing = true)
             }
             is ForumListEvent.ClearError -> {
                 _uiState.update { it.copy(errorMessage = null) }
@@ -50,14 +50,21 @@ class ForumListViewModel @Inject constructor(
         }
     }
 
-    private fun loadForums(title: String? = null) {
+    private fun loadForums(title: String? = null, isRefreshing: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = !isRefreshing,
+                    isRefreshing = isRefreshing,
+                    errorMessage = null
+                )
+            }
             when (val result = getForumsUseCase(title = title?.takeIf { it.isNotBlank() })) {
                 is DataResult.Success -> {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            isRefreshing = false,
                             forums = result.data
                         )
                     }
@@ -66,6 +73,7 @@ class ForumListViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            isRefreshing = false,
                             errorMessage = result.error
                         )
                     }
