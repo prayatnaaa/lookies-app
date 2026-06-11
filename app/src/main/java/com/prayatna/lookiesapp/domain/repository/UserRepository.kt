@@ -10,6 +10,7 @@ import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.domain.model.user.UserEmail
+import com.prayatna.lookiesapp.domain.model.user.UserNotification
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
@@ -46,6 +47,7 @@ interface UserRepository {
     suspend fun rejectPartnerInvitations(merchantAccountId: String): DataResult<MerchantMember>
     suspend fun getFcmToken():
             String?
+    suspend fun getNotifications(): DataResult<List<UserNotification>>
     suspend fun setDarkMode(isDarkMode: Boolean)
     fun isDarkMode(): Flow<Boolean>
 }

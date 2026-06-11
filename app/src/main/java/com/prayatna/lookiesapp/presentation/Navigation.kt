@@ -88,6 +88,7 @@ import com.prayatna.lookiesapp.presentation.user.artistSubmission.artistSubmissi
 import com.prayatna.lookiesapp.presentation.user.createUserAddress.createUserAddressNavigation
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.PartnerSubmissionScreen
+import com.prayatna.lookiesapp.presentation.notification.notificationNavigation
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -563,6 +564,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         unsoldArtworkReturnNavigation(navController)
         forumMembersNavigation(navController)
         selectPayoutChannelNavigation(navController)
+        notificationNavigation(navController)
 
         composable(
             "${NavigationRoutes.BARCODE_SCANNER}/{eventId}",

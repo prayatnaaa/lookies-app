@@ -21,6 +21,7 @@ import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.domain.model.user.UserEmail
+import com.prayatna.lookiesapp.domain.model.user.UserNotification
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
@@ -257,6 +258,18 @@ class UserRepositoryImpl @Inject constructor(
             FirebaseMessaging.getInstance().token.await()
         } catch (e: FirebaseException) {
             e.message ?: "Something went wrong! Please check your connection"
+        }
+    }
+
+    override suspend fun getNotifications(): DataResult<List<UserNotification>> {
+        return try {
+            val result = supabaseUserService.getNotifications()
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }
 

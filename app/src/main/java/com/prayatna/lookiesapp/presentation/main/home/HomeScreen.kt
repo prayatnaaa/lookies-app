@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.chat.conversationList.navigateToConversationList
+import com.prayatna.lookiesapp.presentation.notification.navigateToNotifications
 import com.prayatna.lookiesapp.presentation.components.EmptyState
 import com.prayatna.lookiesapp.presentation.components.SearchBar
 import com.prayatna.lookiesapp.presentation.components.home.FeaturedEventBanner
@@ -69,7 +70,10 @@ fun HomeScreen(
                 if (state.user != null) {
                     val user = state.user
                     user?.let { data ->
-                        HomeTopBar(
+                    HomeTopBar(
+                            onNotifClick = {
+                                navController.navigateToNotifications()
+                            },
                             onChatClick = {
                                 navController.navigateToConversationList()
                             },

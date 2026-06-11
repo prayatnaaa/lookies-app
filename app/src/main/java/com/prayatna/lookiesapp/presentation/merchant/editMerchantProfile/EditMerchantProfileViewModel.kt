@@ -78,7 +78,10 @@ class EditMerchantProfileViewModel @Inject constructor(
                     bankCode = primaryBank?.bankCode ?: "",
                     bankName = primaryBank?.bankName ?: "",
                     accountNumber = primaryBank?.accountNumber ?: "",
-                    accountHolderName = primaryBank?.accountHolderName ?: ""
+                    accountHolderName = primaryBank?.accountHolderName ?: "",
+                    email =  profile.email ?: "",
+                    phoneNumber = profile.phoneNumber ?: "",
+                    websiteUrl = profile.websiteUrl ?: ""
                 ) }
             } else if (profileResult is DataResult.Error) {
                 _state.update { it.copy(isLoading = false, errorMessage = profileResult.error) }
