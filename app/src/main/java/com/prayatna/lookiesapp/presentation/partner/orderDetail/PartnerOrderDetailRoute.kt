@@ -8,6 +8,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.partner.orderDetail.state.PartnerOrderDetailEffect
 import com.prayatna.lookiesapp.presentation.partner.orderDetail.state.PartnerOrderDetailEvent
+import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun PartnerOrderDetailRoute(
@@ -25,6 +26,10 @@ fun PartnerOrderDetailRoute(
         viewModel.effect.collect { effect ->
             when (effect) {
                 PartnerOrderDetailEffect.NavigateBack -> navController.popBackStack()
+                is PartnerOrderDetailEffect.NavigateToArtworkDetail -> {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("refresh", true)
+                    navController.popBackStack()
+                }
             }
         }
     }

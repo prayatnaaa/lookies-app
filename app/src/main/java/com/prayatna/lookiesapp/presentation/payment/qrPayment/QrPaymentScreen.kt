@@ -74,11 +74,10 @@ fun QrPaymentScreen(
 //            delay(1000)
             if (isOfflinePurchase) {
                 navController.navigate("${NavigationRoutes.PARTNER_ORDER_DETAIL}/$orderId") {
-//                    popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}") {
-//                        inclusive = true
-//                    }
-//                    launchSingleTop = true
-                    popUpTo(navController.graph.startDestinationId)
+                    popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}") {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
                 }
             } else {
                 navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {

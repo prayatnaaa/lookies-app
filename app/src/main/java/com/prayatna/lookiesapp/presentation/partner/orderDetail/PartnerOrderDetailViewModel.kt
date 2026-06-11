@@ -45,6 +45,18 @@ class PartnerOrderDetailViewModel @Inject constructor(
                     _effect.emit(PartnerOrderDetailEffect.NavigateBack)
                 }
             }
+            PartnerOrderDetailEvent.OnFinishClicked -> handleFinish()
+        }
+    }
+
+    private fun handleFinish() {
+        val artworkId = _uiState.value.order?.items?.firstOrNull { it.itemType == "painting" }?.itemRefId
+        viewModelScope.launch {
+            if (artworkId != null) {
+                _effect.emit(PartnerOrderDetailEffect.NavigateToArtworkDetail(artworkId))
+            } else {
+                _effect.emit(PartnerOrderDetailEffect.NavigateBack)
+            }
         }
     }
 
