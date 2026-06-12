@@ -55,12 +55,12 @@ fun CreatePaintingReviewScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Nilai Produk", fontSize = 20.sp) },
+                title = { Text("Review Product", fontSize = 20.sp) },
                 navigationIcon = {
                     IconButton(onClick = { onEvent(PaintingReviewEvent.BackClicked) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Kembali"
+                            contentDescription = "Back"
                         )
                     }
                 },
@@ -90,7 +90,7 @@ fun CreatePaintingReviewScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("KIRIM", fontWeight = FontWeight.Bold)
+                        Text("Send", fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -133,7 +133,7 @@ fun CreatePaintingReviewScreen(
 
                     Column {
                         Text(
-                            text = uiState.eventPainting?.painting?.title?: "Nama Lukisan Tidak Tersedia",
+                            text = uiState.eventPainting?.painting?.title?: "Painting's name is not available",
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp
                         )
@@ -160,7 +160,7 @@ fun CreatePaintingReviewScreen(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = "Nilai Produk",
+                        text = "Review Product",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -192,7 +192,7 @@ fun CreatePaintingReviewScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Tulis ulasan",
+                        text = "Write your review",
                         fontSize = 14.sp,
                         color = Color.DarkGray,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -203,7 +203,7 @@ fun CreatePaintingReviewScreen(
                         onValueChange = { onEvent(PaintingReviewEvent.ReviewMessageChanged(it)) },
                         placeholder = {
                             Text(
-                                "Bagikan penilaianmu dan bantu Pengguna lain membuat pilihan yang lebih baik!",
+                                "Share your thoughts!",
                                 color = Color.Gray,
                                 fontSize = 14.sp
                             )
