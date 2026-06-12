@@ -201,6 +201,7 @@ fun EventPaintingListScreen(
                         ) {
                             items(uiState.filteredPaintings) { item ->
                                 PaintingCard(
+                                    showWaterMark = true,
                                     paintingUrl = item.painting.paintingUrl,
                                     name = item.painting.title,
                                     price = item.finalPrice,

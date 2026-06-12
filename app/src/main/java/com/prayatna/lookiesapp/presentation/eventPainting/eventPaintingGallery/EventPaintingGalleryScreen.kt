@@ -14,10 +14,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.painting.EventPainting
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.components.painting.WaterMark
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.state.EventPaintingGalleryUiEvent
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.state.EventPaintingGalleryUiState
 import com.prayatna.lookiesapp.utils.formatRupiah
@@ -101,14 +103,25 @@ private fun PaintingListItem(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
-            model = item.painting.paintingUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
-            contentDescription = item.painting.title,
+        Box(
             modifier = Modifier
                 .size(80.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop
-        )
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            AsyncImage(
+                model = item.painting.paintingUrl.replace(
+                    "http://172.21.179.110",
+                    "http://10.0.2.2"
+                ),
+                contentDescription = item.painting.title,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            WaterMark(
+                fontSize = 12.sp,
+            )
+        }
 
         Spacer(modifier = Modifier.width(16.dp))
 

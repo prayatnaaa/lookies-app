@@ -12,15 +12,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun WaterMark(modifier: Modifier = Modifier) {
+fun WaterMark(modifier: Modifier = Modifier, fontSize: TextUnit = 34.sp) {
     Box(modifier = modifier) {
         Text(
             text = "LOOKIES",
             color = Color.White.copy(alpha = 0.5f),
-            fontSize = 34.sp,
+            fontSize = fontSize,
             fontWeight = FontWeight.Bold,
             letterSpacing = 6.sp,
             style = TextStyle(

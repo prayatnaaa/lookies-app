@@ -193,7 +193,8 @@ fun EventPaintingDetailScreen(
                         )
                         WaterMark(modifier = Modifier
                             .fillMaxSize()
-                            .align(Alignment.Center))
+                            .align(Alignment.Center),
+                            fontSize = 64.sp)
 
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -249,7 +250,8 @@ fun EventPaintingDetailScreen(
 
                     WaterMark(modifier = Modifier
                         .fillMaxSize()
-                        .align(Alignment.Center))
+                        .align(Alignment.Center),
+                        fontSize = 64.sp)
                 }
 
                 Column(modifier = Modifier.padding(20.dp)) {
