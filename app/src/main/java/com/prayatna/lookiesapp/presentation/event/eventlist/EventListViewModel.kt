@@ -68,7 +68,7 @@ class EventListViewModel @Inject constructor(
             
             when (val result = getEventsUseCase(
                 title = state.searchQuery.ifBlank { null },
-                status = state.selectedStatus,
+                status = "published, upcoming, ongoing",
                 location = state.selectedLocation?.ifBlank { null },
                 startDate = state.startDate,
                 endDate = state.endDate,

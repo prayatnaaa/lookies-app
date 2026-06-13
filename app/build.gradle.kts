@@ -72,6 +72,8 @@ android {
 }
 
 dependencies {
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.paging)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -65,6 +65,7 @@ class SupabaseTransactionService @Inject constructor(
             filter {
                 OrderSplitDto::merchantId eq merchantId
             }
+            order("created_at", Order.DESCENDING)
         }.decodeList<OrderSplitDto>()
     }
     suspend fun getMerchantBalanceLogs(merchantId: String): List<MerchantBalanceLogDto> {
