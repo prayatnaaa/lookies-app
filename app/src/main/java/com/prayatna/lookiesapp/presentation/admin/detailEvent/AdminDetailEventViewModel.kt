@@ -45,19 +45,22 @@ class AdminDetailEventViewModel @Inject constructor(
 
     private fun loadDetail(eventId: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-
-            when (val eventResult = getDetailEventUseCase(eventId)) {
-                is DataResult.Success -> {
-                    _uiState.update { it.copy(event = eventResult.data, isLoading = false) }
-                    eventResult.data.id.toIntOrNull()?.let { id ->
-                        loadRevenueRules(id)
+            getDetailEventUseCase(eventId).collect { result ->
+                when (result) {
+                    is DataResult.Success -> {
+                        _uiState.update { it.copy(event = result.data, isLoading = false) }
+                        result.data.id.toIntOrNull()?.let { id ->
+                            loadRevenueRules(id)
+                        }
                     }
+                    is DataResult.Error -> {
+                        _uiState.update { it.copy(errorMessage = result.error, isLoading = false) }
+                    }
+                    is DataResult.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+                    else -> Unit
                 }
-                is DataResult.Error -> {
-                    _uiState.update { it.copy(errorMessage = eventResult.error, isLoading = false) }
-                }
-                else -> {}
             }
         }
     }

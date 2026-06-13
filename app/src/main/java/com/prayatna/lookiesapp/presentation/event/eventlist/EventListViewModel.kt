@@ -62,35 +62,39 @@ class EventListViewModel @Inject constructor(
 
     private fun loadEvents() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
             val state = _uiState.value
             
-            when (val result = getEventsUseCase(
+            // Best Practice: Collect the reactive Flow from the UseCase
+            getEventsUseCase(
                 title = state.searchQuery.ifBlank { null },
-                status = "published, upcoming, ongoing",
+                status = "published, upcoming, ongoing", // Standard app filtering
                 location = state.selectedLocation?.ifBlank { null },
                 startDate = state.startDate,
                 endDate = state.endDate,
                 isTicketPriceAscending = state.isTicketPriceAscending,
                 eventType = state.selectedEventType,
                 eventFormat = state.selectedEventFormat
-            )) {
-                is DataResult.Success -> {
-                    _uiState.update { 
-                        it.copy(
-                            isLoading = false,
-                            events = result.data,
-                            errorMessage = null
-                        )
+            ).collect { result ->
+                when (result) {
+                    is DataResult.Success -> {
+                        _uiState.update { 
+                            it.copy(
+                                isLoading = false,
+                                events = result.data,
+                                errorMessage = null
+                            )
+                        }
                     }
-                }
-                is DataResult.Error -> {
-                    _uiState.update {
-                        it.copy(isLoading = false, errorMessage = result.error)
+                    is DataResult.Error -> {
+                        _uiState.update {
+                            it.copy(isLoading = false, errorMessage = result.error)
+                        }
                     }
+                    is DataResult.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+                    else -> Unit
                 }
-                else -> _uiState.update { it.copy(isLoading = false) }
             }
         }
     }

@@ -11,7 +11,6 @@ import com.prayatna.lookiesapp.presentation.publicMerchantProfile.state.PublicMe
 import com.prayatna.lookiesapp.presentation.publicMerchantProfile.state.PublicMerchantProfileUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -37,7 +36,8 @@ class PublicMerchantProfileViewModel @Inject constructor(
 
     init {
         if (businessId.isNotEmpty()) {
-            loadData(businessId)
+            loadProfile(businessId)
+            loadEvents(businessId)
         }
     }
 
@@ -52,28 +52,33 @@ class PublicMerchantProfileViewModel @Inject constructor(
         }
     }
 
-    private fun loadData(id: String) {
+    private fun loadProfile(id: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            
-            val profileDeferred = async { getPublicMerchantProfileUseCase(id) }
-            val eventsDeferred = async { getEventsUseCase(organizerId = id, status = "ongoing") }
+            _uiState.update { it.copy(isLoading = true) }
+            when (val result = getPublicMerchantProfileUseCase(id)) {
+                is DataResult.Success -> {
+                    _uiState.update { it.copy(isLoading = false, merchant = result.data) }
+                }
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+                }
+                else -> Unit
+            }
+        }
+    }
 
-            val profileResult = profileDeferred.await()
-            val eventsResult = eventsDeferred.await()
-            Log.d("PublicMerchant", eventsResult.toString())
-
-            _uiState.update { state ->
-                state.copy(
-                    isLoading = false,
-                    merchant = if (profileResult is DataResult.Success) profileResult.data else null,
-                    ongoingEvents = if (eventsResult is DataResult.Success) eventsResult.data else emptyList(),
-                    errorMessage = when {
-                        profileResult is DataResult.Error -> profileResult.error
-                        eventsResult is DataResult.Error -> eventsResult.error
-                        else -> null
+    private fun loadEvents(id: String) {
+        viewModelScope.launch {
+            getEventsUseCase(organizerId = id, status = "ongoing").collect { result ->
+                when (result) {
+                    is DataResult.Success -> {
+                        _uiState.update { it.copy(ongoingEvents = result.data) }
                     }
-                )
+                    is DataResult.Error -> {
+                        // Log or handle error if needed
+                    }
+                    else -> Unit
+                }
             }
         }
     }

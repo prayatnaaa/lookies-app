@@ -6,6 +6,6 @@ import javax.inject.Inject
 class GetEventByIdUseCase @Inject constructor(
     private val eventRepository: EventRepository
 ) {
-    suspend operator fun invoke(eventId: String) =
+    operator fun invoke(eventId: String) =
         eventRepository.getEvent(eventId)
 }

@@ -47,37 +47,33 @@ class HomeViewModel @Inject constructor(
         if (!forceRefresh && _uiState.value.events.isNotEmpty()) return
 
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    isLoadingEvents = true,
-                    errorMessage = null
-                )
-            }
-
-            when (val result = getEventsUseCase(
+            getEventsUseCase(
                 limitCount = 5,
                 status = "published, upcoming, ongoing"
-            )) {
-                is DataResult.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoadingEvents = false,
-                            events = result.data
-                        )
+            ).collect { result ->
+                when (result) {
+                    is DataResult.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoadingEvents = false,
+                                events = result.data
+                            )
+                        }
                     }
-                }
 
-                is DataResult.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoadingEvents = false,
-                            errorMessage = result.error
-                        )
+                    is DataResult.Error -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoadingEvents = false,
+                                errorMessage = result.error
+                            )
+                        }
                     }
-                }
 
-                else -> {
-                    _uiState.update { it.copy(isLoadingEvents = false) }
+                    is DataResult.Loading -> {
+                        _uiState.update { it.copy(isLoadingEvents = true) }
+                    }
+                    else -> Unit
                 }
             }
         }

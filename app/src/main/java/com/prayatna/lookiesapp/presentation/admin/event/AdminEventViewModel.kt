@@ -76,21 +76,25 @@ class AdminEventViewModel @Inject constructor(
         val format = _uiState.value.selectedFormat?.name
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            when (val result = getEventsUseCase(
+            getEventsUseCase(
                 title = title,
                 status = status,
                 eventType = type,
                 eventFormat = format
-            )) {
-                is DataResult.Success -> _uiState.update {
-                    it.copy(isLoading = false, events = result.data, errorMessage = null)
+            ).collect { result ->
+                when (result) {
+                    is DataResult.Success -> _uiState.update {
+                        it.copy(isLoading = false, events = result.data, errorMessage = null)
+                    }
+                    is DataResult.Error -> _uiState.update {
+                        it.copy(isLoading = false, errorMessage = result.error)
+                    }
+                    is DataResult.Loading -> _uiState.update { 
+                        it.copy(isLoading = true) 
+                    }
+
+                    else -> {}
                 }
-                is DataResult.Error -> _uiState.update {
-                    it.copy(isLoading = false, errorMessage = result.error)
-                }
-                else -> _uiState.update { it.copy(isLoading = false) }
             }
         }
     }

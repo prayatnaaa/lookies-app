@@ -116,31 +116,29 @@ class DetailEventViewModel @Inject constructor(
         if (!forceRefresh && _state.value.info != null) return
 
         viewModelScope.launch {
-            _state.value = DetailEventUiState(isLoading = true)
-
-            when (val result = getDetailEventUseCase(eventId)) {
-                is DataResult.Error -> {
-                    _state.update {
-                        it.copy(
-                            detailEventError = result.error,
-                            isLoading = false
-                        )
+            getDetailEventUseCase(eventId).collect { result ->
+                when (result) {
+                    is DataResult.Error -> {
+                        _state.update {
+                            it.copy(
+                                detailEventError = result.error,
+                                isLoading = false
+                            )
+                        }
                     }
-                }
-                is DataResult.Loading -> {
-                    _state.update { it.copy(isLoading = true) }
-                }
-                is DataResult.Success -> {
-                   _state.update {
-                       it.copy(
-                           info = result.data,
-                           isLoading = false,
-                           detailEventError = null
-                       )
-                   }
-                }
-                else -> {
-                    _state.update { it.copy(isLoading = true) }
+                    is DataResult.Loading -> {
+                        _state.update { it.copy(isLoading = true) }
+                    }
+                    is DataResult.Success -> {
+                       _state.update {
+                           it.copy(
+                               info = result.data,
+                               isLoading = false,
+                               detailEventError = null
+                           )
+                       }
+                    }
+                    else -> Unit
                 }
             }
         }

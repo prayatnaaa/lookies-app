@@ -9,6 +9,7 @@ import com.prayatna.lookiesapp.domain.model.event.UpdateRevenueRulesInput
 import com.prayatna.lookiesapp.domain.repository.EventRepository
 import com.prayatna.lookiesapp.domain.usecase.event.DeleteEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.event.EditEventUseCase
+import com.prayatna.lookiesapp.domain.usecase.event.GetDetailEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.event.GetRevenueRulesByEventIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.event.UpdateEventRevenueRulesUseCase
 import com.prayatna.lookiesapp.presentation.partner.editEvent.state.EditEventFormEvent
@@ -20,17 +21,19 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class EditEventViewModel @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val getDetailEventUseCase: GetDetailEventUseCase,
     private val editEventUseCase: EditEventUseCase,
     private val getRevenueRulesByEventIdUseCase: GetRevenueRulesByEventIdUseCase,
     private val updateEventRevenueRulesUseCase: UpdateEventRevenueRulesUseCase,
-    private val deleteEventUseCase: DeleteEventUseCase
+    private val deleteEventUseCase: DeleteEventUseCase,
+    private val eventRepository: EventRepository
 ) : ViewModel() {
 
     private val _formState = MutableStateFlow(EditEventFormState())
@@ -108,7 +111,7 @@ class EditEventViewModel @Inject constructor(
         this@EditEventViewModel.eventId = eventId
         _uiState.update { it.copy(isLoading = true) }
 
-        val eventResult = eventRepository.getEvent(eventId)
+        val eventResult = getDetailEventUseCase(eventId).first()
         val rulesResult = getRevenueRulesByEventIdUseCase(eventId.toInt())
 
         if (eventResult is DataResult.Success) {

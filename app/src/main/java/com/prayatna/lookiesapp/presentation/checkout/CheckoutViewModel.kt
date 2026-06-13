@@ -245,32 +245,39 @@ class CheckoutViewModel @Inject constructor(
     // ========================
     // NETWORK HANDLERS
     // ========================
-    private suspend fun handleEventFetch(id: String) {
-        when (val result = getEventByIdUseCase(id)) {
-            is DataResult.Success -> {
-                val event = result.data
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        itemToBuy = CheckoutItemDisplay(
-                            id = event.id,
-                            title = event.title,
-                            subtitle = "by ${event.organizer.legalName}",
-                            price = event.ticketPrice,
-                            imageUrl = event.bannerImageUrl,
-                            type = "event_ticket",
-                            merchantId = event.organizer.id
-                        )
-                    )
+    private fun handleEventFetch(id: String) {
+        viewModelScope.launch {
+            getEventByIdUseCase(id).collect { result ->
+                when (result) {
+                    is DataResult.Success -> {
+                        val event = result.data
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                itemToBuy = CheckoutItemDisplay(
+                                    id = event.id,
+                                    title = event.title,
+                                    subtitle = "by ${event.organizer.legalName}",
+                                    price = event.ticketPrice,
+                                    imageUrl = event.bannerImageUrl,
+                                    type = "event_ticket",
+                                    merchantId = event.organizer.id
+                                )
+                            )
+                        }
+                    }
+
+                    is DataResult.Error -> {
+                        _uiState.update { it.copy(isLoading = false) }
+                        emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
+                    }
+
+                    is DataResult.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+                    else -> Unit
                 }
             }
-
-            is DataResult.Error -> {
-                _uiState.update { it.copy(isLoading = false) }
-                emitEffect(CheckoutEffect.ShowErrorDialog(result.error))
-            }
-
-            else -> Unit
         }
     }
 

@@ -12,7 +12,7 @@ import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface EventRepository {
-    suspend fun getEvents(
+    fun getEvents(
         title: String? = null,
         organizerId: String? = null,
         status: String? = null,
@@ -23,8 +23,8 @@ interface EventRepository {
         limitCount: Long? = null,
         eventType: String? = null,
         eventFormat: String? = null
-    ): DataResult<List<Event>>
-    suspend fun getEvent(eventId: String, forceRefresh: Boolean = false): DataResult<Event>
+    ): Flow<DataResult<List<Event>>>
+    fun getEvent(eventId: String, forceRefresh: Boolean = false): Flow<DataResult<Event>>
     suspend fun getEventStatistics(eventId: String): Flow<DataResult<EventStatisticDto>>
     suspend fun createEvent(params: CreateEventParams, imageByte: Uri): DataResult<Event>
     suspend fun getEventTypes(): DataResult<List<TEventType>>
