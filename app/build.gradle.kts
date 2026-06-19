@@ -45,7 +45,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.prayatna.lookiesapp.HiltTestRunner"
 
         val properties = Properties()
         properties.load(project.rootProject.file("local.properties").inputStream())
@@ -154,4 +154,11 @@ dependencies {
 
     //viewModel lifeCycle
     implementation (libs.androidx.lifecycle.viewmodel.compose)
+
+    //testing
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
+    androidTestImplementation(libs.androidx.work.testing)
 }

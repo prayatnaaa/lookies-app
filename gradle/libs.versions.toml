@@ -36,6 +36,8 @@ constraintlayout = "2.1.4"
 workRuntimeKtx = "2.11.2"
 
 [libraries]
+androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "workRuntimeKtx" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCore" }
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraCore" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraCore" }
