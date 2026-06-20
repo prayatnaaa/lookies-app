@@ -20,5 +20,9 @@ data class RegisterEventUiState(
     
     // Terms & Conditions data
     val revenueRules: List<EventRevenueRules> = emptyList(),
-    val isRevenueLoading: Boolean = false
+    val isRevenueLoading: Boolean = false,
+
+    // Interactive Commission Proposal
+    val proposedCommission: Float = 0.8f, // Default to 80% artist share
+    val totalPaintingPrice: Double = 0.0
 )

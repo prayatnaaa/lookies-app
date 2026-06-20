@@ -5,10 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegisterEventRequest(
-    @SerialName("p_artist_id")
+    @SerialName("artist_id")
     val artistId: String,
     @SerialName("event_id")
     val eventId: Int,
     @SerialName("painting_ids")
-    val paintingIds: List<Int>
+    val paintingIds: List<Int>,
+    @SerialName("comission_rate")
+    val commissionRate: Int
 )

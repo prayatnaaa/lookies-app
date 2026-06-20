@@ -27,14 +27,16 @@ class ArtistRepositoryImpl @Inject constructor(
 ): ArtistRepository {
     override suspend fun registerEvent(
         eventId: Int,
-        paintingIds: List<Int>
+        paintingIds: List<Int>,
+        commissionRate: Double
     ): DataResult<RegisterEventOutput> {
         val artistId = auth.currentSessionOrNull()?.user?.id ?: throw Exception("User not logged in")
         return try {
             val response = supabaseArtistService.registerEvent(
                 artistId = artistId,
                 eventId = eventId,
-                paintingIds = paintingIds
+                paintingIds = paintingIds,
+                commissionRate = commissionRate
             )
 
             Log.e("RegisterEvent", "registerEvent: $response")

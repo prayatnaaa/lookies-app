@@ -58,10 +58,21 @@ class RegisterEventViewModel @Inject constructor(
                     currentSelected.add(event.id)
                 }
                 _state.update { it.copy(selectedIds = currentSelected) }
+                calculateTotalSelectedPrice()
             }
             RegisterEventEvent.Submit -> submitRegistration()
             RegisterEventEvent.DismissError -> _state.update { it.copy(errorMessage = null) }
+            is RegisterEventEvent.SetProposedCommission -> {
+                _state.update { it.copy(proposedCommission = event.rate) }
+            }
         }
+    }
+
+    private fun calculateTotalSelectedPrice() {
+        val selectedIds = _state.value.selectedIds
+        val allPaintings = _state.value.allPaintings
+        val total = allPaintings.filter { it.id in selectedIds }.sumOf { it.price }
+        _state.update { it.copy(totalPaintingPrice = total) }
     }
 
     private fun fetchRevenueRules(eventId: Int) {
@@ -94,6 +105,7 @@ class RegisterEventViewModel @Inject constructor(
                         allPaintings = result.data,
                         isLoading = false
                     ) }
+                    calculateTotalSelectedPrice()
                 }
                 is DataResult.Error -> {
                     _state.update { it.copy(
@@ -123,7 +135,8 @@ class RegisterEventViewModel @Inject constructor(
             
             when (val result = artistRepository.registerEvent(
                 eventId = currentState.eventId,
-                paintingIds = currentState.selectedIds.toList()
+                paintingIds = currentState.selectedIds.toList(),
+                commissionRate = currentState.proposedCommission.toDouble()
             )) {
                 is DataResult.Success -> {
                     _state.update { it.copy(

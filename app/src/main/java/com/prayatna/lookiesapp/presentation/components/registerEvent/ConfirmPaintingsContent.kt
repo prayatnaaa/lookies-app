@@ -105,6 +105,16 @@ fun ConfirmPaintingsContent(
             }
         }
 
+        // --- NEW: Interactive Commission Proposal Section ---
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+            CommissionProposalSection(
+                proposedRate = state.proposedCommission,
+                totalPrice = state.totalPaintingPrice,
+                onRateChange = { onEvent(RegisterEventEvent.SetProposedCommission(it)) }
+            )
+        }
+
         // Payment Summary Section
         item {
             Spacer(modifier = Modifier.height(24.dp))
@@ -131,7 +141,7 @@ fun ConfirmPaintingsContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Payment Summary",
+                            text = "Registration Payment",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -168,7 +178,7 @@ fun ConfirmPaintingsContent(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Total",
+                            text = "Total Payable",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )

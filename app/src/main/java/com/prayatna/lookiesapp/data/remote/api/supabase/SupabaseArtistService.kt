@@ -49,13 +49,17 @@ class SupabaseArtistService @Inject constructor(
     suspend fun registerEvent(
         artistId: String,
         eventId:Int,
-        paintingIds: List<Int>
+        paintingIds: List<Int>,
+        commissionRate: Double
     ): RegisterEventResponse {
         val parameters = RegisterEventRequest(
             artistId = artistId,
             eventId = eventId,
-            paintingIds = paintingIds
+            paintingIds = paintingIds,
+            commissionRate = (commissionRate * 100).toInt()
         )
+
+        Log.d("RegisterEvent", parameters.toString())
 
         val session = auth.currentSessionOrNull()
             ?: throw IllegalStateException("No active session")

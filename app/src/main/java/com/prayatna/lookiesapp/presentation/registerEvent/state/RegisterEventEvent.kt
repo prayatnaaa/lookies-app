@@ -11,4 +11,7 @@ sealed interface RegisterEventEvent {
     data class TogglePainting(val id: Int) : RegisterEventEvent
     data object Submit : RegisterEventEvent
     data object DismissError : RegisterEventEvent
+
+    // Interactive Commission Proposal
+    data class SetProposedCommission(val rate: Float) : RegisterEventEvent
 }
