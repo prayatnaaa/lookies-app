@@ -18,8 +18,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.partner.orderDetail.navigateToPartnerOrderDetail
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.NavigationRoutes
+import com.prayatna.lookiesapp.utils.NavigationRoutes.VA_PAYMENT
 import com.prayatna.lookiesapp.utils.QrCodeGenerator
 import com.prayatna.lookiesapp.utils.formatRupiah
 import kotlinx.coroutines.delay
@@ -31,6 +33,7 @@ fun QrPaymentScreen(
     orderId: String,
     amount: Long,
     description: String? = null,
+    isOfflinePurchase: Boolean = false,
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,14 +69,23 @@ fun QrPaymentScreen(
 
     LaunchedEffect(uiState.isPaid) {
         if (uiState.isPaid) {
-            showSuccessDialog = true
+//            showSuccessDialog = true
 
-            delay(1000)
-            navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
-                popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}") {
-                    inclusive = true
+//            delay(1000)
+            if (isOfflinePurchase) {
+                navController.navigate("${NavigationRoutes.PARTNER_ORDER_DETAIL}/$orderId") {
+                    popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}") {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
                 }
-                launchSingleTop = true
+            } else {
+                navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
+                    popUpTo("${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}") {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
             }
         }
     }

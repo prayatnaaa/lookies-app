@@ -25,18 +25,9 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FilterList
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,11 +52,15 @@ fun EventListScreen(
 ) {
     val focusManager = LocalFocusManager.current
 
-    val statusFilters = listOf(
-        "published" to "Published",
-        "pending_validation" to "Pending",
-        "completed" to "Ended"
-    )
+    val activeFiltersCount = remember(uiState) {
+        var count = 0
+        if (uiState.selectedLocation != null) count++
+        if (uiState.selectedEventType != null) count++
+        if (uiState.selectedEventFormat != null) count++
+        if (uiState.startDate != null) count++
+        if (uiState.endDate != null) count++
+        count
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -134,61 +129,31 @@ fun EventListScreen(
                         )
                     )
 
-                    // Advanced Filter Button
-                    IconButton(
-                        onClick = { onEvent(EventListEvent.OnFilterSheetToggle) },
-                        modifier = Modifier
-                            .size(50.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
-                            )
+                    // Advanced Filter Button with Badge
+                    BadgedBox(
+                        badge = {
+                            if (activeFiltersCount > 0) {
+                                Badge {
+                                    Text(activeFiltersCount.toString())
+                                }
+                            }
+                        }
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.FilterAlt,
-                            contentDescription = "Filters",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                }
-
-                // Status filter chips
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 4.dp)
-                ) {
-                    item {
-                        FilterChip(
-                            selected = uiState.selectedStatus == null,
-                            onClick = { onEvent(EventListEvent.OnStatusSelected(null)) },
-                            label = { Text("All") },
-                            leadingIcon = if (uiState.selectedStatus == null) {
-                                {
-                                    Icon(
-                                        imageVector = Icons.Default.Done,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                    )
-                                }
-                            } else null
-                        )
-                    }
-                    items(statusFilters) { (slug, label) ->
-                        val isSelected = uiState.selectedStatus == slug
-                        FilterChip(
-                            selected = isSelected,
-                            onClick = { onEvent(EventListEvent.OnStatusSelected(slug)) },
-                            label = { Text(label) },
-                            leadingIcon = if (isSelected) {
-                                {
-                                    Icon(
-                                        imageVector = Icons.Default.Done,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                    )
-                                }
-                            } else null
-                        )
+                        IconButton(
+                            onClick = { onEvent(EventListEvent.OnFilterSheetToggle) },
+                            modifier = Modifier
+                                .size(50.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
+                                )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.FilterAlt,
+                                contentDescription = "Filters",
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
                     }
                 }
 
@@ -250,7 +215,7 @@ fun EventListScreen(
                     else -> {
                         EmptyState(
                             query = uiState.searchQuery,
-                            hasFilters = uiState.selectedStatus != null || uiState.selectedLocation != null,
+                            hasFilters = uiState.selectedStatus != null || uiState.selectedLocation != null || uiState.selectedEventType != null || uiState.selectedEventFormat != null,
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }

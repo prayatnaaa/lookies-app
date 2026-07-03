@@ -2,15 +2,27 @@ package com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.p
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,10 +39,14 @@ import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventPainting.EventPaintingDetailContent
 import com.prayatna.lookiesapp.presentation.components.eventPainting.PartnerShipmentActionBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEffect
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
-import com.prayatna.lookiesapp.utils.NavigationRoutes
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.state.PartnerExhibitionPaintingEffect
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.state.PartnerExhibitionPaintingEvent
+import com.prayatna.lookiesapp.presentation.exhibitionShipment.navigateToExhibitionShipment
+import com.prayatna.lookiesapp.presentation.offlineCheckout.navigateToOfflineCheckout
+import com.prayatna.lookiesapp.presentation.unsoldArtworkReturn.navigateToUnsoldArtworkReturn
+import java.time.OffsetDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartnerExhibitionPaintingDetailScreen(
     navController: NavController,
@@ -45,15 +61,16 @@ fun PartnerExhibitionPaintingDetailScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     var showRejectSheet by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var rejectReason by remember { mutableStateOf("") }
     var selectedPaintingId by remember { mutableStateOf<String?>(null) }
+    var showApproveSheet by remember { mutableStateOf(false) }
 
-//    var resultMessage by remember { mutableStateOf<String?>(null) }
 
     // LOAD
     LaunchedEffect(eventPaintingId) {
         viewModel.onEvent(
-            EventPaintingDetailEvent.Load(eventPaintingId)
+            PartnerExhibitionPaintingEvent.Load(eventPaintingId)
         )
     }
 
@@ -61,7 +78,7 @@ fun PartnerExhibitionPaintingDetailScreen(
         viewModel.event.collect { event ->
             when (event) {
 
-                is EventPaintingDetailEffect.ShowResult -> {
+                is PartnerExhibitionPaintingEffect.ShowResult -> {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("snackbar_message", event.message)
@@ -76,7 +93,7 @@ fun PartnerExhibitionPaintingDetailScreen(
                     navController.popBackStack()
                 }
 
-                is EventPaintingDetailEffect.ShowError -> {
+                is PartnerExhibitionPaintingEffect.ShowError -> {
                     snackbarHostState.showSnackbar(
                         event.message,
                         withDismissAction = true
@@ -84,6 +101,25 @@ fun PartnerExhibitionPaintingDetailScreen(
                 }
             }
         }
+    }
+
+    if (showApproveSheet) {
+        ApprovePaintingBottomSheet(
+            onDismiss = {
+                showApproveSheet = false
+                selectedPaintingId = null
+            },
+            onConfirm = {
+                selectedPaintingId?.let {
+                    viewModel.onEvent(
+                        PartnerExhibitionPaintingEvent.Approve(it)
+                    )
+                }
+
+                showApproveSheet = false
+                selectedPaintingId = null
+            }
+        )
     }
 
     if (showRejectSheet) {
@@ -98,7 +134,7 @@ fun PartnerExhibitionPaintingDetailScreen(
             onConfirm = {
                 selectedPaintingId?.let { id ->
                     viewModel.onEvent(
-                        EventPaintingDetailEvent.Reject(
+                        PartnerExhibitionPaintingEvent.Reject(
                             id = id,
                             reason = rejectReason
                         )
@@ -112,7 +148,32 @@ fun PartnerExhibitionPaintingDetailScreen(
         )
     }
 
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Remove Artwork") },
+            text = { Text("Are you sure you want to remove this artwork from the exhibition?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        viewModel.onEvent(PartnerExhibitionPaintingEvent.Delete(eventPaintingId))
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Remove")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BackTopBar(
@@ -123,33 +184,90 @@ fun PartnerExhibitionPaintingDetailScreen(
         bottomBar = {
             state.data?.let { painting ->
 
-                when (painting.status.lowercase()) {
+                val isSelfExhibition = painting.participant.event.eventType.slug == "self_exhibition"
+                val eventStart = try { OffsetDateTime.parse(painting.participant.event.startDate) } catch (e: Exception) { null }
+                val isNotStarted = eventStart?.let { OffsetDateTime.now().isBefore(it) } ?: true
 
-                    "pending" -> {
-                        PartnerPaintingDecisionActionBar(
-                            onApprove = {
-                                viewModel.onEvent(
-                                    EventPaintingDetailEvent.Approve(painting.id)
-                                )
-                            },
-                            onReject = {
-                                selectedPaintingId = painting.id
-                                showRejectSheet = true
+                Column {
+                    if (isSelfExhibition && isNotStarted) {
+                        Surface(
+                            shadowElevation = 4.dp,
+                            color = MaterialTheme.colorScheme.surface,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                            ) {
+                                OutlinedButton(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = { showDeleteDialog = true },
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.error
+                                    ),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                                ) {
+                                    if (state.actionLoading) {
+                                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                                    } else {
+                                        Text("Remove from Exhibition")
+                                    }
+                                }
                             }
-                        )
+                        }
                     }
 
-                    "rejected", "sold", "on_sale" -> {}
+                    when (painting.status.lowercase()) {
 
-                    else -> {
-                        PartnerShipmentActionBar(
-                            status = painting.status,
-                            onManageShipment = {
-                                navController.navigate(
-                                    NavigationRoutes.EXHIBITION_SHIPMENT + "/${painting.id}"
+                        "pending" -> {
+                            PartnerPaintingDecisionActionBar(
+                                onApprove = {
+                                    selectedPaintingId = painting.id
+                                    showApproveSheet = true
+                                },
+                                onReject = {
+                                    selectedPaintingId = painting.id
+                                    showRejectSheet = true
+                                }
+                            )
+                        }
+
+                        "rejected" -> {}
+
+                        "on_sale" -> {
+                            if (state.data?.participant?.event?.eventFormat?.slug == "offline") {
+                                MarkAsSoldButton(
+                                    enable = state.data?.participant?.event?.status == "ongoing",
+                                    onClick = {
+                                        navController.navigateToOfflineCheckout(
+                                            itemId = painting.id,
+                                            quantity = 1
+                                        )
+                                    }
                                 )
                             }
-                        )
+                        }
+
+                        "unsold" -> {
+                            PartnerShipmentActionBar(
+                                enableReturningToCreator = false,
+                                status = painting.status,
+                                onManageShipment = {
+                                    navController.navigateToUnsoldArtworkReturn(painting.id)
+                                }
+                            )
+                        }
+
+                        else -> {
+                            PartnerShipmentActionBar(
+                                enableReturningToCreator = false,
+                                status = painting.status,
+                                onManageShipment = {
+                                    navController.navigateToExhibitionShipment(eventPaintingId, true)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -174,34 +292,61 @@ fun PartnerExhibitionPaintingDetailScreen(
 }
 
 @Composable
-fun PartnerPaintingDecisionActionBar(
-    onApprove: () -> Unit,
-    onReject: () -> Unit
+fun MarkAsSoldButton(
+    onClick: () -> Unit,
+    enable: Boolean = true
 ) {
-    androidx.compose.material3.Surface(
+    Surface(
         shadowElevation = 8.dp,
         color = MaterialTheme.colorScheme.surface,
         modifier = Modifier.fillMaxWidth()
     ) {
-        androidx.compose.foundation.layout.Row(
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .navigationBarsPadding()
+        ) {
+            Button(
+                enabled = enable,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onClick
+            ) {
+                Text("Mark as Sold")
+            }
+        }
+    }
+}
+
+@Composable
+fun PartnerPaintingDecisionActionBar(
+    onApprove: () -> Unit,
+    onReject: () -> Unit
+) {
+    Surface(
+        shadowElevation = 8.dp,
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+       Row(
             modifier = Modifier
                 .padding(16.dp)
                 .navigationBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            androidx.compose.material3.OutlinedButton(
+            OutlinedButton(
                 onClick = onReject,
                 modifier = Modifier.weight(1f)
             ) {
-                androidx.compose.material3.Text("Reject")
+                Text("Reject")
             }
 
-            androidx.compose.material3.Button(
+            Button(
                 onClick = onApprove,
                 modifier = Modifier.weight(1f)
             ) {
-                androidx.compose.material3.Text("Approve")
+                Text("Approve")
             }
         }
     }
@@ -225,7 +370,7 @@ fun RejectPaintingBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            androidx.compose.material3.Text(
+            Text(
                 text = "Reject Painting",
                 style = MaterialTheme.typography.titleLarge
             )
@@ -233,28 +378,75 @@ fun RejectPaintingBottomSheet(
             androidx.compose.material3.OutlinedTextField(
                 value = reason,
                 onValueChange = onReasonChange,
-                label = { androidx.compose.material3.Text("Reason") },
+                label = { Text("Reason") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3
             )
 
-            androidx.compose.foundation.layout.Row(
+            Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
-                androidx.compose.material3.OutlinedButton(
+                OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f)
                 ) {
-                    androidx.compose.material3.Text("Cancel")
+                    Text("Cancel")
                 }
 
-                androidx.compose.material3.Button(
+                Button(
                     onClick = onConfirm,
                     enabled = reason.isNotBlank(),
                     modifier = Modifier.weight(1f)
                 ) {
-                    androidx.compose.material3.Text("Reject")
+                    Text("Reject")
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ApprovePaintingBottomSheet(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Text(
+                text = "Approve Artwork",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Text(
+                text = "Are you sure you want to approve this artwork for the exhibition?"
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+
+                OutlinedButton(
+                    modifier = Modifier.weight(1f),
+                    onClick = onDismiss
+                ) {
+                    Text("Cancel")
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = onConfirm
+                ) {
+                    Text("Approve")
                 }
             }
         }

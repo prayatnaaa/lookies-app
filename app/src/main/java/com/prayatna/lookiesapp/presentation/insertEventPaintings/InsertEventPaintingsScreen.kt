@@ -39,8 +39,8 @@ fun InsertEventPaintingsScreen(
     Scaffold(
         topBar = {
             BackTopBar(
-                title = "Pilih Lukisan Pameran",
-                onBackClick = onBackClick // Callback navigasi
+                title = "Choose Event Paintings",
+                onBackClick = onBackClick
             )
         },
         bottomBar = {
@@ -74,7 +74,7 @@ fun InsertEventPaintingsScreen(
                             )
                         } else {
                             Text(
-                                text = "Tambahkan ${uiState.selectedPaintings.size} Karya",
+                                text = "Add ${uiState.selectedPaintings.size} Paintings",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -202,14 +202,14 @@ fun EmptyState(modifier: Modifier = Modifier) {
         modifier = modifier.padding(32.dp)
     ) {
         Text(
-            text = "Tidak Ada Karya Tersedia",
+            text = "No paintings available",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Koleksi lukisanmu sedang kosong atau semua karya sudah terdaftar di pameran lain.",
+            text = "Your collections is empty or on exhibitions",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -224,7 +224,7 @@ fun ErrorState(errorMessage: String, modifier: Modifier = Modifier) {
         modifier = modifier.padding(32.dp)
     ) {
         Text(
-            text = "Gagal Memuat Data",
+            text = "Failed to load data",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.error,
             fontWeight = FontWeight.Bold

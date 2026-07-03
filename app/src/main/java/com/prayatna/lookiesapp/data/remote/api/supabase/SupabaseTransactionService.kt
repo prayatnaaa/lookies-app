@@ -5,10 +5,12 @@ import com.prayatna.lookiesapp.BuildConfig
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBalanceLogDto
 import com.prayatna.lookiesapp.data.remote.dto.MonthlyFinancialReportDto
 import com.prayatna.lookiesapp.data.remote.dto.OrderSplitDto
+import com.prayatna.lookiesapp.data.remote.dto.PaidOrderItemDto
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
 import com.prayatna.lookiesapp.data.remote.dto.PendingOrderSplitsDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.TransactionDto
+import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOfflineOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.request.order.OrderItemRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.payment.CreateQrisPaymentRequestRequest
@@ -44,6 +46,13 @@ class SupabaseTransactionService @Inject constructor(
     private val httpClient: HttpClient,
 ) {
 
+    suspend fun createOfflineOrder(params: CreateOfflineOrderRpcParams): String {
+        return postgrest.rpc(
+            function = "create_offline_order",
+            parameters = params
+        ).decodeAs<String>()
+    }
+
     suspend fun getPendingOrderSplitByMerchantId(merchantId: String): PendingOrderSplitsDto? {
         return postgrest.rpc(
             "merchant_pending_order_splits",
@@ -56,6 +65,7 @@ class SupabaseTransactionService @Inject constructor(
             filter {
                 OrderSplitDto::merchantId eq merchantId
             }
+            order("created_at", Order.DESCENDING)
         }.decodeList<OrderSplitDto>()
     }
     suspend fun getMerchantBalanceLogs(merchantId: String): List<MerchantBalanceLogDto> {
@@ -121,6 +131,14 @@ class SupabaseTransactionService @Inject constructor(
         return orderId
     }
 
+    suspend fun getPaymentAttemptByOrderId(orderId: String): List<PaymentAttemptDto> {
+        return postgrest["payment_attempts"]
+            .select {
+                filter { eq("order_id", orderId) }
+                order("created_at", Order.DESCENDING)
+            }.decodeList()
+    }
+
     suspend fun getUserTransactions(): List<TransactionDto> {
         val user = auth.currentUserOrNull() ?: throw IllegalStateException("User not logged in")
 
@@ -129,13 +147,22 @@ class SupabaseTransactionService @Inject constructor(
             .select {
                 filter {
                     eq("buyer_id", user.id)
-                    neq("status", "awaiting_payment")
+//                    neq("status", "awaiting_payment")
+                    neq("status", "cancelled")
                 }
                 order("created_at", order = Order.DESCENDING)
             }
             .decodeList<TransactionDto>()
         Log.d("SupabaseTransactionService", "getUserTransactions: $result")
         return result
+    }
+
+    suspend fun getPaidOrderItemsByEventId(eventId: Int): List<PaidOrderItemDto> {
+        return postgrest.from("paid_order_items_view").select {
+            filter {
+                PaidOrderItemDto::eventId eq eventId
+            }
+        }.decodeList<PaidOrderItemDto>()
     }
 
     suspend fun getUserTransactionByOrderId(orderId: String): TransactionDto {

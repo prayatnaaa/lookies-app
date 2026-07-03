@@ -9,6 +9,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionEvent
+import com.prayatna.lookiesapp.presentation.payment.selectPayoutChannel.navigateToSelectPayoutChannel
 
 @Composable
 fun ArtistSubmissionRoute(
@@ -20,6 +21,18 @@ fun ArtistSubmissionRoute(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val formState by viewModel.formState.collectAsStateWithLifecycle()
+
+    val selectedCode = navController.currentBackStackEntry?.savedStateHandle?.get<String>("selected_payout_channel_code")
+    val selectedName = navController.currentBackStackEntry?.savedStateHandle?.get<String>("selected_payout_channel_name")
+
+    LaunchedEffect(selectedCode, selectedName) {
+        if (selectedCode != null && selectedName != null) {
+            viewModel.onEvent(ArtistSubmissionEvent.BankCodeChanged(selectedCode))
+            viewModel.onEvent(ArtistSubmissionEvent.BankNameChanged(selectedName))
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("selected_payout_channel_code")
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("selected_payout_channel_name")
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -33,7 +46,14 @@ fun ArtistSubmissionRoute(
                 }
 
                 ArtistSubmissionEffect.NavigateToSuccess -> {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("refresh", true)
                     navController.popBackStack()
+                }
+
+                ArtistSubmissionEffect.NavigateToSelectBank -> {
+                    navController.navigateToSelectPayoutChannel()
                 }
             }
         }
@@ -50,8 +70,6 @@ fun ArtistSubmissionRoute(
                 else -> viewModel.onEvent(event)
             }
         },
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
     )
-
-
 }

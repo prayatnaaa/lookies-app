@@ -1,19 +1,26 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.remote.dto.AdminTransactionDetailDto
+import com.prayatna.lookiesapp.data.remote.dto.AdminTransactionDto
 import com.prayatna.lookiesapp.data.remote.dto.GetKycDocumentDto
 import com.prayatna.lookiesapp.data.remote.dto.TicketDto
 import com.prayatna.lookiesapp.data.remote.dto.WithdrawalRequestDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecideEventResponseDto
 import com.prayatna.lookiesapp.data.remote.dto.response.admin.DecidePartnerApplicationResponseDto
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
+import io.github.jan.supabase.storage.Storage
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.hours
 
 class SupabaseAdminService @Inject constructor(
     private val postgrest: Postgrest,
-    private val auth: Auth
+    private val auth: Auth,
+    private val storage: Storage
 ) {
     suspend fun decidePartnerApplication(status: String, id: String): DecidePartnerApplicationResponseDto {
          val result = postgrest.from("merchant_accounts").update(
@@ -79,6 +86,22 @@ class SupabaseAdminService @Inject constructor(
         }.decodeList<GetKycDocumentDto>()
     }
 
+    suspend fun getPrivateFileUrl(filePath: String): String? {
+        return try {
+            val signedUrl = storage
+                .from("private_documents")
+                .createSignedUrl(
+                    path = filePath,
+                    expiresIn = 1.hours
+                )
+
+            signedUrl
+        } catch (e: RestException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     suspend fun getTicketByCode(code: String): TicketDto {
         return postgrest.from("purchased_tickets").select {
             filter {
@@ -101,5 +124,48 @@ class SupabaseAdminService @Inject constructor(
                 eq("id", id)
             }
         }.decodeSingle<WithdrawalRequestDto>()
+    }
+
+    suspend fun getTransactionList(limit: Int, offset: Int, status: String?): List<AdminTransactionDto> {
+        return  postgrest["orders"]
+            .select(
+                columns = Columns.raw(
+                    """
+                        id, total_amount, status, created_at, 
+                        users!orders_buyer_id_fkey1(email, user_profiles(full_name)), 
+                        payment_attempts(status)
+                        """.trimIndent()
+                )
+            ) {
+                filter {
+                    if (status != null) {
+                        eq("status", status)
+                    }
+                }
+                order("created_at", Order.DESCENDING)
+                limit(count = limit.toLong())
+                range(offset.toLong(), (offset + limit - 1).toLong())
+            }.decodeList<AdminTransactionDto>()
+    }
+
+    suspend fun getTransactionDetail(orderId: String): AdminTransactionDetailDto {
+        return postgrest["orders"]
+            .select(
+                columns = Columns.raw(
+                    """
+                        id, total_amount, status, created_at, 
+                        users!orders_buyer_id_fkey1(email, user_profiles(full_name)), 
+                        order_items(id, item_type, unit_price, quantity, subtotal, event_id, event_painting_id), 
+                        order_splits(id, order_id, created_at, merchant_id, gross_amount, platform_fee, net_amount, payout_status),
+                        payment_attempts(status, provider, channel, external_id, created_at),
+                        shipments(id, tracking_number, status, shipping_cost, merchant_id, order_id, reciepent_name, phone_number, address_line, province, postal_code, created_at),
+                        refund_requests(id, status, amount, reason)
+                        """.trimIndent()
+                )
+            ) {
+                filter {
+                    eq("id", orderId)
+                }
+            }.decodeSingle<AdminTransactionDetailDto>()
     }
 }

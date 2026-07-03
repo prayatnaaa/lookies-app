@@ -2,41 +2,24 @@ package com.prayatna.lookiesapp.presentation.forumchannellist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelView
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +30,8 @@ fun ForumChannelListScreen(
     onBackClick: () -> Unit,
     onMembersClick: () -> Unit
 ) {
+    var showCreateSheet by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,6 +53,17 @@ fun ForumChannelListScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            if (state.userRole == "organizer") {
+                FloatingActionButton(
+                    onClick = { showCreateSheet = true },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Create Channel")
+                }
+            }
         }
     ) { paddingValues ->
         Box(
@@ -121,13 +117,99 @@ fun ForumChannelListScreen(
                                 onClick = {
                                     onEvent(
                                         ForumChannelListEvent.OnChannelClick(
-                                            channel.id
+                                            channel.id, channel.isReadOnlyForMembers
                                         )
                                     )
                                 }
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+
+    if (showCreateSheet) {
+        CreateChannelBottomSheet(
+            isSubmitting = state.isCreatingChannel,
+            onDismiss = { showCreateSheet = false },
+            onConfirm = { name, isReadOnly ->
+                onEvent(ForumChannelListEvent.CreateChannel(name, isReadOnly))
+                showCreateSheet = false
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CreateChannelBottomSheet(
+    isSubmitting: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: (String, Boolean) -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var isReadOnly by remember { mutableStateOf(false) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Text(
+                text = "Create New Channel",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Channel Name") },
+                placeholder = { Text("e.g. announcements") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
+            )
+            
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isReadOnly = !isReadOnly }
+            ) {
+                Checkbox(
+                    checked = isReadOnly,
+                    onCheckedChange = { isReadOnly = it }
+                )
+                Spacer(Modifier.width(12.dp))
+                Column {
+                    Text("Read-only for members", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "Only organizers can send messages here",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Button(
+                onClick = { onConfirm(name, isReadOnly) },
+                enabled = name.isNotBlank() && !isSubmitting,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                if (isSubmitting) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.5.dp, color = MaterialTheme.colorScheme.onPrimary)
+                } else {
+                    Text("Create Channel", fontWeight = FontWeight.Bold)
                 }
             }
         }

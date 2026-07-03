@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.Flow
 interface ArtistRepository {
     suspend fun registerEvent(
         eventId: Int,
-        paintingIds: List<Int>
+        paintingIds: List<Int>,
+        commissionRate: Double
     ):
             DataResult<RegisterEventOutput>
     fun getDashboardData():

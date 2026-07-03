@@ -41,6 +41,7 @@ fun ConfirmPaintingsContent(
     fee: Double = 0.0
 ) {
     val selectedPaintings = state.allPaintings.filter { it.id in state.selectedIds }
+    val totalFee = fee * selectedPaintings.size
 
     LazyColumn(contentPadding = PaddingValues(16.dp)) {
         item {
@@ -104,6 +105,16 @@ fun ConfirmPaintingsContent(
             }
         }
 
+        // --- NEW: Interactive Commission Proposal Section ---
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+            CommissionProposalSection(
+                proposedRate = state.proposedCommission,
+                totalPrice = state.totalPaintingPrice,
+                onRateChange = { onEvent(RegisterEventEvent.SetProposedCommission(it)) }
+            )
+        }
+
         // Payment Summary Section
         item {
             Spacer(modifier = Modifier.height(24.dp))
@@ -130,7 +141,7 @@ fun ConfirmPaintingsContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Payment Summary",
+                            text = "Registration Payment",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -148,8 +159,13 @@ fun ConfirmPaintingsContent(
                     )
 
                     PaymentSummaryItem(
-                        label = "Registration Fee",
+                        label = "Fee per Painting",
                         value = if (fee == 0.0) "Free" else formatRupiah(fee)
+                    )
+
+                    PaymentSummaryItem(
+                        label = "Registration Fee",
+                        value = if (totalFee == 0.0) "Free" else "${selectedPaintings.size} × ${formatRupiah(fee)}"
                     )
 
                     HorizontalDivider(
@@ -162,12 +178,12 @@ fun ConfirmPaintingsContent(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Total",
+                            text = "Total Payable",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (fee == 0.0) "Free" else formatRupiah(fee),
+                            text = if (totalFee == 0.0) "Free" else formatRupiah(totalFee),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

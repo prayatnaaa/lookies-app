@@ -54,6 +54,7 @@ import com.prayatna.lookiesapp.data.remote.dto.EventStatisticDto
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventlist.EventCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.partner.eventTransactions.navigateToEventTransactionList
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 import com.prayatna.lookiesapp.utils.formatRupiah
 
@@ -145,13 +146,24 @@ fun PartnerManageEventScreen(
                             }
                         )
                     }
+
+                    item {
+                        ManagementOptionCard(
+                            title = "Transactions",
+                            description = "See this event's transaction from buyer",
+                            icon = Icons.Default.MonetizationOn,
+                            onClick = {
+                                navController.navigateToEventTransactionList(eventId)
+                            }
+                        )
+                    }
                     item {
                         ManagementOptionCard(
                             title = "Scan Barcodes",
                             description = "Scan barcodes for event.",
                             icon = Icons.Default.QrCodeScanner,
                             onClick = {
-                                navController.navigate(NavigationRoutes.BARCODE_SCANNER)
+                                navController.navigate("${NavigationRoutes.BARCODE_SCANNER}/${uiState.event?.id}")
                             }
                         )
                     }
@@ -224,12 +236,12 @@ fun EventStatisticsDashboard(
                 }
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    StatBoxSimple(
-                        label = "Total Artworks",
-                        value = stats.totalPaintings.toString(),
-                        icon = Icons.Default.Palette,
-                        modifier = Modifier.weight(1f)
-                    )
+//                    StatBoxSimple(
+//                        label = "Total Artworks",
+//                        value = stats.totalPaintings.toString(),
+//                        icon = Icons.Default.Palette,
+//                        modifier = Modifier.weight(1f)
+//                    )
 
 //                    if (!isSelfExhibition) {
 //                        StatBoxSimple(

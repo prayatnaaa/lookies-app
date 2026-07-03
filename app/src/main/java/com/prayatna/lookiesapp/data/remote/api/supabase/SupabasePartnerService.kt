@@ -4,10 +4,12 @@ import android.util.Log
 import com.prayatna.lookiesapp.data.remote.dto.DefaultEventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventDto
 import com.prayatna.lookiesapp.data.remote.dto.EventParticipantDto
+import com.prayatna.lookiesapp.data.remote.dto.EventRevenueRulesDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantDetailDto
 import com.prayatna.lookiesapp.data.remote.dto.PartnerDashboardDto
 import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateEventRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.event.UpdateRevenueRulesRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.painting.SelfEventPaintingInsertRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.GetPaintingDto
 import com.prayatna.lookiesapp.data.remote.dto.response.painting.InsertSelfEventPaintingsResponse
@@ -15,6 +17,7 @@ import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.channel
@@ -24,6 +27,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import java.util.UUID
 import javax.inject.Inject
 
@@ -33,6 +37,24 @@ class SupabasePartnerService @Inject constructor(
     private val storage: Storage,
     private val realtime: Realtime
 ) {
+
+    suspend fun deleteEventPainting(eventPaintingId: String): String {
+        postgrest.from("event_paintings").delete {
+            filter {
+                eq("id", eventPaintingId)
+            }
+        }
+
+        return "Event painting deleted successfully"
+    }
+    suspend fun updateRevenueRules(id: String, request: UpdateRevenueRulesRequest): EventRevenueRulesDto {
+        return postgrest["event_revenue_rules"].update(request) {
+            select()
+            filter {
+                eq("id", id)
+            }
+        }.decodeSingle<EventRevenueRulesDto>()
+    }
     private suspend fun uploadPartnerLogo(image: ByteArray): String {
         if (image.isEmpty()) throw Exception("Image is empty")
 
@@ -72,7 +94,7 @@ class SupabasePartnerService @Inject constructor(
             .select {
                 filter {
                     if (status != null) {
-                        eq("status", status)
+                        eq("kyc_status", status)
                     }
 
                     if (name != null) {
@@ -268,21 +290,23 @@ class SupabasePartnerService @Inject constructor(
         selectedPaintings: List<GetPaintingDto>
     ): List<InsertSelfEventPaintingsResponse> {
 
-
         val insertPayload = selectedPaintings.map { painting ->
             SelfEventPaintingInsertRequest(
-                paintingId = painting.id,
                 eventId = eventId,
+                paintingId = painting.id,
                 finalPrice = painting.price,
-                status = "on_sale",
-                businessId = painting.artistId
+                businessId = painting.artistId,
+                status = "on_sale"
             )
         }
 
-        Log.d("InsertSelfEventPaintings", insertPayload.toString())
 
-        return postgrest.from("event_paintings").insert(insertPayload) {
-            select(Columns.list("id"))
-        }.decodeList<InsertSelfEventPaintingsResponse>()
+        @Serializable
+        class RpcWrapper(val payload: List<SelfEventPaintingInsertRequest>)
+
+        return postgrest.rpc(
+            function = "insert_self_event_paintings",
+            parameters = RpcWrapper(insertPayload)
+        ).decodeList<InsertSelfEventPaintingsResponse>()
     }
 }

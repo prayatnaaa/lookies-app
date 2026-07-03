@@ -6,6 +6,7 @@ sealed class CreateRefundEvent {
     data class OrderIdChanged(val value: String) : CreateRefundEvent()
     data class AmountChanged(val value: String) : CreateRefundEvent()
     data class BankCodeChanged(val value: String) : CreateRefundEvent()
+    data class BankNameChanged(val value: String) : CreateRefundEvent()
     data class AccountNumberChanged(val value: String) : CreateRefundEvent()
     data class AccountHolderNameChanged(val value: String) : CreateRefundEvent()
     data class ReasonChanged(val value: String) : CreateRefundEvent()

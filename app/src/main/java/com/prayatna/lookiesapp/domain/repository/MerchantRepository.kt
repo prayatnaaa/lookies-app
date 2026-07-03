@@ -1,12 +1,16 @@
 package com.prayatna.lookiesapp.domain.repository
 
 import android.net.Uri
+import com.prayatna.lookiesapp.domain.model.merchant.EditMerchantBankAccountInput
+import com.prayatna.lookiesapp.domain.model.merchant.EditMerchantInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberOutput
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.user.BusinessAddress
 import com.prayatna.lookiesapp.utils.DataResult
 
 interface MerchantRepository {
@@ -25,8 +29,19 @@ interface MerchantRepository {
             DataResult<Shipment>
     suspend fun createTrackingNumberShipment(shipmentId: String, trackingNumber: String):
             DataResult<Shipment>
-    suspend fun getShipmentsByMerchantId(merchantId: String, status: String? = null):
-            DataResult<List<Shipment>>
+    suspend fun getShipmentsByMerchantId(
+        merchantId: String,
+        status: String? = null,
+        trackingNumber: String? = null
+    ): DataResult<List<Shipment>>
     suspend fun uploadShipmentArrivalProof(shipmentId: String, image: Uri):
             DataResult<String>
+    suspend fun getMerchantAddress(merchantBusinessId: String):
+            DataResult<BusinessAddress>
+    suspend fun getPublicMerchantProfile(businessId: String):
+            DataResult<MerchantBusiness>
+    suspend fun updateMerchantBusiness(id: String, input: EditMerchantInput):
+            DataResult<MerchantBusiness>
+    suspend fun updateMerchantBankAccount(id: String, input: EditMerchantBankAccountInput):
+            DataResult<MerchantBankAccount>
 }

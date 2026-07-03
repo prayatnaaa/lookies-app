@@ -37,9 +37,9 @@ class MonthlyFinanceListViewModel @Inject constructor(
     private val _effect = Channel<MonthlyFinanceEffect>()
     val effect = _effect.receiveAsFlow()
 
-    init {
-        loadData()
-    }
+//    init {
+//        loadData()
+//    }
 
     fun onEvent(event: MonthlyFinanceEvent) {
         when (event) {
@@ -60,10 +60,15 @@ class MonthlyFinanceListViewModel @Inject constructor(
                     _effect.send(MonthlyFinanceEffect.NavigateToWithdrawalList(id))
                 }
             }
+            is MonthlyFinanceEvent.PayoutLogClicked -> {
+                viewModelScope.launch {
+                    _effect.send(MonthlyFinanceEffect.NavigateToOrderDetail(event.orderId))
+                }
+            }
         }
     }
 
-    private fun loadData() {
+    fun loadData() {
         _state.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             when (val profileResult = getMerchantProfileUseCase(businessId)) {

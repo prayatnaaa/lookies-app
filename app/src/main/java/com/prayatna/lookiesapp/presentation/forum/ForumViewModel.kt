@@ -3,20 +3,15 @@ package com.prayatna.lookiesapp.presentation.forum
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
-import com.prayatna.lookiesapp.domain.usecase.chat.InsertForumsMessageUseCase
-import com.prayatna.lookiesapp.domain.usecase.chat.ListenToForumMessagesUseCase
+import com.prayatna.lookiesapp.domain.repository.ChatRepository
+import com.prayatna.lookiesapp.domain.usecase.chat.*
 import com.prayatna.lookiesapp.domain.usecase.user.GetProfileUseCase
 import com.prayatna.lookiesapp.presentation.forum.state.ForumEvent
 import com.prayatna.lookiesapp.presentation.forum.state.ForumUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,7 +19,13 @@ import javax.inject.Inject
 class ForumViewModel @Inject constructor(
     private val listenToForumMessagesUseCase: ListenToForumMessagesUseCase,
     private val insertForumsMessageUseCase: InsertForumsMessageUseCase,
-    private val getProfileUseCase: GetProfileUseCase
+    private val updateForumMessageUseCase: UpdateForumMessageUseCase,
+    private val deleteForumMessageUseCase: DeleteForumMessageUseCase,
+    private val pinForumMessageUseCase: PinForumMessageUseCase,
+    private val getForumChannelsUseCase: GetForumChannelsUseCase,
+    private val getForumsUseCase: GetForumsUseCase,
+    private val getProfileUseCase: GetProfileUseCase,
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ForumUiState())
@@ -42,6 +43,40 @@ class ForumViewModel @Inject constructor(
             is ForumEvent.InputChanged -> updateInput(event.text)
             ForumEvent.SendMessage -> handleSendMessage()
             ForumEvent.ClearError -> clearError()
+            
+            is ForumEvent.StartEditing -> {
+                _uiState.update { it.copy(editingMessage = event.message, currentInputString = event.message.content) }
+            }
+            ForumEvent.CancelEditing -> {
+                _uiState.update { it.copy(editingMessage = null, currentInputString = "") }
+            }
+            is ForumEvent.UpdateMessage -> handleUpdateMessage(event.messageId, event.newContent)
+            is ForumEvent.DeleteMessage -> handleDeleteMessage(event.messageId)
+            is ForumEvent.TogglePinMessage -> handleTogglePin(event.messageId, event.currentPinned)
+        }
+    }
+
+    private fun fetchMessages() {
+        viewModelScope.launch {
+            when (val result = chatRepository.getForumChannelMessages(_uiState.value.channelId)) {
+                is DataResult.Error -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, errorMessage = result.error)
+                    }
+                }
+                DataResult.Loading -> {
+                    _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+                }
+                is DataResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            messages = result.data.sortedBy { msg -> msg.createdAt }
+                        )
+                    }
+                }
+                else -> {}
+            }
         }
     }
 
@@ -59,7 +94,6 @@ class ForumViewModel @Inject constructor(
 
     private fun handleInitChannel(channelId: String) {
         val current = _uiState.value
-
         if (current.channelId == channelId && current.messages.isNotEmpty()) return
 
         _uiState.update {
@@ -70,12 +104,27 @@ class ForumViewModel @Inject constructor(
             )
         }
 
+        viewModelScope.launch {
+            val forumsResult = getForumsUseCase(title = null)
+            if (forumsResult is DataResult.Success) {
+                for (forum in forumsResult.data) {
+                    val channelsResult = getForumChannelsUseCase(forum.id)
+                    if (channelsResult is DataResult.Success) {
+                        val channel = channelsResult.data.find { it.id == channelId }
+                        if (channel != null) {
+                            _uiState.update { it.copy(userRole = channel.role) }
+                            break
+                        }
+                    }
+                }
+            }
+        }
+
         listenMessages(channelId)
     }
 
     private fun listenMessages(channelId: String) {
         listenJob?.cancel()
-
         listenJob = viewModelScope.launch {
             listenToForumMessagesUseCase(channelId)
                 .distinctUntilChanged()
@@ -106,6 +155,10 @@ class ForumViewModel @Inject constructor(
 
     private fun handleSendMessage() {
         val current = _uiState.value
+        if (current.editingMessage != null) {
+            handleUpdateMessage(current.editingMessage.id, current.currentInputString)
+            return
+        }
 
         val channelId = current.channelId
         val content = current.currentInputString.trim()
@@ -113,9 +166,7 @@ class ForumViewModel @Inject constructor(
 
         if (channelId.isEmpty() || content.isEmpty() || senderId.isEmpty()) return
 
-        _uiState.update {
-            it.copy(isSending = true, errorMessage = null)
-        }
+        _uiState.update { it.copy(isSending = true, errorMessage = null) }
 
         viewModelScope.launch {
             val result = insertForumsMessageUseCase(
@@ -128,22 +179,53 @@ class ForumViewModel @Inject constructor(
 
             _uiState.update { state ->
                 when (result) {
-                    is DataResult.Success -> {
-                        state.copy(
-                            isSending = false,
-                            currentInputString = ""
-                        )
-                    }
-
-                    is DataResult.Error -> {
-                        state.copy(
-                            isSending = false,
-                            errorMessage = result.error
-                        )
-                    }
-
+                    is DataResult.Success -> state.copy(isSending = false, currentInputString = "")
+                    is DataResult.Error -> state.copy(isSending = false, errorMessage = result.error)
                     else -> state.copy(isSending = false)
                 }
+            }
+        }
+    }
+
+    private fun handleUpdateMessage(id: String, content: String) {
+        if (content.isBlank()) return
+        _uiState.update { it.copy(isSending = true) }
+        
+        viewModelScope.launch {
+            when (val result = updateForumMessageUseCase(id, content)) {
+                is DataResult.Success -> {
+                    _uiState.update { it.copy(isSending = false, editingMessage = null, currentInputString = "") }
+                }
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(isSending = false, errorMessage = result.error) }
+                }
+                else -> _uiState.update { it.copy(isSending = false) }
+            }
+        }
+    }
+
+    private fun handleDeleteMessage(id: String) {
+        viewModelScope.launch {
+            when (val result = deleteForumMessageUseCase(id)) {
+                is DataResult.Success -> {
+                    fetchMessages()
+                }
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(errorMessage = result.error) }
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    private fun handleTogglePin(id: String, currentPinned: Boolean) {
+        viewModelScope.launch {
+            when (val result = pinForumMessageUseCase(id, !currentPinned)) {
+                is DataResult.Success -> { /* Realtime will handle update */ }
+                is DataResult.Error -> {
+                    _uiState.update { it.copy(errorMessage = result.error) }
+                }
+                else -> Unit
             }
         }
     }

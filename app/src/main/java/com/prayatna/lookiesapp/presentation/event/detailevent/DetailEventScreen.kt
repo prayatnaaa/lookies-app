@@ -7,9 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -32,6 +36,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.presentation.chat.privateChat.navigateToPrivateChat
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventBottomModal
@@ -39,8 +44,11 @@ import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventCo
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventFooter
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.event.detailevent.state.DetailEventUiEvent
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.navigateToEventPaintingGallery
+import com.prayatna.lookiesapp.presentation.publicMerchantProfile.navigateToPublicMerchantProfile
 import com.prayatna.lookiesapp.ui.theme.Maroon
 import com.prayatna.lookiesapp.utils.NavigationRoutes
+import java.time.OffsetDateTime
 
 @Composable
 fun DetailEventScreen(
@@ -63,16 +71,29 @@ fun DetailEventScreen(
     }
 
     // Load data
-    LaunchedEffect(eventId) {
+    LaunchedEffect(Unit) {
         viewModel.getEvent(eventId)
         viewModel.getEventPaintings(eventId)
     }
 
-    // Collect UI Event (FIXED)
+    // Collect UI Event
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
-            if (event is DetailEventUiEvent.ShowResult) {
-                resultState = event
+            when (event) {
+                is DetailEventUiEvent.ShowResult -> {
+                    resultState = event
+                }
+                is DetailEventUiEvent.NavigateToChat -> {
+                    navController.navigateToPrivateChat(
+                        partyName = event.merchantName,
+                        conversationId = event.conversationId,
+                        merchantId = event.merchantId,
+                        metadataType = "event",
+                        metadataId = eventId,
+                        metadataImageUrl = detailEventState.info?.bannerImageUrl,
+                        metadataTitle = detailEventState.info?.title
+                    )
+                }
             }
         }
     }
@@ -97,6 +118,27 @@ fun DetailEventScreen(
     }
 
     Scaffold(
+        floatingActionButton = {
+            detailEventState.info?.let { event ->
+                if (role != "admin") {
+                    FloatingActionButton(
+                        onClick = {
+                            viewModel.onChatMerchantClicked(
+                                merchantId = event.organizer.id,
+                                merchantName = event.organizer.legalName
+                            )
+                        },
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Chat,
+                            contentDescription = "Chat Organizer"
+                        )
+                    }
+                }
+            }
+        },
         containerColor = MaterialTheme.colorScheme.background,
 
         topBar = {
@@ -108,7 +150,16 @@ fun DetailEventScreen(
 
         bottomBar = {
             detailEventState.info?.let { event ->
+                val isRegisterEnabled = event.artistRegistrationEndDate?.let { deadlineString ->
+                    try {
+                        val deadline = OffsetDateTime.parse(deadlineString)
+                        OffsetDateTime.now().isBefore(deadline)
+                    } catch (_: Exception) {
+                        false
+                    }
+                } ?: false
                 DetailEventBottomBar(
+                    isRegisterEnabled = isRegisterEnabled,
                     role = role,
                     event = event,
                     isApproveLoading = adminState.isLoading,
@@ -126,7 +177,7 @@ fun DetailEventScreen(
                     },
                     onBuy = { isTicketSheetOpen = true },
                     onSeeArts = {
-                        navController.navigate("${NavigationRoutes.EVENT_PAINTING_LIST}/$eventId?eventType=${event.eventType.slug}")
+                        navController.navigateToEventPaintingGallery(eventId)
                     }
                 )
             }
@@ -151,14 +202,15 @@ fun DetailEventScreen(
                     modifier = Modifier.padding(innerPadding),
                     event = event,
                     paintings = paintings,
-                    isUserArtist = role == "artist",
+                    isUserArtist = role != "user",
                     onPaintingClick = { id ->
                         navController.navigate("${NavigationRoutes.DETAIL_EVENT_PAINTING}/$id")
                     },
                     onPartnerClick = { id ->
-                        navController.navigate(
-                            "${NavigationRoutes.MESSAGES}/$id/${event.organizer.legalName}"
-                        )
+                        navController.navigateToPublicMerchantProfile(id)
+                    },
+                    onChatClick = { merchantId, merchantName ->
+                        viewModel.onChatMerchantClicked(merchantId, merchantName)
                     }
                 )
             }
@@ -273,6 +325,7 @@ fun RejectEventBottomSheet(
 
 @Composable
 private fun DetailEventBottomBar(
+    isRegisterEnabled: Boolean = true,
     role: String,
     event: Event,
     onApprove: () -> Unit,
@@ -293,10 +346,10 @@ private fun DetailEventBottomBar(
             if (!isRejectLoading) onReject()
         },
 
-        showRegisterButton = role == "artist" &&
+        showRegisterButton = role != "user" &&
                 event.eventType.slug == "open_call",
 
-        isRegisterButtonEnabled = event.status == "published",
+        isRegisterButtonEnabled = event.status == "published" || event.status == "upcoming" && isRegisterEnabled,
         onRegisterButtonClick = onRegister,
 
         showBuyButton = role != "admin" &&

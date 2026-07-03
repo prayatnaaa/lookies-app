@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseArtistService
 import com.prayatna.lookiesapp.data.remote.dto.ArtistDashboardSummaryDto
@@ -26,14 +27,16 @@ class ArtistRepositoryImpl @Inject constructor(
 ): ArtistRepository {
     override suspend fun registerEvent(
         eventId: Int,
-        paintingIds: List<Int>
+        paintingIds: List<Int>,
+        commissionRate: Double
     ): DataResult<RegisterEventOutput> {
         val artistId = auth.currentSessionOrNull()?.user?.id ?: throw Exception("User not logged in")
         return try {
             val response = supabaseArtistService.registerEvent(
                 artistId = artistId,
                 eventId = eventId,
-                paintingIds = paintingIds
+                paintingIds = paintingIds,
+                commissionRate = commissionRate
             )
 
             Log.e("RegisterEvent", "registerEvent: $response")
@@ -46,6 +49,11 @@ class ArtistRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             Log.e("RegisterEvent", e.toString())
             DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -59,9 +67,12 @@ class ArtistRepositoryImpl @Inject constructor(
             val response = supabaseArtistService.getArtistEventPaintings(artistId = artistId, status = status)
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
-            DataResult.Error(e.error)
+            DataResult.Error(extractSupabaseError(e.error))
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Something went wrong")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -70,9 +81,12 @@ class ArtistRepositoryImpl @Inject constructor(
             val response = supabaseArtistService.getArtistBusinessId()
             DataResult.Success(response.toDomain())
         } catch (e: RestException) {
-            DataResult.Error(e.error)
+            DataResult.Error(extractSupabaseError(e.error))
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Something went wrong")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 }

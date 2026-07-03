@@ -2,16 +2,22 @@ package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
 import com.prayatna.lookiesapp.BuildConfig
+import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.UserAddressDto
 import com.prayatna.lookiesapp.data.remote.dto.UserEmailDto
+import com.prayatna.lookiesapp.data.remote.dto.UserNotificationDto
+import com.prayatna.lookiesapp.data.remote.dto.request.user.AcceptInvitationRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.ArtistApplicationRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.CreateUserAddressRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.user.RoleApplicationRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.user.AcceptPartnerInvitationResponseDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.utils.Helper
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.storage.Storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -29,6 +35,44 @@ class SupabaseUserService @Inject constructor(
     private val storage: Storage,
     private val httpClient: HttpClient
 ) {
+
+    suspend fun getNotifications(): List<UserNotificationDto> {
+        val userId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("not logged in")
+        return postgrest["notifications"].select {
+            filter {
+                eq("user_id", userId)
+            }
+            order("created_at", Order.DESCENDING)
+        }.decodeList()
+    }
+
+    suspend fun acceptPartnerInvitations(merchantAccountId: String): AcceptPartnerInvitationResponseDto {
+
+        val res = postgrest.rpc(
+            function = "accept_partner_invitation",
+            parameters = AcceptInvitationRequest(merchantAccountId = merchantAccountId)
+        ).decodeAs<AcceptPartnerInvitationResponseDto>()
+
+        Log.d("AcceptPartner", res.toString())
+        return res
+    }
+
+    suspend fun rejectPartnerInvitations(merchantAccountId: String): MerchantMemberDto {
+        val userId = auth.currentSessionOrNull()?.user?.id ?:
+        throw IllegalStateException("User not logged in")
+
+        return postgrest["merchant_members"].update(
+            {
+                MerchantMemberDto::status setTo "inactive"
+            }
+        ) {
+            select()
+            filter {
+                MerchantMemberDto::userId eq userId
+                MerchantMemberDto::merchantAccountId eq merchantAccountId
+            }
+        }.decodeSingle<MerchantMemberDto>()
+    }
 
     suspend fun getUsersEmail(query: String? = null): List<UserEmailDto> {
         return postgrest.from("users")
@@ -110,8 +154,7 @@ class SupabaseUserService @Inject constructor(
 
     suspend fun registerBusiness(
         request: RoleApplicationRequest,
-        kycFile: ByteArray,
-        fileName: String
+        kycFiles: List<Pair<String, ByteArray>> // Pair of FileName to ByteArray
     ): RoleApplicationResponse {
 
         val session = auth.currentSessionOrNull()
@@ -120,33 +163,33 @@ class SupabaseUserService @Inject constructor(
         val userId = auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not logged in")
 
-        var uploadedPath: String? = null
+        val uploadedPaths = mutableListOf<String>()
 
         try {
-            val safeFileName = fileName.replace(" ", "_")
-            val path = "$userId/$safeFileName"
+            val updatedKycDocuments = request.businessPayload.kycDocuments.toMutableList()
 
-            storage.from("private_documents").upload(
-                path = path,
-                data = kycFile,
-                upsert = true
-            )
-
-            uploadedPath = path
-            Log.d("Supabase", "File uploaded successfully at: $path")
-
-            val updatedKycList = request.businessPayload.kycDocuments.toMutableList()
-
-            if (updatedKycList.isNotEmpty()) {
-                updatedKycList[0] = updatedKycList[0].copy(
-                    fileId = path
+            // Process files and update request payload
+            kycFiles.forEachIndexed { index, (filename, content) ->
+                // Basic cleanup for file naming
+                val safeType = updatedKycDocuments[index].type.lowercase().replace("_", "-")
+                val extension = filename.substringAfterLast(".", "")
+                val path = "$userId/${UUID.randomUUID()}_$safeType.$extension"
+                
+                storage.from("private_documents").upload(
+                    path = path,
+                    data = content
                 )
-            } else {
-                throw IllegalStateException("List kycDocuments cannot be empty")
+                uploadedPaths.add(path)
+
+                if (index < updatedKycDocuments.size) {
+                    updatedKycDocuments[index] = updatedKycDocuments[index].copy(
+                        fileId = path
+                    )
+                }
             }
 
             val updatedBusinessPayload = request.businessPayload.copy(
-                kycDocuments = updatedKycList,
+                kycDocuments = updatedKycDocuments,
                 userId = userId
             )
 
@@ -163,14 +206,12 @@ class SupabaseUserService @Inject constructor(
             return response.body()
 
         } catch (e: Exception) {
-            Log.e("Supabase", "Error logic, rolling back file...", e)
-
-            uploadedPath?.let { pathToDelete ->
+            Log.e("Supabase", "Error uploading KYC files, rolling back...", e)
+            uploadedPaths.forEach { pathToDelete ->
                 try {
                     storage.from("private_documents").delete(pathToDelete)
-                    Log.d("Supabase", "Rollback: File deleted $pathToDelete")
                 } catch (deleteErr: Exception) {
-                    Log.e("Supabase", "Failed to rollback file", deleteErr)
+                    Log.e("Supabase", "Failed to rollback file $pathToDelete", deleteErr)
                 }
             }
             throw e
@@ -198,7 +239,7 @@ class SupabaseUserService @Inject constructor(
             storage.from("private_documents").upload(
                 path = path,
                 data = kycFile,
-                upsert = true
+//                upsert = true
             )
 
             uploadedPath = path

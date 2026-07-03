@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.domain.repository
 
 import com.prayatna.lookiesapp.domain.model.refund.ProcessRefundOutput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
+import com.prayatna.lookiesapp.domain.model.transaction.DetailRefund
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
 import com.prayatna.lookiesapp.domain.model.transaction.SetRefundAsCompleteResult
 import com.prayatna.lookiesapp.utils.DataResult
@@ -12,7 +13,7 @@ interface RefundRepository {
         proofImage: ByteArray?
     ): DataResult<Refund>
 
-    suspend fun getRefunds():
+    suspend fun getRefunds(status: String? = null):
             DataResult<List<Refund>>
 
     suspend fun getRefundsByOrderId(orderId: String):
@@ -23,10 +24,13 @@ interface RefundRepository {
 
     suspend fun updateRefundStatus(id: String, status: String, note: String? = null):
             DataResult<Refund>
+            
     suspend fun getRefundById(id: String):
-            DataResult<Refund>
+            DataResult<DetailRefund>
+            
     suspend fun processRefund(refundRequestId: String):
             DataResult<ProcessRefundOutput>
+            
     suspend fun updateReturnTrackingNumber(id: String, trackingNumber: String):
             DataResult<Refund>
 }

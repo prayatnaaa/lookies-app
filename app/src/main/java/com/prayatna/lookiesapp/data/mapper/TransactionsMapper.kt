@@ -40,7 +40,8 @@ fun PaymentInfoDto.toDomain(): PaymentInfo {
         paymentId = paymentId,
         invoiceId = invoiceId,
         status = status,
-        provider = provider
+        provider = provider,
+        channel = channel
     )
 }
 

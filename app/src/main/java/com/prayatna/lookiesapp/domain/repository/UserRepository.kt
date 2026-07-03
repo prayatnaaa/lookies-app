@@ -3,11 +3,14 @@ package com.prayatna.lookiesapp.domain.repository
 import android.net.Uri
 import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
+import com.prayatna.lookiesapp.domain.model.merchant.AcceptPartnerInvitationResponse
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.domain.model.user.UserEmail
+import com.prayatna.lookiesapp.domain.model.user.UserNotification
 import com.prayatna.lookiesapp.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
@@ -29,8 +32,7 @@ interface UserRepository {
             DataResult<String>
     suspend fun registerBusiness(
         request: RoleApplicationInput,
-        kycFile: Uri,
-        fileName: String
+        kycFiles: List<Pair<String, Uri>> // List of (FileName to Uri)
     ): DataResult<RoleApplicationResponse>
     suspend fun getUserAddresses():
             DataResult<List<UserAddress>>
@@ -41,6 +43,11 @@ interface UserRepository {
         kycFile: Uri,
         fileName: String
     ): DataResult<RoleApplicationResponse>
+    suspend fun acceptPartnerInvitations(merchantAccountId: String): DataResult<AcceptPartnerInvitationResponse>
+    suspend fun rejectPartnerInvitations(merchantAccountId: String): DataResult<MerchantMember>
     suspend fun getFcmToken():
             String?
+    suspend fun getNotifications(): DataResult<List<UserNotification>>
+    suspend fun setDarkMode(isDarkMode: Boolean)
+    fun isDarkMode(): Flow<Boolean>
 }

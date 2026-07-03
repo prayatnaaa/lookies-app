@@ -108,6 +108,7 @@ fun DetailTransactionScreen(
                 state.data != null -> {
                     val transactionData = state.data!!
                     DetailTransactionContent(
+                        paintingReview = state.paintingReview,
                         onRatePainting = {
                             val eventPaintingId = transactionData.transaction.items.firstOrNull()?.itemRefId
                             val transactionId = transactionData.transaction.id
@@ -119,9 +120,14 @@ fun DetailTransactionScreen(
                         data = transactionData,
                         shipment = state.shipment,
                         isCompleting = state.isCompleting,
+                        existingRefundId = state.existingRefundId,
                         onCompleteOrder = { viewModel.setOrderToComplete(orderId) },
                         onRequestRefund = {
-                            navController.navigate("${NavigationRoutes.CREATE_REFUND}/$orderId/${state.data?.transaction?.totalAmount}")
+                            if (state.existingRefundId != null) {
+                                navController.navigate("${NavigationRoutes.REFUND_DETAIL}/${state.existingRefundId}")
+                            } else {
+                                navController.navigate("${NavigationRoutes.CREATE_REFUND}/$orderId/${state.data?.transaction?.totalAmount}")
+                            }
                         },
                         onViewRefunds = {
                             navController.navigate("${NavigationRoutes.ORDER_REFUNDS}/$orderId")

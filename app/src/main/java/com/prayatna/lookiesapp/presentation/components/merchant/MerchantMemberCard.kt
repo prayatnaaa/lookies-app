@@ -10,67 +10,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
-
-@Composable
-fun MerchantMemberCard(
-    modifier: Modifier = Modifier,
-    isShowMemberName: Boolean = false,
-    member: MerchantMember,
-    onClick: () -> Unit = {}
-) {
-    Card(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = if (isShowMemberName) member.username else member.tradingName ?: "Unknown Business",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                InfoChip(label = "Role", value = member.role)
-                InfoChip(label = "Status", value = member.status)
-            }
-
-            if (member.kycStatus != null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                InfoChip(label = "KYC", value = member.kycStatus)
-            }
-        }
-    }
-}
 
 @Composable
 fun MerchantMemberItem(
@@ -78,6 +29,7 @@ fun MerchantMemberItem(
     isShowMemberName: Boolean = false,
     member: MerchantMember,
     showDivider: Boolean = true,
+    showKycStatus: Boolean = true,
     onClick: () -> Unit = {}
 ) {
     Column(
@@ -126,14 +78,14 @@ fun MerchantMemberItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
 
-                member.kycStatus?.let {
-                    Text(
-                        text = "KYC: ${
-                            it.replaceFirstChar { char -> char.uppercase() }
-                        }",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+            if (showKycStatus) {
+                member.kycStatus?.let { status ->
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    KycStatusBadge(
+                        status = status
                     )
                 }
             }
@@ -143,26 +95,62 @@ fun MerchantMemberItem(
             Spacer(modifier = Modifier.height(16.dp))
 
             HorizontalDivider(
-                color = MaterialTheme.colorScheme.outline
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
             )
         }
     }
 }
 
+
 @Composable
-private fun InfoChip(label: String, value: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = "$label: ",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+private fun KycStatusBadge(
+    status: String
+) {
+    val (containerColor, contentColor, label) = when (status.lowercase()) {
+        "approved", "verified" -> Triple(
+            Color(0xFFE8F5E9),
+            Color(0xFF2E7D32),
+            "Active"
         )
-        Spacer(modifier = Modifier.width(4.dp))
+
+        "pending" -> Triple(
+            Color(0xFFFFF8E1),
+            Color(0xFFF57F17),
+            "Pending"
+        )
+
+        "rejected" -> Triple(
+            Color(0xFFFFEBEE),
+            Color(0xFFC62828),
+            "Rejected"
+        )
+
+        "not_started" -> Triple(
+            MaterialTheme.colorScheme.surfaceVariant,
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            "Wait approval"
+        )
+
+        else -> Triple(
+            MaterialTheme.colorScheme.surfaceVariant,
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            status.uppercase()
+        )
+    }
+
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = containerColor
+    ) {
         Text(
-            text = value.replaceFirstChar { it.uppercase() },
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+            text = label,
+            modifier = Modifier.padding(
+                horizontal = 10.dp,
+                vertical = 4.dp
+            ),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = contentColor
         )
     }
 }

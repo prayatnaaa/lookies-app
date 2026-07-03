@@ -14,6 +14,8 @@ data class CreateEventRequest(
     val startDate: String,
     @SerialName("end_date")
     val endDate: String,
+    @SerialName("painting_submission_deadline")
+    val paintingSubmissionDeadline: String?,
     val about: String? = null,
     val location: String,
     @SerialName("location_url")
@@ -44,5 +46,9 @@ data class CreateEventRequest(
     val ticketEventPercent: Int? = null,
     @SerialName("ticket_platform_percent")
     val ticketPlatformPercent: Int? = null,
+    @SerialName("registration_start_date")
+    val registrationStartDate: String?,
+    @SerialName("registration_end_date")
+    val registrationEndDate: String?
 )
 

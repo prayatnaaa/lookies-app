@@ -3,7 +3,6 @@ package com.prayatna.lookiesapp.presentation.scanner
 import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -36,6 +35,7 @@ fun ScannerScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -51,7 +51,6 @@ fun ScannerScreen(
         onResult = { isGranted ->
             hasCameraPermission = isGranted
             if (!isGranted) {
-                Toast.makeText(context, "Camera permission is required to scan", Toast.LENGTH_SHORT).show()
                 onNavigateBack()
             }
         }
@@ -66,18 +65,19 @@ fun ScannerScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                is ScannerUiEffect.ShowToast -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                is ScannerUiEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(effect.message)
                 }
                 ScannerUiEffect.NavigateBack -> onNavigateBack()
                 is ScannerUiEffect.OnTicketVerified -> {
-                    // Custom logic for verified ticket
+                    snackbarHostState.showSnackbar(effect.message)
                 }
             }
         }
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Scan Ticket") },

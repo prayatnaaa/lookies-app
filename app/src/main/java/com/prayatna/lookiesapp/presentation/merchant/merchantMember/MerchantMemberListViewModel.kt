@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.merchant.merchantMember
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MerchantMemberListViewModel @Inject constructor(
     private val getMerchantMembersUseCase: GetMerchantMembersUseCase,
-    private val userPreference: UserPreference
+    private val userPreference: UserPreference,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MerchantMemberListUiState())
@@ -25,6 +27,20 @@ class MerchantMemberListViewModel @Inject constructor(
 
     init {
         loadMerchantMembers()
+        refreshData()
+    }
+
+    private fun refreshData() {
+        viewModelScope.launch {
+            savedStateHandle
+                .getStateFlow("refresh", false)
+                .collect { shouldRefresh ->
+                    if (shouldRefresh) {
+                        loadMerchantMembers()
+                        savedStateHandle["refresh"] = false
+                    }
+                }
+        }
     }
 
     fun loadMerchantMembers() {

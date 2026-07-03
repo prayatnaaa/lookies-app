@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.partner.detailpartner
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -34,9 +37,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -44,6 +49,7 @@ import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.partner.PartnerProfileSection
 import com.prayatna.lookiesapp.presentation.error.ErrorScreen
+import com.prayatna.lookiesapp.presentation.partner.detailpartner.state.DetailPartnerEffect
 import com.prayatna.lookiesapp.ui.theme.DarkGreen
 import com.prayatna.lookiesapp.ui.theme.Maroon
 
@@ -60,6 +66,24 @@ fun DetailPartnerScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val adminState by viewModel.adminState.collectAsStateWithLifecycle()
     val role by viewModel.roleState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Handle effect
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is DetailPartnerEffect.ViewPrivateFile -> {
+                    val intent = Intent(Intent.ACTION_VIEW, effect.url.toUri())
+                    context.startActivity(intent)
+                }
+                is DetailPartnerEffect.ShowError -> {
+                    snackbarHostState.showSnackbar( effect.message, withDismissAction = true)
+                }
+            }
+        }
+    }
 
     // Bottom sheet state
     var pendingAction by remember { mutableStateOf<AdminAction?>(null) }
@@ -251,6 +275,9 @@ fun DetailPartnerScreen(
                     role == "admin"
 
                 Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(snackbarHostState)
+                    },
                     containerColor = MaterialTheme.colorScheme.background,
                     topBar = {
                         BackTopBar(
@@ -275,7 +302,9 @@ fun DetailPartnerScreen(
                             onPortofolioClick = {
                                 data.websiteUrl?.let(onPortfolioClick)
                             },
-                            isAdmin = showAdminButtons
+                            isAdmin = showAdminButtons,
+                            kycDocuments = state.kycDocuments,
+                            onKycDocumentClick = viewModel::viewKycDocument
                         )
                     }
                 }

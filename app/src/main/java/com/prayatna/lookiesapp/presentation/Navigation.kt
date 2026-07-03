@@ -12,11 +12,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.prayatna.lookiesapp.presentation.admin.detailEvent.adminDetailEventNavigation
 import com.prayatna.lookiesapp.presentation.admin.event.AdminEventScreen
 import com.prayatna.lookiesapp.presentation.admin.main.AdminMainScreen
-import com.prayatna.lookiesapp.presentation.admin.detailEvent.adminDetailEventNavigation
+import com.prayatna.lookiesapp.presentation.admin.transactionDetail.adminTransactionDetailNavigation
+import com.prayatna.lookiesapp.presentation.admin.transactionList.adminTransactionListNavigation
 import com.prayatna.lookiesapp.presentation.admin.withdrawal.state.adminWithdrawalNavigation
 import com.prayatna.lookiesapp.presentation.artistDashboard.ArtistDashboardScreen
+import com.prayatna.lookiesapp.presentation.chat.conversationList.conversationListNavigation
+import com.prayatna.lookiesapp.presentation.chat.privateChat.privateChatNavigation
 import com.prayatna.lookiesapp.presentation.checkout.state.checkoutNavigation
 import com.prayatna.lookiesapp.presentation.createPaintingReview.createPaintingReviewNavigation
 import com.prayatna.lookiesapp.presentation.event.detailevent.DetailEventScreen
@@ -24,11 +28,13 @@ import com.prayatna.lookiesapp.presentation.event.eventlist.EventListRoute
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.ArtistExhibitionPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.EventPaintingDetailScreen
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.PartnerExhibitionPaintingDetailScreen
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingGallery.eventPaintingGalleryNavigation
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingList.EventPaintingListRoute
 import com.prayatna.lookiesapp.presentation.exhibitionHistory.ExhibitionHistoryScreen
-import com.prayatna.lookiesapp.presentation.forum.members.forumMembersNavigation
 import com.prayatna.lookiesapp.presentation.exhibitionShipment.exhibitionShipmentNavigation
+import com.prayatna.lookiesapp.presentation.merchant.editMerchantProfile.navigation.editMerchantProfileNavigation
 import com.prayatna.lookiesapp.presentation.forum.ForumRoute
+import com.prayatna.lookiesapp.presentation.forum.members.forumMembersNavigation
 import com.prayatna.lookiesapp.presentation.forum.members.navigateToForumMembers
 import com.prayatna.lookiesapp.presentation.forumchannellist.ForumChannelListRoute
 import com.prayatna.lookiesapp.presentation.forumlist.ForumListRoute
@@ -39,40 +45,50 @@ import com.prayatna.lookiesapp.presentation.login.LoginViewModel
 import com.prayatna.lookiesapp.presentation.login.state.AuthState
 import com.prayatna.lookiesapp.presentation.main.MainScreen
 import com.prayatna.lookiesapp.presentation.main.search.SearchScreen
+import com.prayatna.lookiesapp.presentation.merchant.acceptPartnerInvitation.acceptPartnerInvitationNavigation
 import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.createWithdrawalRequestNavigation
 import com.prayatna.lookiesapp.presentation.merchant.inviteMerchantMember.inviteMerchantMemberNavigation
 import com.prayatna.lookiesapp.presentation.merchant.merchantMember.MerchantMemberListScreen
+import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.merchantMemberByMerchantIdNavigation
 import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.merchantWithdrawalRequestListNavigation
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.monthlyFinanceListScreen
+import com.prayatna.lookiesapp.presentation.offlineCheckout.offlineCheckoutNavigation
 import com.prayatna.lookiesapp.presentation.painting.detailpainting.DetailPaintingScreen
 import com.prayatna.lookiesapp.presentation.painting.editpainting.editPaintingNavigation
 import com.prayatna.lookiesapp.presentation.painting.paintinglist.PersonalPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.participantPaintingList.ParticipantPaintingListScreen
 import com.prayatna.lookiesapp.presentation.painting.uploadpainting.UploadPaintingScreen
 import com.prayatna.lookiesapp.presentation.partner.createEvent.CreateEventScreen
+import com.prayatna.lookiesapp.presentation.payment.existingQrPayment.ExistingQrPaymentRoute
+import com.prayatna.lookiesapp.presentation.payment.existingVaPayment.ExistingVaPaymentRoute
 import com.prayatna.lookiesapp.presentation.partner.detailpartner.DetailPartnerScreen
 import com.prayatna.lookiesapp.presentation.partner.editEvent.EditEventScreen
+import com.prayatna.lookiesapp.presentation.partner.eventTransactions.eventTransactionListNavigation
 import com.prayatna.lookiesapp.presentation.partner.main.home.partnerHomeScreenNavigation
 import com.prayatna.lookiesapp.presentation.partner.manageEvent.PartnerManageEventScreen
-import com.prayatna.lookiesapp.presentation.merchant.merchantMemberByMerchantId.merchantMemberByMerchantIdNavigation
+import com.prayatna.lookiesapp.presentation.partner.orderDetail.partnerOrderDetailNavigation
 import com.prayatna.lookiesapp.presentation.partner.participantList.ParticipantListScreen
 import com.prayatna.lookiesapp.presentation.partner.partnerRefund.partnerRefundNavigation
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.PartnerListScreen
 import com.prayatna.lookiesapp.presentation.partner.selfEventList.SelfEventListScreen
 import com.prayatna.lookiesapp.presentation.payment.qrPayment.QrPaymentScreen
+import com.prayatna.lookiesapp.presentation.payment.selectPayoutChannel.selectPayoutChannelNavigation
 import com.prayatna.lookiesapp.presentation.payment.vaPayment.VaPaymentScreen
+import com.prayatna.lookiesapp.presentation.publicMerchantProfile.publicMerchantProfileNavigation
 import com.prayatna.lookiesapp.presentation.refund.refundNavigation
 import com.prayatna.lookiesapp.presentation.register.RegisterScreen
-import com.prayatna.lookiesapp.presentation.scanner.ScannerScreen
 import com.prayatna.lookiesapp.presentation.registerEvent.RegisterEventScreen
+import com.prayatna.lookiesapp.presentation.scanner.ScannerScreen
 import com.prayatna.lookiesapp.presentation.shipment.shipmentListNavigation
 import com.prayatna.lookiesapp.presentation.shipmentDetail.shipmentDetailNavigation
 import com.prayatna.lookiesapp.presentation.transaction.detailTransaction.DetailTransactionScreen
 import com.prayatna.lookiesapp.presentation.transaction.payment.PaymentScreen
+import com.prayatna.lookiesapp.presentation.unsoldArtworkReturn.unsoldArtworkReturnNavigation
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.artistSubmissionNavigation
 import com.prayatna.lookiesapp.presentation.user.createUserAddress.createUserAddressNavigation
 import com.prayatna.lookiesapp.presentation.user.editprofile.EditProfileScreen
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.PartnerSubmissionScreen
+import com.prayatna.lookiesapp.presentation.notification.notificationNavigation
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -99,6 +115,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                     else -> NavigationRoutes.LOGIN
                 }
             }
+
+            is AuthState.Error ->
+                NavigationRoutes.LOGIN
         }
 
         navController.navigate(destination) {
@@ -114,37 +133,77 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         startDestination = NavigationRoutes.MAIN_LOADING
     ) {
 
+        editMerchantProfileNavigation(navController)
         createPaintingReviewNavigation(navController)
+        adminTransactionListNavigation(navController)
+        adminTransactionDetailNavigation(navController)
         exhibitionShipmentNavigation(navController = navController)
         shipmentListNavigation(navController = navController)
+
         composable(
-            route = "${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}",
+            route = "${NavigationRoutes.EXISTING_QRIS_PAYMENT}/{orderId}",
             arguments = listOf(
-                navArgument("orderId") { type = NavType.StringType },
-                navArgument("merchantId") { type = NavType.StringType },
-                navArgument("amount") { type = NavType.LongType }
+                navArgument("orderId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
-            val merchantId = backStackEntry.arguments?.getString("merchantId") ?: ""
-            val amount = backStackEntry.arguments?.getLong("amount") ?: 0L
-
-            QrPaymentScreen(
+            ExistingQrPaymentRoute(
                 orderId = orderId,
-                merchantId = merchantId,
-                amount = amount,
                 navController = navController
             )
         }
 
         composable(
-            route = "${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}",
+            route = "${NavigationRoutes.EXISTING_VA_PAYMENT}/{orderId}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            ExistingVaPaymentRoute(
+                orderId = orderId,
+                navController = navController
+            )
+        }
+
+        composable(
+            route = "${NavigationRoutes.QRIS_PAYMENT}/{orderId}/{merchantId}/{amount}?isOfflinePurchase={isOfflinePurchase}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType },
+                navArgument("merchantId") { type = NavType.StringType },
+                navArgument("amount") { type = NavType.LongType },
+                navArgument("isOfflinePurchase") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            val merchantId = backStackEntry.arguments?.getString("merchantId") ?: ""
+            val amount = backStackEntry.arguments?.getLong("amount") ?: 0L
+            val isOfflinePurchase = backStackEntry.arguments?.getBoolean("isOfflinePurchase") ?: false
+
+            QrPaymentScreen(
+                orderId = orderId,
+                merchantId = merchantId,
+                amount = amount,
+                isOfflinePurchase = isOfflinePurchase,
+                navController = navController
+            )
+        }
+
+        composable(
+            route = "${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}?isOfflinePurchase={isOfflinePurchase}",
             arguments = listOf(
                 navArgument("orderId") { type = NavType.StringType },
                 navArgument("merchantId") { type = NavType.StringType },
                 navArgument("amount") { type = NavType.LongType },
                 navArgument("bankCode") { type = NavType.StringType },
-                navArgument("customerName") { type = NavType.StringType }
+                navArgument("customerName") { type = NavType.StringType },
+                navArgument("isOfflinePurchase") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
             )
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
@@ -152,6 +211,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
             val amount = backStackEntry.arguments?.getLong("amount") ?: 0L
             val bankCode = backStackEntry.arguments?.getString("bankCode") ?: "BRI"
             val customerName = backStackEntry.arguments?.getString("customerName") ?: "Customer"
+            val isOfflinePurchase = backStackEntry.arguments?.getBoolean("isOfflinePurchase") ?: false
 
             VaPaymentScreen(
                 orderId = orderId,
@@ -159,6 +219,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 amount = amount,
                 bankCode = bankCode,
                 customerName = customerName,
+                isOfflinePurchase = isOfflinePurchase,
                 navController = navController
             )
         }
@@ -285,6 +346,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
 
         insertEventPaintingsNavigation(navController)
+        eventPaintingGalleryNavigation(navController)
 
         composable(
             route = "${NavigationRoutes.EVENT_PAINTING_LIST}/{eventId}?eventType={eventType}&businessId={businessId}",
@@ -341,6 +403,7 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         adminWithdrawalNavigation(navController)
         adminDetailEventNavigation(navController)
         inviteMerchantMemberNavigation(navController)
+        acceptPartnerInvitationNavigation(navController)
         composable(
             route = NavigationRoutes.PARTNER_LIST
         ) {
@@ -351,6 +414,10 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         merchantWithdrawalRequestListNavigation(navController)
         merchantMemberByMerchantIdNavigation(navController)
         monthlyFinanceListScreen(navController)
+        partnerOrderDetailNavigation(navController)
+        eventTransactionListNavigation(navController)
+        publicMerchantProfileNavigation(navController)
+        offlineCheckoutNavigation(navController)
         composable(
             route = "${NavigationRoutes.PARTICIPANT_LIST}/{eventId}",
             arguments = listOf(navArgument("eventId") { type = NavType.StringType })
@@ -439,6 +506,9 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         }
         createUserAddressNavigation(navController = navController)
         
+        conversationListNavigation(navController)
+        privateChatNavigation(navController)
+
         composable(NavigationRoutes.FORUM_LIST) {
             ForumListRoute(navController)
         }
@@ -446,14 +516,17 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
         shipmentDetailNavigation(navController)
         
         composable(
-            route = "${NavigationRoutes.FORUM_CHANNEL_LIST}/{forumId}",
-            arguments = listOf(navArgument("forumId") { type = NavType.StringType })
+            route = "${NavigationRoutes.FORUM_CHANNEL_LIST}/{forumId}/{role}",
+            arguments = listOf(
+                navArgument("forumId") { type = NavType.StringType },
+                navArgument("role") { type = NavType.StringType}
+            )
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("forumId")?.let { forumId ->
                 ForumChannelListRoute(
                     forumId = forumId,
-                    onNavigateToChat = { channelId ->
-                        navController.navigate("${NavigationRoutes.FORUM_MESSAGES}/$channelId")
+                    onNavigateToChat = { channelId, isMemberReadOnly ->
+                        navController.navigate("${NavigationRoutes.FORUM_MESSAGES}/$channelId?isMemberReadOnly=${isMemberReadOnly}")
                     },
                     onNavigateToMembers = { id ->
                         navController.navigateToForumMembers(id)
@@ -462,23 +535,41 @@ fun MainNavigation(viewModel: LoginViewModel = hiltViewModel()) {
                 )
             }
         }
-        
+
         composable(
-            route = "${NavigationRoutes.FORUM_MESSAGES}/{channelId}",
-            arguments = listOf(navArgument("channelId") { type = NavType.StringType })
+            route = "${NavigationRoutes.FORUM_MESSAGES}/{channelId}?isMemberReadOnly={isMemberReadOnly}",
+            arguments = listOf(
+                navArgument("channelId") {
+                    type = NavType.StringType
+                },
+                navArgument("isMemberReadOnly") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
         ) { backStackEntry ->
-            backStackEntry.arguments?.getString("channelId")?.let { channelId ->
-                ForumRoute(
-                    channelId = channelId,
-                    onBackClick = { navController.popBackStack() }
-                )
-            }
+
+            val channelId = backStackEntry.arguments?.getString("channelId") ?: return@composable
+            val isMemberReadOnly =
+                backStackEntry.arguments?.getBoolean("isMemberReadOnly") ?: false
+
+            ForumRoute(
+                channelId = channelId,
+                isMemberReadOnly = isMemberReadOnly,
+                onBackClick = { navController.popBackStack() }
+            )
         }
 
         refundNavigation(navController)
+        unsoldArtworkReturnNavigation(navController)
         forumMembersNavigation(navController)
+        selectPayoutChannelNavigation(navController)
+        notificationNavigation(navController)
 
-        composable(NavigationRoutes.BARCODE_SCANNER) {
+        composable(
+            "${NavigationRoutes.BARCODE_SCANNER}/{eventId}",
+            listOf(navArgument("eventId") { type = NavType.IntType })
+            ) {
             ScannerScreen(onNavigateBack = { navController.popBackStack() })
         }
 

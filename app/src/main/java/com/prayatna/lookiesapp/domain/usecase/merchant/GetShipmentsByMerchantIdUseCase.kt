@@ -8,7 +8,15 @@ import javax.inject.Inject
 class GetShipmentsByMerchantIdUseCase @Inject constructor(
     private val merchantRepository: MerchantRepository
 ) {
-    suspend operator fun invoke(merchantId: String, status: String?): DataResult<List<Shipment>> {
-        return merchantRepository.getShipmentsByMerchantId(merchantId, status = status)
+    suspend operator fun invoke(
+        merchantId: String,
+        status: String? = null,
+        trackingNumber: String? = null
+    ): DataResult<List<Shipment>> {
+        return merchantRepository.getShipmentsByMerchantId(
+            merchantId = merchantId,
+            status = status,
+            trackingNumber = trackingNumber
+        )
     }
 }

@@ -3,11 +3,13 @@ package com.prayatna.lookiesapp.presentation.user.artistSubmission
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import com.prayatna.lookiesapp.domain.model.payment.PayoutChannel
+import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.registerArtist.ArtistSubmissionContent
 import com.prayatna.lookiesapp.presentation.components.registerBusiness.SuccessDialog
 import com.prayatna.lookiesapp.presentation.user.artistSubmission.state.ArtistSubmissionEvent
@@ -20,21 +22,13 @@ fun ArtistSubmissionScreen(
     uiState: ArtistSubmissionUiState,
     formState: ArtistSubmissionFormState,
     onEvent: (ArtistSubmissionEvent) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
 ) {
-    var payoutChannels by remember { mutableStateOf<List<PayoutChannel>>(emptyList()) }
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
             onEvent(ArtistSubmissionEvent.KycFileSelected(it))
-        }
-    }
-
-    LaunchedEffect(uiState) {
-        if (uiState is ArtistSubmissionUiState.MetaLoaded) {
-            payoutChannels = uiState.payoutChannels
         }
     }
 
@@ -50,13 +44,10 @@ fun ArtistSubmissionScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Artist Application",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+            BackTopBar(
+                title = "Become Artist",
+                onBackClick = {
+                    onEvent(ArtistSubmissionEvent.OnBack)
                 }
             )
         },
@@ -67,7 +58,7 @@ fun ArtistSubmissionScreen(
                 isLoading = uiState is ArtistSubmissionUiState.Loading,
                 onEvent = onEvent,
                 onPickFileClick = { launcher.launch("*/*") },
-                payoutChannels = payoutChannels
+                onSelectBankClick = { onEvent(ArtistSubmissionEvent.OnSelectBankClicked) }
             )
         }
     )

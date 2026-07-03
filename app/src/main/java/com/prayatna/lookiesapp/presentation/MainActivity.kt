@@ -13,8 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.prayatna.lookiesapp.ui.theme.LookiesAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,7 +39,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         askNotificationPermission()
         setContent {
-            LookiesApp()
+            val viewModel: MainViewModel = hiltViewModel()
+            val isDarkMode by viewModel.isDarkMode.collectAsState()
+            
+            LookiesApp(isDarkMode = isDarkMode)
         }
     }
 
@@ -48,13 +54,13 @@ class MainActivity : ComponentActivity() {
 
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
                 AlertDialog.Builder(this)
-                    .setTitle("Izin Notifikasi Diperlukan")
-                    .setMessage("Aplikasi ini membutuhkan izin notifikasi agar Anda tidak ketinggalan info dan pembaruan penting. Izinkan aplikasi mengirim notifikasi?")
-                    .setPositiveButton("Izinkan") { dialog, _ ->
+                    .setTitle("Notification Permission Required")
+                    .setMessage("This application requires notification permission so you don’t miss important information and updates. Allow the application to send notifications?")
+                    .setPositiveButton("Allow") { dialog, _ ->
                         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         dialog.dismiss()
                     }
-                    .setNegativeButton("Lain Kali") { dialog, _ ->
+                    .setNegativeButton("Not now") { dialog, _ ->
                         dialog.dismiss()
                     }
                     .create()
@@ -67,8 +73,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LookiesApp() {
-    LookiesAppTheme {
+fun LookiesApp(isDarkMode: Boolean) {
+    LookiesAppTheme(darkTheme = isDarkMode) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background

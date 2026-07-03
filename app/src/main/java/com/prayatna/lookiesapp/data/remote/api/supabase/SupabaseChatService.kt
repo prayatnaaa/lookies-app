@@ -1,15 +1,23 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
 import android.util.Log
+import com.prayatna.lookiesapp.data.remote.dto.ChatMessageViewDto
+import com.prayatna.lookiesapp.data.remote.dto.ConversationDto
+import com.prayatna.lookiesapp.data.remote.dto.ConversationViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelMessagesViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumChannelViewDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumMessageDto
 import com.prayatna.lookiesapp.data.remote.dto.ForumsViewDto
+import com.prayatna.lookiesapp.data.remote.dto.MessageDto
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumChannelRequestDto
 import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumMessageRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateMessageRequest
+import com.prayatna.lookiesapp.data.remote.dto.response.chat.CreateForumChannelResponseDto
 import com.prayatna.lookiesapp.domain.model.message.PresenceData
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.PresenceAction
 import io.github.jan.supabase.realtime.Realtime
@@ -17,10 +25,17 @@ import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.presenceChangeFlow
 import io.github.jan.supabase.realtime.track
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
+import java.util.UUID
 import javax.inject.Inject
 
 class SupabaseChatService @Inject constructor(
@@ -28,6 +43,132 @@ class SupabaseChatService @Inject constructor(
     private val postgrest: Postgrest,
     private val realtime: Realtime
 ) {
+
+    suspend fun getOrCreateConversation(merchantId: String): String {
+        val userId = auth.currentSessionOrNull()?.user?.id ?:
+        throw IllegalStateException("no logged in")
+        try {
+            val existingRoom = postgrest["conversations"]
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                        eq("merchant_id", merchantId)
+                    }
+                }.decodeSingleOrNull<ConversationDto>()
+
+            if (existingRoom != null) {
+                return existingRoom.id
+            }
+
+            val newRoomId = UUID.randomUUID().toString()
+            val newConversation = ConversationDto(
+                id = newRoomId,
+                userId = userId,
+                merchantId = merchantId,
+            )
+
+            postgrest["conversations"].insert(newConversation)
+
+            return newRoomId
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+
+    suspend fun getConversations(): List<ConversationViewDto> {
+        val userId = auth.currentSessionOrNull()?.user?.id ?: throw IllegalStateException("User not logged in")
+        return postgrest["conversation_view"]
+            .select {
+                filter { eq("user_id", userId) }
+                order("updated_at", Order.DESCENDING)
+            }.decodeList()
+    }
+
+    suspend fun getConversationByMerchantId(merchantId: String): ConversationViewDto? {
+        val userId = auth.currentSessionOrNull()?.user?.id ?: throw IllegalStateException("User not logged in")
+        return postgrest["conversation_view"]
+            .select {
+                filter { 
+                    eq("user_id", userId) 
+                    eq("merchant_id", merchantId)
+                }
+            }.decodeSingleOrNull()
+    }
+
+    suspend fun getMerchantConversations(merchantId: String): List<ConversationViewDto> {
+        return postgrest["conversation_view"]
+            .select {
+                filter { eq("merchant_id", merchantId) }
+                order("updated_at", Order.DESCENDING)
+            }.decodeList()
+    }
+
+    private suspend fun getMessageHistory(conversationId: String): List<ChatMessageViewDto> {
+        return postgrest["chat_message_view"]
+            .select {
+                filter { eq("conversation_id", conversationId) }
+                order("sent_at", Order.ASCENDING)
+            }.decodeList()
+    }
+
+    suspend fun sendMessage(request: CreateMessageRequest): MessageDto {
+        val userId = auth.currentSessionOrNull()?.user?.id ?:
+        throw IllegalStateException("User not logged in")
+
+        val finalRequest = request.copy(senderUserId = userId)
+        return postgrest["messages"].insert(finalRequest) {
+            select()
+        }.decodeSingle()
+    }
+
+    @Suppress("DEPRECATION")
+    fun listenToMessages(conversationId: String): Flow<List<ChatMessageViewDto>> = callbackFlow {
+
+        val channel = realtime.channel("messages$conversationId")
+
+        val flow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+            table = "messages"
+            filter = "conversation_id=eq.$conversationId"
+        }
+
+        channel.subscribe(blockUntilSubscribed = true)
+
+        trySend(getMessageHistory(conversationId))
+
+        val job = launch {
+            flow.collect {
+                Log.d("PRIVATE-CHAT", "EVENT IN: $it")
+                trySend(getMessageHistory(conversationId))
+            }
+        }
+
+//        awaitClose {
+//            Log.d("PRIVATE-CHAT", "UNSUBSCRIBE CHANNEL")
+//            job.cancel()
+//            launch {
+//                realtime.removeChannel(channel)
+//                channel.unsubscribe()
+//            }
+//        }
+        awaitClose {
+            Log.d("CHAT", "UNSUBSCRIBE CHANNEL")
+            job.cancel()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(NonCancellable) {
+                    try {
+                        channel.unsubscribe()
+                        realtime.removeChannel(channel)
+                        Log.d("CHAT", "CHANNEL CLOSED")
+                    } catch (e: Exception) {
+                        Log.e("CHAT", "Failed to close channel", e)
+                    }
+                }
+            }
+        }
+    }
 
     suspend fun insertForumsMessage(request: CreateForumMessageRequest): ForumMessageDto {
         val userId = auth.currentSessionOrNull()?.user?.id ?:
@@ -37,6 +178,52 @@ class SupabaseChatService @Inject constructor(
         return postgrest.from("forum_messages").insert(finalRequest) {
             select()
         }.decodeSingle<ForumMessageDto>()
+    }
+
+    suspend fun updateForumMessage(messageId: String, content: String): ForumMessageDto {
+        return postgrest.from("forum_messages").update(
+            {
+                set("content", content)
+                set("edited_at", "now()")
+            }
+        ) {
+            filter {
+                eq("id", messageId)
+            }
+            select()
+        }.decodeSingle<ForumMessageDto>()
+    }
+
+    suspend fun deleteForumMessage(messageId: String) {
+        postgrest.from("forum_messages").delete {
+            filter {
+                eq("id", messageId)
+            }
+        }
+    }
+
+    suspend fun pinForumMessage(messageId: String, isPinned: Boolean): ForumMessageDto {
+        return postgrest.from("forum_messages").update(
+            {
+                set("is_pinned", isPinned)
+            }
+        ) {
+            filter {
+                eq("id", messageId)
+            }
+            select()
+        }.decodeSingle<ForumMessageDto>()
+    }
+
+    suspend fun createForumChannel(forumId: String, name: String, isReadOnlyForMember: Boolean = false): CreateForumChannelResponseDto {
+        val request = CreateForumChannelRequestDto(
+            forumId = forumId,
+            name = name,
+            isReadOnlyForMember = isReadOnlyForMember
+        )
+        return postgrest.from("forum_channels").insert(request) {
+            select()
+        }.decodeSingle<CreateForumChannelResponseDto>()
     }
 
     @Suppress("DEPRECATION")
@@ -49,7 +236,7 @@ class SupabaseChatService @Inject constructor(
             filter = "channel_id=eq.$channelId"
         }
 
-        channel.subscribe()
+        channel.subscribe(blockUntilSubscribed = true)
 
         trySend(getForumChannelMessages(channelId))
 
@@ -60,17 +247,35 @@ class SupabaseChatService @Inject constructor(
             }
         }
 
+//        awaitClose {
+//            Log.d("CHAT", "UNSUBSCRIBE CHANNEL")
+//            job.cancel()
+//            launch {
+//                realtime.removeChannel(channel)
+//                channel.unsubscribe()
+//            }
+//        }
         awaitClose {
             Log.d("CHAT", "UNSUBSCRIBE CHANNEL")
             job.cancel()
-            launch {
-                realtime.removeChannel(channel)
-                channel.unsubscribe()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(NonCancellable) {
+                    try {
+                        // 1. Unsubscribe dari server Supabase
+                        channel.unsubscribe()
+                        // 2. Hapus dari cache local realtime client
+                        realtime.removeChannel(channel)
+                        Log.d("CHAT", "CHANNEL CLOSED")
+                    } catch (e: Exception) {
+                        Log.e("CHAT", "Failed to close channel", e)
+                    }
+                }
             }
         }
     }
 
-    private suspend fun getForumChannelMessages(channelId: String): List<ForumChannelMessagesViewDto> {
+    suspend fun getForumChannelMessages(channelId: String): List<ForumChannelMessagesViewDto> {
         val result = postgrest.from("forum_channel_messages_view")
             .select {
                 filter {
@@ -82,12 +287,15 @@ class SupabaseChatService @Inject constructor(
         return result
     }
 
-    suspend fun getForums(): List<ForumsViewDto> {
+    suspend fun getForums(title: String?): List<ForumsViewDto> {
         val userId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
         return postgrest.from("user_forums_view")
             .select {
                 filter {
                     eq("user_id", userId)
+                    if (title != null) {
+                        ilike("title", "%$title%")
+                    }
                 }
             }.decodeList<ForumsViewDto>()
     }
@@ -113,29 +321,65 @@ class SupabaseChatService @Inject constructor(
     }
 
     fun listenToForumPresence(forumId: String): Flow<PresenceAction> = callbackFlow {
-        val channel = realtime.channel("forum_presence_$forumId")
+        val channelId = "forum_presence_$forumId"
+        val channel = realtime.channel(channelId)
         val userId = auth.currentUserOrNull()?.id ?: throw IllegalStateException("User not logged in")
 
-        // 1. Setup flow first
+        Log.d("PRESENCE", "Connecting to channel: $channelId for user: $userId")
+
         val presenceFlow = channel.presenceChangeFlow()
+        
         val job = launch {
             presenceFlow.collect {
+                Log.d("PRESENCE", "Event in $channelId: $it")
                 trySend(it)
             }
         }
 
-        // 2. Subscribe and wait then track
         launch {
-            channel.subscribe(blockUntilSubscribed = true)
-            channel.track(PresenceData(userId = userId))
+            try {
+                // Ensure fresh state by unsubscribing first if somehow still active
+                runCatching { channel.unsubscribe() }
+                
+                channel.subscribe(blockUntilSubscribed = true)
+                // Small delay to ensure join is fully processed
+                // Small delay to ensure join is fully processed
+//                delay(500)
+                Log.d("PRESENCE", "Subscribed to $channelId, now tracking user")
+                channel.track(PresenceData(userId = userId, onlineAt = Clock.System.now().toEpochMilliseconds()))
+            } catch (e: Exception) {
+                Log.e("PRESENCE", "Error subscribing to $channelId", e)
+            }
         }
 
         awaitClose {
+            Log.d("PRESENCE", "Closing presence flow for $channelId")
             job.cancel()
             launch {
-                channel.untrack()
-                channel.unsubscribe()
-                realtime.removeChannel(channel)
+                try {
+                    channel.untrack()
+                    channel.unsubscribe()
+                    realtime.removeChannel(channel)
+                } catch (e: Exception) {
+                    Log.e("PRESENCE", "Error during channel cleanup for $channelId", e)
+                }
+            }
+        }
+    }
+
+    suspend fun markMessagesAsRead(conversationId: String, isMerchant: Boolean = false) {
+        val userId = auth.currentSessionOrNull()?.user?.id ?: throw IllegalStateException("User not logged in")
+        postgrest.from("messages").update(
+            {
+                set("is_read", true)
+            }
+        ) {
+            filter {
+                eq("conversation_id", conversationId)
+                if (!isMerchant) {
+                    neq("sender_user_id", userId)
+                }
+                eq("is_read", false)
             }
         }
     }

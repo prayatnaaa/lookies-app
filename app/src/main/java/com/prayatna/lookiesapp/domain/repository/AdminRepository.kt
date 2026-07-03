@@ -1,5 +1,7 @@
 package com.prayatna.lookiesapp.domain.repository
 
+import com.prayatna.lookiesapp.domain.model.admin.AdminTransaction
+import com.prayatna.lookiesapp.domain.model.admin.AdminTransactionDetail
 import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
 import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.domain.model.admin.GetKycDocument
@@ -15,4 +17,7 @@ interface AdminRepository {
     suspend fun getKycDocuments(businessId: String): DataResult<List<GetKycDocument>>
     suspend fun getTicketByCode(code: String): DataResult<Ticket>
     suspend fun updateWithdrawalStatus(id: String, status: String, adminNotes: String?): DataResult<WithdrawalRequest>
+    suspend fun getTransactionList(limit: Int, offset: Int, status: String?): DataResult<List<AdminTransaction>>
+    suspend fun getTransactionDetail(orderId: String): DataResult<AdminTransactionDetail>
+    suspend fun getPrivateFileUrl(filePath: String): DataResult<String>
 }

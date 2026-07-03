@@ -10,13 +10,11 @@ import javax.inject.Inject
 class RegisterBusinessUseCase @Inject constructor(private val userRepository: UserRepository) {
     suspend operator fun invoke(
         input: RoleApplicationInput,
-        kycFile: Uri,
-        fileName: String
+        kycFiles: List<Pair<String, Uri>>
     ): DataResult<RoleApplicationResponse> {
         return userRepository.registerBusiness(
             request = input,
-            kycFile = kycFile,
-            fileName = fileName
+            kycFiles = kycFiles
         )
     }
 }

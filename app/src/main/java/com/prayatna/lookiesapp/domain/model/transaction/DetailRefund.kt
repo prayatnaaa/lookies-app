@@ -1,0 +1,27 @@
+package com.prayatna.lookiesapp.domain.model.transaction
+
+data class DetailRefund(
+    val id: String,
+    val orderId: String,
+    val userId: String,
+    val amount: Double,
+    val bankCode: String,
+    val accountNumber: String,
+    val accountHolderName: String,
+    val reason: String,
+    val proofImageUrl: String?,
+    val returnTrackingNumber: String?,
+    val status: String,
+    val adminNotes: String?,
+    val xenditPayoutId: String?,
+    val createdAt: String?,
+    val updatedAt: String?,
+    val streetLine1: String?,
+    val streetLine2: String?,
+    val city: String?,
+    val district: String?,
+    val subDistrict: String?,
+    val provinceState: String?,
+    val postalCode: String?,
+    val country: String?,
+)

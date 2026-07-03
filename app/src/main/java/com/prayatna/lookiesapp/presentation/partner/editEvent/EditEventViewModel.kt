@@ -4,23 +4,36 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.mapper.toEditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.domain.model.event.EventRevenueRules
+import com.prayatna.lookiesapp.domain.model.event.UpdateRevenueRulesInput
 import com.prayatna.lookiesapp.domain.repository.EventRepository
+import com.prayatna.lookiesapp.domain.usecase.event.DeleteEventUseCase
 import com.prayatna.lookiesapp.domain.usecase.event.EditEventUseCase
+import com.prayatna.lookiesapp.domain.usecase.event.GetDetailEventUseCase
+import com.prayatna.lookiesapp.domain.usecase.event.GetRevenueRulesByEventIdUseCase
+import com.prayatna.lookiesapp.domain.usecase.event.UpdateEventRevenueRulesUseCase
 import com.prayatna.lookiesapp.presentation.partner.editEvent.state.EditEventFormEvent
 import com.prayatna.lookiesapp.presentation.partner.editEvent.state.EditEventFormState
 import com.prayatna.lookiesapp.presentation.partner.editEvent.state.EditEventUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class EditEventViewModel @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val getDetailEventUseCase: GetDetailEventUseCase,
     private val editEventUseCase: EditEventUseCase,
+    private val getRevenueRulesByEventIdUseCase: GetRevenueRulesByEventIdUseCase,
+    private val updateEventRevenueRulesUseCase: UpdateEventRevenueRulesUseCase,
+    private val deleteEventUseCase: DeleteEventUseCase,
+    private val eventRepository: EventRepository
 ) : ViewModel() {
 
     private val _formState = MutableStateFlow(EditEventFormState())
@@ -75,6 +88,22 @@ class EditEventViewModel @Inject constructor(
             EditEventFormEvent.LoadEventMeta -> loadMeta()
 
             EditEventFormEvent.Submit -> submit()
+            EditEventFormEvent.DeleteEvent -> deleteEvent()
+            is EditEventFormEvent.PaintingSubmissionDeadline ->
+                update { copy(paintingSubmissionDeadline = event.value) }
+
+            is EditEventFormEvent.PaintingArtistPercentChanged ->
+                update { copy(paintingArtistPercent = event.value) }
+            is EditEventFormEvent.PaintingEventPercentChanged ->
+                update { copy(paintingEventPercent = event.value) }
+            is EditEventFormEvent.PaintingPlatformPercentChanged ->
+                update { copy(paintingPlatformPercent = event.value) }
+            is EditEventFormEvent.TicketArtistPercentChanged ->
+                update { copy(ticketArtistPercent = event.value) }
+            is EditEventFormEvent.TicketEventPercentChanged ->
+                update { copy(ticketEventPercent = event.value) }
+            is EditEventFormEvent.TicketPlatformPercentChanged ->
+                update { copy(ticketPlatformPercent = event.value) }
         }
     }
 
@@ -82,25 +111,25 @@ class EditEventViewModel @Inject constructor(
         this@EditEventViewModel.eventId = eventId
         _uiState.update { it.copy(isLoading = true) }
 
-        when (val result = eventRepository.getEvent(eventId)) {
-            is DataResult.Success -> {
-                prefill(result.data)
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        data = result.data,
-                    )
-                }
+        val eventResult = getDetailEventUseCase(eventId).first()
+        val rulesResult = getRevenueRulesByEventIdUseCase(eventId.toInt())
+
+        if (eventResult is DataResult.Success) {
+            val rules = if (rulesResult is DataResult.Success) rulesResult.data else emptyList()
+            prefill(eventResult.data, rules)
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    data = eventResult.data,
+                )
             }
-            is DataResult.Error -> {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = result.error
-                    )
-                }
+        } else if (eventResult is DataResult.Error) {
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = eventResult.error
+                )
             }
-            else -> Unit
         }
     }
 
@@ -133,7 +162,10 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
-    private fun prefill(event: Event) {
+    private fun prefill(event: Event, rules: List<EventRevenueRules>) {
+        val paintingRule = rules.find { it.itemType == "painting" }
+        val ticketRule = rules.find { it.itemType == "ticket" }
+
         _formState.update {
             it.copy(
                 bannerImage = event.bannerImageUrl,
@@ -149,24 +181,99 @@ class EditEventViewModel @Inject constructor(
                 artistRegistrationFee = event.artistRegistrationFee?.toString(),
                 about = event.about.orEmpty(),
                 eventType = event.eventType.id.toString(),
-                eventFormat = event.eventFormat.id.toString()
+                eventFormat = event.eventFormat.id.toString(),
+                paintingSubmissionDeadline = event.paintingSubmissionDeadline,
+                paintingArtistPercent = paintingRule?.artistPercent ?: 0,
+                paintingEventPercent = paintingRule?.eventPercent ?: 0,
+                paintingPlatformPercent = paintingRule?.platformPercent ?: 0,
+                paintingRuleId = paintingRule?.id,
+                ticketArtistPercent = ticketRule?.artistPercent ?: 0,
+                ticketEventPercent = ticketRule?.eventPercent ?: 0,
+                ticketPlatformPercent = ticketRule?.platformPercent ?: 0,
+                ticketRuleId = ticketRule?.id
             )
         }
     }
 
     private fun submit() = viewModelScope.launch {
         val id = eventId ?: return@launch
+        val state = formState.value
 
-        _uiState.update { it.copy(isLoading = true) }
+        if (!state.isPaintingRevenueValid) {
+            _uiState.update { it.copy(errorMessage = "Painting revenue splits must total 100%") }
+            return@launch
+        }
+
+        val selectedEventFormat = state.eventFormats.find { it.id.toString() == state.eventFormat }
+        if (selectedEventFormat?.slug != "online" && !state.isTicketRevenueValid) {
+            _uiState.update { it.copy(errorMessage = "Ticket revenue splits must total 100%") }
+            return@launch
+        }
+
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
         val currentStatus = uiState.value.data?.status.orEmpty()
 
-        val input = formState.value.toEditEventInput(
+        val input = state.toEditEventInput(
             currentStatus = currentStatus
         )
 
-        when (val result = editEventUseCase(id, input)) {
-            is DataResult.Success -> {
+        // 1. Update Core Event Details
+        val eventResult = editEventUseCase(id, input)
+
+        if (eventResult is DataResult.Error) {
+            _uiState.update { it.copy(isLoading = false, errorMessage = "Event Update Failed: ${eventResult.error}") }
+            return@launch
+        }
+
+        // 2. Update Revenue Rules in Parallel
+        coroutineScope {
+            val paintingDeferred = state.paintingRuleId?.let { ruleId ->
+                async {
+                    updateEventRevenueRulesUseCase(
+                        ruleId,
+                        UpdateRevenueRulesInput(
+                            itemType = "painting",
+                            artistPercent = state.paintingArtistPercent,
+                            eventPercent = state.paintingEventPercent,
+                            platformPercent = state.paintingPlatformPercent,
+                            eventId = id.toInt()
+                        )
+                    )
+                }
+            }
+
+            val ticketDeferred = state.ticketRuleId?.let { ruleId ->
+                async {
+                    updateEventRevenueRulesUseCase(
+                        ruleId,
+                        UpdateRevenueRulesInput(
+                            itemType = "ticket",
+                            artistPercent = state.ticketArtistPercent,
+                            eventPercent = state.ticketEventPercent,
+                            platformPercent = state.ticketPlatformPercent,
+                            eventId = id.toInt()
+                        )
+                    )
+                }
+            }
+
+            val paintingResult = paintingDeferred?.await()
+            val ticketResult = ticketDeferred?.await()
+
+            // Handle specific failures
+            val errors = mutableListOf<String>()
+            if (paintingResult is DataResult.Error) errors.add("Painting Splits: ${paintingResult.error}")
+            if (ticketResult is DataResult.Error) errors.add("Ticket Splits: ${ticketResult.error}")
+
+            if (errors.isNotEmpty()) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Some updates failed:\n" + errors.joinToString("\n")
+                    )
+                }
+            } else {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -174,17 +281,22 @@ class EditEventViewModel @Inject constructor(
                     )
                 }
             }
-            is DataResult.Error -> {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = result.error
-                    )
-                }
-            }
+        }
+    }
 
-            else -> {}
+    private fun deleteEvent() = viewModelScope.launch {
+        val id = eventId ?: return@launch
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        when (val result = deleteEventUseCase(id)) {
+            is DataResult.Success -> {
+                _uiState.update { it.copy(isLoading = false, isDeleteSuccess = true) }
+            }
+            is DataResult.Error -> {
+                _uiState.update { it.copy(isLoading = false, errorMessage = result.error) }
+            }
+            else -> Unit
         }
     }
 
 }
+

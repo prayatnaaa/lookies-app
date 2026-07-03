@@ -13,12 +13,13 @@ data class ExhibitionShipmentUiState(
     val errorMessage: String? = null,
     val successMessage: String? = null,
     val selectedArrivalProof: Uri? = null,
+    val isPartner: Boolean = false,
 
     // Existing shipment (if any)
     val shipment: ExhibitionShipment? = null,
 
     // Form — Inbound phase (Artist submits artwork)
-    val selectedDeliveryMethod: DeliveryMethod = DeliveryMethod.SELF_DROP_OFF,
+    val selectedDeliveryMethod: DeliveryMethod = DeliveryMethod.SELF_DROPOFF,
     val courierNameInput: String = "",
     val trackingNumberInput: String = "",
 

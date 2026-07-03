@@ -6,6 +6,8 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,7 +27,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayatna.lookiesapp.domain.model.payment.PayoutChannel
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionFormState
 import com.prayatna.lookiesapp.utils.Constants
@@ -37,8 +38,8 @@ fun PartnerSubmissionContent(
     formState: PartnerSubmissionFormState,
     isLoading: Boolean,
     onEvent: (PartnerSubmissionEvent) -> Unit,
-    onPickFileClick: () -> Unit,
-    payoutChannels: List<PayoutChannel> = emptyList()
+    onPickFileClick: (String) -> Unit,
+    onSelectBankClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -53,7 +54,7 @@ fun PartnerSubmissionContent(
             if (formState.bankName.isNotBlank() && formState.accountNumber.isNotBlank() &&
                 formState.bankCode.isNotBlank() && formState.accountHolderName.isNotBlank()
             ) count++
-            if (formState.kycFileBytes != null) count++
+            if (formState.selectedKycDocuments.any { it.first == "AUTHORIZED_PERSON_KTP_DOCUMENT" }) count++
             count
         }
     }
@@ -297,13 +298,22 @@ fun PartnerSubmissionContent(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
-            PayoutChannelDropdown(
-                selectedCode = formState.bankCode,
-                channels = payoutChannels,
-                onSelect = { channel ->
-                    onEvent(PartnerSubmissionEvent.BankCodeChanged(channel.channelCode))
-                    onEvent(PartnerSubmissionEvent.BankNameChanged(channel.channelName))
-                }
+            OutlinedTextField(
+                value = formState.bankName.ifBlank { "Select Bank" },
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Bank") },
+                trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onSelectBankClick() },
+                enabled = false,
+                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
 
             OutlinedTextField(
@@ -336,51 +346,25 @@ fun PartnerSubmissionContent(
             title = "Legal Documents (KYC)",
             icon = Icons.Default.Description
         ) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                ),
-                shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.UploadFile,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Upload ID Card / Business License / Registration Number",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center
-                    )
+            val kycOptions = listOf(
+                "AUTHORIZED_PERSON_KTP_DOCUMENT" to "Owner/Director KTP (Required)",
+                "BUSINESS_LICENSE" to "Business License (SIUP/NIB)",
+                "TAX_ID_DOCUMENT" to "Tax ID (NPWP)",
+                "OTHER" to "Other Supporting Documents"
+            )
 
+            kycOptions.forEach { (type, label) ->
+                val selectedFile = formState.selectedKycDocuments.find { it.first == type }
+                
+                KycUploadItem(
+                    label = label,
+                    isSelected = selectedFile != null,
+                    onPickFile = { onPickFileClick(type) },
+                    onRemoveFile = { onEvent(PartnerSubmissionEvent.RemoveKycFile(type)) }
+                )
+                
+                if (type != kycOptions.last().first) {
                     Spacer(modifier = Modifier.height(12.dp))
-
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "File: ${formState.kycFileName}",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(8.dp),
-                            maxLines = 1
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    OutlinedButton(onClick = onPickFileClick) {
-                        Text("Change File")
-                    }
                 }
             }
         }
@@ -415,44 +399,67 @@ fun PartnerSubmissionContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PayoutChannelDropdown(
-    selectedCode: String,
-    channels: List<PayoutChannel>,
-    onSelect: (PayoutChannel) -> Unit
+private fun KycUploadItem(
+    label: String,
+    isSelected: Boolean,
+    onPickFile: () -> Unit,
+    onRemoveFile: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val selectedChannel = channels.find { it.channelCode == selectedCode }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) 
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) 
+            else 
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ),
+        shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
         modifier = Modifier.fillMaxWidth()
     ) {
-        OutlinedTextField(
-            value = selectedChannel?.channelName ?: "Select Bank",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Bank") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE)
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            channels.forEach { channel ->
-                DropdownMenuItem(
-                    text = { Text(channel.channelName) },
-                    onClick = {
-                        onSelect(channel)
-                        expanded = false
-                    }
+            Icon(
+                imageVector = if (isSelected) Icons.Default.CheckCircle else Icons.Default.CloudUpload,
+                contentDescription = null,
+                tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp)
+            )
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
                 )
+                if (isSelected) {
+                    Text(
+                        text = "File selected",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            if (isSelected) {
+                IconButton(onClick = onRemoveFile) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            } else {
+                OutlinedButton(
+                    onClick = onPickFile,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Text("Upload", fontSize = 12.sp)
+                }
             }
         }
     }

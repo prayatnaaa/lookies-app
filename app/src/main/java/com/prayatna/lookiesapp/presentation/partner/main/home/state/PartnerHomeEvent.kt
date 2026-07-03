@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.presentation.partner.main.home.state
 
 sealed interface PartnerHomeEvent {
+    data object ChatClick: PartnerHomeEvent
     data class Load(val businessId: String) : PartnerHomeEvent
     data class LoadMonthlyFinancialReport(val businessId: String) : PartnerHomeEvent
     data object Retry : PartnerHomeEvent
@@ -12,6 +13,7 @@ sealed interface PartnerHomeEvent {
     data object BackClicked : PartnerHomeEvent
     data object MonthlyFinanceClicked : PartnerHomeEvent
     data object MemberListClicked : PartnerHomeEvent
+    data object EditProfileClicked : PartnerHomeEvent
 
     data class StartDateSelected(val date: String) : PartnerHomeEvent
     data class EndDateSelected(val date: String) : PartnerHomeEvent

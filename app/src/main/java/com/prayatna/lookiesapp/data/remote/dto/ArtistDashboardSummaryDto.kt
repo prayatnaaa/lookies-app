@@ -7,7 +7,9 @@ import kotlinx.serialization.Serializable
 data class ArtistDashboardSummaryDto(
 
     @SerialName("business_id")
-     val businessId: String,
+    val businessId: String,
+
+    val status: String,
 
     @SerialName("user_id")
     val userId: String,

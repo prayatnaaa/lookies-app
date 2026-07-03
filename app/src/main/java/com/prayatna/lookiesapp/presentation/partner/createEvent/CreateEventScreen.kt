@@ -82,16 +82,23 @@ fun CreateEventScreen(
     val selectedEventType =
         formState.eventTypes.find { it.id.toString() == formState.eventType }
     val isSelfExhibition = selectedEventType?.slug == "self_exhibition"
+    val isOpenCall = selectedEventType?.slug == "open_call"
 
     // Progress tracking
     val totalSections = 7
-    val filledSections by remember(formState) {
+    val filledSections by remember(formState, isOpenCall) {
         derivedStateOf {
             var count = 0
-            // 1. Event Details: title + banner + dates + type + format
-            if (formState.title.isNotBlank() && formState.bannerUri != null &&
+            // 1. Event Details: title + banner + dates + type + format + (deadlines if opencall)
+            val basicDetails = formState.title.isNotBlank() && formState.bannerUri != null &&
                 formState.startDate.isNotBlank() && formState.endDate.isNotBlank()
-            ) count++
+            val registrationDetails = !isOpenCall || (
+                !formState.paintingSubmissionDeadline.isNullOrBlank() &&
+                !formState.registrationStartDate.isNullOrBlank() &&
+                !formState.registrationEndDate.isNullOrBlank()
+            )
+            if (basicDetails && registrationDetails) count++
+            
             // 2. Event type & format selected
             if (formState.eventType.isNotBlank() && formState.eventFormat.isNotBlank()) count++
             // 3. Location (only for non-online)
@@ -223,6 +230,7 @@ fun CreateEventScreen(
                 // ── 1. Event Details ────────────────────────────
                 item {
                     DetailEventForm(
+                        isOnline = isOnlineEvent,
                         eventName = formState.title,
                         onEventNameChange = {
                             viewModel.onEvent(CreateEventFormEvent.TitleChanged(it))
@@ -248,7 +256,21 @@ fun CreateEventScreen(
                         selectedEventFormatId = formState.eventFormat,
                         onEventFormatChange = {
                             viewModel.onEvent(CreateEventFormEvent.EventFormatChanged(it))
-                        }
+                        },
+                        paintingSubmissionDeadline = formState.paintingSubmissionDeadline,
+                        onPaintingSubmissionDeadlineChange = {
+                            viewModel.onEvent(CreateEventFormEvent.PaintingSubmissionDeadlineChanged(it))
+                        },
+                        registrationStartDate = formState.registrationStartDate,
+                        onRegistrationStartDateChange = {
+                            viewModel.onEvent(CreateEventFormEvent.RegistrationStartDateChanged(it))
+                        },
+                        registrationEndDate = formState.registrationEndDate,
+                        onRegistrationEndDateChange = {
+                            viewModel.onEvent(CreateEventFormEvent.RegistrationEndDateChanged(it))
+                        },
+                        isSelfExhibition = isSelfExhibition,
+                        isOpenCall = isOpenCall
                     )
                 }
 
@@ -281,10 +303,6 @@ fun CreateEventScreen(
                     ) {
                         ParticipationRulesForm(
                             isSelfExhibition = isSelfExhibition,
-                            maxParticipants = formState.maxParticipant,
-                            onMaxParticipantsChange = {
-                                viewModel.onEvent(CreateEventFormEvent.MaxParticipantChanged(it))
-                            },
                             maxPainting = formState.maxPainting,
                             onMaxPaintingChange = {
                                 viewModel.onEvent(CreateEventFormEvent.MaxPaintingChanged(it))
@@ -323,7 +341,7 @@ fun CreateEventScreen(
                     }
                 }
 
-                // ── 5. Revenue Sharing (NEW) ────────────────────
+                // ── 5. Revenue Sharing ────────────────────
                 item {
                     AnimatedVisibility(
                         visible = formState.eventType.isNotEmpty(),
@@ -332,6 +350,7 @@ fun CreateEventScreen(
                     ) {
                         RevenueShareForm(
                             isSelfExhibition = isSelfExhibition,
+                            isOnline = isOnlineEvent,
                             paintingArtistPercent = formState.paintingArtistPercent,
                             onPaintingArtistPercentChange = {
                                 viewModel.onEvent(

@@ -8,22 +8,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.prayatna.lookiesapp.domain.model.event.Event
 import com.prayatna.lookiesapp.domain.model.event.EventRevenueRules
 import com.prayatna.lookiesapp.presentation.admin.detailEvent.state.AdminDetailEventUiEvent
 import com.prayatna.lookiesapp.presentation.admin.detailEvent.state.AdminDetailEventUiState
@@ -42,6 +36,8 @@ import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.detailevent.DetailEventContent
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.ui.theme.Maroon
+import com.prayatna.lookiesapp.utils.formatDate
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
 fun AdminDetailEventScreen(
@@ -58,7 +54,7 @@ fun AdminDetailEventScreen(
         topBar = {
             BackTopBar(
                 onBackClick = onNavigateBack,
-                title = "Admin - Event Detail"
+                title = "Event Review"
             )
         },
         bottomBar = {
@@ -94,9 +90,19 @@ fun AdminDetailEventScreen(
                             event = uiState.event,
                             paintings = emptyList(),
                             isUserArtist = false,
+                            showStatus = true,
                             extraContent = {
-                                if (uiState.revenueRules.isNotEmpty()) {
-                                    RevenueRulesSection(rules = uiState.revenueRules)
+                                Column(
+                                    modifier = Modifier.padding(bottom = 32.dp),
+                                    verticalArrangement = Arrangement.spacedBy(32.dp)
+                                ) {
+                                    AdminQuotasSection(event = uiState.event)
+
+                                    if (uiState.revenueRules.isNotEmpty()) {
+                                        RevenueRulesSection(rules = uiState.revenueRules)
+                                    }
+
+                                    AdminAuditSection(event = uiState.event)
                                 }
                             },
                             onPaintingClick = {},
@@ -124,8 +130,8 @@ fun AdminDetailEventScreen(
     if (isApproveSheetOpen) {
         CustomBottomSheet(
             title = "Approve Event",
-            message = "Are you sure you want to approve this event?",
-            confirmText = "Approve",
+            message = "Are you sure you want to approve this event? This will make it visible to artists and buyers.",
+            confirmText = "Confirm Approval",
             onConfirm = {
                 uiState.event?.id?.toIntOrNull()?.let { id ->
                     onEvent(AdminDetailEventUiEvent.ApproveEvent(id))
@@ -159,39 +165,44 @@ private fun AdminDetailEventBottomBar(
     onReject: () -> Unit
 ) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
-        tonalElevation = 8.dp,
+        modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
+        tonalElevation = 2.dp,
         shadowElevation = 8.dp
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
-            horizontalArrangement =
-                Arrangement.spacedBy(12.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
             OutlinedButton(
                 onClick = onReject,
-                modifier = Modifier.weight(1f),
-                enabled = !isDeciding
+                modifier = Modifier.weight(1f).height(48.dp),
+                enabled = !isDeciding,
+                shape = RoundedCornerShape(14.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Maroon.copy(alpha = 0.5f)),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Maroon)
             ) {
-                Text("Reject")
+                Text("Reject", fontWeight = FontWeight.SemiBold)
             }
 
             Button(
                 onClick = onApprove,
-                modifier = Modifier.weight(1f),
-                enabled = !isDeciding
+                modifier = Modifier.weight(1.5f).height(48.dp),
+                enabled = !isDeciding,
+                shape = RoundedCornerShape(14.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
             ) {
 
                 if (isDeciding) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        strokeWidth = 2.dp
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Approve Event")
+                    Text("Approve Event", fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -207,37 +218,43 @@ private fun RejectEventBottomSheet(
     onConfirm: () -> Unit
 ) {
     ModalBottomSheet(
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-                .padding(bottom = 24.dp),
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text =
-                    "Provide a reason so the organizer can revise and resubmit the event.",
-                style =
-                    MaterialTheme.typography.bodyMedium,
-                color =
-                    MaterialTheme.colorScheme
-                        .onSurfaceVariant
+                text = "Reject Event Application",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Text(
+                text = "Explain why this event doesn't meet the requirements. This feedback will be sent to the organizer.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
 
             OutlinedTextField(
                 value = reason,
                 onValueChange = onReasonChange,
-                label = { Text("Reason") },
-                placeholder = {
-                    Text("Explain why this event is rejected")
-                },
+                label = { Text("Rejection Reason") },
+                placeholder = { Text("e.g. Incomplete description, inappropriate banner...") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 4,
+                shape = RoundedCornerShape(16.dp),
                 supportingText = {
-                    Text("${reason.length}/300")
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                        Text("${reason.length}/300")
+                    }
                 }
             )
 
@@ -245,23 +262,24 @@ private fun RejectEventBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                OutlinedButton(
+                TextButton(
                     onClick = onDismiss,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).height(48.dp)
                 ) {
                     Text("Cancel")
                 }
 
                 Button(
                     onClick = onConfirm,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1.5f).height(48.dp),
                     enabled = reason.isNotBlank(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Maroon,
                         contentColor = Color.White
-                    )
+                    ),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Reject")
+                    Text("Reject Application", fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -269,70 +287,134 @@ private fun RejectEventBottomSheet(
 }
 
 @Composable
-private fun RevenueRulesSection(
-    rules: List<EventRevenueRules>
-) {
-    Column(
-        modifier = Modifier.padding(vertical = 20.dp)
+private fun AdminQuotasSection(event: Event) {
+    Column {
+        SectionHeader(title = "Capacities & Fees", icon = Icons.Default.Inventory2)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Quotas Grid
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                QuotaCard(
+                    label = "Participants",
+                    total = event.maxParticipant?.toString() ?: "∞",
+                    remaining = event.remainingParticipantQuota?.toString() ?: "-",
+                    modifier = Modifier.weight(1f)
+                )
+                QuotaCard(
+                    label = "Artworks",
+                    total = event.maxPainting?.toString() ?: "∞",
+                    remaining = event.remainingPaintingQuota?.toString() ?: "-",
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // Fee Items
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MinimalAuditItem(
+                        label = "Visitor Ticket",
+                        value = event.ticketPrice?.let { if (it == 0.0) "Free" else formatRupiah(it) } ?: "N/A"
+                    )
+                    MinimalAuditItem(
+                        label = "Artist Reg. Fee",
+                        value = event.artistRegistrationFee?.let { if (it == 0.0) "Free" else formatRupiah(it) } ?: "N/A"
+                    )
+                    MinimalAuditItem(
+                        label = "Limit per Artist",
+                        value = "${event.maxPaintingPerArtist ?: "No Limit"} items"
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun QuotaCard(label: String, total: String, remaining: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+        shape = RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
     ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(text = remaining, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text(text = "/$total", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 4.dp))
+            }
+            Text(text = "Remaining", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
 
-        Text(
-            text = "Revenue Distribution",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
+@Composable
+private fun AdminAuditSection(event: Event) {
+    Column {
+        SectionHeader(title = "Audit & System", icon = Icons.Default.Analytics)
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Column(
-            verticalArrangement =
-                Arrangement.spacedBy(12.dp)
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(20.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
         ) {
-            rules.forEach { rule ->
+            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                MinimalAuditItem(label = "Internal ID", value = "#${event.id.take(8).uppercase()}")
+                MinimalAuditItem(label = "Classification", value = "${event.eventType.name} • ${event.eventFormat.name}")
+                
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
-                ElevatedCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    colors =
-                        CardDefaults.elevatedCardColors(
-                            containerColor =
-                                MaterialTheme.colorScheme.surface
-                        )
-                ) {
+                MinimalAuditItem(label = "Timeline", value = "Created: ${formatDate(event.createdAt)}")
 
-                    Column(
-                        modifier = Modifier.padding(18.dp)
+                event.updatedAt?.let {
+                    MinimalAuditItem(label = "Last Activity", value = formatDate(it))
+                }
+
+                if (!event.approvedAt.isNullOrBlank()) {
+                    MinimalAuditItem(label = "Approved", value = "${formatDate(event.approvedAt)} by ${event.approvedBy ?: "System"}")
+                }
+
+                if (event.locationUrl.isNotBlank()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(text = "Raw Location URL", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Surface(
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = event.locationUrl,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(8.dp),
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+
+                if (!event.rejectionReason.isNullOrBlank()) {
+                    Surface(
+                        color = Maroon.copy(alpha = 0.05f),
+                        shape = RoundedCornerShape(12.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Maroon.copy(alpha = 0.1f))
                     ) {
-
-                        Text(
-                            text = rule.itemType
-                                .replace("_", " ")
-                                .uppercase(),
-                            style = MaterialTheme
-                                .typography
-                                .titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Spacer(
-                            modifier = Modifier.height(14.dp)
-                        )
-
-                        RevenueSplitRow(
-                            label = "Artist",
-                            value = "${rule.artistPercent}%"
-                        )
-
-                        RevenueSplitRow(
-                            label = "Event",
-                            value = "${rule.eventPercent}%"
-                        )
-
-                        RevenueSplitRow(
-                            label = "Platform",
-                            value =
-                                "${rule.platformPercent}%"
-                        )
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.ErrorOutline, null, tint = Maroon, modifier = Modifier.size(14.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(text = "Previous Rejection Reason", style = MaterialTheme.typography.labelSmall, color = Maroon, fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(text = event.rejectionReason, style = MaterialTheme.typography.bodySmall, color = Maroon)
+                        }
                     }
                 }
             }
@@ -341,33 +423,72 @@ private fun RevenueRulesSection(
 }
 
 @Composable
-private fun RevenueSplitRow(
-    label: String,
-    value: String
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement =
-            Arrangement.SpaceBetween
-    ) {
+private fun SectionHeader(title: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(12.dp))
         Text(
-            text = label,
-            style = MaterialTheme
-                .typography
-                .bodyMedium,
-            color =
-                MaterialTheme.colorScheme
-                    .onSurfaceVariant
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.5.sp
         )
+    }
+}
 
-        Text(
-            text = value,
-            style = MaterialTheme
-                .typography
-                .bodyMedium,
-            fontWeight = FontWeight.SemiBold
-        )
+@Composable
+private fun MinimalAuditItem(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
+    }
+}
+
+@Composable
+private fun RevenueRulesSection(rules: List<EventRevenueRules>) {
+    Column {
+        SectionHeader(title = "Revenue Distribution", icon = Icons.Default.Payments)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            rules.forEach { rule ->
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text(
+                            text = rule.itemType.replace("_", " ").uppercase(),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.secondary,
+                            letterSpacing = 1.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                            RevenueMetric(label = "Artist", value = "${rule.artistPercent}%", modifier = Modifier.weight(1f))
+                            RevenueMetric(label = "Event", value = "${rule.eventPercent}%", modifier = Modifier.weight(1f))
+                            RevenueMetric(label = "Platform", value = "${rule.platformPercent}%", modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RevenueMetric(label: String, value: String, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
     }
 }

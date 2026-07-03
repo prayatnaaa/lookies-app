@@ -17,11 +17,12 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.Money
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -29,7 +30,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.admin.transactionList.navigateToAdminTransactionList
 import com.prayatna.lookiesapp.presentation.admin.withdrawal.state.navigateToAdminWithdrawalList
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
@@ -115,13 +116,24 @@ fun AdminMainScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             AdminDashboardCard(
-                icon = Icons.Filled.People,
-                title = "Withdrawal Requests",
-                subtitle = "Manage merchant withdrawals",
+                icon = Icons.Default.Payments,
+                title = "Refunds",
+                subtitle = "Manage refunds request and others",
                 onClick = {
-                    navController.navigateToAdminWithdrawalList()
+                    navController.navigate(NavigationRoutes.REFUND_LIST)
                 }
             )
+
+//            Spacer(modifier = Modifier.height(12.dp))
+//
+//            AdminDashboardCard(
+//                icon = Icons.Filled.People,
+//                title = "Withdrawal Requests",
+//                subtitle = "Manage merchant withdrawals",
+//                onClick = {
+//                    navController.navigateToAdminWithdrawalList()
+//                }
+//            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -131,6 +143,17 @@ fun AdminMainScreen(
                 subtitle = "Oversee community discussions",
                 onClick = {
                     navController.navigate(NavigationRoutes.FORUM_LIST)
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            AdminDashboardCard(
+                icon = Icons.Filled.Money,
+                title = "Transactions",
+                subtitle = "View transactions of the platform",
+                onClick = {
+                    navController.navigateToAdminTransactionList()
                 }
             )
 

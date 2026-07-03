@@ -17,7 +17,12 @@ import io.github.jan.supabase.realtime.realtime
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
+import io.ktor.client.engine.okhttp.OkHttpEngine
+import io.ktor.client.engine.okhttp.OkHttpConfig
+import okhttp3.ConnectionPool
 import javax.inject.Singleton
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -30,6 +35,18 @@ object SupabaseModule {
             supabaseKey = BuildConfig.API_KEY,
             supabaseUrl = BuildConfig.BASE_URL
         ) {
+            requestTimeout = 30.seconds
+            httpEngine = OkHttpEngine(OkHttpConfig().apply {
+                config {
+                    retryOnConnectionFailure(true)
+                    connectTimeout(15, TimeUnit.SECONDS)
+                    readTimeout(30, TimeUnit.SECONDS)
+                    writeTimeout(30, TimeUnit.SECONDS)
+                    // Shorter keep-alive prevents stale connections from causing
+                    // "connect_timeout=unknown ms" errors after network changes
+                    connectionPool(ConnectionPool(5, 60, TimeUnit.SECONDS))
+                }
+            })
             install(Postgrest) {
                 serializer = KotlinXSerializer(
                     json = kotlinx.serialization.json.Json {
@@ -60,7 +77,7 @@ object SupabaseModule {
     @Provides
     @Singleton
     fun provideSupabaseAuth(client: SupabaseClient): Auth {
-        return  client.auth
+        return client.auth
     }
 
     @Provides
@@ -74,4 +91,4 @@ object SupabaseModule {
     fun provideSupabaseRealtime(client: SupabaseClient): Realtime {
         return client.realtime
     }
-}
+}

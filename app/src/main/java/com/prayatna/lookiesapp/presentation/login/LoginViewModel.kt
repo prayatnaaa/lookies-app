@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.dto.response.auth.LoginResponse
@@ -34,8 +35,20 @@ class LoginViewModel @Inject constructor(
     private val getFcmTokenUseCase: GetFcmTokenUseCase,
 //    private val getRoleUseCase: GetRoleUseCase,
     private val fcmTokenScheduler: FcmTokenScheduler,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val _errorMessage = savedStateHandle.getStateFlow<String?>("error_msg", null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
+    fun setError(message: String) {
+        savedStateHandle["error_msg"] = message
+    }
+
+    fun clearError() {
+        savedStateHandle["error_msg"] = null
+    }
 
     var emailValue by mutableStateOf("")
         private set
@@ -51,7 +64,8 @@ class LoginViewModel @Inject constructor(
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<AuthEvent>(
-        replay = 1
+        replay = 0,
+        extraBufferCapacity = 1
     )
     val eventFlow = _eventFlow.asSharedFlow()
 
@@ -86,13 +100,15 @@ class LoginViewModel @Inject constructor(
 
                 is DataResult.Success -> {
                     Log.d("SignIn", "Success " + result.data)
+                    clearError()
                     resetForm()
                 }
 
                 is DataResult.Error -> {
                     Log.d("SignIn", "Error " + result.error)
                     _eventFlow.emit(AuthEvent.ShowError(result.error))
-                    _authState.value = AuthState.Unauthenticated
+                    _authState.value = AuthState.Error(result.error)
+                    setError(result.error)
                 }
 
                 else -> Unit
@@ -105,6 +121,7 @@ class LoginViewModel @Inject constructor(
             when (val result = listenUserSessionUseCase()) {
                 is DataResult.Error -> {
                     _eventFlow.emit(AuthEvent.ShowError(result.error))
+                    setError(result.error)
                 }
                 is DataResult.Success -> {
                     val session = result.data
@@ -113,6 +130,7 @@ class LoginViewModel @Inject constructor(
                         when (sessionStatus) {
                             is SessionStatus.Authenticated -> {
                                 Log.d("SignIn", "Authenticated")
+                                clearError()
                                 loadAuthenticatedUser()
                             }
                             is SessionStatus.NotAuthenticated -> {

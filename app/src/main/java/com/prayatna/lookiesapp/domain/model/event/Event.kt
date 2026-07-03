@@ -26,5 +26,8 @@ data class Event (
     val updatedAt: String? = null,
     val rejectionReason: String? = null,
     val approvedBy: String? = null,
-    val approvedAt: String? = null
+    val approvedAt: String? = null,
+    val paintingSubmissionDeadline: String? = null,
+    val artistRegistrationStartDate: String? = null,
+    val artistRegistrationEndDate: String? = null
 )

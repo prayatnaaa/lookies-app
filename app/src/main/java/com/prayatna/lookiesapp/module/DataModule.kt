@@ -13,6 +13,7 @@ import com.prayatna.lookiesapp.data.repository.PartnerRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.PaymentRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.RefundRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.ShipmentRepositoryImpl
+import com.prayatna.lookiesapp.data.repository.TicketRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.TransactionRepositoryImpl
 import com.prayatna.lookiesapp.data.repository.UserRepositoryImpl
 import com.prayatna.lookiesapp.domain.repository.AdminRepository
@@ -28,6 +29,7 @@ import com.prayatna.lookiesapp.domain.repository.PartnerRepository
 import com.prayatna.lookiesapp.domain.repository.PaymentRepository
 import com.prayatna.lookiesapp.domain.repository.RefundRepository
 import com.prayatna.lookiesapp.domain.repository.ShipmentRepository
+import com.prayatna.lookiesapp.domain.repository.TicketRepository
 import com.prayatna.lookiesapp.domain.repository.TransactionRepository
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import dagger.Binds
@@ -98,4 +100,8 @@ interface DataModule {
     @Singleton
     @Binds
     fun bindsRefundRepository(refundRepositoryImpl: RefundRepositoryImpl): RefundRepository
+
+    @Singleton
+    @Binds
+    fun bindsTicketRepository(ticketRepositoryImpl: TicketRepositoryImpl): TicketRepository
 }

@@ -1,10 +1,12 @@
 package com.prayatna.lookiesapp.data.repository
 
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseRefundService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.model.refund.ProcessRefundOutput
 import com.prayatna.lookiesapp.domain.model.transaction.CreateRefundRequestInput
+import com.prayatna.lookiesapp.domain.model.transaction.DetailRefund
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
 import com.prayatna.lookiesapp.domain.model.transaction.SetRefundAsCompleteResult
 import com.prayatna.lookiesapp.domain.repository.RefundRepository
@@ -26,18 +28,26 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
-    override suspend fun getRefunds(): DataResult<List<Refund>> {
+    override suspend fun getRefunds(status: String?): DataResult<List<Refund>> {
         return try {
-            val result = refundService.getRefunds()
+            val result = refundService.getRefunds(status)
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -48,6 +58,11 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -58,6 +73,11 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -68,16 +88,26 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
-    override suspend fun getRefundById(id: String): DataResult<Refund> {
+    override suspend fun getRefundById(id: String): DataResult<DetailRefund> {
         return try {
             val result = refundService.getRefundById(id)
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -91,6 +121,11 @@ class RefundRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -103,6 +138,11 @@ class RefundRepositoryImpl @Inject constructor(
             DataResult.Error(eMessage)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 }

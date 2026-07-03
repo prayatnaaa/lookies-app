@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.merchant.inviteMerchantMember
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -110,6 +111,7 @@ class InviteMerchantMemberViewModel @Inject constructor(
                     _effect.send(InviteMerchantMemberEffect.ShowMessage("Member invited successfully"))
                 }
                 is DataResult.Error -> {
+                    Log.e("InviteMember", businessId)
                     _uiState.update { it.copy(isInviting = false, errorMessage = result.error) }
                     _effect.send(InviteMerchantMemberEffect.ShowMessage(result.error))
                 }

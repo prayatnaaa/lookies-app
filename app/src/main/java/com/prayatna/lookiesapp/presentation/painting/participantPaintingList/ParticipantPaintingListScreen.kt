@@ -50,15 +50,15 @@ fun ParticipantPaintingListScreen(
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it, withDismissAction = true)
         }
     }
 
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
-            snackbarHostState.showSnackbar("Action success")
-        }
-    }
+//    LaunchedEffect(uiState.isSuccess) {
+//        if (uiState.isSuccess) {
+//            snackbarHostState.showSnackbar("Action success", withDismissAction = true)
+//        }
+//    }
 
     LaunchedEffect(Unit) {
         navController.currentBackStackEntry
@@ -71,7 +71,7 @@ fun ParticipantPaintingListScreen(
 
                 if (message != null) {
 
-                    snackbarHostState.showSnackbar(message)
+                    snackbarHostState.showSnackbar(message, withDismissAction = true)
 
                     navController.currentBackStackEntry
                         ?.savedStateHandle
@@ -81,12 +81,15 @@ fun ParticipantPaintingListScreen(
     }
 
     Scaffold(
-        bottomBar = {
+        floatingActionButton = {
             if (eventType == "self_exhibition") {
                 Button(onClick = {
-                    navController.navigate("${NavigationRoutes.SELF_EVENT_LIST}/${businessId}")
+                    navController.navigate(
+                        "${
+                            NavigationRoutes.INSERT_EVENT_PAINTINGS_ROUTE
+                        }/${eventId}/${businessId}")
                 }) {
-                    Text("Upload Painting")
+                    Text("Add Event Artworks")
                 }
             }
         },

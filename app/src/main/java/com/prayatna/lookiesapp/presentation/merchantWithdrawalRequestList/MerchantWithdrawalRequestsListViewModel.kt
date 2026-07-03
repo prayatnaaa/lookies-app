@@ -32,9 +32,9 @@ class MerchantWithdrawalRequestsListViewModel @Inject constructor(
     private val _effect = Channel<MerchantWithdrawalRequestListEffect>()
     val effect = _effect.receiveAsFlow()
 
-    init {
-        getMerchantWithdrawalRequest()
-    }
+//    init {
+//        getMerchantWithdrawalRequest()
+//    }
 
     fun onEvent(event: MerchantWithdrawalRequestListEvent) {
         when(event) {
@@ -63,7 +63,7 @@ class MerchantWithdrawalRequestsListViewModel @Inject constructor(
         }
     }
 
-    private fun getMerchantWithdrawalRequest() {
+    fun getMerchantWithdrawalRequest() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             when (val result = getWithdrawalRequestsByMerchantIdUseCase(businessId)) {

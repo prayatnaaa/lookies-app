@@ -77,7 +77,8 @@ class RefundDetailViewModel @Inject constructor(
             _uiState.update { it.copy(isSubmittingTracking = true, errorMessage = null) }
             when (val result = updateReturnTrackingNumberUseCase(refundId, tracking)) {
                 is DataResult.Success -> {
-                    _uiState.update { it.copy(isSubmittingTracking = false, refund = result.data) }
+                    _uiState.update { it.copy(isSubmittingTracking = false, successRefundData = result.data) }
+                    loadRefund(refundId)
                     _effect.emit(RefundDetailEffect.ShowToast("Tracking number updated!"))
                 }
                 is DataResult.Error -> {

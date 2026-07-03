@@ -5,9 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.painting.GetEventPaintingByIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.ApprovePaintingUseCase
+import com.prayatna.lookiesapp.domain.usecase.partner.DeleteEventPaintingUseCase
 import com.prayatna.lookiesapp.domain.usecase.partner.RejectPaintingUseCase
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEffect
-import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.state.PartnerExhibitionPaintingEffect
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.partnerExhibition.state.PartnerExhibitionPaintingEvent
 import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,20 +24,22 @@ import javax.inject.Inject
 class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
     private val getEventPaintingByIdUseCase: GetEventPaintingByIdUseCase,
     private val approvePaintingUseCase: ApprovePaintingUseCase,
-    private val rejectPaintingUseCase: RejectPaintingUseCase
+    private val rejectPaintingUseCase: RejectPaintingUseCase,
+    private val deleteEventPaintingUseCase: DeleteEventPaintingUseCase
 ): ViewModel() {
 
     private val _state = MutableStateFlow(EventPaintingDetailUiState())
     val state = _state.asStateFlow()
 
-    private val _event = Channel<EventPaintingDetailEffect>()
+    private val _event = Channel<PartnerExhibitionPaintingEffect>()
     val event = _event.receiveAsFlow()
 
-    fun onEvent(intent: EventPaintingDetailEvent) {
+    fun onEvent(intent: PartnerExhibitionPaintingEvent) {
         when (intent) {
-            is EventPaintingDetailEvent.Load -> load(intent.id)
-            is EventPaintingDetailEvent.Approve -> approve(intent.id)
-            is EventPaintingDetailEvent.Reject -> reject(intent.id, intent.reason)
+            is PartnerExhibitionPaintingEvent.Load -> load(intent.id)
+            is PartnerExhibitionPaintingEvent.Approve -> approve(intent.id)
+            is PartnerExhibitionPaintingEvent.Reject -> reject(intent.id, intent.reason)
+            is PartnerExhibitionPaintingEvent.Delete -> delete(intent.id)
         }
     }
 
@@ -60,7 +63,7 @@ class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
                     _state.update { it.copy(isLoading = false, errorMessage = result.error) }
 
                     _event.send(
-                        EventPaintingDetailEffect.ShowError(result.error)
+                        PartnerExhibitionPaintingEffect.ShowError(result.error)
                     )
                 }
 
@@ -78,7 +81,7 @@ class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
                     _state.update { it.copy(actionLoading = false) }
 
                     _event.send(
-                        EventPaintingDetailEffect.ShowResult("Painting Approved")
+                        PartnerExhibitionPaintingEffect.ShowResult("Painting Approved")
                     )
                 }
 
@@ -86,7 +89,7 @@ class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
                     _state.update { it.copy(actionLoading = false) }
 
                     _event.send(
-                        EventPaintingDetailEffect.ShowError(result.error)
+                        PartnerExhibitionPaintingEffect.ShowError(result.error)
                     )
                 }
 
@@ -104,7 +107,7 @@ class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
                     _state.update { it.copy(actionLoading = false) }
 
                     _event.send(
-                        EventPaintingDetailEffect.ShowResult("Painting Rejected")
+                        PartnerExhibitionPaintingEffect.ShowResult("Painting Rejected")
                     )
                 }
 
@@ -112,11 +115,31 @@ class PartnerExhibitionPaintingDetailViewModel @Inject constructor(
                     _state.update { it.copy(actionLoading = false) }
 
                     _event.send(
-                        EventPaintingDetailEffect.ShowError(result.error)
+                        PartnerExhibitionPaintingEffect.ShowError(result.error)
                     )
                 }
 
                 else -> Unit
+            }
+        }
+    }
+
+    private fun delete(id: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(actionLoading = true) }
+
+            when (val result = deleteEventPaintingUseCase(id)) {
+                is DataResult.Success -> {
+                    _state.update { it.copy(actionLoading = false) }
+                    _event.send(PartnerExhibitionPaintingEffect.ShowResult("Painting Deleted Successfully"))
+                }
+                is DataResult.Error -> {
+                    _state.update { it.copy(actionLoading = false) }
+                    _event.send(PartnerExhibitionPaintingEffect.ShowError(result.error))
+                }
+                else -> {
+                    _state.update { it.copy(actionLoading = false) }
+                }
             }
         }
     }

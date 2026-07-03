@@ -1,10 +1,9 @@
 package com.prayatna.lookiesapp.presentation.registerEvent
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.model.painting.PaintingFilter
 import com.prayatna.lookiesapp.domain.repository.ArtistRepository
+import com.prayatna.lookiesapp.domain.usecase.event.GetRevenueRulesByEventIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.painting.GetArtistPaintingsUseCase
 import com.prayatna.lookiesapp.presentation.registerEvent.state.RegisterEventEvent
 import com.prayatna.lookiesapp.presentation.registerEvent.state.RegisterEventUiState
@@ -20,8 +19,9 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterEventViewModel @Inject constructor(
     private val artistRepository: ArtistRepository,
-    private val getArtistPaintingsUseCase: GetArtistPaintingsUseCase
-): ViewModel() {
+    private val getArtistPaintingsUseCase: GetArtistPaintingsUseCase,
+    private val getRevenueRulesByEventIdUseCase: GetRevenueRulesByEventIdUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow(RegisterEventUiState())
     val state: StateFlow<RegisterEventUiState> = _state.asStateFlow()
@@ -34,42 +34,64 @@ class RegisterEventViewModel @Inject constructor(
         when (event) {
             is RegisterEventEvent.SetEventId -> {
                 _state.update { it.copy(eventId = event.id) }
+                fetchRevenueRules(event.id)
             }
-            is RegisterEventEvent.SetFee -> {
-                _state.update { it.copy(fee = event.fee) }
-            }
-            is RegisterEventEvent.SetMerchantId -> {
-                _state.update { it.copy(merchantId = event.merchantId) }
-            }
-            is RegisterEventEvent.TogglePainting -> {
-                _state.update { currentState ->
-                    val newSelection = currentState.selectedIds.toMutableSet()
-
-                    if (newSelection.contains(event.id)) {
-                        newSelection.remove(event.id)
-                    } else {
-                        if (newSelection.size < currentState.maxLimit) {
-                            newSelection.add(event.id)
-                        }
-                    }
-                    currentState.copy(selectedIds = newSelection)
+            is RegisterEventEvent.SetFee -> _state.update { it.copy(fee = event.fee) }
+            is RegisterEventEvent.SetMerchantId -> _state.update { it.copy(merchantId = event.merchantId) }
+            is RegisterEventEvent.SetMaxLimit -> _state.update { it.copy(maxLimit = event.maxLimit) }
+            
+            RegisterEventEvent.NextStep -> {
+                if (_state.value.currentStep < 2) {
+                    _state.update { it.copy(currentStep = it.currentStep + 1) }
                 }
             }
-
-            is RegisterEventEvent.NextStep -> {
-                _state.update { it.copy(currentStep = 2) }
+            RegisterEventEvent.PrevStep -> {
+                if (_state.value.currentStep > 0) {
+                    _state.update { it.copy(currentStep = it.currentStep - 1) }
+                }
             }
-
-            is RegisterEventEvent.PrevStep -> {
-                _state.update { it.copy(currentStep = 1) }
+            is RegisterEventEvent.TogglePainting -> {
+                val currentSelected = _state.value.selectedIds.toMutableSet()
+                if (currentSelected.contains(event.id)) {
+                    currentSelected.remove(event.id)
+                } else {
+                    currentSelected.add(event.id)
+                }
+                _state.update { it.copy(selectedIds = currentSelected) }
+                calculateTotalSelectedPrice()
             }
-
-            is RegisterEventEvent.Submit -> {
-                submitRegistration()
+            RegisterEventEvent.Submit -> submitRegistration()
+            RegisterEventEvent.DismissError -> _state.update { it.copy(errorMessage = null) }
+            is RegisterEventEvent.SetProposedCommission -> {
+                _state.update { it.copy(proposedCommission = event.rate) }
             }
+        }
+    }
 
-            is RegisterEventEvent.DismissError -> {
-                _state.update { it.copy(errorMessage = null, isLoading = false) }
+    private fun calculateTotalSelectedPrice() {
+        val selectedIds = _state.value.selectedIds
+        val allPaintings = _state.value.allPaintings
+        val total = allPaintings.filter { it.id in selectedIds }.sumOf { it.price }
+        _state.update { it.copy(totalPaintingPrice = total) }
+    }
+
+    private fun fetchRevenueRules(eventId: Int) {
+        viewModelScope.launch {
+            _state.update { it.copy(isRevenueLoading = true) }
+            when (val result = getRevenueRulesByEventIdUseCase(eventId)) {
+                is DataResult.Success -> {
+                    _state.update { it.copy(
+                        revenueRules = result.data,
+                        isRevenueLoading = false
+                    ) }
+                }
+                is DataResult.Error -> {
+                    _state.update { it.copy(
+                        errorMessage = result.error,
+                        isRevenueLoading = false
+                    ) }
+                }
+                else -> _state.update { it.copy(isRevenueLoading = false) }
             }
         }
     }
@@ -77,61 +99,60 @@ class RegisterEventViewModel @Inject constructor(
     private fun fetchArtistPaintings() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-
-            val filter = PaintingFilter(
-                status = "available"
-            )
-
-            val result = getArtistPaintingsUseCase(filter = filter)
-
-            _state.update { currentState ->
-                when (result) {
-                    is DataResult.Success -> {
-                        currentState.copy(
-                            isLoading = false,
-                            allPaintings = result.data
-                        )
-                    }
-                    is DataResult.Error -> {
-                        currentState.copy(
-                            isLoading = false,
-                            errorMessage = result.error
-                        )
-                    }
-                    else -> {
-                        currentState.copy(isLoading = true)
-                    }
+            when (val result = getArtistPaintingsUseCase()) {
+                is DataResult.Success -> {
+                    _state.update { it.copy(
+                        allPaintings = result.data,
+                        isLoading = false
+                    ) }
+                    calculateTotalSelectedPrice()
                 }
+                is DataResult.Error -> {
+                    _state.update { it.copy(
+                        errorMessage = result.error,
+                        isLoading = false
+                    ) }
+                }
+                else -> _state.update { it.copy(isLoading = false) }
             }
         }
     }
 
     private fun submitRegistration() {
         val currentState = _state.value
+        if (currentState.selectedIds.isEmpty()) {
+            _state.update { it.copy(errorMessage = "Please select at least one painting") }
+            return
+        }
+        
+        if (currentState.selectedIds.size > currentState.maxLimit) {
+            _state.update { it.copy(errorMessage = "You can only select up to ${currentState.maxLimit} paintings") }
+            return
+        }
 
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMessage = null) }
-
-            val result = artistRepository.registerEvent(
+            _state.update { it.copy(isLoading = true) }
+            
+            when (val result = artistRepository.registerEvent(
                 eventId = currentState.eventId,
-                paintingIds = currentState.selectedIds.toList()
-            )
-
-            Log.d("RegisterEvent", currentState.eventId.toString())
-            Log.d("RegisterEvent", currentState.selectedIds.toString())
-
-            _state.update {
-                when (result) {
-                    is DataResult.Success -> {
-                        it.copy(isLoading = false, data = result.data, isSuccess = true, successMessage = result.data.message)
-                    }
-                    is DataResult.Error -> {
-                        it.copy(isLoading = false, errorMessage = result.error)
-                    }
-                    else -> {
-                        it.copy(isLoading = true)
-                    }
+                paintingIds = currentState.selectedIds.toList(),
+                commissionRate = currentState.proposedCommission.toDouble()
+            )) {
+                is DataResult.Success -> {
+                    _state.update { it.copy(
+                        isLoading = false,
+                        isSuccess = true,
+                        successMessage = "Registration submitted successfully",
+                        data = result.data
+                    ) }
                 }
+                is DataResult.Error -> {
+                    _state.update { it.copy(
+                        isLoading = false,
+                        errorMessage = result.error
+                    ) }
+                }
+                else -> _state.update { it.copy(isLoading = false) }
             }
         }
     }

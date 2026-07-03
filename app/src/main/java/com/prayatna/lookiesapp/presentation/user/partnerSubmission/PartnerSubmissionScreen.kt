@@ -2,6 +2,8 @@ package com.prayatna.lookiesapp.presentation.user.partnerSubmission
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.font.FontWeight
@@ -10,6 +12,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.payment.PayoutChannel
 import com.prayatna.lookiesapp.presentation.components.registerBusiness.PartnerSubmissionContent
 import com.prayatna.lookiesapp.presentation.components.registerBusiness.SuccessDialog
+import com.prayatna.lookiesapp.presentation.payment.selectPayoutChannel.navigateToSelectPayoutChannel
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionEvent
 import com.prayatna.lookiesapp.presentation.user.partnerSubmission.state.PartnerSubmissionUiState
 
@@ -24,13 +27,15 @@ fun PartnerSubmissionScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var payoutChannels by remember { mutableStateOf<List<PayoutChannel>>(emptyList()) }
+    var currentPickingType by remember { mutableStateOf<String?>(null) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
-            viewModel.onEvent(PartnerSubmissionEvent.KycFileSelected(it))
+            currentPickingType?.let { type ->
+                viewModel.onEvent(PartnerSubmissionEvent.KycFileSelected(type, it))
+            }
         }
     }
 
@@ -40,10 +45,19 @@ fun PartnerSubmissionScreen(
                 snackbarHostState.showSnackbar((uiState as PartnerSubmissionUiState.Error).message)
                 viewModel.onEvent(PartnerSubmissionEvent.DismissError)
             }
-            is PartnerSubmissionUiState.MetaLoaded -> {
-                payoutChannels = (uiState as PartnerSubmissionUiState.MetaLoaded).payoutChannels
-            }
             else -> Unit
+        }
+    }
+
+    val selectedCode = navController.currentBackStackEntry?.savedStateHandle?.get<String>("selected_payout_channel_code")
+    val selectedName = navController.currentBackStackEntry?.savedStateHandle?.get<String>("selected_payout_channel_name")
+
+    LaunchedEffect(selectedCode, selectedName) {
+        if (selectedCode != null && selectedName != null) {
+            viewModel.onEvent(PartnerSubmissionEvent.BankCodeChanged(selectedCode))
+            viewModel.onEvent(PartnerSubmissionEvent.BankNameChanged(selectedName))
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("selected_payout_channel_code")
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("selected_payout_channel_name")
         }
     }
 
@@ -51,6 +65,9 @@ fun PartnerSubmissionScreen(
         SuccessDialog(
             message = "Your partner application has been submitted. We'll review it and get back to you.",
             onConfirm = {
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("refresh", true)
                 navController.popBackStack()
             }
         )
@@ -59,13 +76,25 @@ fun PartnerSubmissionScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
                         text = "Partner Application",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
                 }
             )
         },
@@ -75,8 +104,13 @@ fun PartnerSubmissionScreen(
                 formState = formState,
                 isLoading = uiState is PartnerSubmissionUiState.Loading,
                 onEvent = viewModel::onEvent,
-                onPickFileClick = { launcher.launch("*/*") },
-                payoutChannels = payoutChannels
+                onPickFileClick = { type ->
+                    currentPickingType = type
+                    launcher.launch("*/*")
+                },
+                onSelectBankClick = {
+                    navController.navigateToSelectPayoutChannel()
+                }
             )
         }
     )

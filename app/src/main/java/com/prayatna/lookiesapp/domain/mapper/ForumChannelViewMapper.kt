@@ -8,5 +8,6 @@ fun ForumChannelViewDto.toDomain() = ForumChannelView(
     forumId = forumId,
     name = name,
     userId = userId,
-    role = role
+    role = role,
+    isReadOnlyForMembers = isReadOnlyForMembers
 )

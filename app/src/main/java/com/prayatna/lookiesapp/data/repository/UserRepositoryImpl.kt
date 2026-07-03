@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.repository
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import coil.network.HttpException
 import com.google.firebase.FirebaseException
 import com.google.firebase.messaging.FirebaseMessaging
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
@@ -13,16 +14,22 @@ import com.prayatna.lookiesapp.data.remote.dto.ProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.response.user.RoleApplicationResponse
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.merchant.AcceptPartnerInvitationResponse
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.user.ArtistApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.CreateUserAddressInput
 import com.prayatna.lookiesapp.domain.model.user.RoleApplicationInput
 import com.prayatna.lookiesapp.domain.model.user.UserAddress
 import com.prayatna.lookiesapp.domain.model.user.UserEmail
+import com.prayatna.lookiesapp.domain.model.user.UserNotification
 import com.prayatna.lookiesapp.domain.repository.UserRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.Helper
 import com.prayatna.lookiesapp.utils.compressImage
 import com.prayatna.lookiesapp.utils.extractSupabaseError
+import com.prayatna.lookiesapp.utils.getExtensionFromMimeType
+import com.prayatna.lookiesapp.utils.getMimeType
+import com.prayatna.lookiesapp.utils.readFileBytes
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
@@ -64,6 +71,11 @@ class UserRepositoryImpl @Inject constructor(
             val msg = extractSupabaseError(e.error)
             Log.e("UserRepositoryImpl", "updateFcmToken: $msg")
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -153,17 +165,28 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun registerBusiness(
         request: RoleApplicationInput,
-        kycFile: Uri,
-        fileName: String
+        kycFiles: List<Pair<String, Uri>>
     ): DataResult<RoleApplicationResponse> {
-        val compressedImage = kycFile.compressImage(context, 500_000L)
-            ?: return DataResult.Error("Image is not selected")
         return try {
+            val fileContents = kycFiles.map { (name, uri) ->
+                val mimeType = uri.getMimeType(context) ?: "application/octet-stream"
+                val extension = mimeType.getExtensionFromMimeType()
+                val content = if (mimeType.startsWith("image/")) {
+                    uri.compressImage(context, 500_000L)
+                } else {
+                    uri.readFileBytes(context)
+                } ?: return DataResult.Error("Failed to process file: $name")
+
+                val filename = "$name.$extension"
+
+                filename to content
+            }
+
             val result = supabaseUserService.registerBusiness(
                 request = request.toDto(),
-                kycFile = compressedImage,
-                fileName = fileName
+                kycFiles = fileContents
             )
+
             if (result.status == "success") {
                 DataResult.Success(result)
             } else {
@@ -203,12 +226,50 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun acceptPartnerInvitations(merchantAccountId: String): DataResult<AcceptPartnerInvitationResponse> {
+        return try {
+            val result = supabaseUserService.acceptPartnerInvitations(merchantAccountId)
+            Log.d("AcceptPartner", result.toString())
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            Log.e("AcceptPartner", e.toString())
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
+
+    override suspend fun rejectPartnerInvitations(merchantAccountId: String): DataResult<MerchantMember> {
+        return try {
+            val result = supabaseUserService.rejectPartnerInvitations(merchantAccountId)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        }
+    }
+
     override suspend fun getFcmToken(): String? {
         return try {
             Log.d("UserRepositoryImpl", "getFcmToken: ${FirebaseMessaging.getInstance().token.await()}")
             FirebaseMessaging.getInstance().token.await()
         } catch (e: FirebaseException) {
             e.message ?: "Something went wrong! Please check your connection"
+        }
+    }
+
+    override suspend fun getNotifications(): DataResult<List<UserNotification>> {
+        return try {
+            val result = supabaseUserService.getNotifications()
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val msg = extractSupabaseError(e.error)
+            DataResult.Error(msg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }
 
@@ -219,6 +280,11 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -229,6 +295,19 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
+    }
+
+    override suspend fun setDarkMode(isDarkMode: Boolean) {
+        userPreference.setDarkMode(isDarkMode)
+    }
+
+    override fun isDarkMode(): Flow<Boolean> {
+        return userPreference.darkModePreference
     }
 }

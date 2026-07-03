@@ -128,7 +128,9 @@ class SupabaseEventService @Inject constructor(
         startDate: String? = null,
         endDate: String? = null,
         limitCount: Long? = null,
-        isTicketPriceAscending: Boolean = true
+        isTicketPriceAscending: Boolean = true,
+        eventType: String? = null,
+        eventFormat: String? = null
     ): List<EventDto> {
 
         val query = postgrest
@@ -142,7 +144,7 @@ class SupabaseEventService @Inject constructor(
                         ilike("title", "%$title%")
                     }
                     if (organizerId != null) {
-                        eq("organizer_id", organizerId)
+                        eq("organizer->>id", organizerId)
                     }
                     if (status != null) {
                         val statuses = status.split(",").map { it.trim() }
@@ -157,6 +159,12 @@ class SupabaseEventService @Inject constructor(
                     if (endDate != null) {
                         lte("end_date", endDate)
                     }
+                    if (eventType != null) {
+                        eq("event_type->>name", eventType)
+                    }
+                    if (eventFormat != null) {
+                        eq("event_format->>name", eventFormat)
+                    }
                 }
                 order("ticket_price", if (isTicketPriceAscending) Order.ASCENDING else Order.DESCENDING)
             }
@@ -166,7 +174,7 @@ class SupabaseEventService @Inject constructor(
 
 
     suspend fun getDetailEvent(id: String): EventDto {
-        val event = postgrest.from("events_view").select {
+        val event = postgrest.from("v2_event_view").select {
             filter {
                 eq("id", id)
             }
@@ -174,6 +182,14 @@ class SupabaseEventService @Inject constructor(
 
         Log.d("getDetailEvent", event.toString())
         return event
+    }
+
+    suspend fun deleteEvent(eventId: String) {
+        postgrest.from("events").delete {
+            filter {
+                eq("id", eventId)
+            }
+        }
     }
 
     suspend fun getEventPaintings(eventId: String, status: String? = null): List<EventPaintingDto> {

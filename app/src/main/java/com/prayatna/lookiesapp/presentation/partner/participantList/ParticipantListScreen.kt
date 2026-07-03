@@ -75,7 +75,7 @@ fun ParticipantListScreen(
 
                 state.errorMessage != null -> {
                     Text(
-                        text = state.errorMessage ?: "Terjadi kesalahan",
+                        text = state.errorMessage ?: "Something went wrong",
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -86,7 +86,7 @@ fun ParticipantListScreen(
 
                 state.participants.isEmpty() -> {
                     Text(
-                        text = "Belum ada seniman yang mendaftar di event ini.",
+                        text = "No one registered",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,

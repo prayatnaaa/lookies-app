@@ -41,7 +41,6 @@ fun EventOriginCard(
     Card(
         onClick = onClick,
         colors = CardDefaults.cardColors(
-            // Warna sedikit transparan agar menyatu
             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
         ),
         shape = RoundedCornerShape(16.dp),
@@ -95,7 +94,7 @@ fun EventOriginCard(
                     Icon(
                         imageVector = Icons.Outlined.Timer,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
+                        tint = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
@@ -109,7 +108,7 @@ fun EventOriginCard(
                             text = formatDate(endDate),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 }

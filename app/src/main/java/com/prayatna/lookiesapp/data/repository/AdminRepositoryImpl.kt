@@ -1,8 +1,12 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
+import coil.network.HttpException
+import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAdminService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.admin.AdminTransaction
+import com.prayatna.lookiesapp.domain.model.admin.AdminTransactionDetail
 import com.prayatna.lookiesapp.domain.model.admin.DecideEventResult
 import com.prayatna.lookiesapp.domain.model.admin.DecidePartnerApplicationResult
 import com.prayatna.lookiesapp.domain.model.admin.GetKycDocument
@@ -28,6 +32,11 @@ class AdminRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -45,6 +54,11 @@ class AdminRepositoryImpl @Inject constructor(
             val msg = extractSupabaseError(e.error)
             Log.d("Approve Event", e.message.toString())
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -56,6 +70,11 @@ class AdminRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -66,6 +85,11 @@ class AdminRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -77,6 +101,11 @@ class AdminRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -92,6 +121,65 @@ class AdminRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getTransactionList(
+        limit: Int,
+        offset: Int,
+        status: String?
+    ): DataResult<List<AdminTransaction>> {
+        return try {
+            val res = supabaseAdminService.getTransactionList(
+                limit = limit,
+                offset = offset,
+                status = status
+            )
+            DataResult.Success(res.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getTransactionDetail(orderId: String): DataResult<AdminTransactionDetail> {
+        return try {
+            val res = supabaseAdminService.getTransactionDetail(orderId)
+            DataResult.Success(res.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getPrivateFileUrl(filePath: String): DataResult<String> {
+        return try {
+            val res = supabaseAdminService.getPrivateFileUrl(filePath)
+            if (res != null) {
+                DataResult.Success(res)
+            } else {
+                DataResult.Error("Failed to get private file URL")
+            }
+        } catch (e: RestException) {
+            DataResult.Error(e.message ?: "Something went wrong")
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 }

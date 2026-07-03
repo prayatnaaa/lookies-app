@@ -47,37 +47,33 @@ class HomeViewModel @Inject constructor(
         if (!forceRefresh && _uiState.value.events.isNotEmpty()) return
 
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    isLoadingEvents = true,
-                    errorMessage = null
-                )
-            }
-
-            when (val result = getEventsUseCase(
+            getEventsUseCase(
                 limitCount = 5,
-                status = "published, upcoming"
-            )) {
-                is DataResult.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoadingEvents = false,
-                            events = result.data
-                        )
+                status = "published, upcoming, ongoing"
+            ).collect { result ->
+                when (result) {
+                    is DataResult.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoadingEvents = false,
+                                events = result.data
+                            )
+                        }
                     }
-                }
 
-                is DataResult.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoadingEvents = false,
-                            errorMessage = result.error
-                        )
+                    is DataResult.Error -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoadingEvents = false,
+                                errorMessage = result.error
+                            )
+                        }
                     }
-                }
 
-                else -> {
-                    _uiState.update { it.copy(isLoadingEvents = false) }
+                    is DataResult.Loading -> {
+                        _uiState.update { it.copy(isLoadingEvents = true) }
+                    }
+                    else -> Unit
                 }
             }
         }
@@ -94,7 +90,7 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            when (val result = getPaintingsUseCase(status = "on_sale", limitCount = 5)) {
+            when (val result = getPaintingsUseCase(status = "on_sale, sold", limitCount = 5)) {
                 is DataResult.Success -> {
                     _uiState.update {
                         it.copy(
@@ -121,7 +117,18 @@ class HomeViewModel @Inject constructor(
     }
 
     fun refreshHome() {
-        loadEvents(forceRefresh = true)
-        loadPaintings(forceRefresh = true)
+        viewModelScope.launch {
+
+            _uiState.update {
+                it.copy(isRefreshing = true)
+            }
+
+            loadEvents(forceRefresh = true)
+            loadPaintings(forceRefresh = true)
+
+            _uiState.update {
+                it.copy(isRefreshing = false)
+            }
+        }
     }
 }

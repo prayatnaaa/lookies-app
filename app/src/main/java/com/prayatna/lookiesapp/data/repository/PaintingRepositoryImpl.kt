@@ -3,6 +3,7 @@ package com.prayatna.lookiesapp.data.repository
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabasePaintingService
 import com.prayatna.lookiesapp.domain.mapper.toDomain
@@ -49,6 +50,11 @@ class PaintingRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             Log.e("PaintingService", e.message.toString())
             DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -68,7 +74,10 @@ class PaintingRepositoryImpl @Inject constructor(
             val response = paintingService.getPaintingByArtistId(id, status)
             Log.d("PaintingRepository", response.toString())
             DataResult.Success(response.map { it.toDomain() })
-        } catch (e: Exception) {
+        } catch (e: RestException) {
+            val eMsg = extractSupabaseError(e.error)
+            DataResult.Error(eMsg)
+        }catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
         }
     }
@@ -81,6 +90,11 @@ class PaintingRepositoryImpl @Inject constructor(
             }
         } catch (e: RestException) {
             DataResult.Error(e.message ?: "Something went wrong")
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -89,6 +103,9 @@ class PaintingRepositoryImpl @Inject constructor(
         return try {
             val response = paintingService.uploadPainting(painting = painting.toDto(), image = compressedImage)
             DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            val eMsg = extractSupabaseError(e.error)
+            DataResult.Error(eMsg)
         } catch (e: Exception) {
             Log.d("UPLOAD-PAINTING", e.message.toString())
             DataResult.Error(e.message ?: "Something went wrong! Please check your connection")
@@ -101,6 +118,11 @@ class PaintingRepositoryImpl @Inject constructor(
             DataResult.Success(response)
         } catch (e: RestException) {
             DataResult.Error(e.message ?: "Something went wrong!")
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -129,6 +151,11 @@ class PaintingRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.message ?: "Something went wrong!")
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -138,6 +165,11 @@ class PaintingRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.message ?: "Something went wrong!")
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -159,6 +191,17 @@ class PaintingRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong!")
+        }
+    }
+
+    override suspend fun getPaintingReviewByEventPaintingId(eventPaintingId: String): DataResult<PaintingReview?> {
+        return try {
+            val response = paintingService.getPaintingReviewByEventPaintingId(eventPaintingId)
+            DataResult.Success(response?.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong!")
         }

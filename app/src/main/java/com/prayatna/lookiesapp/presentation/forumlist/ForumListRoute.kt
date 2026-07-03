@@ -19,7 +19,7 @@ fun ForumListRoute(
         onEvent = { event ->
             when (event) {
                 is ForumListEvent.OnForumClick -> {
-                    navController.navigate("${NavigationRoutes.FORUM_CHANNEL_LIST}/${event.forumId}")
+                    navController.navigate("${NavigationRoutes.FORUM_CHANNEL_LIST}/${event.forumId}/${event.role}")
                 }
                 else -> viewModel.onEvent(event)
             }

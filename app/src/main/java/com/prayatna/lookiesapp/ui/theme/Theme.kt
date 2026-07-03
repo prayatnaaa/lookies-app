@@ -21,10 +21,10 @@ private val DarkColorScheme = darkColorScheme(
     secondaryContainer = DarkGrey,
     onSecondaryContainer = PureWhite,
 
-    tertiary = MaroonLight,
+    tertiary = Gold,
     onTertiary = AmoledBlack,
-    tertiaryContainer = Maroon.copy(alpha = 0.3f),
-    onTertiaryContainer = MaroonContainer,
+    tertiaryContainer = Gold.copy(alpha = 0.2f),
+    onTertiaryContainer = PureWhite,
 
     background = AmoledBlack,
     onBackground = PureWhite,
@@ -53,10 +53,10 @@ private val LightColorScheme = lightColorScheme(
     secondaryContainer = SoftWhite,
     onSecondaryContainer = BlackText,
 
-    tertiary = Maroon,
-    onTertiary = PureWhite,
-    tertiaryContainer = MaroonContainer,
-    onTertiaryContainer = OnMaroonContainer,
+    tertiary = Gold,
+    onTertiary = AmoledBlack,
+    tertiaryContainer = GoldContainer,
+    onTertiaryContainer = PureWhite,
 
     background = OffWhite,
     onBackground = BlackText,

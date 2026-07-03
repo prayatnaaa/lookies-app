@@ -4,6 +4,8 @@ import com.prayatna.lookiesapp.domain.model.message.ForumsView
 
 data class ForumListUiState(
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     val forums: List<ForumsView> = emptyList(),
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val searchQuery: String = ""
 )

@@ -32,4 +32,13 @@ data class MerchantProfileDto(
 
     @SerialName("merchant_type")
     val merchantType: String,
+
+    @SerialName("email")
+    val email: String? = null,
+
+    @SerialName("phone_number")
+    val phoneNumber: String? = null,
+
+    @SerialName("website_url")
+    val websiteUrl: String? = null
 )

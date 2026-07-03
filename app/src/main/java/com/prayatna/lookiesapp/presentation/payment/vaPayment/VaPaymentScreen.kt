@@ -45,8 +45,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.partner.orderDetail.navigateToPartnerOrderDetail
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.NavigationRoutes
+import com.prayatna.lookiesapp.utils.NavigationRoutes.VA_PAYMENT
 import com.prayatna.lookiesapp.utils.formatRupiah
 import kotlinx.coroutines.delay
 import java.time.Instant
@@ -59,6 +61,7 @@ fun VaPaymentScreen(
     amount: Long,
     bankCode: String,
     customerName: String,
+    isOfflinePurchase: Boolean = false,
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -89,13 +92,22 @@ fun VaPaymentScreen(
 
     LaunchedEffect(uiState.isPaid) {
         if (uiState.isPaid) {
-            showSuccessDialog = true
-            delay(1000)
-            navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
-                popUpTo("${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}") {
-                    inclusive = true
+//            showSuccessDialog = true
+//            delay(1000)
+            if (isOfflinePurchase) {
+                navController.navigate("${NavigationRoutes.PARTNER_ORDER_DETAIL}/$orderId") {
+                    popUpTo("${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}?isOfflinePurchase={isOfflinePurchase}") {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
                 }
-                launchSingleTop = true
+            } else {
+                navController.navigate("${NavigationRoutes.DETAIL_TRANSACTION}/$orderId") {
+                    popUpTo("${NavigationRoutes.VA_PAYMENT}/{orderId}/{merchantId}/{amount}/{bankCode}/{customerName}?isOfflinePurchase={isOfflinePurchase}") {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
             }
         }
     }
@@ -321,7 +333,7 @@ fun VaPaymentScreen(
  */
 @Composable
 fun VaCountdownTimer(expiresAt: String) {
-    // Parse expiry epoch seconds once — remember so it never re-parses on recompose
+    // Parse expiry epoch seconds once — remember so it never reparses on recompose
     val expiryEpochSeconds = remember(expiresAt) {
         runCatching { Instant.parse(expiresAt).epochSecond }.getOrDefault(0L)
     }

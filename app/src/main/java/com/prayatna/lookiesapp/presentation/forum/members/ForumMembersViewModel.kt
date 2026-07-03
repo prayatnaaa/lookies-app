@@ -34,7 +34,9 @@ class ForumMembersViewModel @Inject constructor(
     fun onEvent(event: ForumMembersUiEvent) {
         when (event) {
             is ForumMembersUiEvent.LoadMembers -> {
-                loadMembers(event.forumId)
+                if (_uiState.value.members.isEmpty()) {
+                    loadMembers(event.forumId)
+                }
             }
         }
     }

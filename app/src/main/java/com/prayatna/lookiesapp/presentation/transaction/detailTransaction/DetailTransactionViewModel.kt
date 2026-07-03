@@ -3,12 +3,16 @@ package com.prayatna.lookiesapp.presentation.transaction.detailTransaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteInput
+import com.prayatna.lookiesapp.domain.usecase.painting.GetPaintingReviewByEventPaintingIdUseCase
+import com.prayatna.lookiesapp.domain.usecase.refund.GetRefundsByOrderIdUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailPaintingOrderUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetDetailTransactionUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.SetOrderToCompleteUseCase
 import com.prayatna.lookiesapp.presentation.transaction.detailTransaction.state.DetailTransactionUiState
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +24,9 @@ import javax.inject.Inject
 class DetailTransactionViewModel @Inject constructor(
     private val getDetailTransactionUseCase: GetDetailTransactionUseCase,
     private val getDetailPaintingOrderUseCase: GetDetailPaintingOrderUseCase,
-    private val setOrderToCompleteUseCase: SetOrderToCompleteUseCase
+    private val setOrderToCompleteUseCase: SetOrderToCompleteUseCase,
+    private val getRefundsByOrderIdUseCase: GetRefundsByOrderIdUseCase,
+    private val getPaintingReviewByEventPaintingIdUseCase: GetPaintingReviewByEventPaintingIdUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(DetailTransactionUiState())
@@ -30,40 +36,58 @@ class DetailTransactionViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            when(val result = getDetailTransactionUseCase(orderId)) {
-                is DataResult.Error -> {
+            coroutineScope {
+                val detailDeferred = async { getDetailTransactionUseCase(orderId) }
+                val refundDeferred = async { getRefundsByOrderIdUseCase(orderId) }
+
+                val detailResult = detailDeferred.await()
+                val refundResult = refundDeferred.await()
+
+                if (detailResult is DataResult.Error) {
                     _uiState.update {
                         it.copy(
-                            errorMessage = result.error,
+                            errorMessage = detailResult.error,
                             isLoading = false
                         )
                     }
+                    return@coroutineScope
                 }
-                is DataResult.Success -> {
-                    val detailTx = result.data
-                    val isPainting = detailTx.transaction.items.any { it.itemType == "painting" }
+
+                if (detailResult is DataResult.Success) {
+                    val detailTx = detailResult.data
+                    val paintingItem = detailTx.transaction.items.find { it.itemType == "painting" }
                     
-                    if (isPainting) {
-                        when (val paintingResult = getDetailPaintingOrderUseCase(orderId)) {
-                            is DataResult.Success -> {
-                                _uiState.update {
-                                    it.copy(
-                                        errorMessage = null,
-                                        isLoading = false,
-                                        data = detailTx,
-                                        shipment = paintingResult.data.shipment
-                                    )
-                                }
+                    val existingRefundId = if (refundResult is DataResult.Success) {
+                        refundResult.data.firstOrNull()?.id
+                    } else null
+
+                    if (paintingItem != null) {
+                        val paintingOrderDeferred = async { getDetailPaintingOrderUseCase(orderId) }
+                        val reviewDeferred = async { getPaintingReviewByEventPaintingIdUseCase(paintingItem.itemRefId) }
+
+                        val paintingResult = paintingOrderDeferred.await()
+                        val reviewResult = reviewDeferred.await()
+
+                        if (paintingResult is DataResult.Success) {
+                            val review = if (reviewResult is DataResult.Success) reviewResult.data else null
+                            _uiState.update {
+                                it.copy(
+                                    errorMessage = null,
+                                    isLoading = false,
+                                    data = detailTx,
+                                    shipment = paintingResult.data.shipment,
+                                    existingRefundId = existingRefundId,
+                                    paintingReview = review
+                                )
                             }
-                            is DataResult.Error -> {
-                                _uiState.update {
-                                    it.copy(
-                                        errorMessage = paintingResult.error,
-                                        isLoading = false
-                                    )
-                                }
+                        } else if (paintingResult is DataResult.Error) {
+                            _uiState.update {
+                                it.copy(
+                                    errorMessage = paintingResult.error,
+                                    isLoading = false,
+                                    existingRefundId = existingRefundId
+                                )
                             }
-                            else -> Unit
                         }
                     } else {
                         _uiState.update {
@@ -71,14 +95,13 @@ class DetailTransactionViewModel @Inject constructor(
                                 errorMessage = null,
                                 isLoading = false,
                                 data = detailTx,
-                                shipment = null
+                                shipment = null,
+                                existingRefundId = existingRefundId
                             )
                         }
                     }
                 }
-                else -> Unit
             }
-
         }
     }
 

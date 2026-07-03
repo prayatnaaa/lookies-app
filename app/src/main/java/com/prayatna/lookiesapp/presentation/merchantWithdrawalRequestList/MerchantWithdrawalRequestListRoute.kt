@@ -8,9 +8,10 @@ import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.navigateToCreateWithdrawalRequest
+import com.prayatna.lookiesapp.presentation.merchant.createWithdrawalRequest.navigateToWithdrawalConfirmation
 import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.state.MerchantWithdrawalRequestListEffect
 import com.prayatna.lookiesapp.presentation.merchantWithdrawalRequestList.state.MerchantWithdrawalRequestListEvent
-import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
 fun MerchantWithdrawalRequestListRoute(
@@ -21,6 +22,10 @@ fun MerchantWithdrawalRequestListRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+
+    LaunchedEffect(Unit) {
+        viewModel.getMerchantWithdrawalRequest()
+    }
 
     LaunchedEffect(savedStateHandle) {
         savedStateHandle
@@ -50,10 +55,12 @@ fun MerchantWithdrawalRequestListRoute(
                 }
                 is MerchantWithdrawalRequestListEffect.NavigateToDetail -> {
                     // Navigate to detail if implemented
+                    navController.navigateToWithdrawalConfirmation(effect.id)
                 }
 
                 is MerchantWithdrawalRequestListEffect.NavigateCreateWithdrawal -> {
-                    navController.navigate("${NavigationRoutes.CREATE_WITHDRAWAL_REQUEST}/${effect.id}")
+//                    navController.navigate("${NavigationRoutes.CREATE_WITHDRAWAL_REQUEST}/${effect.id}")
+                    navController.navigateToCreateWithdrawalRequest(effect.id)
                 }
 
                 is MerchantWithdrawalRequestListEffect.ShowSnackbar -> {

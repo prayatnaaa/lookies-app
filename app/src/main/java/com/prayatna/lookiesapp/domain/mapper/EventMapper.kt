@@ -29,6 +29,9 @@ fun EventDto.toDomain() : Event {
         remainingPaintingQuota = remainingPaintingQuota,
         rejectionReason = rejectionReason,
         approvedAt = approvedAt,
-        approvedBy = approvedBy
+        approvedBy = approvedBy,
+        paintingSubmissionDeadline = paintingSubmissionDeadline,
+        artistRegistrationEndDate = artistRegistrationEndDate,
+        artistRegistrationStartDate = artistRegistrationStartDate
     )
 }

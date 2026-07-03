@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AspectRatio
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.domain.model.painting.DetailPainting
+import com.prayatna.lookiesapp.utils.formatRupiah
 
 @Composable
 fun DetailPaintingSection(
@@ -113,14 +113,6 @@ fun DetailPaintingSection(
             Column(modifier = Modifier.padding(16.dp)) {
 
                 InfoRowItem(
-                    icon = Icons.Default.Person,
-                    label = "Created by",
-                    value = painting.artistName ?: "Unknown Artist"
-                )
-
-                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.4f))
-
-                InfoRowItem(
                     icon = Icons.Default.CalendarToday,
                     label = "Year Created",
                     value = painting.yearCreated.toString()
@@ -135,6 +127,15 @@ fun DetailPaintingSection(
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.4f))
+
+                InfoRowItem(
+                    icon = Icons.Default.CalendarToday,
+                    label = "Price",
+                    value = formatRupiah(painting.price)
+                )
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.4f))
+
 
                 val styleInfo = listOfNotNull(painting.mediumName, painting.artStyleName).joinToString(", ")
                 InfoRowItem(

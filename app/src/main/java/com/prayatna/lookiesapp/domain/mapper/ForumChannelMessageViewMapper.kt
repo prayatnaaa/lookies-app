@@ -12,5 +12,7 @@ fun ForumChannelMessagesViewDto.toDomain() =
         email = email,
         createdAt = createdAt,
         fullName = fullName,
-        profilePictureUrl = profilePictureUrl
+        profilePictureUrl = profilePictureUrl,
+        isPinned = isPinned,
+        editedAt = editedAt
     )

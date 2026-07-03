@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.event.detailevent
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.prayatna.lookiesapp.domain.usecase.admin.ApproveEventUseCase
@@ -59,6 +60,17 @@ class DetailEventViewModel @Inject constructor(
         _quantityValue.value = value
     }
 
+    fun onChatMerchantClicked(merchantId: String, merchantName: String) {
+        viewModelScope.launch {
+            _uiEvent.emit(
+                DetailEventUiEvent.NavigateToChat(
+                    merchantId = merchantId,
+                    merchantName = merchantName
+                )
+            )
+        }
+    }
+
     fun getEventPaintings(eventId: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, eventPaintingsError = null) }
@@ -66,11 +78,12 @@ class DetailEventViewModel @Inject constructor(
             when (
                 val result = getPaintingUseCase(
                     eventId = eventId,
-                    status = "on_sale",
+                    status = "on_sale, sold",
                     showSelfPaintings = true
                 )
             ) {
                 is DataResult.Success -> {
+                    Log.d("Detail-Event", result.data.toString())
                     _state.update {
                         it.copy(
                             paintings = result.data,
@@ -103,31 +116,29 @@ class DetailEventViewModel @Inject constructor(
         if (!forceRefresh && _state.value.info != null) return
 
         viewModelScope.launch {
-            _state.value = DetailEventUiState(isLoading = true)
-
-            when (val result = getDetailEventUseCase(eventId)) {
-                is DataResult.Error -> {
-                    _state.update {
-                        it.copy(
-                            detailEventError = result.error,
-                            isLoading = false
-                        )
+            getDetailEventUseCase(eventId).collect { result ->
+                when (result) {
+                    is DataResult.Error -> {
+                        _state.update {
+                            it.copy(
+                                detailEventError = result.error,
+                                isLoading = false
+                            )
+                        }
                     }
-                }
-                is DataResult.Loading -> {
-                    _state.update { it.copy(isLoading = true) }
-                }
-                is DataResult.Success -> {
-                   _state.update {
-                       it.copy(
-                           info = result.data,
-                           isLoading = false,
-                           detailEventError = null
-                       )
-                   }
-                }
-                else -> {
-                    _state.update { it.copy(isLoading = true) }
+                    is DataResult.Loading -> {
+                        _state.update { it.copy(isLoading = true) }
+                    }
+                    is DataResult.Success -> {
+                       _state.update {
+                           it.copy(
+                               info = result.data,
+                               isLoading = false,
+                               detailEventError = null
+                           )
+                       }
+                    }
+                    else -> Unit
                 }
             }
         }

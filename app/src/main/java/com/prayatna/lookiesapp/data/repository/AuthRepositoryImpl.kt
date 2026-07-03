@@ -1,6 +1,7 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.local.datastore.UserPreference
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseAuthService
@@ -16,11 +17,13 @@ import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.SessionStatus
+import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val auth: Auth,
+    private val postgrest: Postgrest,
     private val supabaseAuthService: SupabaseAuthService,
     private val userPreference: UserPreference
 ): AuthRepository {
@@ -51,7 +54,7 @@ class AuthRepositoryImpl @Inject constructor(
             DataResult.Error(msg)
         } catch (e: HttpRequestException) {
             DataResult.Error(e.message ?: "Network error")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DataResult.Error("Something went wrong! Please check your connection")
         }
     }
@@ -67,6 +70,11 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val msg = extractSupabaseError(e.error)
             DataResult.Error(msg)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -81,7 +89,7 @@ class AuthRepositoryImpl @Inject constructor(
             return try {
                 auth.refreshCurrentSession()
                 DataResult.Success(true)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 userPreference.logout()
                 DataResult.Success(false)
             }
@@ -95,6 +103,15 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun logout(): DataResult<Any> {
         return try {
+            val userId = auth.currentSessionOrNull()?.user?.id ?: DataResult.Error("Something went wrong!")
+            postgrest["user_profiles"]
+                .update({
+                    set("fcm_token", "")
+                }) {
+                    filter {
+                        eq("user_id", userId)
+                    }
+                }
             auth.signOut()
             userPreference.logout()
             DataResult.Success(Any())
@@ -103,7 +120,7 @@ class AuthRepositoryImpl @Inject constructor(
             DataResult.Error(msg)
         } catch (e: HttpRequestException) {
             DataResult.Error(e.message ?: "Network error")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DataResult.Error("Something went wrong! Please check your connection")
         }
     }
@@ -112,10 +129,13 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val response = supabaseAuthService.getRole()
             response
-        } catch (e: Exception) {
-            e.message.toString()
         } catch (e: RestException) {
             e.message.toString()
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            errorMsg
+        } catch (e: Exception) {
+            e.message ?: "Something went wrong"
         }
     }
 }

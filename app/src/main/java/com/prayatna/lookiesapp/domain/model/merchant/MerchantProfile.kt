@@ -9,5 +9,8 @@ data class MerchantProfile(
     val tradingName: String? = null,
     val pictureUrl: String? = null,
     val description: String? = null,
-    val merchantType: String
+    val merchantType: String,
+    val email: String? = null,
+    val phoneNumber: String? = null,
+    val websiteUrl: String? = null
 )

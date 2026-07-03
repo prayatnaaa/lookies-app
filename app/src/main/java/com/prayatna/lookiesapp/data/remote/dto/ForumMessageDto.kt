@@ -12,5 +12,9 @@ data class ForumMessageDto(
     val senderId: String,
     val content: String,
     @SerialName("created_at")
-    val createdAt: String
+    val createdAt: String,
+    @SerialName("is_pinned")
+    val isPinned: Boolean = false,
+    @SerialName("edited_at")
+    val editedAt: String?
 )

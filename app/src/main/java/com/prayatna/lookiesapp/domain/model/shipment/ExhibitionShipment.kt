@@ -28,7 +28,7 @@ enum class ShipmentType {
 }
 
 enum class DeliveryMethod {
-    SELF_DROP_OFF,
+    SELF_DROPOFF,
     COURIER,
     ARTIST_PICKUP
 }

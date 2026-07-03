@@ -3,7 +3,7 @@ package com.prayatna.lookiesapp.domain.model.transaction
 data class Transaction(
     val id: String,
     val merchantId: String,
-    val buyerId: String,
+    val buyerId: String? = null,
     val totalAmount: Double,
     val currency: String,
     val status: String,
@@ -16,5 +16,6 @@ data class PaymentInfo(
     val paymentId: String? = null,
     val invoiceId: String? = null,
     val status: String? = null,
-    val provider: String? = null
+    val provider: String? = null,
+    val channel: String? = null
 )

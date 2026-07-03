@@ -21,11 +21,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
-import com.prayatna.lookiesapp.presentation.components.CustomDialog
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.components.registerEvent.BottomActionBar
 import com.prayatna.lookiesapp.presentation.components.registerEvent.ConfirmPaintingsContent
 import com.prayatna.lookiesapp.presentation.components.registerEvent.SelectPaintingContent
+import com.prayatna.lookiesapp.presentation.components.registerEvent.terms.RegistrationTermsContent
 import com.prayatna.lookiesapp.presentation.registerEvent.state.RegisterEventEvent
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
@@ -42,10 +42,11 @@ fun RegisterEventScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val onEvent = viewModel::onEvent
 
-    LaunchedEffect(eventId) {
+    LaunchedEffect(eventId, fee, merchantId, maxPaintingPerArtist) {
         viewModel.onEvent(RegisterEventEvent.SetEventId(eventId))
         viewModel.onEvent(RegisterEventEvent.SetFee(fee))
         viewModel.onEvent(RegisterEventEvent.SetMerchantId(merchantId))
+        viewModel.onEvent(RegisterEventEvent.SetMaxLimit(maxPaintingPerArtist))
     }
 
     if (state.isSuccess) {
@@ -56,7 +57,11 @@ fun RegisterEventScreen(
                 onConfirm = {
                     navController.navigate(
                         "${NavigationRoutes.CHECKOUT}/event_registration/${state.data?.data?.orderId}/1"
-                    )
+                    ) {
+                        popUpTo(navController.currentBackStackEntry?.destination?.route ?: "") {
+                            inclusive = true
+                        }
+                    }
                 },
                 onDismiss = {
                     navController.popBackStack()
@@ -65,7 +70,7 @@ fun RegisterEventScreen(
         }
     } else {
         state.errorMessage?.let { message ->
-            CustomDialog(
+            CustomBottomSheet(
                 title = "Error",
                 message = message,
                 onConfirm = {
@@ -80,18 +85,30 @@ fun RegisterEventScreen(
 
     Scaffold(
         topBar = {
+            val title = when(state.currentStep) {
+                0 -> "Terms & Conditions"
+                1 -> "Step 1: Select painting"
+                else -> "Step 2: Review & Submit"
+            }
+            val progress = when(state.currentStep) {
+                0 -> 0.33f
+                1 -> 0.66f
+                else -> 1f
+            }
             Column(Modifier.padding(16.dp).statusBarsPadding()) {
                 Text(
-                    text = if (state.currentStep == 1) "Step 1: Select painting" else "Step 2: Review & Submit",
+                    text = title,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = "Event Quota: ${state.selectedIds.size} / $maxPaintingPerArtist",
-                    color = if (state.selectedIds.size > maxPaintingPerArtist) Color.Red else Color.Gray
-                )
+                if (state.currentStep > 0) {
+                    Text(
+                        text = "Event Quota: ${state.selectedIds.size} / $maxPaintingPerArtist",
+                        color = if (state.selectedIds.size > maxPaintingPerArtist) Color.Red else Color.Gray
+                    )
+                }
                 LinearProgressIndicator(
-                    progress = { if (state.currentStep == 1) 0.5f else 1f },
+                    progress = { progress },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
             }
@@ -106,13 +123,13 @@ fun RegisterEventScreen(
         Box(modifier = Modifier
             .padding(padding)
             .fillMaxSize()) {
-            if (state.isLoading) {
+            if (state.isLoading || state.isRevenueLoading) {
                 CircularLoading()
             }
-            if (state.currentStep == 1) {
-                SelectPaintingContent(state, onEvent)
-            } else {
-                ConfirmPaintingsContent(state, onEvent, fee)
+            when (state.currentStep) {
+                0 -> RegistrationTermsContent(state)
+                1 -> SelectPaintingContent(state, onEvent)
+                2 -> ConfirmPaintingsContent(state, onEvent, fee)
             }
         }
     }

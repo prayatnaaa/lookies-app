@@ -2,15 +2,22 @@ package com.prayatna.lookiesapp.data.repository
 
 import android.content.Context
 import android.net.Uri
+import coil.network.HttpException
+import com.prayatna.lookiesapp.data.mapper.toDomain
+import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseMerchantService
 import com.prayatna.lookiesapp.domain.mapper.toData
 import com.prayatna.lookiesapp.domain.mapper.toDomain
+import com.prayatna.lookiesapp.domain.model.merchant.EditMerchantBankAccountInput
+import com.prayatna.lookiesapp.domain.model.merchant.EditMerchantInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberInput
 import com.prayatna.lookiesapp.domain.model.merchant.InviteMerchantMemberOutput
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBankAccount
+import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantMember
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantProfile
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.user.BusinessAddress
 import com.prayatna.lookiesapp.domain.repository.MerchantRepository
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.compressImage
@@ -20,7 +27,6 @@ import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import javax.inject.Inject
-import kotlin.collections.map
 
 class MerchantRepositoryImpl @Inject constructor(
     private val supabaseMerchantService: SupabaseMerchantService,
@@ -36,6 +42,36 @@ class MerchantRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getMerchantAddress(merchantBusinessId: String): DataResult<BusinessAddress> {
+        return try {
+            val response = supabaseMerchantService.getMerchantAddress(merchantBusinessId)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getPublicMerchantProfile(businessId: String): DataResult<MerchantBusiness> {
+        return try {
+            val response = supabaseMerchantService.getPublicMerchantProfile(businessId)
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
     override suspend fun getMerchantMembersByMerchantId(merchantBusinessId: String): DataResult<List<MerchantMember>> {
         return try {
             val res = supabaseMerchantService.getMerchantMembersByMerchantId(merchantBusinessId)
@@ -43,6 +79,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -53,6 +94,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -63,6 +109,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -73,6 +124,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -83,6 +139,11 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -93,12 +154,21 @@ class MerchantRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
-    override suspend fun getShipmentsByMerchantId(merchantId: String, status: String?): DataResult<List<Shipment>> {
+    override suspend fun getShipmentsByMerchantId(
+        merchantId: String,
+        status: String?,
+        trackingNumber: String?
+    ): DataResult<List<Shipment>> {
         return try {
-            val result = supabaseMerchantService.getShipmentsByMerchantId(merchantId, status)
+            val result = supabaseMerchantService.getShipmentsByMerchantId(merchantId, status, trackingNumber)
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
              when(e) {
@@ -113,6 +183,11 @@ class MerchantRepositoryImpl @Inject constructor(
                     DataResult.Error(eMessage)
                 }
             }
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -122,8 +197,39 @@ class MerchantRepositoryImpl @Inject constructor(
                 ?: return DataResult.Error("Failed to compress image")
             val result = supabaseMerchantService.uploadArrivalProof(shipmentId, compressedBytes)
             DataResult.Success(result)
-        } catch (e: Exception) {
+        } catch (e: RestException) {
+            val eMsg = extractSupabaseError(e.error)
+            DataResult.Error(eMsg)
+        }catch (e: Exception) {
             DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
+
+    override suspend fun updateMerchantBusiness(
+        id: String,
+        input: EditMerchantInput
+    ): DataResult<MerchantBusiness> {
+        return try {
+            val response = supabaseMerchantService.updateMerchantBusiness(id, input.toDto())
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(extractSupabaseError(e.error))
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun updateMerchantBankAccount(
+        id: String,
+        input: EditMerchantBankAccountInput
+    ): DataResult<MerchantBankAccount> {
+        return try {
+            val response = supabaseMerchantService.updateMerchantBankAccount(id, input.toDto())
+            DataResult.Success(response.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(extractSupabaseError(e.error))
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 }

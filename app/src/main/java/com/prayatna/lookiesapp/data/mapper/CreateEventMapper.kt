@@ -12,7 +12,7 @@ fun CreateEventRequest.toDomain(): CreateEventParams {
         about = this.about,
         location = this.location,
         locationUrl = this.locationUrl,
-        maxParticipant = this.maxParticipant,
+//        maxParticipant = this.maxParticipant,
         maxPainting = this.maxPainting,
         maxPaintingPerArtist = this.maxPaintingPerArtist,
         ticketPrice = this.ticketPrice,

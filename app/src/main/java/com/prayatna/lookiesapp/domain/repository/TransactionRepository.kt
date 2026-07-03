@@ -15,6 +15,7 @@ import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
 import com.prayatna.lookiesapp.domain.model.transaction.OrderSplit
+import com.prayatna.lookiesapp.domain.model.transaction.PaidOrderItem
 import com.prayatna.lookiesapp.domain.model.transaction.PayoutResult
 import com.prayatna.lookiesapp.domain.model.transaction.PendingOrderSplits
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
@@ -38,14 +39,23 @@ interface TransactionRepository {
         postalCode: String
     ):
             DataResult<String>
+    suspend fun createOfflineOrder(
+        buyerId: String?,
+        currency: String,
+        items: List<OrderItemInput>
+    ): DataResult<String>
     suspend fun createQrisPaymentRequest(data: CreateQrisPaymentRequestInput):
             DataResult<CreateQrisPaymentRequestResult>
     suspend fun createVaPaymentRequest(data: CreateVaPaymentRequestInput):
             DataResult<CreateVaPaymentRequestResult>
+    suspend fun getPaidOrderItemsByEventId(eventId: Int):
+            DataResult<List<PaidOrderItem>>
     suspend fun getUserTransactions():
             DataResult<List<Transaction>>
     suspend fun createPaymentRequest(request: CreateXenditPaymentRequestInput):
             DataResult<CreateXenditPaymentRequestResult>
+    suspend fun getPaymentAttemptByOrderId(orderId: String):
+            DataResult<PaymentAttempt?>
     fun getPaymentAttempt(orderId: String):
             Flow<DataResult<PaymentAttempt>>
     suspend fun getTicketsByOrderId(orderId: String):

@@ -7,6 +7,7 @@ import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.usecase.partner.GetPartnersUseCase
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.state.MerchantBusinessType
 import com.prayatna.lookiesapp.presentation.partner.partnerlist.state.PartnerListUiState
+import com.prayatna.lookiesapp.presentation.partner.partnerlist.state.PartnerStatus
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +23,6 @@ import javax.inject.Inject
 class PartnerListViewModel @Inject constructor(
     private val getPartnersUseCase: GetPartnersUseCase,
     userPref: UserPreference,
-//    private val approvePartnerUseCase: ApprovePartnerUseCase,
-//    private val rejectPartnerUseCase: RejectPartnerUseCase
 ): ViewModel() {
 
     private val _partnerState = MutableStateFlow<DataResult<List<MerchantBusiness>>>(DataResult.Idle)
@@ -35,19 +34,20 @@ class PartnerListViewModel @Inject constructor(
     val roleState: StateFlow<String> = userPref.getRole()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
-//    private val _actionMessage = MutableSharedFlow<String>()
-
     init {
         loadPartners()
     }
 
     fun loadPartners() {
-        val merchantType = _uiState.value.selectedStatus
+        val type = _uiState.value.selectedType
+        val status = _uiState.value.selectedStatus
+        val title = _uiState.value.title.ifBlank { null }
+        
         viewModelScope.launch {
             getPartnersUseCase(
-                merchantType = merchantType?.type,
-                status = null,
-                name = null,
+                merchantType = type?.type,
+                status = status?.value,
+                name = title,
                 kycStatus = null
             ).collect { result ->
                 _partnerState.value = result
@@ -55,35 +55,19 @@ class PartnerListViewModel @Inject constructor(
         }
     }
 
-    fun onFilterSelected(status: MerchantBusinessType?) {
+    fun onTypeSelected(type: MerchantBusinessType?) {
+        val newType = if (_uiState.value.selectedType == type) null else type
+        _uiState.update { it.copy(selectedType = newType) }
+        loadPartners()
+    }
+
+    fun onStatusSelected(status: PartnerStatus?) {
         val newStatus = if (_uiState.value.selectedStatus == status) null else status
         _uiState.update { it.copy(selectedStatus = newStatus) }
         loadPartners()
     }
 
-//    fun approvePartner(partnerId: String) {
-//        decidePartner(partnerId, approvePartnerUseCase::invoke)
-//    }
-//
-//    fun rejectPartner(partnerId: String) {
-//        decidePartner(partnerId, rejectPartnerUseCase::invoke)
-//    }
-
-//    private fun decidePartner(
-//        partnerId: String,
-//        action: suspend (String) -> DataResult<String>
-//    ) {
-//        viewModelScope.launch {
-//            when (val result = action(partnerId)) {
-//                is DataResult.Success -> {
-//                    _actionMessage.emit(result.data)
-//                    loadPartners()
-//                }
-//                is DataResult.Error -> {
-//                    _actionMessage.emit(result.error)
-//                }
-//                else -> Unit
-//            }
-//        }
-//    }
+    fun onTitleChanged(title: String) {
+        _uiState.update { it.copy(title = title) }
+    }
 }

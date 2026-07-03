@@ -1,16 +1,20 @@
 package com.prayatna.lookiesapp.data.repository
 
-import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseChatService
-import com.prayatna.lookiesapp.data.remote.dto.ForumChannelMessagesViewDto
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
+import com.prayatna.lookiesapp.domain.model.message.Conversation
 import com.prayatna.lookiesapp.domain.model.message.CreateForumMessageInput
+import com.prayatna.lookiesapp.domain.model.message.CreateMessageInput
 import com.prayatna.lookiesapp.domain.model.message.ForumChannelMessagesView
 import com.prayatna.lookiesapp.domain.model.message.ForumMember
 import com.prayatna.lookiesapp.domain.model.message.ForumMessage
+import com.prayatna.lookiesapp.domain.model.message.InitiatedConversation
+import com.prayatna.lookiesapp.domain.model.message.Message
 import com.prayatna.lookiesapp.domain.repository.ChatRepository
 import com.prayatna.lookiesapp.utils.DataResult
+import com.prayatna.lookiesapp.utils.extractSupabaseError
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.realtime.PresenceAction
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +24,110 @@ import javax.inject.Inject
 class ChatRepositoryImpl @Inject constructor(
     private val supabaseChatService: SupabaseChatService
 ): ChatRepository {
+    override suspend fun getForumChannelMessages(channelId: String): DataResult<List<ForumChannelMessagesView>> {
+        return try {
+            val res = supabaseChatService.getForumChannelMessages(channelId)
+            DataResult.Success(res.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override fun listenToMessages(conversationId: String): Flow<List<Message>> {
+        return supabaseChatService.listenToMessages(conversationId)
+            .map { dtoList ->
+                dtoList.map { it.toDomain() }
+            }
+    }
+
+    override suspend fun sendMessage(data: CreateMessageInput): DataResult<Message> {
+        return try {
+            val result = supabaseChatService.sendMessage(data.toDto())
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getConversations(): DataResult<List<Conversation>> {
+        return try {
+            val result = supabaseChatService.getConversations()
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(extractSupabaseError( e.error))
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getMerchantConversations(merchantId: String): DataResult<List<Conversation>> {
+        return try {
+            val result = supabaseChatService.getMerchantConversations(merchantId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getConversationByMerchantId(merchantId: String): DataResult<Conversation?> {
+        return try {
+            val result = supabaseChatService.getConversationByMerchantId(merchantId)
+            DataResult.Success(result?.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getOrCreateConversation(merchantId: String): DataResult<InitiatedConversation> {
+        return try {
+            val id = supabaseChatService.getOrCreateConversation(merchantId)
+            DataResult.Success(InitiatedConversation(id))
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun markMessagesAsRead(conversationId: String, isMerchant: Boolean): DataResult<Unit> {
+        return try {
+            supabaseChatService.markMessagesAsRead(conversationId, isMerchant)
+            DataResult.Success(Unit)
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
 
     override fun listenToForumMessages(
         channelId: String
@@ -33,9 +141,12 @@ class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun insertForumsMessage(data: CreateForumMessageInput): DataResult<ForumMessage> {
         return try {
-            val requestDto = data.toDto()
+            val requestDto = com.prayatna.lookiesapp.data.remote.dto.request.chat.CreateForumMessageRequest(
+                channelId = data.channelId,
+                content = data.content,
+                senderId = data.senderId
+            )
             val result = supabaseChatService.insertForumsMessage(requestDto)
-            Log.d("INSERT_MESSAGE", result.toString())
             DataResult.Success(result.toDomain())
         } catch (e: RestException) {
             DataResult.Error(e.error)
@@ -44,14 +155,17 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getForums(): DataResult<List<com.prayatna.lookiesapp.domain.model.message.ForumsView>> {
+    override suspend fun getForums(title: String?): DataResult<List<com.prayatna.lookiesapp.domain.model.message.ForumsView>> {
         return try {
-            val result = supabaseChatService.getForums()
+            val result = supabaseChatService.getForums(title)
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error fetching forums")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -61,8 +175,11 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error fetching forum channels")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -72,12 +189,81 @@ class ChatRepositoryImpl @Inject constructor(
             DataResult.Success(result.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
         } catch (e: Exception) {
-            DataResult.Error(e.message ?: "Error fetching forum members")
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
     override fun listenToForumPresence(forumId: String): Flow<PresenceAction> {
         return supabaseChatService.listenToForumPresence(forumId)
+    }
+
+    override suspend fun createForumChannel(
+        forumId: String,
+        name: String,
+        isReadOnlyForMember: Boolean
+    ): DataResult<com.prayatna.lookiesapp.domain.model.message.CreateForumChannelResult> {
+        return try {
+            val result = supabaseChatService.createForumChannel(forumId, name, isReadOnlyForMember)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun updateForumMessage(
+        messageId: String,
+        content: String
+    ): DataResult<ForumMessage> {
+        return try {
+            val result = supabaseChatService.updateForumMessage(messageId, content)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun deleteForumMessage(messageId: String): DataResult<Unit> {
+        return try {
+            supabaseChatService.deleteForumMessage(messageId)
+            DataResult.Success(Unit)
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun pinForumMessage(
+        messageId: String,
+        isPinned: Boolean
+    ): DataResult<ForumMessage> {
+        return try {
+            val result = supabaseChatService.pinForumMessage(messageId, isPinned)
+            DataResult.Success(result.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        }  catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
     }
 }

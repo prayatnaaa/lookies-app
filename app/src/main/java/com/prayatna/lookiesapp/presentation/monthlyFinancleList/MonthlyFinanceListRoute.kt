@@ -11,6 +11,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.monthlyFinancleList.state.MonthlyFinanceEffect
+import com.prayatna.lookiesapp.presentation.partner.orderDetail.navigateToPartnerOrderDetail
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 
 @Composable
@@ -26,6 +27,10 @@ fun MonthlyFinanceListRoute(
     var isSuccessStatus by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
+
+    LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 MonthlyFinanceEffect.NavigateBack -> {
@@ -39,6 +44,10 @@ fun MonthlyFinanceListRoute(
                 }
                 is MonthlyFinanceEffect.NavigateToWithdrawalList -> {
                     navController.navigate("${NavigationRoutes.MERCHANT_WITHDRAWAL_REQUEST_LIST}/${effect.businessId}")
+                }
+
+                is MonthlyFinanceEffect.NavigateToOrderDetail -> {
+                    navController.navigateToPartnerOrderDetail(effect.orderId)
                 }
             }
         }

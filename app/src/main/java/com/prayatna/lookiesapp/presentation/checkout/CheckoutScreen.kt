@@ -1,5 +1,6 @@
 package com.prayatna.lookiesapp.presentation.checkout
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,7 @@ fun CheckoutScreen(
 
     val showSuccessDialog = remember { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf<String?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         effectFlow.collect { effect ->
@@ -34,6 +36,10 @@ fun CheckoutScreen(
 
                 CheckoutEffect.ShowSuccessDialog -> {
                     showSuccessDialog.value = true
+                }
+
+                is CheckoutEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(effect.message)
                 }
 
                 else -> Unit
@@ -104,5 +110,6 @@ fun CheckoutScreen(
         },
         type = type ,
         quantity = quantity,
+        snackbarHostState = snackbarHostState
     )
 }

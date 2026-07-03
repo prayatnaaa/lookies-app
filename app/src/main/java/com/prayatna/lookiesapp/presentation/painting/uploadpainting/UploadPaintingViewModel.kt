@@ -41,7 +41,7 @@ class UploadPaintingViewModel @Inject constructor(
             dimensionWidth = 0.0,
             medium = "",
             yearCreated = 0,
-            price = 0.0
+            price = 0
         )
     )
         private set
@@ -108,7 +108,7 @@ class UploadPaintingViewModel @Inject constructor(
                 uiState = UploadPaintingUiState.Idle
 
             is UploadPaintingEvent.OnPriceChange -> {
-                params = params.copy(price = event.value.toDoubleOrNull() ?: 0.0)
+                params = params.copy(price = event.value.toLongOrNull() ?: 0)
             }
         }
     }
@@ -125,6 +125,11 @@ class UploadPaintingViewModel @Inject constructor(
         }
         if (params.dimensionHeight <= 0 || params.dimensionWidth <= 0) {
             uiState = UploadPaintingUiState.Error("Dimensions must be greater than 0")
+            return
+        }
+        val priceValue = params.price
+        if (priceValue  <= 0) {
+            uiState = UploadPaintingUiState.Error("Please enter a valid price")
             return
         }
         if (params.yearCreated <= 100) {

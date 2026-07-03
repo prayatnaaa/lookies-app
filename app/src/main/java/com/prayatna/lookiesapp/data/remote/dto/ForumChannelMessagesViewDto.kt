@@ -17,5 +17,9 @@ data class ForumChannelMessagesViewDto(
     @SerialName("full_name")
     val fullName: String,
     @SerialName("profile_picture_url")
-    val profilePictureUrl: String? = null
+    val profilePictureUrl: String? = null,
+    @SerialName("is_pinned")
+    val isPinned: Boolean = false,
+    @SerialName("edited_at")
+    val editedAt: String? = null
 )

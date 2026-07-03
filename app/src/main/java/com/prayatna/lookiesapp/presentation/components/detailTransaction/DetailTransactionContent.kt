@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -28,10 +29,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,13 +44,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.prayatna.lookiesapp.domain.model.painting.PaintingReview
 import com.prayatna.lookiesapp.domain.model.shipment.Shipment
+import com.prayatna.lookiesapp.domain.model.shipment.isPendingMoreThan3Days
 import com.prayatna.lookiesapp.domain.model.transaction.DetailTransaction
+import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
+import com.prayatna.lookiesapp.presentation.components.painting.PaintingReviewCard
 import com.prayatna.lookiesapp.presentation.components.transactionList.TransactionStatusChip
 import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
@@ -61,6 +68,8 @@ fun DetailTransactionContent(
     data: DetailTransaction,
     shipment: Shipment? = null,
     isCompleting: Boolean = false,
+    existingRefundId: String? = null,
+    paintingReview: PaintingReview? = null,
     onCompleteOrder: (() -> Unit)? = null,
     onRequestRefund: (() -> Unit)? = null,
     onRatePainting: (() -> Unit)? = null,
@@ -69,6 +78,14 @@ fun DetailTransactionContent(
     val transaction = data.transaction
     val clipboardManager = LocalClipboardManager.current
     var isShipmentExpanded by remember { mutableStateOf(false) }
+    var showImagePreview by remember { mutableStateOf<String?>(null) }
+
+    if (showImagePreview != null) {
+        ImagePreviewDialog(
+            imageUrl = showImagePreview!!,
+            onDismiss = { showImagePreview = null }
+        )
+    }
 
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
@@ -146,7 +163,7 @@ fun DetailTransactionContent(
                             modifier = Modifier.size(14.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(6.6.dp))
                         Text(
                             text = formatDate(transaction.createdAt),
                             style = MaterialTheme.typography.bodySmall,
@@ -206,6 +223,25 @@ fun DetailTransactionContent(
                             }
                             
                             ShipmentTimeline(shipment)
+
+                            shipment.arrivalProofUrl?.let { url ->
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Arrival Proof",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                CustomAsyncImage(
+                                    model = url,
+                                    contentDescription = "Shipment Proof",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable { showImagePreview = url }
+                                )
+                            }
                         }
                     }
                 }
@@ -324,13 +360,6 @@ fun DetailTransactionContent(
             }
         }
 
-//        if(transaction.status == "awaiting_payment") {
-//            CheckoutPaymentMethodContent(
-//                selectedMethod = transaction.paymentMethod,
-//                onPaymentMethodSelected = {}
-//            )
-//        }
-
         if (data.tickets.isNotEmpty()) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -354,58 +383,80 @@ fun DetailTransactionContent(
             }
         }
 
-        if (shipment?.status?.lowercase() in listOf("delivered", "completed")) {
+        if (paintingReview != null) {
             item {
-                Button(
-                    onClick = { onCompleteOrder?.invoke() },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    enabled = !isCompleting
-                ) {
-                    if (isCompleting) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text("Complete Order", fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-        }
-
-        if (shipment?.status?.lowercase() in listOf("delivered", "completed")) {
-            item {
-                OutlinedButton(
-                    onClick = { onRequestRefund?.invoke() },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Request Refund", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
-                }
-            }
-            item {
-                OutlinedButton(
-                    onClick = { onViewRefunds?.invoke() },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("View Refund Requests", fontWeight = FontWeight.Bold)
-                }
+                Text(
+                    text = "My Review",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                PaintingReviewCard(review = paintingReview)
             }
         }
 
         item {
-            if (shipment != null && shipment.status == "delivered") {
+            if (shipment?.status == "delivered" && paintingReview == null) {
                 OutlinedButton(
                     onClick = {
                         onRatePainting?.invoke()
                     },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text("Rate painting")
+                }
+            }
+        }
+
+        val canRequestRefund =
+            shipment?.status?.lowercase() in listOf("delivered", "completed") ||
+                    shipment?.isPendingMoreThan3Days() == true
+
+        item {
+            if (canRequestRefund) {
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+
+                        Text(
+                            text = "Refund & Support",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = if (existingRefundId != null) 
+                                "You have already requested a refund for this order. You can view the status below." 
+                                else "Having issues with your order? You can request a refund or review existing requests.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedButton(
+                            onClick = { onRequestRefund?.invoke() },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = if (existingRefundId != null) "View Refund Detail" else "Request Refund",
+                                color = if (existingRefundId != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -474,6 +525,42 @@ fun ShipmentTimeline(shipment: Shipment) {
                         Text(text = formatDate(shipment.shippedAt), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun ImagePreviewDialog(
+    imageUrl: String,
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.9f))
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column {
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+                }
+
+                CustomAsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Full Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                )
             }
         }
     }

@@ -2,19 +2,10 @@ package com.prayatna.lookiesapp.presentation.refund.refundList
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,6 +36,7 @@ import androidx.navigation.NavController
 import com.prayatna.lookiesapp.domain.model.transaction.Refund
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.components.partner.FilterItem
 import com.prayatna.lookiesapp.presentation.refund.refundList.state.RefundListEvent
 import com.prayatna.lookiesapp.utils.NavigationRoutes
 import com.prayatna.lookiesapp.utils.formatRupiah
@@ -55,6 +48,11 @@ fun RefundListScreen(
     viewModel: RefundListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val statuses = listOf("pending", "approved", "rejected", "waiting_for_return", "returning", "completed", "processing")
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(RefundListEvent.LoadData)
+    }
 
     if (uiState.successMessage != null) {
         CustomBottomSheet(
@@ -92,61 +90,93 @@ fun RefundListScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            when {
-                uiState.isLoading -> CircularLoading(modifier = Modifier.align(Alignment.Center))
-
-                uiState.refunds.isEmpty() -> {
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoneyOff,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = "No Refund Requests",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            text = "There are no refund requests at the moment.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+            // Filter Row
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                item {
+                    FilterItem(
+                        title = "All",
+                        selected = uiState.selectedStatus == null,
+                        onClick = { viewModel.onEvent(RefundListEvent.FilterByStatus(null)) }
+                    )
                 }
+                items(statuses) { status ->
+                    FilterItem(
+                        title = status.replace("_", " ").replaceFirstChar { it.uppercase() },
+                        selected = uiState.selectedStatus == status,
+                        onClick = { viewModel.onEvent(RefundListEvent.FilterByStatus(status)) }
+                    )
+                }
+            }
 
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(vertical = 8.dp)
-                    ) {
-                        itemsIndexed(
-                            items = uiState.refunds,
-                            key = { _, refund -> refund.id }
-                        ) { index, refund ->
+            Box(modifier = Modifier.weight(1f)) {
+//                val filteredRefunds = if (uiState.selectedStatus == null) {
+//                    uiState.refunds
+//                } else {
+//                    uiState.refunds.filter { it.status.equals(uiState.selectedStatus!!, ignoreCase = true) }
+//                }
 
-                            RefundItem(
-                                refund = refund,
-                                showDivider = index != uiState.refunds.lastIndex,
-                                onClicked = {
-                                    navController.navigate(
-                                        "${NavigationRoutes.PARTNER_REFUND}/${refund.id}"
-                                    )
-                                }
+                when {
+                    uiState.isLoading && uiState.refunds.isEmpty() -> CircularLoading(modifier = Modifier.align(Alignment.Center))
+
+                    uiState.refunds.isEmpty() -> {
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoneyOff,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                             )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = if (uiState.selectedStatus == null) "No Refund Requests" else "No ${uiState.selectedStatus} Requests",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = "There are no refund requests matching this status.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(vertical = 8.dp)
+                        ) {
+                            itemsIndexed(
+                                items = uiState.refunds,
+                                key = { _, refund -> refund.id }
+                            ) { index, refund ->
+
+                                RefundItem(
+                                    refund = refund,
+                                    showDivider = index != uiState.refunds.lastIndex,
+                                    onClicked = {
+                                        navController.navigate(
+                                            "${NavigationRoutes.PARTNER_REFUND}/${refund.id}"
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
                 }

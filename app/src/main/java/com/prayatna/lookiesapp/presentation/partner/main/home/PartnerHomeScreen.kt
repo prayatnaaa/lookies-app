@@ -19,14 +19,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocalShipping
-import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -36,12 +37,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,15 +60,26 @@ import com.prayatna.lookiesapp.utils.formatRupiah
 @Composable
 fun PartnerHomeScreen(
     state: PartnerHomeUiState,
-    onEvent: (PartnerHomeEvent) -> Unit
+    onEvent: (PartnerHomeEvent) -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
+    val isApproved = state.profile?.payoutEnabled == true
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = {
                     DashboardHeader(
+                        onChatClick = {
+                            onEvent(PartnerHomeEvent.ChatClick)
+                        },
                         onMemberClick = {
                             onEvent(PartnerHomeEvent.MemberListClicked)
+                        },
+                        onEditProfileClick = {
+                            onEvent(PartnerHomeEvent.EditProfileClicked)
                         },
                         title = state.profile?.tradingName
                             ?: state.profile?.legalName
@@ -86,8 +101,15 @@ fun PartnerHomeScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    onEvent(PartnerHomeEvent.CreateEventClicked)
+                    if (isApproved) {
+                        onEvent(PartnerHomeEvent.CreateEventClicked)
+                    }
                 },
+                expanded = true,
+                containerColor = if (isApproved)
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.surfaceVariant,
                 icon = {
                     Icon(Icons.Default.Add, null)
                 },
@@ -118,14 +140,22 @@ fun PartnerHomeScreen(
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 
+            if (!isApproved) {
+                item {
+                    ApprovalPendingCard()
+                }
+            }
+
             item {
                 RevenueOverviewCard(
                     balanceLogs = state.balanceLogs,
                     pendingOrderSplits = state.pendingOrderSplits,
-                    isLoading = state.isLoading
-                ) {
-                    onEvent(PartnerHomeEvent.MonthlyFinanceClicked)
-                }
+                    isLoading = state.isLoading,
+                    enabled = isApproved,
+                onClick = {
+                        onEvent(PartnerHomeEvent.MonthlyFinanceClicked)
+                    }
+                )
             }
 
             item {
@@ -133,7 +163,7 @@ fun PartnerHomeScreen(
             }
 
             item {
-                ActionGrid(onEvent)
+                ActionGrid(onEvent, enabled = isApproved)
             }
 
             if (state.monthlyFinancialReport.isNotEmpty()) {
@@ -160,7 +190,9 @@ fun PartnerHomeScreen(
 @Composable
 private fun DashboardHeader(
     title: String,
-    onMemberClick: () -> Unit
+    onMemberClick: () -> Unit,
+    onChatClick: () -> Unit,
+    onEditProfileClick: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -181,13 +213,31 @@ private fun DashboardHeader(
             )
         }
 
-        IconButton(
-            onClick = onMemberClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.People,
-                contentDescription = "Member"
-            )
+        Row {
+            IconButton(
+                onClick = onEditProfileClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Edit"
+                )
+            }
+            IconButton(
+                onClick = onMemberClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.People,
+                    contentDescription = "Member"
+                )
+            }
+            IconButton(
+                onClick = onChatClick
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Message,
+                    contentDescription = "Chat"
+                )
+            }
         }
     }
 }
@@ -199,15 +249,21 @@ private fun RevenueOverviewCard(
     balanceLogs: List<MerchantBalanceLog>,
     pendingOrderSplits: PendingOrderSplits?,
     isLoading: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enabled: Boolean
 ) {
     val latestBalance = balanceLogs.firstOrNull()?.balanceAfter
     val pending = pendingOrderSplits?.totalAmount
 
     ElevatedCard(
+        enabled = enabled,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        onClick = onClick,
+        onClick = {
+            if (enabled) {
+                onClick()
+            }
+        },
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -219,7 +275,6 @@ private fun RevenueOverviewCard(
                 .padding(24.dp)
                 .fillMaxWidth()
         ) {
-            // Header Card: Icon + Title + Arrow Right (Indikator bisa diklik)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -253,7 +308,6 @@ private fun RevenueOverviewCard(
 
             // Main Balance Amount
             if (isLoading && latestBalance == null) {
-                // Skeleton loading yang lebih elegan daripada CircularProgressIndicator
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.6f)
@@ -264,8 +318,8 @@ private fun RevenueOverviewCard(
             } else {
                 Text(
                     text = formatRupiah(latestBalance?.toDouble() ?: 0.0),
-                    style = MaterialTheme.typography.headlineLarge, // Ukuran teks diperbesar
-                    fontWeight = FontWeight.ExtraBold, // Lebih tebal
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
@@ -274,7 +328,6 @@ private fun RevenueOverviewCard(
             if ((pending ?: 0L) > 0) {
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Dibuat seperti badge/banner di dalam card
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
@@ -330,7 +383,7 @@ private fun QuickStatsSection(
     ) {
 
         SmallStatCard(
-            title = "Events",
+            title = "Active events",
             value = dashboard?.activeEvents?.toString(),
             isLoading = state.isLoading && dashboard == null,
             modifier = Modifier.weight(1f)
@@ -374,7 +427,10 @@ private fun SmallStatCard(
         ) {
 
             if (isLoading) {
-                CircularProgressIndicator()
+                Text(
+                    text = "...",
+                    fontWeight = FontWeight.Bold
+                )
             } else {
                 Text(
                     text = value ?: "-",
@@ -394,7 +450,8 @@ private fun SmallStatCard(
 
 @Composable
 private fun ActionGrid(
-    onEvent: (PartnerHomeEvent) -> Unit
+    onEvent: (PartnerHomeEvent) -> Unit,
+    enabled: Boolean
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -410,6 +467,7 @@ private fun ActionGrid(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             ActionCircle(
+                enabled = enabled,
                 title = "Events",
                 icon = {
                     Icon(Icons.Default.Event, null)
@@ -422,18 +480,19 @@ private fun ActionGrid(
                 modifier = Modifier.weight(1f)
             )
 
-            ActionCircle(
-                title = "Refund",
-                icon = {
-                    Icon(Icons.Default.Payments, null)
-                },
-                onClick = {
-                    onEvent(
-                        PartnerHomeEvent.RefundClicked
-                    )
-                },
-                modifier = Modifier.weight(1f)
-            )
+//            ActionCircle(
+//                title = "Refund",
+//                icon = {
+//                    Icon(Icons.Default.Payments, null)
+//                },
+//                onClick = {
+//                    onEvent(
+//                        PartnerHomeEvent.RefundClicked
+//                    )
+//                },
+//                modifier = Modifier.weight(1f),
+//                enabled = enabled
+//            )
         }
 
         Row(
@@ -449,7 +508,8 @@ private fun ActionGrid(
                         PartnerHomeEvent.PaintingClicked
                     )
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                enabled = enabled
             )
 
             ActionCircle(
@@ -462,7 +522,8 @@ private fun ActionGrid(
                         PartnerHomeEvent.ShipmentClicked
                     )
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                enabled = enabled
             )
         }
     }
@@ -473,10 +534,14 @@ private fun ActionCircle(
     title: String,
     icon: @Composable () -> Unit,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean,
 ) {
     ElevatedCard(
-        onClick = onClick,
+        enabled = enabled,
+        onClick = {
+            if (enabled) onClick()
+        },
         modifier = modifier,
         shape = RoundedCornerShape(22.dp)
     ) {
@@ -492,7 +557,9 @@ private fun ActionCircle(
                 tonalElevation = 4.dp
             ) {
                 Box(
-                    modifier = Modifier.padding(14.dp)
+                    modifier = Modifier
+                        .padding(14.dp)
+                        .alpha(if (enabled) 1f else 0.45f)
                 ) {
                     icon()
                 }
@@ -500,7 +567,12 @@ private fun ActionCircle(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Text(title)
+            Text(
+                text = title,
+                modifier = Modifier.alpha(
+                    if (enabled) 1f else 0.5f
+                )
+            )
         }
     }
 }
@@ -536,6 +608,32 @@ private fun MonthlyReportCard(
             Text(
                 "Net : ${formatRupiah(report.netRevenue)}",
                 fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun ApprovalPendingCard() {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Text(
+                text = "Approval Required",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "Your partner account is still under review. Features will be available maximum 5 minutes after approval from admin.",
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }

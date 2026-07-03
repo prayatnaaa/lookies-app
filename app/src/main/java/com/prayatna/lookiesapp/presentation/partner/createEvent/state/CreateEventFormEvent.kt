@@ -7,9 +7,11 @@ sealed interface CreateEventFormEvent {
     data class BannerChanged(val uri: Uri?) : CreateEventFormEvent
     data class StartDateChanged(val value: String) : CreateEventFormEvent
     data class EndDateChanged(val value: String) : CreateEventFormEvent
+    data class PaintingSubmissionDeadlineChanged(val value: String) : CreateEventFormEvent
+    data class RegistrationStartDateChanged(val value: String) : CreateEventFormEvent
+    data class RegistrationEndDateChanged(val value: String) : CreateEventFormEvent
     data class LocationChanged(val value: String) : CreateEventFormEvent
     data class LocationUrlChanged(val value: String) : CreateEventFormEvent
-    data class MaxParticipantChanged(val value: String?) : CreateEventFormEvent
     data class MaxPaintingChanged(val value: String?) : CreateEventFormEvent
     data class MaxPaintingPerArtistChanged(val value: String?) : CreateEventFormEvent
     data class AboutChanged(val value: String) : CreateEventFormEvent

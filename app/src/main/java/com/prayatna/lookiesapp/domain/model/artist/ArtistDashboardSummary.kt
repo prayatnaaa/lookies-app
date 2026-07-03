@@ -2,6 +2,7 @@ package com.prayatna.lookiesapp.domain.model.artist
 
 data class ArtistDashboardSummary(
     val businessId: String,
+    val status: String,
     val userId: String,
     val totalPaintings: Int,
     val totalCatalogValue: Double,

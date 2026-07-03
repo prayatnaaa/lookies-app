@@ -35,7 +35,6 @@ import com.prayatna.lookiesapp.ui.theme.PureWhite
 import com.prayatna.lookiesapp.utils.Constants
 import com.prayatna.lookiesapp.utils.DataResult
 import com.prayatna.lookiesapp.utils.NavigationRoutes
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier,
@@ -48,13 +47,17 @@ fun LoginScreen(modifier: Modifier = Modifier,
     var dialogMessage by remember { mutableStateOf("") }
     var isErrorDialog by remember { mutableStateOf(false) }
 
-    val authState by viewModel.authState.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.resetLoginState()
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(errorMessage) {
+        showDialog = errorMessage != null
+    }
+
+    LaunchedEffect(viewModel.eventFlow) {
         viewModel.eventFlow.collect { event ->
             when (event) {
                 is AuthEvent.ShowError -> {
@@ -65,6 +68,7 @@ fun LoginScreen(modifier: Modifier = Modifier,
             }
         }
     }
+
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -127,13 +131,32 @@ fun LoginScreen(modifier: Modifier = Modifier,
                     title = if (isErrorDialog) "Error" else "Success",
                     onDismiss = {
                         showDialog = false
+                        dialogMessage = ""
                     },
                     message = dialogMessage,
                     onConfirm = {
                         showDialog = false
+                        dialogMessage = ""
                         if (isErrorDialog) {
                             viewModel.resetLoginState()
                         }
+                    }
+                )
+            }
+
+            if (showDialog && errorMessage != null) {
+                CustomDialog(
+                    title = "Error",
+                    message = errorMessage!!,
+                    onDismiss = {
+                        showDialog = false
+                        dialogMessage = ""
+                        viewModel.clearError()
+                    },
+                    onConfirm = {
+                        showDialog = false
+                        dialogMessage = ""
+                        viewModel.clearError()
                     }
                 )
             }

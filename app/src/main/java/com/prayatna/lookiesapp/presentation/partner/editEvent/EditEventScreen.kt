@@ -3,11 +3,17 @@ package com.prayatna.lookiesapp.presentation.partner.editEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,6 +41,7 @@ import com.prayatna.lookiesapp.presentation.components.createEvent.EventAboutFor
 import com.prayatna.lookiesapp.presentation.components.createEvent.EventLocationForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.ParticipationRulesForm
 import com.prayatna.lookiesapp.presentation.components.createEvent.PricingForm
+import com.prayatna.lookiesapp.presentation.components.createEvent.RevenueShareForm
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
 import com.prayatna.lookiesapp.presentation.partner.editEvent.state.EditEventFormEvent
 import com.prayatna.lookiesapp.utils.Constants
@@ -49,7 +56,7 @@ fun EditEventScreen(
     val formState by viewModel.formState.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(eventId) {
+    LaunchedEffect(Unit) {
         viewModel.onEvent(EditEventFormEvent.LoadEventMeta)
         viewModel.loadEvent(eventId)
     }
@@ -57,11 +64,18 @@ fun EditEventScreen(
     var showDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
     var dialogTitle by remember { mutableStateOf("") }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     LaunchedEffect(uiState) {
         when {
             uiState.isSuccess -> {
                 dialogTitle = "Success"
                 dialogMessage = "Event updated successfully"
+                showDialog = true
+            }
+
+            uiState.isDeleteSuccess -> {
+                dialogTitle = "Deleted"
+                dialogMessage = "Event has been deleted successfully"
                 showDialog = true
             }
 
@@ -83,7 +97,7 @@ fun EditEventScreen(
                 dialogMessage = ""
                 dialogTitle = ""
 
-                if (uiState.isSuccess) {
+                if (uiState.isSuccess || uiState.isDeleteSuccess) {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("shouldRefresh", true)
@@ -96,6 +110,18 @@ fun EditEventScreen(
                 dialogMessage = ""
                 dialogTitle = ""
             }
+        )
+    }
+
+    if (showDeleteConfirmDialog) {
+        CustomDialog(
+            title = "Delete Event",
+            message = "Are you sure you want to delete this event? This action cannot be undone.",
+            onConfirm = {
+                showDeleteConfirmDialog = false
+                viewModel.onEvent(EditEventFormEvent.DeleteEvent)
+            },
+            onDismiss = { showDeleteConfirmDialog = false }
         )
     }
 
@@ -117,8 +143,10 @@ fun EditEventScreen(
 
         LazyColumn(
             modifier = Modifier
+                .imePadding()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
             val event = uiState.data
@@ -173,6 +201,10 @@ fun EditEventScreen(
                     onEndDateChange = {
                         viewModel.onEvent(EditEventFormEvent.EndDateChanged(it))
                     },
+                    paintingSubmissionDeadline = formState.paintingSubmissionDeadline,
+                    onPaintingSubmissionDeadlineChange = {
+                        viewModel.onEvent(EditEventFormEvent.PaintingSubmissionDeadline(it))
+                    },
                     eventTypes = formState.eventTypes,
                     selectedEventTypeId = formState.eventType,
                     onEventTypeChange = {
@@ -213,10 +245,10 @@ fun EditEventScreen(
                 item {
                     ParticipationRulesForm(
                         isSelfExhibition = isSelfExhibition,
-                        maxParticipants = formState.maxParticipant,
-                        onMaxParticipantsChange = {
-                            viewModel.onEvent(EditEventFormEvent.MaxParticipantChanged(it))
-                        },
+//                        maxParticipants = formState.maxParticipant,
+//                        onMaxParticipantsChange = {
+//                            viewModel.onEvent(EditEventFormEvent.MaxParticipantChanged(it))
+//                        },
                         maxPainting = formState.maxPainting,
                         onMaxPaintingChange = {
                             viewModel.onEvent(EditEventFormEvent.MaxPaintingChanged(it))
@@ -259,6 +291,37 @@ fun EditEventScreen(
                     eventDescription = formState.about,
                     onEventDescriptionChange = {
                         viewModel.onEvent(EditEventFormEvent.AboutChanged(it))
+                    }
+                )
+            }
+
+            item {
+                RevenueShareForm(
+                    isSelfExhibition = isSelfExhibition,
+                    isOnline = isOnlineEvent,
+                    paintingArtistPercent = formState.paintingArtistPercent,
+                    onPaintingArtistPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.PaintingArtistPercentChanged(it))
+                    },
+                    paintingEventPercent = formState.paintingEventPercent,
+                    onPaintingEventPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.PaintingEventPercentChanged(it))
+                    },
+                    paintingPlatformPercent = formState.paintingPlatformPercent,
+                    onPaintingPlatformPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.PaintingPlatformPercentChanged(it))
+                    },
+                    ticketArtistPercent = formState.ticketArtistPercent,
+                    onTicketArtistPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.TicketArtistPercentChanged(it))
+                    },
+                    ticketEventPercent = formState.ticketEventPercent,
+                    onTicketEventPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.TicketEventPercentChanged(it))
+                    },
+                    ticketPlatformPercent = formState.ticketPlatformPercent,
+                    onTicketPlatformPercentChange = {
+                        viewModel.onEvent(EditEventFormEvent.TicketPlatformPercentChanged(it))
                     }
                 )
             }
@@ -310,7 +373,37 @@ fun EditEventScreen(
                             )
                         }
                     }
+
+                    // Delete button – only shown when event is pending validation
+                    if (event?.status == "pending_validation") {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(Constants.ROUNDED_CORNER_SHAPE),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            ),
+                            enabled = !uiState.isLoading,
+                            onClick = { showDeleteConfirmDialog = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Delete Event",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                    }
                 }
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }

@@ -7,6 +7,7 @@ import com.prayatna.lookiesapp.domain.usecase.partner.GetPartnerDashboardSummary
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetMerchantBalanceLogsUseCase
 import com.prayatna.lookiesapp.domain.usecase.transaction.GetPendingOrderSplitByMerchantIdUseCase
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEffect
+import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEffect.*
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeEvent
 import com.prayatna.lookiesapp.presentation.partner.main.home.state.PartnerHomeUiState
 import com.prayatna.lookiesapp.utils.DataResult
@@ -49,22 +50,22 @@ class PartnerHomeViewModel @Inject constructor(
             PartnerHomeEvent.Retry -> loadData()
 
             PartnerHomeEvent.BackClicked ->
-                sendEffect(PartnerHomeEffect.NavigateBack)
+                sendEffect(NavigateBack)
 
             PartnerHomeEvent.CreateEventClicked ->
-                sendEffect(PartnerHomeEffect.NavigateCreateEvent)
+                sendEffect(NavigateCreateEvent)
 
             PartnerHomeEvent.MyEventsClicked ->
-                sendEffect(PartnerHomeEffect.NavigateMyEvents)
+                sendEffect(NavigateMyEvents)
 
             PartnerHomeEvent.RefundClicked ->
-                sendEffect(PartnerHomeEffect.NavigateRefund)
+                sendEffect(NavigateRefund)
 
             PartnerHomeEvent.PaintingClicked ->
-                sendEffect(PartnerHomeEffect.NavigatePainting)
+                sendEffect(NavigatePainting)
 
             PartnerHomeEvent.ShipmentClicked ->
-                sendEffect(PartnerHomeEffect.NavigateShipment)
+                sendEffect(NavigateShipment)
 
             is PartnerHomeEvent.LoadMonthlyFinancialReport -> {
                 loadMonthlyFinancialReport()
@@ -92,13 +93,27 @@ class PartnerHomeViewModel @Inject constructor(
             }
 
             PartnerHomeEvent.MonthlyFinanceClicked -> {
-                sendEffect(PartnerHomeEffect.NavigateMonthlyFinanceList)
+                sendEffect(NavigateMonthlyFinanceList)
             }
 
             PartnerHomeEvent.MemberListClicked -> {
-                sendEffect(PartnerHomeEffect.NavigateMemberList(
-                    merchantBusinessId = businessId
-                ))
+                sendEffect(
+                    NavigateMemberList(
+                        merchantBusinessId = businessId
+                    )
+                )
+            }
+
+            is PartnerHomeEvent.ChatClick ->{
+                sendEffect(
+                    NavigateToChat(businessId)
+                )
+            }
+
+            PartnerHomeEvent.EditProfileClicked -> {
+                sendEffect(
+                    NavigateEditProfile(businessId)
+                )
             }
         }
     }

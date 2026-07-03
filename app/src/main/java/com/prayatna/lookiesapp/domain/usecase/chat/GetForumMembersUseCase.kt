@@ -20,29 +20,37 @@ class GetForumMembersUseCase @Inject constructor(
         val membersResult = repository.getForumMembers(forumId)
         val initialMembers = (membersResult as? DataResult.Success)?.data ?: emptyList()
 
-        // State to keep track of current online user IDs
-        val onlineUserIds = MutableStateFlow<Set<String>>(emptySet())
+        val onlineUsers =
+            MutableStateFlow<Map<String, Long>>(emptyMap())
 
         return repository.listenToForumPresence(forumId)
             .onEach { action ->
-                val currentSet = onlineUserIds.value.toMutableSet()
-                
-                // Decode joins and leaves from the action
+                val currentUsers = onlineUsers.value.toMutableMap()
+
                 val joined = action.decodeJoinsAs<PresenceData>()
                 val left = action.decodeLeavesAs<PresenceData>()
-                
-                currentSet.addAll(joined.map { it.userId })
-                currentSet.removeAll(left.map { it.userId }.toSet())
 
-                onlineUserIds.value = currentSet
+                joined.forEach {
+                    currentUsers[it.userId] = it.onlineAt
+                }
+
+                left.forEach {
+                    currentUsers.remove(it.userId)
+                }
+
+                onlineUsers.value = currentUsers
             }
-            .map { _ ->
+            .map {
                 initialMembers.map { member ->
-                    member.copy(isOnline = onlineUserIds.value.contains(member.userId))
+                    val onlineAt = onlineUsers.value[member.userId]
+
+                    member.copy(
+                        isOnline = onlineAt != null,
+                        onlineAt = onlineAt
+                    )
                 }
             }
             .onStart {
-                // Immediately emit the initial list so UI doesn't stick on loading
                 emit(initialMembers)
             }
     }

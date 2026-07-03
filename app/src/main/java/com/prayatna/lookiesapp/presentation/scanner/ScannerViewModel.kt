@@ -1,9 +1,10 @@
 package com.prayatna.lookiesapp.presentation.scanner
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.prayatna.lookiesapp.domain.usecase.admin.VerifyUserTicketUseCase
 import com.prayatna.lookiesapp.domain.usecase.scanner.ScanBarcodeUseCase
+import com.prayatna.lookiesapp.domain.usecase.ticket.VerifyAndConsumeTicketUseCase
 import com.prayatna.lookiesapp.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,8 +20,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ScannerViewModel @Inject constructor(
     private val scanBarcodeUseCase: ScanBarcodeUseCase,
-    private val verifyUserTicketUseCase: VerifyUserTicketUseCase
+    private val verifyAndConsumeTicketUseCase: VerifyAndConsumeTicketUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val eventId: Int = checkNotNull(savedStateHandle["eventId"])
 
     private val _uiState = MutableStateFlow(ScannerUiState())
     val uiState = _uiState.asStateFlow()
@@ -44,7 +48,7 @@ class ScannerViewModel @Inject constructor(
                             if (barcodes.isNotEmpty()) {
                                 val ticketCode = barcodes.firstNotNullOfOrNull { it.rawValue }
                                 if (ticketCode != null) {
-                                    verifyTicket(ticketCode)
+                                    verifyTicket(ticketCode, eventId = eventId.toInt())
                                 }
                             }
                         } catch (e: Exception) {
@@ -69,29 +73,26 @@ class ScannerViewModel @Inject constructor(
         }
     }
 
-    private fun verifyTicket(code: String) {
+    private fun verifyTicket(code: String, eventId: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            when (val result = verifyUserTicketUseCase(code)) {
+            
+            when (val result = verifyAndConsumeTicketUseCase(code, eventId)) {
                 is DataResult.Success -> {
                     _uiState.update { it.copy(
-                        scannedTicket = result.data,
                         isSuccess = true,
                         isLoading = false
                     ) }
-                    _uiEffect.emit(ScannerUiEffect.OnTicketVerified(result.data))
-                    _uiEffect.emit(ScannerUiEffect.ShowToast("Ticket Verified: ${result.data.ticketCode}"))
+                    _uiEffect.emit(ScannerUiEffect.OnTicketVerified("Ticket successfully scanned and consumed"))
                 }
                 is DataResult.Error -> {
                     _uiState.update { it.copy(
                         errorMessage = result.error,
                         isLoading = false
                     ) }
-                    _uiEffect.emit(ScannerUiEffect.ShowToast("Error: ${result.error}"))
+                    _uiEffect.emit(ScannerUiEffect.ShowSnackbar("Error: ${result.error}"))
                 }
-                else -> {
-                    // Handle Idle or Loading if necessary
-                }
+                else -> Unit
             }
         }
     }

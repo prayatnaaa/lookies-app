@@ -31,6 +31,7 @@ sealed class ArtistSubmissionEvent {
     data class KycFileSelected(val uri: Uri) : ArtistSubmissionEvent()
     
     data object Submit : ArtistSubmissionEvent()
+    data object OnSelectBankClicked: ArtistSubmissionEvent()
     data object DismissError : ArtistSubmissionEvent()
     data object OnBack : ArtistSubmissionEvent()
 }

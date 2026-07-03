@@ -4,6 +4,8 @@ import com.prayatna.lookiesapp.domain.model.EventParticipant
 import com.prayatna.lookiesapp.domain.model.event.DefaultEvent
 import com.prayatna.lookiesapp.domain.model.event.EditEventInput
 import com.prayatna.lookiesapp.domain.model.event.Event
+import com.prayatna.lookiesapp.domain.model.event.EventRevenueRules
+import com.prayatna.lookiesapp.domain.model.event.UpdateRevenueRulesInput
 import com.prayatna.lookiesapp.domain.model.partner.PartnerDashboard
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantBusiness
 import com.prayatna.lookiesapp.domain.model.merchant.MerchantDetail
@@ -28,9 +30,11 @@ interface PartnerRepository {
         eventTypeId: Int? = null
     ): DataResult<List<Event>>
     suspend fun updateEvent(id: String, input: EditEventInput): DataResult<DefaultEvent>
+    suspend fun updateRevenueRules(id: String, input: UpdateRevenueRulesInput): DataResult<EventRevenueRules>
     suspend fun getParticipantList(eventId: String?): DataResult<List<EventParticipant>>
     suspend fun approvePainting(id: String): DataResult<String>
     suspend fun rejectPainting(id: String, reason: String): DataResult<String>
+    suspend fun deleteEventPainting(id: String): DataResult<String>
     fun getDashboardSummary(merchantId: String): Flow<PartnerDashboard>
     suspend fun insertSelfEventPaintings(eventId: Int, selectedPaintings: List<Painting>):
             DataResult<InsertSelfEventPaintingsResult>

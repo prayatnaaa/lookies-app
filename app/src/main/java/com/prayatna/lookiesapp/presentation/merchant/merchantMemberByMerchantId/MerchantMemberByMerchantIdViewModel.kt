@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MerchantMemberByMerchantIdViewModel @Inject constructor(
     private val getMerchantMembersByMerchantIdUseCase: GetMerchantMembersByMerchantIdUseCase,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MerchantMemberByMerchantIdUiState())
@@ -30,9 +30,11 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     private val businessId: String? = savedStateHandle["businessId"]
+    private var accountId: String? = null
 
     init {
         businessId?.let { loadMembers(it) }
+        observeRefresh()
     }
 
     fun onEvent(event: MerchantMemberByMerchantIdEvent) {
@@ -48,7 +50,7 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
 
             MerchantMemberByMerchantIdEvent.InviteMemberClicked -> {
                 viewModelScope.launch {
-                    businessId?.let { id ->
+                    accountId?.let { id ->
                         _effect.send(
                             MerchantMemberByMerchantIdEffect.NavigateInviteMember(
                                 id
@@ -66,6 +68,7 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
             
             when (val result = getMerchantMembersByMerchantIdUseCase(businessId)) {
                 is DataResult.Success -> {
+                    accountId = result.data[0].merchantAccountId
                     _uiState.update { 
                         it.copy(
                             isLoading = false,
@@ -84,6 +87,21 @@ class MerchantMemberByMerchantIdViewModel @Inject constructor(
                 }
                 else -> Unit
             }
+        }
+    }
+
+    private fun observeRefresh() {
+        viewModelScope.launch {
+            savedStateHandle
+                .getStateFlow("refresh", false)
+                .collect { shouldRefresh ->
+
+                    if (shouldRefresh) {
+                        businessId?.let { loadMembers(it) }
+
+                        savedStateHandle["refresh"] = false
+                    }
+                }
         }
     }
 }

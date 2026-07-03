@@ -19,6 +19,7 @@ fun ArtistDashboardSummaryDto.toDomain(): ArtistDashboardSummary {
         totalPaidOut = totalPaidOut,
         currentMonthRevenue = currentMonthRevenue,
         ordersToShip = ordersToShip,
-        conversionRatePercent = conversionRatePercent
+        conversionRatePercent = conversionRatePercent,
+        status = status
     )
 }

@@ -88,8 +88,6 @@ fun EditProfileScreen(
                     navController.navigate(NavigationRoutes.ADD_LOCATION) {
                         popUpTo(NavigationRoutes.EDIT_PROFILE) { inclusive = true }
                     }
-                } else {
-                    navController.popBackStack()
                 }
             }
             is DataResult.Error -> {

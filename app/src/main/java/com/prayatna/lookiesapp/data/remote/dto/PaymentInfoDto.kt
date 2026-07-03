@@ -13,5 +13,6 @@ data class PaymentInfoDto(
 
     val status: String? = null,
 
-    val provider: String? = null
+    val provider: String? = null,
+    val channel: String?  = null
 )

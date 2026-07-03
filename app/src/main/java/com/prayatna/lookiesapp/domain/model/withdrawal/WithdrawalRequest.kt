@@ -5,6 +5,7 @@ data class WithdrawalRequest(
     val merchantId: String,
     val amount: Long,
     val bankCode: String,
+    val bankName: String? = null,
     val accountNumber: String,
     val accountName: String,
     val status: String,

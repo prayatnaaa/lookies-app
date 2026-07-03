@@ -1,10 +1,12 @@
 package com.prayatna.lookiesapp.data.repository
 
 import android.util.Log
+import coil.network.HttpException
 import com.prayatna.lookiesapp.data.mapper.toDomain
 import com.prayatna.lookiesapp.data.mapper.toDto
 import com.prayatna.lookiesapp.data.remote.api.supabase.SupabaseTransactionService
 import com.prayatna.lookiesapp.data.remote.dto.PaymentAttemptDto
+import com.prayatna.lookiesapp.data.remote.dto.request.order.CreateOfflineOrderRpcParams
 import com.prayatna.lookiesapp.data.remote.dto.response.payment.SetOrderToCompleteInput
 import com.prayatna.lookiesapp.domain.mapper.toDomain
 import com.prayatna.lookiesapp.domain.mapper.toDto
@@ -22,6 +24,7 @@ import com.prayatna.lookiesapp.domain.model.transaction.MerchantBalanceLog
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReport
 import com.prayatna.lookiesapp.domain.model.transaction.MonthlyFinancialReportFilterInput
 import com.prayatna.lookiesapp.domain.model.transaction.OrderSplit
+import com.prayatna.lookiesapp.domain.model.transaction.PaidOrderItem
 import com.prayatna.lookiesapp.domain.model.transaction.PayoutResult
 import com.prayatna.lookiesapp.domain.model.transaction.PendingOrderSplits
 import com.prayatna.lookiesapp.domain.model.transaction.Transaction
@@ -59,6 +62,11 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -69,6 +77,11 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -79,6 +92,11 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -110,6 +128,26 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun createOfflineOrder(
+        buyerId: String?,
+        currency: String,
+        items: List<OrderItemInput>
+    ): DataResult<String> {
+        return try {
+            val params = CreateOfflineOrderRpcParams(
+                buyerId = buyerId,
+                currency = currency,
+                items = items.map { it.toDto() }
+            )
+            val response = transactionService.createOfflineOrder(params)
+            DataResult.Success(response)
+        } catch (e: RestException) {
+            DataResult.Error(e.error)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Something went wrong")
+        }
+    }
+
     override suspend fun createQrisPaymentRequest(data: CreateQrisPaymentRequestInput): DataResult<CreateQrisPaymentRequestResult> {
         return try {
             val response = transactionService.createQrisPaymentRequest(request = data.toDto())
@@ -117,6 +155,11 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -139,6 +182,26 @@ class TransactionRepositoryImpl @Inject constructor(
             DataResult.Success(response.map { it.toDomain() })
         } catch (e: RestException) {
             DataResult.Error(e.error)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    override suspend fun getPaidOrderItemsByEventId(eventId: Int): DataResult<List<PaidOrderItem>> {
+        return try {
+            val result = transactionService.getPaidOrderItemsByEventId(eventId)
+            DataResult.Success(result.map { it.toDomain() })
+        } catch (e: RestException) {
+            val eMessage = extractSupabaseError(e.error)
+            DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -157,6 +220,17 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: ConnectTimeoutException) {
             Log.e("Create Payment Request",e.message ?: e.toString())
             DataResult.Error("Connection timeout")
+        }
+    }
+
+    override suspend fun getPaymentAttemptByOrderId(orderId: String): DataResult<PaymentAttempt?> {
+        return try {
+            val result = transactionService.getPaymentAttemptByOrderId(orderId)
+            DataResult.Success(result.firstOrNull()?.toDomain())
+        } catch (e: RestException) {
+            DataResult.Error(extractSupabaseError(e.error))
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Failed to get payment attempt")
         }
     }
 
@@ -180,6 +254,11 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -190,6 +269,11 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -200,6 +284,11 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -210,6 +299,11 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 
@@ -220,6 +314,11 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: RestException) {
             val eMessage = extractSupabaseError(e.error)
             DataResult.Error(eMessage)
+        } catch (e: HttpException) {
+            val errorMsg = e.response.message
+            DataResult.Error(errorMsg)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "An unexpected error occurred")
         }
     }
 

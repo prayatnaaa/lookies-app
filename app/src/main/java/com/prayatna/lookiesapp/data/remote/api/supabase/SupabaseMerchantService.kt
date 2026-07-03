@@ -1,9 +1,14 @@
 package com.prayatna.lookiesapp.data.remote.api.supabase
 
+import android.util.Log
+import com.prayatna.lookiesapp.data.remote.dto.BusinessAddressDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantBankAccountDto
+import com.prayatna.lookiesapp.data.remote.dto.MerchantBusinessDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantMemberDto
 import com.prayatna.lookiesapp.data.remote.dto.MerchantProfileDto
 import com.prayatna.lookiesapp.data.remote.dto.ShipmentDto
+import com.prayatna.lookiesapp.data.remote.dto.request.merchant.EditMerchantBankAccountRequest
+import com.prayatna.lookiesapp.data.remote.dto.request.merchant.EditMerchantBusinessRequest
 import com.prayatna.lookiesapp.data.remote.dto.request.merchant.InviteMerchantMemberRequest
 import com.prayatna.lookiesapp.data.remote.dto.response.merchant.InviteMerchantMemberResponse
 import com.prayatna.lookiesapp.utils.Helper
@@ -16,6 +21,14 @@ class SupabaseMerchantService @Inject constructor(
     private val postgrest: Postgrest,
     private val storage: Storage
 ) {
+
+    suspend fun getPublicMerchantProfile(businessId: String): MerchantBusinessDto {
+        return postgrest["merchant_businesses_views"].select {
+            filter {
+                MerchantBusinessDto::id eq businessId
+            }
+        }.decodeSingle<MerchantBusinessDto>()
+    }
 
     suspend fun uploadArrivalProof(shipmentId: String, image: ByteArray): String {
         val fileName = "${UUID.randomUUID()}.png"
@@ -39,6 +52,14 @@ class SupabaseMerchantService @Inject constructor(
         return imageUrl
     }
 
+    suspend fun getMerchantAddress(merchantBusinessId: String): BusinessAddressDto {
+        return postgrest["business_addresses"].select {
+            filter {
+                BusinessAddressDto::businessId eq merchantBusinessId
+            }
+        }.decodeSingle<BusinessAddressDto>()
+    }
+
     suspend fun inviteMerchantMember(request: InviteMerchantMemberRequest): InviteMerchantMemberResponse {
         return postgrest.from("merchant_members").insert(request) {
             select()
@@ -50,6 +71,7 @@ class SupabaseMerchantService @Inject constructor(
             .select {
                 filter {
                     eq("business_id", merchantBusinessId)
+                    neq("status", "inactive")
                 }
             }.decodeList<MerchantMemberDto>()
     }
@@ -86,6 +108,20 @@ class SupabaseMerchantService @Inject constructor(
             }.decodeList<MerchantBankAccountDto>()
     }
 
+    suspend fun updateMerchantBusiness(id: String, request: EditMerchantBusinessRequest): MerchantBusinessDto {
+        return postgrest.from("merchant_businesses").update(request) {
+            filter { eq("id", id) }
+            select()
+        }.decodeSingle<MerchantBusinessDto>()
+    }
+
+    suspend fun updateMerchantBankAccount(id: String, request: EditMerchantBankAccountRequest): MerchantBankAccountDto {
+        return postgrest.from("merchant_bank_accounts").update(request) {
+            filter { eq("id", id) }
+            select()
+        }.decodeSingle<MerchantBankAccountDto>()
+    }
+
     suspend fun updateShipmentStatus(shipmentId: String, status: String): ShipmentDto {
         return postgrest
             .from("shipments")
@@ -114,8 +150,10 @@ class SupabaseMerchantService @Inject constructor(
 
     suspend fun getShipmentsByMerchantId(
         merchantId: String,
-        status: String? = null
+        status: String? = null,
+        trackingNumber: String? = null
     ): List<ShipmentDto> {
+        Log.d("Shipment-List", merchantId)
         return postgrest
             .from("shipments")
             .select {
@@ -125,6 +163,9 @@ class SupabaseMerchantService @Inject constructor(
                         ShipmentDto::artistId eq merchantId
                     }
 
+                    if (!trackingNumber.isNullOrBlank()) {
+                        ShipmentDto::trackingNumber ilike "%$trackingNumber%"
+                    }
                     if (status != null) {
                         ShipmentDto::status eq status
                     } else {

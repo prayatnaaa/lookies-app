@@ -4,12 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,7 +41,7 @@ import coil3.compose.AsyncImage
 import com.prayatna.lookiesapp.utils.formatRupiah
 
 private fun getStatusColor(status: String): Color {
-    return when (status) {
+    return when (status.lowercase()) {
         "available" -> Color(0xFF4CAF50)
         "sold" -> Color(0xFFF44336)
         "in_exhibition" -> Color(0xFFFF9800)
@@ -47,7 +50,7 @@ private fun getStatusColor(status: String): Color {
 }
 
 private fun getStatusLabel(status: String): String {
-    return when (status) {
+    return when (status.lowercase()) {
         "available" -> "Available"
         "sold" -> "Sold"
         "in_exhibition" -> "Exhibition"
@@ -64,12 +67,14 @@ fun PaintingCard(
     price: Double? = null,
     status: String? = null,
     isSelected: Boolean = false,
+    showWaterMark: Boolean = false,
     onClick: () -> Unit,
 ) {
     val highlightColor = MaterialTheme.colorScheme.primary
+    val isSold = status.equals("sold", ignoreCase = true)
 
     ElevatedCard(
-        enabled = status != "sold",
+        enabled = !isSold,
         shape = RectangleShape,
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -77,63 +82,94 @@ fun PaintingCard(
         modifier = modifier
             .fillMaxWidth()
             .then(
-                if (isSelected) Modifier.border(3.dp, highlightColor)
-                else Modifier
+                if (isSelected) {
+                    Modifier.border(3.dp, highlightColor)
+                } else {
+                    Modifier
+                }
             ),
         onClick = onClick
     ) {
 
-        if (status == "sold") {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f))
-            )
-        }
-        Box {
-            Box(modifier = Modifier
-                .fillMaxSize()) {
-                AsyncImage(
-                    model = paintingUrl.replace("http://172.21.179.110", "http://10.0.2.2"),
-                    contentDescription = name,
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentScale = ContentScale.FillWidth
-                )
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
 
-                Text(
-                    text = "LOOKIES",
-                    color = Color.White.copy(alpha = 0.15f),
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 4.sp,
+            // IMAGE
+            AsyncImage(
+                model = paintingUrl.replace(
+                    "http://172.21.179.110",
+                    "http://10.0.2.2"
+                ),
+                contentDescription = name,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            // WATERMARK
+            if (showWaterMark) {
+                WaterMark(modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center))
+            }
+
+            // SOLD OVERLAY
+            if (isSold) {
+                Box(
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .rotate(-35f)
-                        .semantics { hideFromAccessibility() }
+                        .matchParentSize()
+                        .background(Color.Black.copy(alpha = 0.4f))
                 )
             }
 
-            if (status != null) {
-                Box(
+            // STATUS CHIP
+            status?.let {
+                Surface(
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(8.dp)
-                        .background(
-                            color = getStatusColor(status),
-                            shape = RoundedCornerShape(6.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(10.dp),
+                    shape = RoundedCornerShape(999.dp),
+                    color = Color.Black.copy(alpha = 0.55f)
                 ) {
-                    Text(
-                        text = getStatusLabel(status),
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(
+                        modifier = Modifier.padding(
+                            horizontal = 10.dp,
+                            vertical = 6.dp
+                        ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        if (isSold) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = getStatusColor(it),
+                                modifier = Modifier.size(14.dp)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(
+                                        getStatusColor(it),
+                                        CircleShape
+                                    )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(6.dp))
+
+                        Text(
+                            text = getStatusLabel(it),
+                            color = Color.White,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
 
+            // BOTTOM INFO
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -149,6 +185,7 @@ fun PaintingCard(
                     .padding(8.dp)
             ) {
                 Column {
+
                     Text(
                         text = name,
                         color = Color.White,
@@ -158,9 +195,9 @@ fun PaintingCard(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    if (artistName != null) {
+                    artistName?.let {
                         Text(
-                            text = artistName,
+                            text = it,
                             color = Color.LightGray,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Normal,
@@ -168,12 +205,17 @@ fun PaintingCard(
                             overflow = TextOverflow.Ellipsis
                         )
                     }
+
                     Spacer(modifier = Modifier.height(4.dp))
 
                     price?.let {
                         Text(
                             text = formatRupiah(it),
-                            color = if (status != "available") Color.LightGray else MaterialTheme.colorScheme.primaryContainer,
+                            color = if (!isSold) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            } else {
+                                Color.LightGray
+                            },
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -181,6 +223,7 @@ fun PaintingCard(
                 }
             }
 
+            // SELECTED CHECK
             if (isSelected) {
                 Box(
                     modifier = Modifier

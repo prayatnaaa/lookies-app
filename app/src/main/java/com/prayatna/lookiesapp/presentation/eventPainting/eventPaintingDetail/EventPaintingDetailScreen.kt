@@ -22,8 +22,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.ZoomInMap
 import androidx.compose.material.icons.outlined.Brush
@@ -32,6 +34,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +45,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,16 +58,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.prayatna.lookiesapp.presentation.chat.privateChat.navigateToPrivateChat
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
 import com.prayatna.lookiesapp.presentation.components.eventPainting.EventOriginCard
 import com.prayatna.lookiesapp.presentation.components.loading.CircularLoading
+import com.prayatna.lookiesapp.presentation.components.painting.PaintingReviewCard
 import com.prayatna.lookiesapp.presentation.components.painting.WaterMark
+import com.prayatna.lookiesapp.presentation.eventPainting.eventPaintingDetail.state.EventPaintingDetailEvent
 import com.prayatna.lookiesapp.utils.NavigationRoutes
+import com.prayatna.lookiesapp.utils.formatDate
 import com.prayatna.lookiesapp.utils.formatRupiah
+import java.time.OffsetDateTime
 
 @Composable
 fun EventPaintingDetailScreen(
@@ -69,13 +82,53 @@ fun EventPaintingDetailScreen(
     id: String,
     viewModel: EventPaintingDetailViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(id) {
+    LaunchedEffect(Unit) {
         viewModel.getEventPaintingDetail(id)
     }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var showFullImage by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(viewModel.uiEvent) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is EventPaintingDetailEvent.NavigateToChat -> {
+                    navController.navigateToPrivateChat(
+                        partyName = event.otherPartyName,
+                        conversationId = event.conversationId,
+                        merchantId = event.merchantId,
+                        metadataType = "painting",
+                        metadataId = id,
+                        metadataImageUrl = state.data?.painting?.paintingUrl,
+                        metadataTitle = state.data?.painting?.title
+                    )
+                }
+            }
+        }
+    }
 
     Scaffold(
+        floatingActionButton = {
+            state.data?.let { data ->
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.onChatArtistClicked(
+                            artistId = data.artistId,
+                            artistName = data.participant.artist.fullName ?: data.participant.artist.username ?: "Artist"
+                        )
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Chat,
+                        contentDescription = "Chat Artist"
+                    )
+                }
+            }
+        },
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BackTopBar(
@@ -87,9 +140,12 @@ fun EventPaintingDetailScreen(
         },
         bottomBar = {
             state.data?.let { data ->
+                val event = data.participant.event
                 PaintingPurchaseBottomBar(
                     price = data.finalPrice,
                     isSold = data.status == "sold",
+                    startDate = event.startDate,
+                    endDate = event.endDate,
                     onBuyClick = {
                         Log.d("CHECK-PAINTING", data.id)
                         navController.navigate("${NavigationRoutes.CHECKOUT}/painting/${data.id}/1")
@@ -110,6 +166,50 @@ fun EventPaintingDetailScreen(
             val participant = item.participant
             val artist = participant.artist
             val event = participant.event
+
+            if (showFullImage) {
+                Dialog(
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    ),
+                    onDismissRequest = {
+                        showFullImage = false
+                    }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Black)
+                    ) {
+
+                        AsyncImage(
+                            model = painting.paintingUrl.replace(
+                                "http://172.21.179.110",
+                                "http://10.0.2.2"
+                            ),
+                            contentDescription = painting.title,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        WaterMark(modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center),
+                            fontSize = 64.sp)
+
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(20.dp)
+                                .clickable {
+                                    showFullImage = false
+                                }
+                        )
+                    }
+                }
+            }
 
             Column(
                 modifier = Modifier
@@ -138,13 +238,20 @@ fun EventPaintingDetailScreen(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(16.dp)
-                            .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                            .background(
+                                Color.Black.copy(alpha = 0.5f),
+                                CircleShape
+                            )
+                            .clickable {
+                                showFullImage = true
+                            }
                             .padding(8.dp)
                     )
 
                     WaterMark(modifier = Modifier
                         .fillMaxSize()
-                        .align(Alignment.Center))
+                        .align(Alignment.Center),
+                        fontSize = 64.sp)
                 }
 
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -168,9 +275,10 @@ fun EventPaintingDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                artist.id?.let {
-                                    navController.navigate("${NavigationRoutes.MESSAGES}/$it/${artist.username}")
-                                }
+                                viewModel.onChatArtistClicked(
+                                    artistId = item.artistId,
+                                    artistName = artist.fullName ?: artist.username ?: "Artist"
+                                )
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -291,6 +399,11 @@ fun EventPaintingDetailScreen(
                         lineHeight = 24.sp
                     )
 
+                    state.paintingReview?.let { review ->
+                        Spacer(modifier = Modifier.height(24.dp))
+                        PaintingReviewCard(review = review)
+                    }
+
                     Spacer(modifier = Modifier.height(100.dp))
                 }
             }
@@ -344,8 +457,33 @@ fun SpecItem(
 fun PaintingPurchaseBottomBar(
     price: Double,
     isSold: Boolean,
+    startDate: String,
+    endDate: String,
     onBuyClick: () -> Unit
 ) {
+    val now = remember { OffsetDateTime.now() }
+    val start = remember(startDate) {
+        try { OffsetDateTime.parse(startDate) } catch (_: Exception) { null }
+    }
+    val end = remember(endDate) {
+        try { OffsetDateTime.parse(endDate) } catch (_: Exception) { null }
+    }
+
+    val isStarted: Boolean = start?.let { now.isAfter(it) || now.isEqual(it) } ?: true
+    val isFinished: Boolean = end?.let { now.isAfter(it) } ?: false
+    val isBuyable: Boolean = isStarted && !isFinished && !isSold
+
+    val statusLabel = when {
+        !isStarted -> "Start on"
+        !isFinished -> "Close on"
+        else -> "Ended on"
+    }
+
+    val statusDate = when {
+        !isStarted -> formatDate(startDate)
+        else -> formatDate(endDate)
+    }
+
     Surface(
         shadowElevation = 16.dp,
         tonalElevation = 4.dp,
@@ -360,11 +498,20 @@ fun PaintingPurchaseBottomBar(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(
-                    text = "Price",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = statusLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = statusDate,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = if (!isBuyable && !isSold) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
+                    )
+                }
                 Text(
                     text = formatRupiah(price),
                     style = MaterialTheme.typography.headlineSmall,
@@ -373,19 +520,26 @@ fun PaintingPurchaseBottomBar(
                 )
             }
 
+            val buttonText = when {
+                isSold -> "Sold Out"
+                !isStarted -> "Buy Now"
+                isFinished -> "Sale Ended"
+                else -> "Buy Now"
+            }
+
             Button(
                 onClick = onBuyClick,
-                enabled = !isSold,
+                enabled = isBuyable,
                 modifier = Modifier
                     .height(48.dp)
                     .width(150.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSold) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary
+                    containerColor = if (!isBuyable) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(
-                    text = if (isSold) "Sold Out" else "Buy Now",
+                    text = buttonText,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )

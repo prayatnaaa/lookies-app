@@ -50,6 +50,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.prayatna.lookiesapp.domain.model.shipment.DeliveryMethod
+import com.prayatna.lookiesapp.domain.model.shipment.ExhibitionShipment
 import com.prayatna.lookiesapp.presentation.components.CustomAsyncImage
 import com.prayatna.lookiesapp.presentation.components.CustomBottomSheet
 import com.prayatna.lookiesapp.presentation.components.backtopbar.BackTopBar
@@ -64,7 +65,6 @@ fun ExhibitionShipmentScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Error Bottom Sheet
     uiState.errorMessage?.let { message ->
         CustomBottomSheet(
             title = "Error",
@@ -72,11 +72,11 @@ fun ExhibitionShipmentScreen(
             confirmText = "OK",
             onConfirm = {
                 onEvent(ExhibitionShipmentEvent.DismissError)
-                backAction()
+//                backAction()
             },
             onDismiss = {
                 onEvent(ExhibitionShipmentEvent.DismissError)
-                backAction()
+//                backAction()
             }
         )
     }
@@ -119,22 +119,27 @@ fun ExhibitionShipmentScreen(
                 .imePadding(),
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            // ── Always-visible context header ─────────────────────────────
             ExhibitionContextCard(uiState = uiState)
 
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
 
-            // ── Phase-specific action section ─────────────────────────────
             Column(
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                ShipmentRoleInfoCard(
+                    isPartner = uiState.isPartner,
+                    status = uiState.eventPaintingStatus
+                )
+                uiState.shipment?.let {
+                    ShipmentInfoCard(it)
+                }
                 when (uiState.eventPaintingStatus) {
 
-                    "approved", "accepted" -> InboundSubmitSection(uiState, onEvent)
+                    "approved", "accepted" -> if (!uiState.isPartner) { InboundSubmitSection(uiState, onEvent) }
 
-                    "shipping_to_event" -> OrganizerConfirmReceivedSection(uiState, onEvent)
+                    "shipping_to_event" ->  if (uiState.isPartner) { OrganizerConfirmReceivedSection(uiState, onEvent) }
 
                     "exhibited" -> StatusInfoSection(
                         title = "Artwork is Being Exhibited",
@@ -142,9 +147,9 @@ fun ExhibitionShipmentScreen(
                         isPositive = true
                     )
 
-                    "unsold" -> ReturnShipmentSection(uiState, onEvent)
+                    "unsold" ->  if(uiState.isPartner) { ReturnShipmentSection(uiState, onEvent) }
 
-                    "returning_to_creator" -> ArtistConfirmReturnSection(uiState, onEvent)
+                    "returning_to_creator" -> if (!uiState.isPartner) { ArtistConfirmReturnSection(uiState, onEvent) }
 
                     "returned" -> StatusInfoSection(
                         title = "Artwork Returned",
@@ -165,7 +170,43 @@ fun ExhibitionShipmentScreen(
     }
 }
 
-// ── Context header card ───────────────────────────────────────────────────────
+@Composable
+private fun ShipmentRoleInfoCard(
+    isPartner: Boolean,
+    status: String
+) {
+    val message = when {
+        !isPartner && status in listOf("approved", "accepted") ->
+            "Your artwork has been accepted. Please arrange delivery to the exhibition venue."
+
+        isPartner && status in listOf("approved", "accepted") ->
+            "Waiting for the artist to ship the artwork to the venue."
+
+        isPartner && status == "shipping_to_event" ->
+            "The artist has shipped the artwork. Verify its arrival and condition."
+
+        !isPartner && status == "shipping_to_event" ->
+            "Your artwork is on its way to the venue."
+
+        isPartner && status == "unsold" ->
+            "The exhibition has ended without a sale. Arrange return shipment to the artist."
+
+        !isPartner && status == "returning_to_creator" ->
+            "Your artwork is currently being returned. Confirm receipt once it arrives."
+
+        else ->
+            null
+    }
+
+    if (message != null) {
+        StatusInfoSection(
+            title = "Information",
+            body = message,
+            isPositive = true
+        )
+    }
+}
+
 @Composable
 private fun ExhibitionContextCard(uiState: ExhibitionShipmentUiState) {
     Card(
@@ -280,7 +321,7 @@ private fun InboundSubmitSection(
             value = uiState.courierNameInput,
             onValueChange = { onEvent(ExhibitionShipmentEvent.OnCourierNameChanged(it)) },
             label = { Text("Courier Name") },
-            placeholder = { Text("e.g. JNE, SiCepat, Anteraja") },
+            placeholder = { Text("e.g. JNE, ExpressJE") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -392,7 +433,7 @@ private fun OrganizerConfirmReceivedSection(
 
     Button(
         onClick = { onEvent(ExhibitionShipmentEvent.ConfirmArtworkReceived) },
-        enabled = !uiState.isSubmitting,
+        enabled = !uiState.isSubmitting || uiState.shipment?.arrivalProofUrl != null,
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -427,7 +468,7 @@ private fun ReturnShipmentSection(
         value = uiState.courierNameInput,
         onValueChange = { onEvent(ExhibitionShipmentEvent.OnCourierNameChanged(it)) },
         label = { Text("Courier Name") },
-        placeholder = { Text("e.g. JNE, SiCepat") },
+        placeholder = { Text("e.g. JNE, JNT") },
         singleLine = true,
         modifier = Modifier.fillMaxWidth()
     )
@@ -517,12 +558,12 @@ private fun DeliveryMethodSelector(
         Spacer(Modifier.height(4.dp))
         DeliveryMethod.entries.forEach { method ->
             val label = when (method) {
-                DeliveryMethod.SELF_DROP_OFF -> "Self Drop-Off"
+                DeliveryMethod.SELF_DROPOFF -> "Self Drop-Off"
                 DeliveryMethod.COURIER -> "Courier"
                 DeliveryMethod.ARTIST_PICKUP -> "Pick-Up by Organizer"
             }
             val description = when (method) {
-                DeliveryMethod.SELF_DROP_OFF -> "You personally deliver to the venue"
+                DeliveryMethod.SELF_DROPOFF -> "You personally deliver to the venue"
                 DeliveryMethod.COURIER -> "Ship via a courier with tracking"
                 DeliveryMethod.ARTIST_PICKUP -> "Organizer collects from you"
             }
@@ -570,6 +611,102 @@ private fun DeliveryMethodSelector(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(
+    label: String,
+    value: String
+) {
+    Column {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun ShipmentInfoCard(
+    shipment: ExhibitionShipment
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Text(
+                text = "Shipment Information",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+
+            InfoRow(
+                label = "Type",
+                value = shipment.shipmentType.name
+            )
+
+            InfoRow(
+                label = "Status",
+                value = shipment.status.name.replace("_", " ")
+            )
+
+            shipment.courierName?.let {
+                InfoRow(
+                    label = "Courier",
+                    value = it
+                )
+            }
+
+            shipment.trackingNumber?.let {
+                InfoRow(
+                    label = "Tracking Number",
+                    value = it
+                )
+            }
+
+            shipment.dispatchedAt?.let {
+                InfoRow(
+                    label = "Dispatched",
+                    value = it.toString()
+                )
+            }
+
+            shipment.receivedAt?.let {
+                InfoRow(
+                    label = "Received",
+                    value = it.toString()
+                )
+            }
+
+            shipment.galleryConditionNotes?.let {
+                InfoRow(
+                    label = "Gallery Notes",
+                    value = it
+                )
+            }
+
+            shipment.artistConditionNotes?.let {
+                InfoRow(
+                    label = "Artist Notes",
+                    value = it
+                )
             }
         }
     }

@@ -3,7 +3,6 @@ package com.prayatna.lookiesapp.presentation.components.checkout
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,6 +31,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -57,7 +59,8 @@ fun CheckoutContent(
     onShipmentFeeSelected: (ShipmentFee) -> Unit,
     onAddressSelected: (UserAddress) -> Unit,
     onAddAddressClick: () -> Unit,
-    children: @Composable () -> Unit
+    children: @Composable () -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
 
     val shippingCost = if (type == "painting") {
@@ -68,6 +71,9 @@ fun CheckoutContent(
     val totalPrice = subtotal + shippingCost
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = { Text("Checkout") },
@@ -310,6 +316,7 @@ fun CheckoutBottomBar(
 ) {
     Column(
         modifier = Modifier
+            .navigationBarsPadding()
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
