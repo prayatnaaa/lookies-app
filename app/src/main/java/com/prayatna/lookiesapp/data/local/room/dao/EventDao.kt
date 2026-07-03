@@ -30,10 +30,6 @@ interface EventDao {
     @Query("SELECT * FROM events ORDER BY start_date DESC")
     suspend fun getEventsSync(): List<Event>
 
-    /**
-     * Best Practice: Robust filtered query for offline fallback.
-     * Supports search by title and filtering by status, type, and format.
-     */
     @Query("""
     SELECT * FROM events
     WHERE (:title IS NULL OR title LIKE '%' || :title || '%')
@@ -78,7 +74,6 @@ interface EventDao {
 
     @Transaction
     suspend fun syncEvents(events: List<Event>) {
-        // We use REPLACE strategy in insertEvents, so this keeps things up to date.
         insertEvents(events)
     }
 }
